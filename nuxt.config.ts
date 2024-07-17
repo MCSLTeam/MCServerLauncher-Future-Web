@@ -31,13 +31,5 @@ export default defineNuxtConfig({
 			mode: 'out-in',
 		},
 	},
-	nitro: {
-		storage: {
-			db: {
-				driver: 'fs',
-				base: './mcsl-web',
-			},
-		},
-	},
 	ssr: false,
 });

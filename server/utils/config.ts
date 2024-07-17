@@ -8,8 +8,6 @@ const defaultConfig = {
 	},
 };
 
-const storage = useStorage('db');
-
 let config: typeof defaultConfig | null = null;
 const load = loadConfig();
 
