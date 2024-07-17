@@ -3,10 +3,18 @@ import type { JwtPayload } from 'jsonwebtoken';
 import jwt from 'jsonwebtoken';
 import { getConfig } from '~/server/utils/config';
 
+/**
+ * @description 返回配置文件中的私钥
+ * @return string _
+ */
 async function getSecret() {
 	return (await getConfig()).auth.secret;
 }
 
+/**
+ * @description 获取所有用户
+ * @return Promise<{[p: string]: any}> _
+ */
 async function getUsers() {
 	const users: { [key: string]: any } | null =
 		await storage.getItem('users.json');
@@ -17,11 +25,20 @@ async function getUsers() {
 	return users;
 }
 
+/**
+ * @description 是否存在用户
+ * @param username string
+ * @returns boolean _
+ */
 export async function hasUser(username: string) {
 	const users = await getUsers();
 	return Object.getOwnPropertyNames(users).includes(username);
 }
 
+/**
+ * @description 是否存在管理员
+ * @returns boolean _
+ */
 export async function hasAdmin() {
 	const users = await getUsers();
 	for (const key in users) {
@@ -30,6 +47,13 @@ export async function hasAdmin() {
 	return false;
 }
 
+/**
+ * @description 增加用户
+ * @return void
+ * @param username string
+ * @param password string
+ * @param permissions string[]
+ */
 export async function addUser(
 	username: string,
 	password: string,
@@ -44,11 +68,22 @@ export async function addUser(
 	await storage.setItem('users.json', users);
 }
 
+/**
+ * @description 获取指定用户
+ * @param username string
+ * @return any _
+ */
 export async function getUser(username: string) {
 	const users = await getUsers();
 	return users[username];
 }
 
+/**
+ * @description 生成token
+ * @param username string
+ * @param rememberMe boolean
+ * @return string _
+ */
 async function generateToken(username: string, rememberMe: boolean = false) {
 	const config = await getConfig();
 	const expire = rememberMe ? config.auth.rememberMeExpire : config.auth.expire;
@@ -63,6 +98,11 @@ async function generateToken(username: string, rememberMe: boolean = false) {
 	);
 }
 
+/**
+ * @description 通过token获得用户名字
+ * @param token string
+ * @return string _
+ */
 export async function getUsernameByToken(token: string) {
 	return new Promise<string>((resolve, reject) => {
 		getSecret()
@@ -77,6 +117,11 @@ export async function getUsernameByToken(token: string) {
 	});
 }
 
+/**
+ * @description 获取token的有效时间
+ * @param token string
+ * @returns string -
+ */
 export function getTokenExpire(token: string) {
 	return new Promise<string>((resolve, reject) => {
 		getSecret()
@@ -98,6 +143,13 @@ export function getTokenExpire(token: string) {
 	});
 }
 
+/**
+ * @description 登录
+ * @param username string
+ * @param password string
+ * @param rememberMe boolean
+ * @returns if password is right,it will return a token.
+ */
 export async function login(
 	username: string,
 	password: string,
@@ -111,11 +163,22 @@ export async function login(
 	throw new Error('用户名或密码错误');
 }
 
+/**
+ * @description 删除用户
+ * @param username string
+ * @returns void
+ */
 export async function deleteUser(username: string) {
 	const users = await getUsers();
 	users[username] = undefined;
 }
 
+/**
+ * @description 是否存在此权限
+ * @param permissionList string[]
+ * @param permission string
+ * @returns boolean _
+ */
 export async function hasPermission(
 	permissionList: string[],
 	permission: string,
@@ -126,6 +189,12 @@ export async function hasPermission(
 	return false;
 }
 
+/**
+ * @description 匹配权限
+ * @param a string
+ * @param b string
+ * @return boolean _
+ */
 function matchPermission(a: string, b: string) {
 	const nodesA = a.split('.');
 	const nodesB = b.split('.');
