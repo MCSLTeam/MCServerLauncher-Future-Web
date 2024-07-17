@@ -1,0 +1,37 @@
+name: Auto Build Artifacts
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install PNPM
+        run: npm i -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build website
+        run: pnpm build
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: MCSL-Future-Web
+          path: .output
