@@ -1,0 +1,132 @@
+/* 变量 */
+:root {
+	--font-sans: 'MiSans VF', Inter, -apple-system, BlinkMacSystemFont, Segoe UI,
+		Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+		sans-serif;
+	--font-minecraft: 'Minecraft', 'GNU Unifont', sans-serif;
+	--font-mono: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
+		Liberation Mono, monospace;
+}
+
+* {
+	font-family: var(--font-sans);
+}
+
+/* 基本样式 */
+body,
+html,
+#__nuxt {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	background: var(--el-bg-color);
+}
+
+.font-mono {
+	font-family: var(--font-mono);
+}
+
+.font-minecraft {
+	font-family: var(--font-minecraft);
+}
+
+.noscript {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.noscript p {
+	max-width: 30rem;
+	width: 90%;
+	font-size: 1.5rem;
+	color: red;
+	font-weight: 500;
+	margin: 0;
+	padding: 0.5rem;
+	border-radius: 0 0 0.5rem 0.5rem;
+	box-shadow:
+		0 12px 32px 4px rgba(0, 0, 0, 0.04),
+		0 8px 20px rgba(0, 0, 0, 0.08);
+	text-align: center;
+	vertical-align: middle;
+}
+
+#__nuxt {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+}
+
+/* 主题切换过渡动画 */
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation: none;
+	mix-blend-mode: normal;
+}
+
+html.dark::view-transition-old(root) {
+	z-index: 1;
+}
+
+html.dark::view-transition-new(root) {
+	z-index: 999;
+}
+
+::view-transition-old(root) {
+	z-index: 999;
+}
+
+::view-transition-new(root) {
+	z-index: 1;
+}
+
+/* 渐变动画 */
+.fade-leave,
+.fade-enter-to {
+	opacity: 1;
+}
+
+.fade-leave-active,
+.fade-enter-active {
+	transition: all 0.25s;
+}
+
+.fade-leave-to,
+.fade-enter {
+	opacity: 0;
+}
+
+/* MC字体 */
+@font-face {
+	font-family: 'Minecraft';
+	src: url('../font/Minecraft.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'GNU Unifont';
+	src: url('../font/unifont-15.1.05.otf') format('opentype');
+}
+
+/* Element Plus 魔改 */
+.el-link {
+	transition: ease-in-out 0.3s;
+}
+
+.el-overlay-dialog {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	overflow: auto;
+	border-radius: 12px;
+}
+
+.el-dialog {
+	margin: 0 !important;
+	border-radius: 10px !important;
+}
