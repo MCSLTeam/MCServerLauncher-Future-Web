@@ -15,7 +15,7 @@ export function useDarkMode() {
 function isDark(darkMode: DarkMode): boolean {
     switch (darkMode) {
         case 'auto':
-            return usePreferredDark().value
+            return window.matchMedia('(prefers-color-scheme:dark)').matches
         case 'dark':
             return true
         case 'light':
@@ -110,6 +110,9 @@ function changeTheme(darkMode: DarkMode, event?: MouseEvent, transition: DarkMod
     setTimeout(() => style.remove(), 500);
 }
 
-
-
-
+// 监听系统主题变更
+window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', (e) => {
+    if (darkModeStorage.value == 'auto') {
+        changeTheme(darkModeStorage.value, undefined, 'fade', true);
+    }
+});
