@@ -1,0 +1,86 @@
+<script setup lang="ts">
+import LoadingStatusEnum from "~/utils/enums/loadingStatusEnum";
+import LoadingStatus from "~/utils/loadingStatus";
+
+const loadingStatus = new LoadingStatus(LoadingStatusEnum.LOADING, useI18n().t('loading.default'));
+// TODO: 加载
+(async () => {
+  await sleep(2000);
+  loadingStatus.setLoadingStatus(LoadingStatusEnum.SUCCESS);
+})()
+</script>
+
+<template>
+  <div>
+    <transition name="fade" mode="out-in">
+      <div
+          v-show="loadingStatus.getLoadingStatus().value == LoadingStatusEnum.LOADING"
+          class="default-layout__loading"
+      >
+        <img src="/assets/img/MCSLFuture.png" alt="">
+        <h1>{{ $t('app.name') }} <span>{{ $t('app.name.suffix') }}</span></h1>
+        <div>
+          <div v-loading="true" class="default-layout__loading__icon"/>
+          <p>{{ loadingStatus.getMessage() }}</p>
+        </div>
+      </div>
+    </transition>
+    <div v-show="loadingStatus.getLoadingStatus().value == LoadingStatusEnum.SUCCESS">
+      <slot/>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.default-layout__loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.default-layout__loading h1,
+.default-layout__loading h2 {
+  margin: 0;
+  font-size: 3rem;
+}
+
+.default-layout__loading > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.default-layout__loading img {
+  width: 7rem;
+}
+
+.default-layout__loading > h1 {
+  font-weight: var(--el-font-weight-primary);
+  color: var(--el-text-color-primary);
+}
+
+.default-layout__loading > h1 span {
+  font-weight: bold;
+  color: transparent;
+  background: linear-gradient(
+      135deg,
+      var(--el-color-primary),
+      var(--el-color-primary-dark-2)
+  );
+  background-clip: text;
+}
+
+.default-layout__loading > div p {
+  width: 7rem;
+  color: var(--el-text-color-regular);
+}
+
+.default-layout__loading__icon {
+  padding: 25px;
+}
+</style>
