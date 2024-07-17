@@ -55,7 +55,7 @@ function fillMissingValues(
 					'”！已重置为：',
 				defaultConfig[key],
 			);
-		// 默认配置文件中的类型和config中的类型不统一
+			// 默认配置文件中的类型和config中的类型不统一
 		} else if (typeof config[key] !== typeof defaultConfig[key]) {
 			config[key] = defaultConfig[key];
 			console.warn(
@@ -65,7 +65,7 @@ function fillMissingValues(
 					'”的值类型错误！已重置为：',
 				defaultConfig[key],
 			);
-		// 这个key对应的值可能包含下一级
+			// 这个key对应的值可能包含下一级
 		} else if (typeof defaultConfig[key] === 'object') {
 			fillMissingValues(
 				config[key],

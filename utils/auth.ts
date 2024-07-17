@@ -64,7 +64,7 @@ export async function registerAdmin(
 	username: string,
 	password: string,
 	successCallback: () => void = () => {},
-	errorCallback: (message: string) => void = (_) => {},
+	errorCallback: (message: string) => void = () => {},
 ) {
 	const data = await $fetch('/api/auth/registerAdmin', {
 		method: 'POST',
@@ -86,8 +86,8 @@ export async function login(
 	username: string,
 	password: string,
 	rememberMe: boolean = false,
-	successCallback: (token: string) => void = (_) => {},
-	errorCallback: (message: string) => void = (_) => {},
+	successCallback: (token: string) => void = () => {},
+	errorCallback: (message: string) => void = () => {},
 ) {
 	const data = await $fetch('/api/auth/login', {
 		method: 'POST',

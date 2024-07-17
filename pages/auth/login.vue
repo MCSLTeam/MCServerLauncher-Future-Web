@@ -55,7 +55,7 @@ async function submit() {
 				form.username,
 				form.password,
 				form.rememberMe,
-				(_) => {
+				() => {
 					ElMessage({
 						message: i18n.t('login.success'),
 						type: 'success',
@@ -117,9 +117,5 @@ async function submit() {
 
 .auth__card .el-form-item * {
 	justify-content: space-between !important;
-}
-
-.auth__copyright {
-	color: var(--el-text-color-regular);
 }
 </style>
