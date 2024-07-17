@@ -9,9 +9,7 @@
 				<span>{{ $t('app.name.suffix') }}</span>
 			</h1>
 		</div>
-		<ElCard class="auth__card">
-			<slot />
-		</ElCard>
+		<slot />
 	</div>
 </template>
 
@@ -55,13 +53,5 @@
 		var(--el-color-primary-dark-2)
 	);
 	background-clip: text;
-}
-
-.auth__card {
-	margin: 1rem;
-	border-radius: 1rem;
-	padding: 1rem 1rem 0 1rem;
-	width: calc(90% - 2rem);
-	max-width: 30rem;
 }
 </style>

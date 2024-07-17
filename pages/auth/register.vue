@@ -65,58 +65,75 @@ async function submit() {
 	if (!formRef.value) return;
 	await formRef.value.validate(async (valid) => {
 		if (valid) {
-			await registerAdmin(form.username, form.password, () => {
-        ElMessage({
-          message: i18n.t('register.success'),
-          type: 'success',
-        });
-			}, message => {
-        ElMessage({
-          message: i18n.t('register.failed', { reason: message }),
-          type: 'error',
-        });
-			})
+			await registerAdmin(
+				form.username,
+				form.password,
+				() => {
+					ElMessage({
+						message: i18n.t('register.success'),
+						type: 'success',
+					});
+				},
+				(message) => {
+					ElMessage({
+						message: i18n.t('register.failed', { reason: message }),
+						type: 'error',
+					});
+				},
+			);
 		}
 	});
 }
 </script>
 
 <template>
-	<h1>{{ $t('register.title') }}</h1>
-	<ElForm ref="formRef" :model="form" :rules="rules">
-		<ElFormItem prop="username">
-			<ElInput v-model="form.username" :placeholder="$t('register.username')" />
-		</ElFormItem>
-		<ElFormItem prop="password">
-			<ElInput
-				v-model="form.password"
-				type="password"
-				:placeholder="$t('register.password')" />
-		</ElFormItem>
-		<ElFormItem prop="passwordRepeat">
-			<ElInput
-				v-model="form.passwordRepeat"
-				type="password"
-				:placeholder="$t('register.password-repeat')" />
-		</ElFormItem>
-		<ElFormItem>
-			<p class="auth__copyright">
-				Powered by
-				<ElLink
-					:underline="false"
-					href="https://github.com/MCSL-Future/MCSL2"
-					target="_blank"
-					>MCSL Future Web
-				</ElLink>
-			</p>
-			<ElButton type="primary" @click="submit"
-				>{{ $t('register.submit') }}
-			</ElButton>
-		</ElFormItem>
-	</ElForm>
+	<ElCard class="auth__card">
+		<h1>{{ $t('register.title') }}</h1>
+		<ElForm ref="formRef" :model="form" :rules="rules">
+			<ElFormItem prop="username">
+				<ElInput
+					v-model="form.username"
+					:placeholder="$t('register.username')" />
+			</ElFormItem>
+			<ElFormItem prop="password">
+				<ElInput
+					v-model="form.password"
+					type="password"
+					:placeholder="$t('register.password')" />
+			</ElFormItem>
+			<ElFormItem prop="passwordRepeat">
+				<ElInput
+					v-model="form.passwordRepeat"
+					type="password"
+					:placeholder="$t('register.password-repeat')" />
+			</ElFormItem>
+			<ElFormItem>
+				<p class="auth__copyright">
+					Powered by
+					<ElLink
+						:underline="false"
+						href="https://github.com/MCSL-Future/MCSL2"
+						target="_blank"
+						>MCSL Future Web
+					</ElLink>
+				</p>
+				<ElButton type="primary" @click="submit"
+					>{{ $t('register.submit') }}
+				</ElButton>
+			</ElFormItem>
+		</ElForm>
+	</ElCard>
 </template>
 
 <style scoped>
+.auth__card {
+	margin: 1rem;
+	border-radius: 1rem;
+	padding: 1rem 1rem 0 1rem;
+	width: calc(90% - 2rem);
+	max-width: 30rem;
+}
+
 .auth__card h1 {
 	width: calc(100% - var(--el-card-padding));
 	text-align: center;

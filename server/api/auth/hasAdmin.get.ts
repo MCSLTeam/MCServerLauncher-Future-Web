@@ -1,11 +1,11 @@
-import {hasAdmin} from "~/server/utils/auth";
+import { hasAdmin } from '~/server/utils/auth';
 
-export default defineEventHandler(async _ => {
+export default defineEventHandler(async (_) => {
 	return {
-		status:  'ok',
+		status: 'ok',
 		message: '',
 		data: {
-			has: await hasAdmin()
-		}
+			has: await hasAdmin(),
+		},
 	};
 });
