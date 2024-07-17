@@ -4,7 +4,7 @@ import '~/assets/css/style.css';
 import '~/assets/css/fontawesome.min.css';
 import 'element-plus/theme-chalk/dark/css-vars.css';
 
-changeTheme(undefined, false, false);
+useDarkMode().loadTheme();
 
 useHead({
 	titleTemplate: (titleChunk) => {
