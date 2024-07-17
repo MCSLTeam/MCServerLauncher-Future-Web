@@ -1,13 +1,13 @@
 /* 浅色/深色模式 */
-const darkModeStorage: Ref<DarkMode> = useSessionStorage('darkMode', 'auto');
+const darkModeStorage = useSessionStorage('darkMode', 'auto');
 export type DarkMode = 'auto' | 'dark' | 'light';
 export type DarkModeTransition = 'viewTransition' | 'fade' | 'none';
 
 export function useDarkMode() {
 	return {
-		value: isDark(darkModeStorage.value),
+		value: isDark(<DarkMode>darkModeStorage.value),
 		loadTheme: () =>
-			changeTheme(darkModeStorage.value, undefined, 'none', true),
+			changeTheme(<DarkMode>darkModeStorage.value, undefined, 'none', true),
 		isDark: isDark,
 		changeTheme: changeTheme,
 	};
@@ -31,7 +31,7 @@ function changeTheme(
 	force: boolean = false,
 ): void {
 	const darken = isDark(darkMode);
-	if (!force && darken == isDark(darkModeStorage.value)) return;
+	if (!force && darken == isDark(<DarkMode>darkModeStorage.value)) return;
 
 	function toggleDark() {
 		darkModeStorage.value = darkMode;
@@ -111,8 +111,8 @@ function changeTheme(
 						},
 					);
 				});
-				break;
 			})();
+			break;
 	}
 	setTimeout(() => style.remove(), 500);
 }
