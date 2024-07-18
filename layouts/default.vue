@@ -20,8 +20,8 @@ const loadingStatus = new LoadingStatus(LoadingStatusEnum.LOADING, useI18n().t('
         <img src="/assets/img/MCSLFuture.png" alt="">
         <h1>{{ $t('app.name') }} <span>{{ $t('app.name.suffix') }}</span></h1>
         <div>
-          <div v-loading="true" class="default-layout__loading__icon"/>
-          <p>{{ loadingStatus.getMessage() }}</p>
+          <div v-loading="true" class="default-layout__loading-icon"/>
+          <p>{{ mcslLoadingStatus.getMessage() }}</p>
         </div>
       </div>
     </transition>
@@ -42,10 +42,10 @@ const loadingStatus = new LoadingStatus(LoadingStatusEnum.LOADING, useI18n().t('
   gap: 1rem;
 }
 
-.default-layout__loading h1,
-.default-layout__loading h2 {
+.default-layout__loading h1 {
   margin: 0;
   font-size: 3rem;
+  text-align: center;
 }
 
 .default-layout__loading > div {
@@ -60,11 +60,11 @@ const loadingStatus = new LoadingStatus(LoadingStatusEnum.LOADING, useI18n().t('
 }
 
 .default-layout__loading > h1 {
-	font-weight: var(--el-font-weight-primary);
-	color: var(--el-text-color-primary);
-	@media (max-width: 768px) {
-		font-size: 2rem;
-	}
+  font-weight: var(--el-font-weight-primary);
+  color: var(--el-text-color-primary);
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
 }
 
 .default-layout__loading > h1 span {
@@ -83,7 +83,11 @@ const loadingStatus = new LoadingStatus(LoadingStatusEnum.LOADING, useI18n().t('
   color: var(--el-text-color-regular);
 }
 
-.default-layout__loading__icon {
+.default-layout__loading-icon {
   padding: 25px;
+}
+
+.default-layout__loading-icon * {
+  background-color: transparent;
 }
 </style>
