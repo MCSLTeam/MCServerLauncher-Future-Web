@@ -45,7 +45,7 @@ const rules = reactive<FormRules<RuleForm>>({
 			trigger: 'blur',
 		},
 		{
-			pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d$@!%*?&]{8,}$/,
+			pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d$@!%*?&\-_]{8,}$/,
 			message: i18n.t('form.invalid.format'),
 			trigger: 'blur',
 		},
