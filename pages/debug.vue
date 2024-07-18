@@ -1,4 +1,14 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+definePageMeta({
+	layout: false,
+});
+
+const i18n = useI18n();
+
+useHead({
+	title: '调试页面',
+});
+</script>
 
 <template>
 	<ElForm>

@@ -60,8 +60,11 @@ const loadingStatus = new LoadingStatus(LoadingStatusEnum.LOADING, useI18n().t('
 }
 
 .default-layout__loading > h1 {
-  font-weight: var(--el-font-weight-primary);
-  color: var(--el-text-color-primary);
+	font-weight: var(--el-font-weight-primary);
+	color: var(--el-text-color-primary);
+	@media (max-width: 768px) {
+		font-size: 2rem;
+	}
 }
 
 .default-layout__loading > h1 span {
