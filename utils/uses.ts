@@ -125,3 +125,30 @@ window
 			changeTheme(darkModeStorage.value, undefined, 'fade', true);
 		}
 	});
+
+/* 屏幕宽度 */
+const screenWidthRef: Ref<ScreenWidth> = ref('sm');
+export function useScreenWidth() {
+	return {
+		value: screenWidthRef.value,
+		isMdOrBigger: () => screenWidthRef.value != 'sm',
+		isMdOrSmaller: () => screenWidthRef.value != 'lg',
+	};
+}
+export type ScreenWidth = 'lg' | 'md' | 'sm';
+// lg: 屏幕宽度 >= 1024px
+// md: 768px <= 屏幕宽度 < 1024px
+// sm: 屏幕宽度  <768px
+function detectScreenWidth() {
+	const screenWidth = window.innerWidth;
+	if (screenWidth >= 1024) {
+		screenWidthRef.value = 'lg';
+	} else if (screenWidth >= 768) {
+		screenWidthRef.value = 'md';
+	} else {
+		screenWidthRef.value = 'sm';
+	}
+}
+
+detectScreenWidth();
+window.addEventListener('resize', debounce(detectScreenWidth, 250));

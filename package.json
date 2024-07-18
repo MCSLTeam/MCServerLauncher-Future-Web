@@ -27,6 +27,7 @@
 		"jsonwebtoken": "^9.0.2",
 		"nanoid": "^5.0.7",
 		"nuxt": "^3.12.3",
+		"pinyin-pro": "^3.23.1",
 		"typescript-eslint": "^7.16.1",
 		"unstorage": "^1.10.2",
 		"vue": "latest"
