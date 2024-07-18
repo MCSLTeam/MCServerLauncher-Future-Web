@@ -36,17 +36,22 @@ const isMinimized = useLocalStorage('sidebar-minimized', false);
 							$router.currentRoute.value.fullPath === '/',
 					}"
 					@click="$router.push('/')">
-					<i class="fa fa-home" /><span>{{ $t('sidebar.home') }}</span>
+					<i class="fa fa-home" /><span>{{
+						$t('sidebar.home')
+					}}</span>
 				</ElButton>
 
 				<ElButton
 					class="sidebar__menu-item"
 					:class="{
 						'sidebar__menu-item-selected':
-							$router.currentRoute.value.fullPath === '/instances',
+							$router.currentRoute.value.fullPath ===
+							'/instances',
 					}"
 					@click="$router.push('/instances')">
-					<i class="fa fa-server" /><span>{{ $t('sidebar.instances') }}</span>
+					<i class="fa fa-server" /><span>{{
+						$t('sidebar.instances')
+					}}</span>
 				</ElButton>
 				<ElButton
 					class="sidebar__menu-item"
@@ -55,7 +60,9 @@ const isMinimized = useLocalStorage('sidebar-minimized', false);
 							$router.currentRoute.value.fullPath === '/news',
 					}"
 					@click="$router.push('/news')">
-					<i class="fa fa-newspaper" /><span>{{ $t('sidebar.news') }}</span>
+					<i class="fa fa-newspaper" /><span>{{
+						$t('sidebar.news')
+					}}</span>
 				</ElButton>
 			</div>
 
@@ -63,7 +70,9 @@ const isMinimized = useLocalStorage('sidebar-minimized', false);
 				<ElButton
 					class="sidebar__menu-item-primary sidebar__menu-item"
 					@click="showNewInstance = true">
-					<i class="fa fa-plus" /><span>{{ $t('sidebar.newInstance') }}</span>
+					<i class="fa fa-plus" /><span>{{
+						$t('sidebar.newInstance')
+					}}</span>
 				</ElButton>
 				<NewInstance v-model="showNewInstance" />
 				<ElBadge
@@ -72,12 +81,16 @@ const isMinimized = useLocalStorage('sidebar-minimized', false);
 					:offset="[-30, 22]"
 					:show-zero="false"
 					:value="
-						tasks.filter((t) => t.status.value === TaskStatus.Executing).length
+						tasks.filter(
+							(t) => t.status.value === TaskStatus.Executing,
+						).length
 					">
 					<ElButton
 						class="sidebar__menu-item-secondary sidebar__menu-item"
 						@click="showTasks = true">
-						<i class="fa fa-tasks" /><span>{{ $t('sidebar.tasks') }}</span>
+						<i class="fa fa-tasks" /><span>{{
+							$t('sidebar.tasks')
+						}}</span>
 					</ElButton>
 				</ElBadge>
 				<TasksDialog v-model="showTasks" />
@@ -86,10 +99,13 @@ const isMinimized = useLocalStorage('sidebar-minimized', false);
 						class="sidebar__menu-item"
 						:class="{
 							'sidebar__menu-item-selected':
-								$router.currentRoute.value.fullPath === '/settings',
+								$router.currentRoute.value.fullPath ===
+								'/settings',
 						}"
 						@click="$router.push('/settings')">
-						<i class="fa fa-gear" /><span>{{ $t('sidebar.settings') }}</span>
+						<i class="fa fa-gear" /><span>{{
+							$t('sidebar.settings')
+						}}</span>
 					</ElButton>
 					<ElButton
 						v-if="useScreenWidth().value == 'lg'"

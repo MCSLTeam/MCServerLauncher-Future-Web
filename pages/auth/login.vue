@@ -82,7 +82,9 @@ async function submit() {
 	<ElForm ref="formRef" :model="form" :rules="rules">
 		<h1>{{ $t('login.title') }}</h1>
 		<ElFormItem prop="username">
-			<ElInput v-model="form.username" :placeholder="$t('login.username')" />
+			<ElInput
+				v-model="form.username"
+				:placeholder="$t('login.username')" />
 		</ElFormItem>
 		<ElFormItem prop="password">
 			<ElInput
@@ -91,7 +93,9 @@ async function submit() {
 				:placeholder="$t('login.password')" />
 		</ElFormItem>
 		<ElFormItem>
-			<ElCheckbox v-model="form.rememberMe" :label="$t('login.remember-me')" />
+			<ElCheckbox
+				v-model="form.rememberMe"
+				:label="$t('login.remember-me')" />
 			<ElButton type="primary" @click="submit"
 				>{{ $t('login.submit') }}
 			</ElButton>

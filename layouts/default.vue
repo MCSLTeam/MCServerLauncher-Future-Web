@@ -13,17 +13,21 @@ import LoadingStatusEnum from '~/utils/enums/loadingStatusEnum';
 				class="default-layout__loading">
 				<img src="/assets/img/MCSLFuture.png" alt="" >
 				<h1>
-					{{ $t('app.name') }} <span>{{ $t('app.name.suffix') }}</span>
+					{{ $t('app.name') }}
+					<span>{{ $t('app.name.suffix') }}</span>
 				</h1>
 				<div>
-					<div v-loading="true" class="default-layout__loading-icon" />
+					<div
+						v-loading="true"
+						class="default-layout__loading-icon" />
 					<p>{{ mcslLoadingStatus.getMessage() }}</p>
 				</div>
 			</div>
 		</transition>
 		<div
 			v-show="
-				mcslLoadingStatus.getLoadingStatus().value == LoadingStatusEnum.SUCCESS
+				mcslLoadingStatus.getLoadingStatus().value ==
+				LoadingStatusEnum.SUCCESS
 			"
 			class="default-layout__max-screen">
 			<ElContainer class="default-layout__max-screen">

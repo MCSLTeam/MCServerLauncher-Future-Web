@@ -26,8 +26,11 @@ function getTaskStatus(task: SimpleTask) {
 		width="600px"
 		@close="visible = false">
 		<ElEmpty v-if="tasks.length === 0" :description="$t('tasks.empty')" />
-		<ElScrollbar class="task-dialog__scrollbar" height="500px" v-else>
-			<ElCard v-for="task in tasks" class="task-dialog__card">
+		<ElScrollbar v-else class="task-dialog__scrollbar" height="500px">
+			<ElCard
+				v-for="task in tasks"
+				:key="task.id"
+				class="task-dialog__card">
 				<h3>{{ task.name }}</h3>
 				<h4>{{ task.desc }}</h4>
 				<sup>{{ $t('tasks.id') + task.id }}</sup>

@@ -95,7 +95,9 @@ async function submit() {
 	<ElForm ref="formRef" :model="form" :rules="rules">
 		<h1>{{ $t('register.title') }}</h1>
 		<ElFormItem prop="username">
-			<ElInput v-model="form.username" :placeholder="$t('register.username')" />
+			<ElInput
+				v-model="form.username"
+				:placeholder="$t('register.username')" />
 		</ElFormItem>
 		<ElFormItem prop="password">
 			<ElInput

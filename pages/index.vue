@@ -10,7 +10,9 @@ useHead({
 	<ElContainer>
 		<Header>
 			<template #breadcrumb>
-				<el-breadcrumb-item>{{ $t('sidebar.home') }}</el-breadcrumb-item>
+				<el-breadcrumb-item>{{
+					$t('sidebar.home')
+				}}</el-breadcrumb-item>
 			</template>
 		</Header>
 		<el-main class="index__main">

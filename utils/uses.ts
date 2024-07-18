@@ -7,7 +7,12 @@ export function useDarkMode() {
 	return {
 		value: isDark(<DarkMode>darkModeStorage.value),
 		loadTheme: () =>
-			changeTheme(<DarkMode>darkModeStorage.value, undefined, 'none', true),
+			changeTheme(
+				<DarkMode>darkModeStorage.value,
+				undefined,
+				'none',
+				true,
+			),
 		isDark: isDark,
 		changeTheme: changeTheme,
 	};
@@ -100,7 +105,9 @@ function changeTheme(
 					];
 					document.documentElement.animate(
 						{
-							clipPath: darken ? clipPath : [...clipPath].reverse(),
+							clipPath: darken
+								? clipPath
+								: [...clipPath].reverse(),
 						},
 						{
 							duration: 500,

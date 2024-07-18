@@ -8,7 +8,9 @@ useDarkMode().loadTheme();
 
 useHead({
 	titleTemplate: (titleChunk) => {
-		return titleChunk ? `${titleChunk} | MCSL Future Web` : 'MCSL Future Web';
+		return titleChunk
+			? `${titleChunk} | MCSL Future Web`
+			: 'MCSL Future Web';
 	},
 });
 </script>

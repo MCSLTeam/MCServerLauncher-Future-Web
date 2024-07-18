@@ -80,7 +80,9 @@ export async function getUser(username: string) {
  */
 async function generateToken(username: string, rememberMe: boolean = false) {
 	const config = await getConfig();
-	const expire = rememberMe ? config.auth.rememberMeExpire : config.auth.expire;
+	const expire = rememberMe
+		? config.auth.rememberMeExpire
+		: config.auth.expire;
 	return jwt.sign(
 		{
 			username: username,
@@ -126,7 +128,9 @@ export function getTokenExpire(token: string) {
 				const decoded = jwt.verify(token, secret);
 				if (decoded && (<JwtPayload>decoded).exp) {
 					resolve(
-						new Date((<{ exp: number }>decoded).exp * 1000).toISOString(),
+						new Date(
+							(<{ exp: number }>decoded).exp * 1000,
+						).toISOString(),
 					);
 				}
 			})

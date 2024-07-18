@@ -4,7 +4,9 @@
 	<ElContainer>
 		<el-header class="instances__header">
 			<el-breadcrumb class="instances__breadcrumb" separator="/">
-				<el-breadcrumb-item>{{ $t('sidebar.instances') }}</el-breadcrumb-item>
+				<el-breadcrumb-item>{{
+					$t('sidebar.instances')
+				}}</el-breadcrumb-item>
 			</el-breadcrumb>
 		</el-header>
 		<el-main class="instances__main">
