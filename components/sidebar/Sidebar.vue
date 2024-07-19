@@ -200,6 +200,10 @@ const expandedButtonIndex = ref(0);
 
 .sidebar__menu-item i {
   margin-right: 5px;
+  width: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar__menu-items {
