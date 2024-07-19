@@ -19,7 +19,7 @@
 	flex-shrink: 0;
 }
 
-.sidebar__minimized .sidebar__logo-container p {
+.sidebar__collapsed .sidebar__logo-container p {
 	display: none;
 }
 
@@ -28,7 +28,7 @@
 	height: 48px;
 }
 
-.sidebar__minimized .sidebar__logo-container .el-image {
+.sidebar__collapsed .sidebar__logo-container .el-image {
 	width: 40px;
 	height: 40px;
 }

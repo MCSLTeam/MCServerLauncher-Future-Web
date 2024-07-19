@@ -14,7 +14,8 @@ defineProps({
 
 const showNewInstance = ref(false);
 const showTasks = ref(false);
-const isMinimized = useLocalStorage('sidebar-minimized', false);
+const isCollapsed = useLocalStorage('sidebar-collapsed', false);
+const expandedButtonIndex = ref(0);
 </script>
 
 <template>
@@ -22,8 +23,8 @@ const isMinimized = useLocalStorage('sidebar-minimized', false);
 		v-if="useScreenWidth().isMdOrBigger() || isInDrawer"
 		class="sidebar__aside"
 		:class="{
-			sidebar__minimized:
-				!isInDrawer && (useScreenWidth().value == 'md' || isMinimized),
+			sidebar__collapsed:
+				!isInDrawer && (useScreenWidth().value == 'md' || isCollapsed),
 			sidebar__standalone: !isInDrawer,
 		}">
 		<SidebarLogo v-if="!isInDrawer" />
@@ -64,6 +65,28 @@ const isMinimized = useLocalStorage('sidebar-minimized', false);
 						$t('sidebar.news')
 					}}</span>
 				</ElButton>
+				<!-- TODO: 生产环境删了 -->
+				<ElButton
+					class="sidebar__menu-item"
+					:class="{
+						'sidebar__menu-item-selected':
+							$router.currentRoute.value.fullPath === '/debug',
+					}"
+					@click="$router.push('/debug')">
+					<i class="fa fa-bug" /><span>Debug</span>
+				</ElButton>
+				<ElButton
+					class="sidebar__menu-item"
+					:class="{
+						'sidebar__menu-item-selected':
+							$router.currentRoute.value.fullPath ===
+							'/help-center',
+					}"
+					@click="$router.push('/help-center')">
+					<i class="fa fa-question" /><span>{{
+						$t('sidebar.help-center')
+					}}</span>
+				</ElButton>
 			</div>
 
 			<div>
@@ -94,24 +117,49 @@ const isMinimized = useLocalStorage('sidebar-minimized', false);
 					</ElButton>
 				</ElBadge>
 				<TasksDialog v-model="showTasks" />
-				<div class="sidebar__settings-minimize-group">
+				<div
+					class="sidebar__square-item-group"
+					:class="{
+						'sidebar__show-collapse-button':
+							useScreenWidth().value == 'lg',
+					}">
 					<ElButton
-						class="sidebar__menu-item"
+						class="sidebar__menu-item sidebar__square-item"
 						:class="{
 							'sidebar__menu-item-selected':
 								$router.currentRoute.value.fullPath ===
 								'/settings',
+							'sidebar__square-item-expanded':
+								expandedButtonIndex == 0,
 						}"
+						@mouseenter="expandedButtonIndex = 0"
 						@click="$router.push('/settings')">
 						<i class="fa fa-gear" /><span>{{
 							$t('sidebar.settings')
 						}}</span>
 					</ElButton>
 					<ElButton
-						v-if="useScreenWidth().value == 'lg'"
-						class="sidebar__menu-item sidebar__menu-item-secondary sidebar__minimize-button"
-						@click="isMinimized = !isMinimized">
-						<i class="fa fa-angle-left" />
+						class="sidebar__menu-item sidebar__menu-item-secondary sidebar__square-item sidebar__collapse-button"
+						:class="{
+							'sidebar__square-item-expanded':
+								expandedButtonIndex == 1,
+						}"
+						@click="isCollapsed = !isCollapsed"
+						@mouseenter="expandedButtonIndex = 1">
+						<i class="fa fa-angle-left" /><span>{{
+							$t('sidebar.collapse')
+						}}</span>
+					</ElButton>
+					<ElButton
+						class="sidebar__menu-item sidebar__menu-item-danger sidebar__square-item"
+						:class="{
+							'sidebar__square-item-expanded':
+								expandedButtonIndex == 2,
+						}"
+						@mouseenter="expandedButtonIndex = 2">
+						<i class="fa fa-door-open" /><span>{{
+							$t('sidebar.disconnect')
+						}}</span>
 					</ElButton>
 				</div>
 			</div>
@@ -144,8 +192,8 @@ const isMinimized = useLocalStorage('sidebar-minimized', false);
 	animation: 0.5s ease-in-out fadeInUp;
 }
 
-.sidebar__minimized {
-	width: 60px;
+.sidebar__collapsed {
+	width: 65px;
 }
 
 .sidebar__menu-item i {
@@ -162,7 +210,12 @@ const isMinimized = useLocalStorage('sidebar-minimized', false);
 	height: calc(100% - 68px);
 }
 
-.sidebar__minimized .sidebar__menu-items {
+.sidebar__menu-items > div {
+	width: 100%;
+	overflow: hidden;
+}
+
+.sidebar__collapsed .sidebar__menu-items {
 	height: calc(100% - 60px);
 }
 
@@ -174,9 +227,12 @@ const isMinimized = useLocalStorage('sidebar-minimized', false);
 	padding-left: 20px;
 	margin: 2.5px 0 !important;
 	justify-content: start;
+	overflow: hidden;
 }
 
-.sidebar__minimized .sidebar__menu-item span {
+.sidebar__collapsed .sidebar__menu-item span,
+.sidebar__collapse-button,
+.sidebar__square-item span {
 	display: none;
 }
 
@@ -206,27 +262,55 @@ const isMinimized = useLocalStorage('sidebar-minimized', false);
 	background: var(--el-color-primary-light-7);
 }
 
-.sidebar__minimized .sidebar__menu-item,
-.sidebar__minimize-button {
-	width: 40px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+.sidebar__menu-item-danger {
+	background: var(--el-color-danger-light-3);
 }
 
-.sidebar__minimized .sidebar__minimize-button i {
+.sidebar__menu-item-danger:hover {
+	background: var(--el-color-danger);
+}
+
+.sidebar__collapsed .sidebar__menu-item,
+.sidebar__square-item,
+.sidebar__collapsed .sidebar__square-item-expanded {
+	width: 40px;
+	justify-content: center;
+	padding-left: 20px;
+}
+
+.sidebar__square-item-expanded {
+	width: calc(100% - 50px);
+	justify-content: start;
+	padding-left: 10px;
+}
+
+.sidebar__show-collapse-button .sidebar__square-item-expanded {
+	width: calc(100% - 95px);
+}
+
+.sidebar__square-item-expanded span {
+	display: unset;
+	width: 100%;
+	font-size: var(--el-font-size-small);
+}
+
+.sidebar__collapsed .sidebar__collapse-button i {
 	transform: rotate(180deg);
 }
 
-.sidebar__settings-minimize-group {
+.sidebar__square-item-group {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	gap: 5px;
 }
 
-.sidebar__minimized .sidebar__settings-minimize-group {
+.sidebar__collapsed .sidebar__square-item-group {
 	flex-direction: column;
 	gap: 0;
+}
+
+.sidebar__show-collapse-button .sidebar__collapse-button {
+	display: flex;
 }
 </style>
