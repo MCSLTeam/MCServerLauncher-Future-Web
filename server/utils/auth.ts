@@ -48,7 +48,7 @@ export async function hasAdmin() {
  * @param username string
  * @param password string
  * @param permissions string[]
- * @throws 用户已存在则抛出异常
+ * @throws Error 用户已存在则抛出异常
  */
 export async function addUser(
 	username: string,
@@ -115,7 +115,7 @@ export async function getUsernameByToken(token: string) {
 /**
  * @description 获取token的有效时间
  * @param token string
- * @throws 无效Token（过期、未知用户等）则抛出异常
+ * @throws string 无效Token（过期、未知用户等）则抛出异常
  */
 export function getTokenExpire(token: string) {
 	return new Promise<string>((resolve, reject) => {
@@ -145,8 +145,8 @@ export function getTokenExpire(token: string) {
  * @param username string
  * @param password string
  * @param rememberMe boolean
- * @returns 密码正确返回Token
- * @throws 密码错误抛出异常
+ * @returns Promise<string> 密码正确返回Token
+ * @throws Error 密码错误抛出异常
  */
 export async function login(
 	username: string,

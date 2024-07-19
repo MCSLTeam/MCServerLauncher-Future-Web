@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import type { PropType } from 'vue';
 import type { SimpleTask } from '~/utils/tasks';
 
 const visible = defineModel({
-	type: Object as PropType<boolean | undefined>,
+	type: Boolean,
 	required: true,
 });
 

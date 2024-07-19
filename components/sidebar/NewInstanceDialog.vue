@@ -1,6 +1,6 @@
 <!-- TODO: 本地化 -->
 <script lang="ts" setup>
-import { type PropType, reactive, type Ref, ref } from 'vue';
+import { reactive, type Ref, ref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { pinyin } from 'pinyin-pro';
 import {
@@ -10,8 +10,8 @@ import {
 } from '~/utils/daemon/serverInstaller';
 
 const visible = defineModel({
-	type: Object as PropType<boolean | undefined>,
-	default: false,
+	type: Boolean,
+	required: true,
 });
 const i18n = useI18n();
 const instancesDirName = ref('服务器目录路径加载中...');

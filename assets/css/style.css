@@ -133,6 +133,6 @@ html.dark::view-transition-new(root) {
 }
 
 .el-dialog {
-	margin: 0 !important;
+	margin: 1rem !important;
 	border-radius: 10px !important;
 }

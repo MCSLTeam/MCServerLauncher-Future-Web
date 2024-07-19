@@ -15,14 +15,14 @@ useHead({
 interface RuleForm {
 	username: string;
 	password: string;
-	passwordRepeat: string;
+	passwordConfirm: string;
 }
 
 const formRef = ref<FormInstance>();
 const form = reactive<RuleForm>({
 	username: '',
 	password: '',
-	passwordRepeat: '',
+	passwordConfirm: '',
 });
 
 const rules = reactive<FormRules<RuleForm>>({
@@ -50,13 +50,13 @@ const rules = reactive<FormRules<RuleForm>>({
 			trigger: 'blur',
 		},
 	],
-	passwordRepeat: [
+	passwordConfirm: [
 		{
 			validator: (_rule, value, callback) => {
 				if (value === '') {
 					callback(new Error(i18n.t('form.invalid.require')));
 				} else if (value !== form.password) {
-					callback(new Error(i18n.t('register.invalid.repeat')));
+					callback(new Error(i18n.t('register.invalid.confirm')));
 				} else {
 					callback();
 				}
@@ -105,11 +105,11 @@ async function submit() {
 				type="password"
 				:placeholder="$t('register.password')" />
 		</ElFormItem>
-		<ElFormItem prop="passwordRepeat">
+		<ElFormItem prop="passwordConfirm">
 			<ElInput
-				v-model="form.passwordRepeat"
+				v-model="form.passwordConfirm"
 				type="password"
-				:placeholder="$t('register.password-repeat')" />
+				:placeholder="$t('register.password-confirm')" />
 		</ElFormItem>
 		<ElFormItem>
 			<p class="auth__copyright">

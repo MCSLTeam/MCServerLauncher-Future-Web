@@ -20,7 +20,9 @@ import LoadingStatusEnum from '~/utils/enums/loadingStatusEnum';
 					<div
 						v-loading="true"
 						class="default-layout__loading-icon" />
-					<p class="default-layout__loading-text">{{ mcslLoadingStatus.getMessage() }}</p>
+					<p class="default-layout__loading-text">
+						{{ mcslLoadingStatus.getMessage() }}
+					</p>
 				</div>
 			</div>
 		</transition>
@@ -99,7 +101,7 @@ import LoadingStatusEnum from '~/utils/enums/loadingStatusEnum';
 }
 
 .default-layout__loading-text {
-  width: 100% !important;
+	width: 100% !important;
 }
 
 .default-layout__max-screen {

@@ -70,7 +70,7 @@ export async function registerAdmin(
 	} else {
 		errorCallback(data.message);
 	}
-	await shouldRegister();
+	await logout();
 }
 
 export async function login(
@@ -107,7 +107,7 @@ export async function login(
 
 export async function logout() {
 	token.value = tokenExpires = tokenSession.value = null;
-	await useRouter().push('/auth/login');
+	await useRouter().push('/');
 }
 
 export function getToken() {
