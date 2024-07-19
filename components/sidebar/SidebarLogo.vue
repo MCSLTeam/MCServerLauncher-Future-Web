@@ -26,6 +26,7 @@
 .sidebar__logo-container .el-image {
 	width: 48px;
 	height: 48px;
+  flex-shrink: 0;
 }
 
 .sidebar__collapsed .sidebar__logo-container .el-image {
@@ -36,6 +37,7 @@
 .sidebar__logo-container p {
 	font-size: var(--el-font-size-extra-large);
 	margin: 0 7px;
+  width: min-content;
 	color: var(--el-text-color-primary);
 }
 
