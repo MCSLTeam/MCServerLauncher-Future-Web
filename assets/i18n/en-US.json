@@ -36,6 +36,6 @@
 	"tasks.id": "Task ID: ",
 	"tasks.status": "Task status: ",
 	"tasks.status.0": "Done",
-	"tasks.status.1": "Executing",
+	"tasks.status.1": "Processing",
 	"tasks.status.2": "Failed"
 }

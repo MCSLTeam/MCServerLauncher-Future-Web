@@ -106,7 +106,7 @@ const expandedButtonIndex = ref(0);
               :show-zero="false"
               :value="
 						tasks.filter(
-							(t) => t.status.value === TaskStatus.Executing,
+							(t) => t.status.value === TaskStatus.Processing,
 						).length
 					">
             <ElButton

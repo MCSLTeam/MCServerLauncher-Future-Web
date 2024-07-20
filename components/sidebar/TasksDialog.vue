@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { SimpleTask } from '~/utils/tasks';
+import type {SimpleTask} from '~/utils/tasks';
 
 const visible = defineModel({
 	type: Boolean,
@@ -8,7 +8,7 @@ const visible = defineModel({
 
 function getTaskStatus(task: SimpleTask) {
 	switch (task.status.value) {
-		case TaskStatus.Executing:
+		case TaskStatus.Processing:
 			return '';
 		case TaskStatus.Done:
 			return 'success';

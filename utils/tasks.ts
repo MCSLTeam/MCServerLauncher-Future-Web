@@ -1,9 +1,9 @@
-import type { Ref } from 'vue';
-import { ref, watch } from 'vue';
+import type {Ref} from 'vue';
+import {ref, watch} from 'vue';
 
 export enum TaskStatus {
 	Done,
-	Executing,
+	Processing,
 	Fail,
 }
 
@@ -19,7 +19,7 @@ export class SimpleTask {
 	constructor(name: string, desc: string) {
 		this._name = ref(name);
 		this._desc = ref(desc);
-		this._status = ref(TaskStatus.Executing);
+		this._status = ref(TaskStatus.Processing);
 		this._createTime = Date.now();
 		this._id = ++SimpleTask.lastId;
 		addTask(this);
