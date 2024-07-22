@@ -1,12 +1,86 @@
 <script setup lang="ts">
+import type {Ref} from 'vue';
+
 useHead({
 	title: '调试页面',
 });
 
 const locale = ref(useLocale().value);
+const updateInfo: Ref<any> = ref(null);
+const stop = ref(false);
+const showUpdateDialog = ref(false);
+
+async function checkUpdate() {
+	const res = await $fetch('/api/update/check', {
+		method: 'POST',
+		body: {
+			token: getToken(),
+		},
+	});
+	if (res.status == 'ok') {
+		if (res.data.update != null) {
+			updateInfo.value = res.data.update;
+			showUpdateDialog.value = true;
+		} else {
+			ElMessage({
+				message: '当前已是最新版本',
+				type: 'success',
+			});
+		}
+	} else {
+		ElMessage({
+			message: '检查更新失败：' + res.message,
+			type: 'error',
+		});
+	}
+}
+
+async function update() {
+	const res = await $fetch('/api/update/update', {
+		method: 'POST',
+		body: {
+			token: getToken(),
+			stop: stop.value,
+		},
+	});
+	if (res.status == 'async') {
+		ElMessage({
+			message: '正在更新，请稍后',
+			type: 'success',
+		});
+	} else {
+		ElMessage({
+			message: '更新失败：' + res.message,
+			type: 'error',
+		});
+	}
+}
+
+function openUrl(url: string) {
+	window.open(url, '_blank');
+}
 </script>
 
 <template>
+	<ElDialog
+		v-if="updateInfo"
+		v-model="showUpdateDialog"
+		:title="'MCSL Future Web 更新 - ' + updateInfo.version">
+		<sup
+			>更新发布时间：{{
+				new Date(updateInfo.publish_date).toLocaleString()
+			}}</sup
+		>
+		<p>{{ updateInfo.notes }}</p>
+		<ElCheckbox v-model="stop" label="更新完成后关闭MCSL Future Web" />
+		<ElFormItem>
+			<ElButton @click="showUpdateDialog = false"> 取消 </ElButton>
+			<ElButton @click="openUrl(updateInfo.version_info)">
+				详细信息
+			</ElButton>
+			<ElButton type="primary" @click="update"> 下载更新 </ElButton>
+		</ElFormItem>
+	</ElDialog>
 	<ElForm>
 		<h3>主题</h3>
 		<ElFormItem label="扩散动画（部分浏览器不支持）">
@@ -68,6 +142,9 @@ const locale = ref(useLocale().value);
 				<ElOption label="简体中文" value="zh-CN" />
 				<ElOption label="英语" value="en-US" />
 			</ElSelect>
+		</ElFormItem>
+		<ElFormItem label="更新">
+			<ElButton @click="checkUpdate">检查更新 </ElButton>
 		</ElFormItem>
 	</ElForm>
 </template>

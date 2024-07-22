@@ -1,14 +1,57 @@
-import { createStorage } from 'unstorage';
+import {createStorage} from 'unstorage';
 import fsDriver from 'unstorage/drivers/fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import {fileURLToPath} from 'node:url';
+import * as fs from 'fs-extra';
+import {createWriteStream, readdirSync} from 'node:fs';
+import axios from 'axios';
+import {finished} from 'node:stream';
 
 const __filename = fileURLToPath(import.meta.url);
 
 export const __dirname = path.dirname(__filename);
+export const serverDir = path.resolve(__dirname, '../');
 export const dataDir = path.resolve(__dirname, '../mcsl-web');
 export const storage = createStorage({
 	driver: fsDriver({ base: dataDir }),
 });
 
 console.log('数据目录：', dataDir);
+
+export async function backup() {
+	const backupsDir = path.resolve(serverDir, 'backup');
+	const backupDir = path.resolve(
+		backupsDir,
+		'backup-' + new Date().toISOString(),
+	);
+	await fs.ensureDir(backupsDir);
+	await fs.emptyDir(backupDir);
+	await fs.ensureDir(backupDir);
+	for (const file of readdirSync(serverDir)) {
+		if (file != 'backup')
+			await fs.copy(
+				path.resolve(serverDir, file),
+				path.resolve(backupDir, file),
+			);
+	}
+}
+
+export async function downloadFile(url: string, path: string): Promise<void> {
+	console.log('正在下载 ' + url + ' 到 ' + path);
+	const writer = createWriteStream(path);
+	const res = await axios.get(url, {
+		responseType: 'stream',
+	});
+	res.data.pipe(writer);
+	return new Promise((resolve, reject) => {
+		finished(writer, (err) => {
+			if (err) {
+				console.error('从' + url + ' 下载文件到 ' + path + '失败！');
+				reject(err);
+			} else {
+				console.log('文件 ' + path + ' 下载完成！');
+				resolve();
+			}
+		});
+	});
+}

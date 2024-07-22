@@ -28,9 +28,9 @@ importers:
             axios:
                 specifier: ^1.7.2
                 version: 1.7.2
-            js-md5:
-                specifier: ^0.8.3
-                version: 0.8.3
+            fs-extra:
+                specifier: ^11.2.0
+                version: 11.2.0
             jsonwebtoken:
                 specifier: ^9.0.2
                 version: 9.0.2
@@ -49,6 +49,9 @@ importers:
             unstorage:
                 specifier: ^1.10.2
                 version: 1.10.2(ioredis@5.4.1)
+            unzipper:
+                specifier: ^0.12.2
+                version: 0.12.2
             vue:
                 specifier: latest
                 version: 3.4.31(typescript@5.5.3)
@@ -68,9 +71,18 @@ importers:
             '@nuxtjs/eslint-module':
                 specifier: ^4.1.0
                 version: 4.1.0(eslint@9.7.0)(magicast@0.3.4)(rollup@4.18.1)(vite@5.3.3(@types/node@20.14.10)(terser@5.31.2))(webpack@5.93.0(esbuild@0.21.5))
+            '@types/crypto-js':
+                specifier: ^4.2.2
+                version: 4.2.2
+            '@types/fs-extra':
+                specifier: ^11.0.4
+                version: 11.0.4
             '@types/jsonwebtoken':
                 specifier: ^9.0.6
                 version: 9.0.6
+            '@types/unzipper':
+                specifier: ^0.10.9
+                version: 0.10.9
             element-plus:
                 specifier: ^2.7.7
                 version: 2.7.7(vue@3.4.31(typescript@5.5.3))
@@ -1970,6 +1982,12 @@ packages:
             }
         engines: { node: '>=10.13.0' }
 
+    '@types/crypto-js@4.2.2':
+        resolution:
+            {
+                integrity: sha512-sDOLlVbHhXpAUAL0YHDUUwDZf3iN4Bwi4W6a0W0b+QcAezUbRtH4FVb+9J4h+XFPW7l/gQ9F8qC7P+Ec4k8QVQ==,
+            }
+
     '@types/eslint-scope@3.7.7':
         resolution:
             {
@@ -1986,6 +2004,12 @@ packages:
         resolution:
             {
                 integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==,
+            }
+
+    '@types/fs-extra@11.0.4':
+        resolution:
+            {
+                integrity: sha512-yTbItCNreRooED33qjunPthRcSjERP1r4MqCZc7wv0u2sUkzTFp45tgUfS5+r7FrZPdmCCNflLhVSP/o+SemsQ==,
             }
 
     '@types/http-proxy@1.17.14':
@@ -2016,6 +2040,12 @@ packages:
         resolution:
             {
                 integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==,
+            }
+
+    '@types/jsonfile@6.1.4':
+        resolution:
+            {
+                integrity: sha512-D5qGUYwjvnNNextdU59/+fI+spnwtTFmyQP0h+PfIOSkNfpU6AOICUOkm4i0OnSk+NyjdPJrxCDro0sJsWlRpQ==,
             }
 
     '@types/jsonwebtoken@9.0.6':
@@ -2052,6 +2082,12 @@ packages:
         resolution:
             {
                 integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==,
+            }
+
+    '@types/unzipper@0.10.9':
+        resolution:
+            {
+                integrity: sha512-vHbmFZAw8emNAOVkHVbS3qBnbr0x/qHQZ+ei1HE7Oy6Tyrptl+jpqnOX+BF5owcu/HZLOV0nJK+K9sjs1Ox2JA==,
             }
 
     '@types/web-bluetooth@0.0.16':
@@ -2777,6 +2813,12 @@ packages:
         resolution:
             {
                 integrity: sha512-+hkTxhot+dWsLpp3gia5AkVHIsKlZybNT5gIYiDlNzJrmYPcTM9k5/w2uaj3IPpd7LlEYpmCj4Jj1nC41VhDFg==,
+            }
+
+    bluebird@3.7.2:
+        resolution:
+            {
+                integrity: sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==,
             }
 
     boolbase@1.0.0:
@@ -3535,6 +3577,12 @@ packages:
         resolution:
             {
                 integrity: sha512-TcgsqnhHYytg+JKusKAwe4YLZWtD/vfOmblUEbSDZxQy1nlOQTChbyvj/f6kqKLUYbcJqie97rVhDc1JBs00LA==,
+            }
+
+    duplexer2@0.1.4:
+        resolution:
+            {
+                integrity: sha512-asLFVfWWtJ90ZyOUHMqk7/S2w2guQKxUI2itj3d92ADHhxUSbCMGi1f1cBcJ7xM1To+pE/Khbwo1yuNbMEPKeA==,
             }
 
     duplexer@0.1.2:
@@ -4708,12 +4756,6 @@ packages:
             }
         hasBin: true
 
-    js-md5@0.8.3:
-        resolution:
-            {
-                integrity: sha512-qR0HB5uP6wCuRMrWPTrkMaev7MJZwJuuw4fnwAzRgP4J4/F8RwtodOKpGp4XpqsLBFzzgqIO42efFAyz2Et6KQ==,
-            }
-
     js-tokens@4.0.0:
         resolution:
             {
@@ -5366,6 +5408,12 @@ packages:
                 integrity: sha512-OSs33Z9yWr148JZcbZd5WiAXhh/n9z8TxQcdMhIOlpN9AhWpLfvVFO73+m77bBABQMaY9XSvIa+qk0jlI7Gcaw==,
             }
         hasBin: true
+
+    node-int64@0.4.0:
+        resolution:
+            {
+                integrity: sha512-O5lz91xSOeoXP6DulyHfllpq+Eg00MWitZIbtPfoSEvqIHdl5gfcY6hYzDWnj0qD5tz52PI08u9qUvSVeUBeHw==,
+            }
 
     node-releases@2.0.14:
         resolution:
@@ -7135,6 +7183,12 @@ packages:
                 integrity: sha512-LDxTx/2DkFURUd+BU1vUsF/moj0JsoTvl+2tcg2AUOiEzVturhGGx17/IMgGvKUYdZwr33EJHtChCJuhu9Ouvg==,
             }
 
+    unzipper@0.12.2:
+        resolution:
+            {
+                integrity: sha512-ecRhBc+ZfQkYnRr8L7OkxvAAWDkqP3Dun9CHUmYYZx/mErGdy7N7ju6ODJ7uKmm9PD99aAG8grxzl5y9lmEK2A==,
+            }
+
     upath@2.0.1:
         resolution:
             {
@@ -8895,6 +8949,8 @@ snapshots:
 
     '@trysound/sax@0.2.0': {}
 
+    '@types/crypto-js@4.2.2': {}
+
     '@types/eslint-scope@3.7.7':
         dependencies:
             '@types/eslint': 8.56.10
@@ -8906,6 +8962,11 @@ snapshots:
             '@types/json-schema': 7.0.15
 
     '@types/estree@1.0.5': {}
+
+    '@types/fs-extra@11.0.4':
+        dependencies:
+            '@types/jsonfile': 6.1.4
+            '@types/node': 20.14.10
 
     '@types/http-proxy@1.17.14':
         dependencies:
@@ -8922,6 +8983,10 @@ snapshots:
             '@types/istanbul-lib-report': 3.0.3
 
     '@types/json-schema@7.0.15': {}
+
+    '@types/jsonfile@6.1.4':
+        dependencies:
+            '@types/node': 20.14.10
 
     '@types/jsonwebtoken@9.0.6':
         dependencies:
@@ -8940,6 +9005,10 @@ snapshots:
     '@types/normalize-package-data@2.4.4': {}
 
     '@types/resolve@1.20.2': {}
+
+    '@types/unzipper@0.10.9':
+        dependencies:
+            '@types/node': 20.14.10
 
     '@types/web-bluetooth@0.0.16': {}
 
@@ -9512,6 +9581,8 @@ snapshots:
 
     birpc@0.2.17: {}
 
+    bluebird@3.7.2: {}
+
     boolbase@1.0.0: {}
 
     brace-expansion@1.1.11:
@@ -9896,6 +9967,10 @@ snapshots:
     dotenv@16.4.5: {}
 
     dotprop@1.2.1: {}
+
+    duplexer2@0.1.4:
+        dependencies:
+            readable-stream: 2.3.8
 
     duplexer@0.1.2: {}
 
@@ -10726,8 +10801,6 @@ snapshots:
 
     jiti@1.21.6: {}
 
-    js-md5@0.8.3: {}
-
     js-tokens@4.0.0: {}
 
     js-tokens@9.0.0: {}
@@ -11125,6 +11198,8 @@ snapshots:
     node-forge@1.3.1: {}
 
     node-gyp-build@4.8.1: {}
+
+    node-int64@0.4.0: {}
 
     node-releases@2.0.14: {}
 
@@ -12265,6 +12340,14 @@ snapshots:
             pathe: 1.1.2
             pkg-types: 1.1.3
             unplugin: 1.11.0
+
+    unzipper@0.12.2:
+        dependencies:
+            bluebird: 3.7.2
+            duplexer2: 0.1.4
+            fs-extra: 11.2.0
+            graceful-fs: 4.2.11
+            node-int64: 0.4.0
 
     upath@2.0.1: {}
 

@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
 	const password = body.password;
 	const rememberMe = body.rememberMe ?? false;
 	try {
-		if (!username || !password) throw new Error('用户名和密码不能为空');
+		if (!username || !password) throw '用户名和密码不能为空';
 		const token = await login(username, password, rememberMe);
 		return {
 			status: 'ok',
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
 	} catch (e) {
 		return {
 			status: 'failed',
-			message: (<Error>e).message,
+			message: e,
 		};
 	}
 });

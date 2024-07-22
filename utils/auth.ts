@@ -73,6 +73,17 @@ export async function registerAdmin(
 	await logout();
 }
 
+export async function hasPermission(permission: string): Promise<boolean> {
+	const data = await $fetch('/api/auth/hasPermission', {
+		method: 'POST',
+		body: {
+			token: getToken(),
+			permission: permission,
+		},
+	});
+	return data.status == 'ok' && data.data.has;
+}
+
 export async function login(
 	username: string,
 	password: string,
