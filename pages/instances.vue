@@ -2,13 +2,13 @@
 
 <template>
 	<ElContainer direction="vertical">
-    <Header>
-      <template #breadcrumb>
-        <el-breadcrumb-item>{{
-            $t('sidebar.instances')
-          }}</el-breadcrumb-item>
-      </template>
-    </Header>
+		<Header>
+			<template #breadcrumb>
+				<el-breadcrumb-item>{{
+					$t('sidebar.instances')
+				}}</el-breadcrumb-item>
+			</template>
+		</Header>
 		<el-main class="instances__main">
 			<el-scrollbar />
 		</el-main>
