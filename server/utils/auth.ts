@@ -10,6 +10,10 @@ async function getSecret() {
     return (await getConfig()).auth.secret;
 }
 
+export async function encrypt(str: string) {
+    return md5(str + await getSecret())
+}
+
 /**
  * @description 获取所有用户
  */
@@ -59,7 +63,7 @@ export async function addUser(
     const users = await getUsers();
     users[username] = {
         permissions: permissions,
-        password: md5(password),
+        password: encrypt(password),
     };
     await storage.setItem('users.json', users);
 }
@@ -85,7 +89,7 @@ async function generateToken(username: string, rememberMe: boolean = false) {
         : config.auth.expire;
     return jwt.sign(
         {
-            username: md5(username),
+            username: encrypt(username),
         },
         await getSecret(),
         {
@@ -97,15 +101,19 @@ async function generateToken(username: string, rememberMe: boolean = false) {
 /**
  * @description 通过token获取用户名字
  * @param token string
+ * @throws string 无效Token（过期、未知用户等）则抛出异常
  */
 export async function getUsernameByToken(token: string) {
     return new Promise<string>((resolve, reject) => {
+        verifyToken(token).catch((e) => {
+            reject(e)
+        })
         getSecret()
             .then((secret) => {
-                jwt.verify(token, secret, async(err, decoded) => {
+                jwt.verify(token, secret, async (err, decoded) => {
                     if (decoded && (<JwtPayload>decoded).username)
-                        for(const user in await getUsers()){
-                            if (md5(user) == (<JwtPayload>decoded).username)
+                        for (const user in await getUsers()) {
+                            if (await encrypt(user) == (<JwtPayload>decoded).username)
                                 resolve(user);
                         }
                     reject(err ?? new Error('无效的Token'));
@@ -120,29 +128,20 @@ export async function getUsernameByToken(token: string) {
  * @param token string
  * @throws string 无效Token（过期、未知用户等）则抛出异常
  */
-export function getTokenExpire(token: string) {
-    return new Promise<string>((resolve, reject) => {
-        getSecret()
-            .then(async (secret) => {
-                try {
-                    await getUsernameByToken(token)
-                } catch (e) {
-                    reject('未知用户');
-                    return;
-                }
-                const decoded = jwt.verify(token, secret);
-                if (decoded && (<JwtPayload>decoded).exp) {
-                    resolve(
-                        new Date(
-                            (<{ exp: number }>decoded).exp * 1000,
-                        ).toISOString(),
-                    );
-                }
-            })
-            .catch((e) => {
-                reject(e.message);
-            });
-    });
+export async function getTokenExpire(token: string) {
+    const decoded = await verifyToken(token)
+    return new Date(
+        <number>decoded.exp * 1000,
+    ).toISOString()
+}
+
+export async function verifyToken(token: string) {
+    try {
+        await getUsernameByToken(token)
+    } catch (e) {
+        throw new Error('未知用户');
+    }
+    return <JwtPayload>jwt.verify(token, await getSecret());
 }
 
 /**
@@ -158,7 +157,7 @@ export async function login(
     password: string,
     rememberMe: boolean,
 ) {
-    if (await hasUser(username) && (await getUser(username)).password == md5(password)) {
+    if (await hasUser(username) && (await getUser(username)).password == await encrypt(password)) {
         console.log('用户' + username + '已登录');
         return await generateToken(username, rememberMe);
     }
@@ -172,6 +171,7 @@ export async function login(
 export async function deleteUser(username: string) {
     const users = await getUsers();
     users[username] = undefined;
+    await storage.setItem('users.json', users);
 }
 
 /**
@@ -179,7 +179,7 @@ export async function deleteUser(username: string) {
  * @param permissionList string[]
  * @param permission string
  */
-function hasPermission(
+export function hasPermission(
     permissionList: string[],
     permission: string,
 ) {
