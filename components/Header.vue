@@ -39,7 +39,7 @@ const showSidebar = ref(false);
 	height: 60px;
 	margin: 10px;
 	border-radius: 10px;
-	padding: 20px;
+	padding: 10px 20px;
 	border: 1px solid var(--el-border-color);
 	box-shadow: var(--el-box-shadow);
 	animation: 0.5s ease-in-out fadeIn;

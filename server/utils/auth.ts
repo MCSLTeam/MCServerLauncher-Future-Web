@@ -10,7 +10,7 @@ async function getSecret() {
 	return (await getConfig()).auth.secret;
 }
 
-export async function encrypt(str: string) {
+export async function encode(str: string) {
 	const md5 = crypto.createHash('md5');
 	return md5.update(str + (await getSecret())).digest('hex');
 }
@@ -64,7 +64,7 @@ export async function addUser(
 	const users = await getUsers();
 	users[username] = {
 		permissions: permissions,
-		password: await encrypt(password),
+		password: await encode(password),
 	};
 	await storage.setItem('users.json', users);
 }
@@ -90,7 +90,7 @@ async function generateToken(username: string, rememberMe: boolean = false) {
 		: config.auth.expire;
 	return jwt.sign(
 		{
-			username: await encrypt(username),
+			username: await encode(username),
 		},
 		await getSecret(),
 		{
@@ -112,7 +112,7 @@ export async function getUsernameByToken(token: string) {
 					if (decoded && (<JwtPayload>decoded).username)
 						for (const user in await getUsers()) {
 							if (
-								(await encrypt(user)) ==
+								(await encode(user)) ==
 								(<JwtPayload>decoded).username
 							)
 								resolve(user);
@@ -159,11 +159,11 @@ export async function login(
 	console.log(
 		(await getUser(username)).password,
 		password,
-		await encrypt(password),
+		await encode(password),
 	);
 	if (
 		(await hasUser(username)) &&
-		(await getUser(username)).password == (await encrypt(password))
+		(await getUser(username)).password == (await encode(password))
 	) {
 		console.log('用户' + username + '已登录');
 		return await generateToken(username, rememberMe);

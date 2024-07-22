@@ -18,7 +18,7 @@ export default withNuxt(
 			'vue/multi-word-component-names': 'off',
 			'vue/valid-template-root': 'warn',
 			'vue/no-multiple-template-root': 'warn',
-			'@typescript-eslint/no-explicit-any': 'warn',
+			'@typescript-eslint/no-explicit-any': 'off',
 		},
 	},
 	{

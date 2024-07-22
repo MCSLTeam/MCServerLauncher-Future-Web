@@ -1,4 +1,6 @@
 {
+	"announcement.close": "不再显示此公告",
+	"announcement.title": "公告",
 	"app.name": "MCServerLauncher",
 	"app.name.abbr": "MCSL",
 	"app.name.suffix": "Future",

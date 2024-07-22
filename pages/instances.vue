@@ -1,14 +1,14 @@
 <script lang="ts" setup></script>
 
 <template>
-	<ElContainer>
-		<el-header class="instances__header">
-			<el-breadcrumb class="instances__breadcrumb" separator="/">
-				<el-breadcrumb-item>{{
-					$t('sidebar.instances')
-				}}</el-breadcrumb-item>
-			</el-breadcrumb>
-		</el-header>
+	<ElContainer direction="vertical">
+    <Header>
+      <template #breadcrumb>
+        <el-breadcrumb-item>{{
+            $t('sidebar.instances')
+          }}</el-breadcrumb-item>
+      </template>
+    </Header>
 		<el-main class="instances__main">
 			<el-scrollbar />
 		</el-main>
