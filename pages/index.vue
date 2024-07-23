@@ -9,7 +9,7 @@ useHead({
 });
 
 const announcement: Ref<any> = ref(null);
-const announcementClosed = ref(localStorage.getItem('announcement-closed'));
+const announcementClosed = ref(localStorage.getItem('announcementClosed'));
 
 (async () => {
 	// TODO: 获取公告
@@ -24,7 +24,7 @@ function closeAnnouncement() {
 	if (announcement.value) {
 		const encoded = MD5(announcement.value.text).toString();
 		announcementClosed.value = encoded;
-		localStorage.setItem('announcement-closed', encoded);
+		localStorage.setItem('announcementClosed', encoded);
 	}
 }
 </script>
