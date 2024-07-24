@@ -1,5 +1,5 @@
 ![Header Image](https://socialify.git.ci/MCSLTeam/MCServerLauncher-Future-Web/image?description=1&descriptionEditable=Future%20version%20of%20MCSL.%20Redefined%2C%20Versatile%2C%20Easy%20to%20use.&font=Jost&forks=1&language=1&logo=https%3A%2F%2Fimg.fastmirror.net%2Fs%2F2024%2F07%2F24%2F66a0f36d0242c.png&name=1&pattern=Circuit%20Board&stargazers=1&theme=Auto)  
-English | <a href="https://github.com/MCSLTeam/MCServerLauncher-Future-Web/blob/master/README_EN.md" target="_blank">中文</a>  
+English | <a href="https://github.com/MCSLTeam/MCServerLauncher-Future-Web/blob/master/README_ZH.md" target="_blank">中文</a>  
 </br>
 This repository only includes sources of the Web Panel. If you want to know more about the Daemon and the WPF Desktop Launcher, just click [here](https://github.com/MCSLTeam/MCServerLauncher-Future).
 
