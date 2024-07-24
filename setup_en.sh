@@ -6,7 +6,7 @@ set_format() {
 
 # 判断是否为sudoer
 user_id=$(id -u)
-if [ "$user_id" -eq 0 ]; then
+if [ "$user_id" -ne 0 ]; then
   set_format 31
   echo "MCSL Future Web requires sudo to start!"
   set_format 0
