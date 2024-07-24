@@ -36,7 +36,7 @@ WIP
 ### Linux
 
 ```bash
-sudo su -c "wget -qO- https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Web/main/setup_cn.sh | bash"
+sudo su -c "curl https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Web/main/setup_cn.sh | bash"
 ```
 
 ## 贡献
