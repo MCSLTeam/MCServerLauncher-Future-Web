@@ -37,7 +37,7 @@
 .sidebar__logo-container p {
 	font-size: var(--el-font-size-extra-large);
 	margin: 0 7px;
-  text-align: center;
+	text-align: center;
 	color: var(--el-text-color-primary);
 }
 

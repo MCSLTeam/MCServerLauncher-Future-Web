@@ -33,9 +33,7 @@ function closeAnnouncement() {
 	<ElContainer direction="vertical">
 		<Header>
 			<template #breadcrumb>
-				<el-breadcrumb-item
-					>{{ $t('sidebar.home') }}
-				</el-breadcrumb-item>
+				<ElBreadcrumb-item>{{ $t('sidebar.home') }} </ElBreadcrumb-item>
 			</template>
 		</Header>
 		<ElMain class="index__main">

@@ -39,5 +39,10 @@
 	"tasks.status": "任务状态：",
 	"tasks.status.0": "完成",
 	"tasks.status.1": "进行中",
-	"tasks.status.2": "失败"
+	"tasks.status.2": "失败",
+	"news.mc-news.load-failed": "无法加载Minecraft新闻",
+	"news.mc-update.load-failed": "无法加载Minecraft更新",
+	"news.tabs.mc-news": "Minecraft新闻",
+	"news.tabs.mc-update": "Minecraft更新",
+	"notification.warning.title": "警告"
 }

@@ -75,7 +75,7 @@ function changeTheme(
 			(() => {
 				if (!document.startViewTransition) {
 					// 浏览器不支持ViewTransition
-					changeTheme(darkMode, event, 'none', force);
+					changeTheme(darkMode, event, 'fade', force);
 					return;
 				}
 

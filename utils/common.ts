@@ -12,3 +12,7 @@ export function debounce(func: () => any, delay: number) {
 		}, delay);
 	};
 }
+
+export function openUrl(url: string) {
+	window.open(url, '_blank');
+}

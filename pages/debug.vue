@@ -55,100 +55,108 @@ async function update() {
 		});
 	}
 }
-
-function openUrl(url: string) {
-	window.open(url, '_blank');
-}
 </script>
 
 <template>
 	<div>
-    <ElDialog
-        v-if="updateInfo"
-        v-model="showUpdateDialog"
-        :title="'MCSL Future Web 更新 - ' + updateInfo.version">
-      <sup
-      >更新发布时间：{{
-          new Date(updateInfo.publish_date).toLocaleString()
-        }}</sup
-      >
-      <p>{{ updateInfo.notes }}</p>
-      <ElCheckbox v-model="stop" label="更新完成后关闭MCSL Future Web" />
-      <ElFormItem>
-        <ElButton @click="showUpdateDialog = false"> 取消 </ElButton>
-        <ElButton @click="openUrl(updateInfo.version_info)">
-          详细信息
-        </ElButton>
-        <ElButton type="primary" @click="update"> 下载更新 </ElButton>
-      </ElFormItem>
-    </ElDialog>
-    <ElForm>
-      <h3>主题</h3>
-      <ElFormItem label="扩散动画（部分浏览器不支持）">
-        <ElButton @click="useDarkMode().changeTheme('light', $event)"
-        >浅色模式
-        </ElButton>
-        <ElButton @click="useDarkMode().changeTheme('dark', $event)"
-        >深色模式
-        </ElButton>
-        <ElButton @click="useDarkMode().changeTheme('auto', $event)"
-        >跟随系统
-        </ElButton>
-      </ElFormItem>
-      <ElFormItem label="中心扩散动画（部分浏览器不支持）">
-        <ElButton @click="useDarkMode().changeTheme('light')"
-        >浅色模式
-        </ElButton>
-        <ElButton @click="useDarkMode().changeTheme('dark')"
-        >深色模式
-        </ElButton>
-        <ElButton @click="useDarkMode().changeTheme('auto')"
-        >跟随系统
-        </ElButton>
-      </ElFormItem>
-      <ElFormItem label="渐变动画">
-        <ElButton
-            @click="useDarkMode().changeTheme('light', undefined, 'fade')"
-        >浅色模式
-        </ElButton>
-        <ElButton
-            @click="useDarkMode().changeTheme('dark', undefined, 'fade')"
-        >深色模式
-        </ElButton>
-        <ElButton
-            @click="useDarkMode().changeTheme('auto', undefined, 'fade')"
-        >跟随系统
-        </ElButton>
-      </ElFormItem>
-      <ElFormItem label="无动画">
-        <ElButton
-            @click="useDarkMode().changeTheme('light', undefined, 'none')"
-        >浅色模式
-        </ElButton>
-        <ElButton
-            @click="useDarkMode().changeTheme('dark', undefined, 'none')"
-        >深色模式
-        </ElButton>
-        <ElButton
-            @click="useDarkMode().changeTheme('auto', undefined, 'none')"
-        >跟随系统
-        </ElButton>
-      </ElFormItem>
-      <ElFormItem label="语言">
-        <ElSelect
-            v-model="locale"
-            label="语言"
-            @change="useLocale().setLocale(locale)">
-          <ElOption label="系统默认" value="auto" />
-          <ElOption label="简体中文" value="zh-CN" />
-          <ElOption label="英语" value="en-US" />
-        </ElSelect>
-      </ElFormItem>
-      <ElFormItem label="更新">
-        <ElButton @click="checkUpdate">检查更新</ElButton>
-      </ElFormItem>
-    </ElForm>
-  </div>
+		<ElDialog
+			v-if="updateInfo"
+			v-model="showUpdateDialog"
+			:title="'MCSL Future Web 更新 - ' + updateInfo.version">
+			<sup
+				>更新发布时间：{{
+					new Date(updateInfo.publish_date).toLocaleString()
+				}}</sup
+			>
+			<p>{{ updateInfo.notes }}</p>
+			<ElCheckbox v-model="stop" label="更新完成后关闭MCSL Future Web" />
+			<ElFormItem>
+				<ElButton @click="showUpdateDialog = false"> 取消 </ElButton>
+				<ElButton @click="openUrl(updateInfo.version_info)">
+					详细信息
+				</ElButton>
+				<ElButton type="primary" @click="update"> 下载更新 </ElButton>
+			</ElFormItem>
+		</ElDialog>
+		<ElForm>
+			<h3>主题</h3>
+			<ElFormItem label="扩散动画（部分浏览器不支持）">
+				<ElButton @click="useDarkMode().changeTheme('light', $event)"
+					>浅色模式
+				</ElButton>
+				<ElButton @click="useDarkMode().changeTheme('dark', $event)"
+					>深色模式
+				</ElButton>
+				<ElButton @click="useDarkMode().changeTheme('auto', $event)"
+					>跟随系统
+				</ElButton>
+			</ElFormItem>
+			<ElFormItem label="中心扩散动画（部分浏览器不支持）">
+				<ElButton @click="useDarkMode().changeTheme('light')"
+					>浅色模式
+				</ElButton>
+				<ElButton @click="useDarkMode().changeTheme('dark')"
+					>深色模式
+				</ElButton>
+				<ElButton @click="useDarkMode().changeTheme('auto')"
+					>跟随系统
+				</ElButton>
+			</ElFormItem>
+			<ElFormItem label="渐变动画">
+				<ElButton
+					@click="
+						useDarkMode().changeTheme('light', undefined, 'fade')
+					"
+					>浅色模式
+				</ElButton>
+				<ElButton
+					@click="
+						useDarkMode().changeTheme('dark', undefined, 'fade')
+					"
+					>深色模式
+				</ElButton>
+				<ElButton
+					@click="
+						useDarkMode().changeTheme('auto', undefined, 'fade')
+					"
+					>跟随系统
+				</ElButton>
+			</ElFormItem>
+			<ElFormItem label="无动画">
+				<ElButton
+					@click="
+						useDarkMode().changeTheme('light', undefined, 'none')
+					"
+					>浅色模式
+				</ElButton>
+				<ElButton
+					@click="
+						useDarkMode().changeTheme('dark', undefined, 'none')
+					"
+					>深色模式
+				</ElButton>
+				<ElButton
+					@click="
+						useDarkMode().changeTheme('auto', undefined, 'none')
+					"
+					>跟随系统
+				</ElButton>
+			</ElFormItem>
+			<ElFormItem label="语言">
+				<ElSelect
+					v-model="locale"
+					label="语言"
+					@change="useLocale().setLocale(locale)">
+					<ElOption label="系统默认" value="auto" />
+					<ElOption label="简体中文" value="zh-CN" />
+					<ElOption label="英语" value="en-US" />
+				</ElSelect>
+			</ElFormItem>
+			<ElFormItem label="更新">
+				<ElButton @click="checkUpdate">检查更新</ElButton>
+			</ElFormItem>
+		</ElForm>
+	</div>
 </template>
 
 <style scoped></style>

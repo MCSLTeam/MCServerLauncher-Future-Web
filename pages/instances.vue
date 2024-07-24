@@ -4,14 +4,14 @@
 	<ElContainer direction="vertical">
 		<Header>
 			<template #breadcrumb>
-				<el-breadcrumb-item>{{
+				<ElBreadcrumbItem>{{
 					$t('sidebar.instances')
-				}}</el-breadcrumb-item>
+				}}</ElBreadcrumbItem>
 			</template>
 		</Header>
-		<el-main class="instances__main">
-			<el-scrollbar />
-		</el-main>
+		<ElMain class="instances__main">
+			<ElScrollbar />
+		</ElMain>
 	</ElContainer>
 </template>
 

@@ -198,11 +198,11 @@ export async function hasPermission(username: string, permission: string) {
  * @param a 权限列表中的一项
  * @param b 要匹配的权限
  */
-function matchPermission(a: string, b: string) {
-	const nodesA = a.split('.');
-	const nodesB = b.split('.');
-	for (let i = 0; i < nodesA.length; i++) {
-		if (nodesA[i] != '*' && nodesA[i] != nodesB[i]) return false;
-	}
-	return true;
+function matchPermission(a: string, b: string): boolean {
+	const pattern =
+		a.replace('.', '\\s').replace('**', '.+').replace('*', '\\S+') +
+		'(\\s.+)?';
+	const input = b.replace('.', ' ');
+	const regex = new RegExp('^' + pattern + '$');
+	return regex.test(input);
 }
