@@ -41,7 +41,7 @@ sudo su -c "curl https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Fut
 
 ## Contribute
 
-To report issues or suggest improvements, please [open an issue](https://github.com/MCSLTeam/MCServerLauncher-Future/issues/new/choose) or [submit a pull request](https://github.com/MCSLTeam/MCServerLauncher-Future/compare).zz
+To report issues or suggest improvements, please [open an issue](https://github.com/MCSLTeam/MCServerLauncher-Future/issues/new/choose) or [submit a pull request](https://github.com/MCSLTeam/MCServerLauncher-Future/compare).
 
 ## Contact
 
