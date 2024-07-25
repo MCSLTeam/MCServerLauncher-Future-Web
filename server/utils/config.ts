@@ -1,4 +1,4 @@
-import { nanoid } from 'nanoid';
+import {nanoid} from 'nanoid';
 
 const defaultConfig = {
 	auth: {
@@ -6,9 +6,9 @@ const defaultConfig = {
 		rememberMeExpire: '30d', // 记住我的token有效期
 		expire: '1d', // 不记住我的token有效期
 	},
+	beian: '',
 };
 
-let config: typeof defaultConfig | null = null;
 const load = loadConfig();
 
 export async function saveDefaultConfig() {
@@ -22,7 +22,7 @@ export async function saveDefaultConfig() {
 export async function loadConfig() {
 	// 确保config存在
 	await saveDefaultConfig();
-	config = await storage.getItem('config.json');
+	let config = await storage.getItem('config.json');
 	// 校验config格式
 	if (typeof config !== 'object') {
 		config = defaultConfig;
@@ -30,10 +30,10 @@ export async function loadConfig() {
 	}
 	fillMissingValues(config, defaultConfig);
 	console.log('已加载配置文件');
-	await saveConfig();
+	await saveConfig(config);
 }
 
-export async function saveConfig() {
+export async function saveConfig(config: any) {
 	await saveDefaultConfig();
 	await storage.setItem('config.json', config);
 	console.log('已保存配置文件');
@@ -50,7 +50,7 @@ function fillMissingValues(
 			config[key] = defaultConfig[key];
 			console.warn(
 				'配置文件缺失键“' +
-					(parentKey === null ? '' : parentKey + '.') +
+					(parentKey == null ? '' : parentKey + '.') +
 					key +
 					'”！已重置为：',
 				defaultConfig[key],
@@ -60,25 +60,24 @@ function fillMissingValues(
 			config[key] = defaultConfig[key];
 			console.warn(
 				'配置文件中键“' +
-					(parentKey === null ? '' : parentKey + '.') +
+					(parentKey == null ? '' : parentKey + '.') +
 					key +
 					'”的值类型错误！已重置为：',
 				defaultConfig[key],
 			);
 			// 这个key对应的值可能包含下一级
-		} else if (typeof defaultConfig[key] === 'object') {
+		} else if (typeof defaultConfig[key] == 'object') {
 			fillMissingValues(
 				config[key],
 				defaultConfig[key],
-				parentKey === null ? key : parentKey + '.' + key,
+				parentKey == null ? key : parentKey + '.' + key,
 			);
 		}
 	}
 	return config;
 }
 
-export async function getConfig() {
+export async function getConfig(): Promise<any> {
 	await load;
-	if (!config) return defaultConfig;
-	return config;
+	return await storage.getItem('config.json');
 }

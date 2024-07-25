@@ -4,7 +4,7 @@ import {ElNotification} from 'element-plus';
 import {type Ref, ref} from 'vue';
 
 const activeTab = ref(
-	location.href.split('#').length === 2
+	location.href.split('#').length == 2
 		? location.href.split('#')[1]
 		: 'mc-update',
 );
@@ -74,12 +74,12 @@ axios
 															100% - 80px
 														);
 													" />
-												<br >
+												<br>
 												<ElSkeletonItem
 													variant="h3"
 													class="news__title"
 													style="width: 90%" />
-												<br >
+												<br>
 												<ElSkeletonItem
 													variant="p"
 													class="news__desc"
@@ -130,7 +130,7 @@ axios
 												'https://launchercontent.mojang.com/' +
 												item.image.url
 											"
-											:alt="item.image.title" >
+											:alt="item.image.title">
 										<h3 class="news__title">
 											{{ item.title }}
 										</h3>
@@ -177,17 +177,17 @@ axios
 															100% - 100px
 														);
 													" />
-												<br >
+												<br>
 												<ElSkeletonItem
 													variant="h3"
 													class="news__title"
 													style="width: 100%" />
-												<br >
+												<br>
 												<ElSkeletonItem
 													class="news__desc"
 													variant="p"
 													style="width: 75%" />
-												<br >
+												<br>
 												<ElSkeletonItem
 													class="news__date"
 													variant="p"
@@ -219,7 +219,7 @@ axios
 												'https://launchercontent.mojang.com/' +
 												item.playPageImage.url
 											"
-											:alt="item.playPageImage.title" >
+											:alt="item.playPageImage.title">
 										<h3 class="news__title">
 											{{ item.title }}
 										</h3>
@@ -240,6 +240,7 @@ axios
 						</ElTabPane>
 					</ElTabs>
 				</ElCard>
+				<Footer />
 			</ElScrollbar>
 		</ElMain>
 	</ElContainer>

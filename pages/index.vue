@@ -33,7 +33,7 @@ function closeAnnouncement() {
 	<ElContainer direction="vertical">
 		<Header>
 			<template #breadcrumb>
-				<ElBreadcrumb-item>{{ $t('sidebar.home') }} </ElBreadcrumb-item>
+				<ElBreadcrumb-item>{{ $t('sidebar.home') }}</ElBreadcrumb-item>
 			</template>
 		</Header>
 		<ElMain class="index__main">
@@ -55,6 +55,46 @@ function closeAnnouncement() {
 						class="index__announcement-desc"
 						v-html="announcement.text" />
 				</ElAlert>
+				<ElCard class="index__card">
+					<h1>{{ $t('index.overview') }}</h1>
+					<ElRow>
+						<ElCol :span="6">
+							<ElProgress type="dashboard" :percentage="50">
+								<template #default>
+									<h3>114 / 514</h3>
+									<p>{{ $t('index.overview.instances') }}</p>
+								</template>
+							</ElProgress>
+						</ElCol>
+						<ElCol :span="6">
+							<ElProgress type="dashboard" :percentage="50">
+								<template #default>
+									<h3>114 / 514</h3>
+									<p>
+										{{ $t('index.overview.online-users') }}
+									</p>
+								</template>
+							</ElProgress>
+						</ElCol>
+						<ElCol :span="6">
+							<ElProgress type="dashboard" :percentage="50">
+								<template #default>
+									<h3>114G / 514G</h3>
+									<p>{{ $t('index.overview.disk-usage') }}</p>
+								</template>
+							</ElProgress>
+						</ElCol>
+						<ElCol :span="6">
+							<ElProgress type="dashboard" :percentage="50">
+								<template #default>
+									<h3>114G / 514G</h3>
+									<p>{{ $t('index.overview') }}</p>
+								</template>
+							</ElProgress>
+						</ElCol>
+					</ElRow>
+				</ElCard>
+				<Footer />
 			</ElScrollbar>
 		</ElMain>
 	</ElContainer>
@@ -66,6 +106,11 @@ function closeAnnouncement() {
 }
 
 .index__announcement {
+	width: calc(100% - 20px);
+}
+
+.index__announcement,
+.index__card {
 	margin: 10px;
 	box-shadow: var(--el-box-shadow-light);
 	width: calc(100% - 20px);

@@ -5,9 +5,9 @@
 
 ## 特色
 
-**高效**：顷刻即可创建新实例。  
+**高效**：顷刻即可创建新实例。
 
-**全面**：支持大多数控制台应用程序的管理。  
+**全面**：支持大多数控制台应用程序的管理。
 
 **多实例管理**：从一处同时控制多个实例。
 
@@ -17,9 +17,9 @@ MCServerLauncher Future 是新一代的服务器管理软件，提供直观的�
 
 ## 组件
 
-[守护进程](https://github.com/MCSLTeam/MCServerLauncher-Future/tree/master/MCServerLauncher.Daemon)：使用 .NET 6.0 C# 构建的核心服务，提供强大的性能和灵活性。  
+[守护进程](https://github.com/MCSLTeam/MCServerLauncher-Future/tree/master/MCServerLauncher.Daemon)：使用 .NET 6.0 C# 构建的核心服务，提供强大的性能和灵活性。
 
-[网页面板](https://github.com/MCSLTeam/MCServerLauncher-Future-Web)：可以通过浏览器访问的仪表板，非常适合非 Windows 用户，当然 Windows 用户也可使用。  
+[网页面板](https://github.com/MCSLTeam/MCServerLauncher-Future-Web)：可以通过浏览器访问的仪表板，非常适合非 Windows 用户，当然 Windows 用户也可使用。
 
 [WPF桌面启动器](https://github.com/MCSLTeam/MCServerLauncher-Future/tree/master/MCServerLauncher.WPF.Main)：针对 Windows 用户的最优解决方案。
 
@@ -36,7 +36,7 @@ WIP
 ### Linux
 
 ```bash
-sudo su -c "curl https://github.moeyy.xyz/https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Web/main/setup_cn.sh | bash"
+sudo su -c "curl -sSL https://github.moeyy.xyz/https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Web/main/setup_cn.sh | bash"
 ```
 
 ## 贡献

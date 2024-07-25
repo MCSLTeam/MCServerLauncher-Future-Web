@@ -5,9 +5,9 @@ This repository only includes sources of the Web Panel. If you want to know more
 
 ## Feature
 
-**Efficient Instance Setup**: Simplified methods for creating new server instances.  
+**Efficient Instance Setup**: Simplified methods for creating new server instances.
 
-**Console Program Compatibility**: Supports a wide range of console applications.  
+**Console Program Compatibility**: Supports a wide range of console applications.
 
 **Multi-instance Management**: Control multiple servers simultaneously from a single interface.
 
@@ -17,11 +17,11 @@ MCServerLauncher Future is the next generation of server management software, pr
 
 ## Components
 
-[Daemon](https://github.com/MCSLTeam/MCServerLauncher-Future/tree/master/MCServerLauncher.Daemon): The core service built with .NET 6.0 C#, delivering robust performance and flexibility.  
+[Daemon](https://github.com/MCSLTeam/MCServerLauncher-Future/tree/master/MCServerLauncher.Daemon): The core service built with .NET 6.0 C#, delivering robust performance and flexibility.
 
 [Web Panel](https://github.com/MCSLTeam/MCServerLauncher-Future-Web): A browser-accessible dashboard, ideal for non-Windows users.
 
-[WPF Desktop Launcher](https://github.com/MCSLTeam/MCServerLauncher-Future/tree/master/MCServerLauncher.WPF.Main): A Windows-specific interface for connecting to daemons.  
+[WPF Desktop Launcher](https://github.com/MCSLTeam/MCServerLauncher-Future/tree/master/MCServerLauncher.WPF.Main): A Windows-specific interface for connecting to daemons.
 
 ## System Requirements
 
@@ -36,7 +36,7 @@ WIP
 ### For Linux
 
 ```bash
-sudo su -c "curl https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Web/main/setup_en.sh | bash"
+sudo su -c "curl -sSL https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Web/main/setup_en.sh | bash"
 ```
 
 ## Contribute

@@ -11,6 +11,7 @@
 		</Header>
 		<ElMain class="instances__main">
 			<ElScrollbar />
+			<Footer />
 		</ElMain>
 	</ElContainer>
 </template>

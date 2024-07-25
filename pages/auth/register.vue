@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
-import type { FormInstance, FormRules } from 'element-plus';
+import {reactive} from 'vue';
+import type {FormInstance, FormRules} from 'element-plus';
 
 definePageMeta({
 	layout: 'auth',
@@ -53,7 +53,7 @@ const rules = reactive<FormRules<RuleForm>>({
 	passwordConfirm: [
 		{
 			validator: (_rule, value, callback) => {
-				if (value === '') {
+				if (value == '') {
 					callback(new Error(i18n.t('form.invalid.require')));
 				} else if (value !== form.password) {
 					callback(new Error(i18n.t('register.invalid.confirm')));
