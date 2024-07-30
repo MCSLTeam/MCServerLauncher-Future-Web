@@ -30,81 +30,76 @@ function closeAnnouncement() {
 </script>
 
 <template>
-	<ElContainer direction="vertical">
-		<Header>
-			<template #breadcrumb>
-				<ElBreadcrumb-item>{{ $t('sidebar.home') }}</ElBreadcrumb-item>
-			</template>
-		</Header>
-		<ElMain class="index__main">
-			<ElScrollbar>
-				<!-- 公告 -->
-				<ElAlert
-					v-if="
-						!announcement.closable ||
-						!announcementClosed ||
-						announcementClosed != MD5(announcement.text).toString()
-					"
-					class="index__announcement"
-					:title="$t('announcement.title')"
-					:type="announcement.type"
-					:closable="announcement.closable"
-					:close-text="$t('announcement.close')"
-					@close="closeAnnouncement">
-					<p
-						class="index__announcement-desc"
-						v-html="announcement.text" />
-				</ElAlert>
-				<ElCard class="index__card">
-					<h1>{{ $t('index.overview') }}</h1>
-					<ElRow>
-						<ElCol :span="6">
-							<ElProgress type="dashboard" :percentage="50">
-								<template #default>
-									<h3>114 / 514</h3>
-									<p>{{ $t('index.overview.instances') }}</p>
-								</template>
-							</ElProgress>
-						</ElCol>
-						<ElCol :span="6">
-							<ElProgress type="dashboard" :percentage="50">
-								<template #default>
-									<h3>114 / 514</h3>
-									<p>
-										{{ $t('index.overview.online-users') }}
-									</p>
-								</template>
-							</ElProgress>
-						</ElCol>
-						<ElCol :span="6">
-							<ElProgress type="dashboard" :percentage="50">
-								<template #default>
-									<h3>114G / 514G</h3>
-									<p>{{ $t('index.overview.disk-usage') }}</p>
-								</template>
-							</ElProgress>
-						</ElCol>
-						<ElCol :span="6">
-							<ElProgress type="dashboard" :percentage="50">
-								<template #default>
-									<h3>114G / 514G</h3>
-									<p>{{ $t('index.overview') }}</p>
-								</template>
-							</ElProgress>
-						</ElCol>
-					</ElRow>
-				</ElCard>
-				<Footer />
-			</ElScrollbar>
-		</ElMain>
-	</ElContainer>
+	<Page>
+		<template #breadcrumb>
+			<ElBreadcrumb-item>{{ $t('sidebar.home') }}</ElBreadcrumb-item>
+		</template>
+		<!-- 公告 -->
+		<ElAlert
+			v-if="
+				!announcement.closable ||
+				!announcementClosed ||
+				announcementClosed != MD5(announcement.text).toString()
+			"
+			class="index__announcement"
+			:title="$t('announcement.title')"
+			:type="announcement.type"
+			:closable="announcement.closable"
+			:close-text="$t('announcement.close')"
+			@close="closeAnnouncement">
+			<p class="index__announcement-desc" v-html="announcement.text" />
+		</ElAlert>
+
+		<!-- 概览 -->
+		<ElCard class="index__card">
+			<h1 class="index__card-title">{{ $t('index.overview') }}</h1>
+			<ElRow class="index__card-row">
+				<ElCol :sm="6" :xs="24" class="index__statistic">
+					<ElProgress type="dashboard" :percentage="50">
+						<template #default="{ percentage }">
+							<div class="index__progress">
+								<h2>{{ percentage }}%</h2>
+								<h3>114 / 514</h3>
+							</div>
+						</template>
+					</ElProgress>
+					<div class="index__progress-title">
+						<h2>{{ $t('index.overview.instances') }}</h2>
+						<h3>{{ $t('index.overview.instances.desc') }}</h3>
+					</div>
+				</ElCol>
+				<ElCol :sm="6" :xs="24" class="index__statistic">
+					<ElProgress type="dashboard" :percentage="50">
+						<template #default="{ percentage }">
+							<div class="index__progress">
+								<h2>{{ percentage }}%</h2>
+								<h3 class="index__progress-small">
+									114.51GB / 514.19GB
+								</h3>
+							</div>
+						</template>
+					</ElProgress>
+					<div class="index__progress-title">
+						<h2>{{ $t('index.overview.disk-usage') }}</h2>
+						<h3>{{ $t('index.overview.disk-usage.desc') }}</h3>
+					</div>
+				</ElCol>
+				<ElCol :sm="6" :xs="24" class="index__statistic">
+					<ElStatistic
+						:title="$t('index.overview.online')"
+						:value="114" />
+				</ElCol>
+				<ElCol :sm="6" :xs="24" class="index__statistic">
+					<ElStatistic
+						:title="$t('index.overview.online')"
+						:value="514" />
+				</ElCol>
+			</ElRow>
+		</ElCard>
+	</Page>
 </template>
 
 <style scoped>
-.index__main {
-	padding: 0;
-}
-
 .index__announcement {
 	width: calc(100% - 20px);
 }
@@ -142,6 +137,77 @@ function closeAnnouncement() {
 }
 
 .index__announcement-desc {
+	margin: 0;
+}
+
+.index__card-row {
+	@media (max-width: 768px) {
+		gap: 20px;
+	}
+}
+
+.index__card-title {
+	font-weight: var(--el-font-weight-primary);
+	color: var(--el-text-color-primary);
+	margin: 0 0 10px 0;
+}
+
+.index__statistic {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	@media (max-width: 768px) {
+		flex-direction: column-reverse;
+	}
+}
+
+.index__progress,
+.index__progress-title {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.index__progress-title h2 {
+	color: var(--el-text-color-primary);
+}
+
+.index__progress-title h3 {
+	color: var(--el-text-color-regular);
+	margin: 0 0 10px 0;
+}
+
+.index__progress {
+	gap: 5px;
+}
+
+.index__progress h2,
+.index__progress-title h2 {
+	font-weight: var(--el-font-weight-primary);
+	font-size: var(--el-font-size-large);
+	margin: 0;
+}
+
+.index__progress h3,
+.index__progress-title h3 {
+	font-weight: var(--el-font-weight-primary);
+	font-size: var(--el-font-size-base);
+}
+
+.index__progress h3 {
+	margin: 5px;
+}
+
+h3.index__progress-small {
+	font-size: 10px;
+}
+
+.index__progress-info {
+	font-size: var(--el-font-size-small);
+	font-weight: var(--el-font-weight-primary);
+	color: var(--el-text-color-regular);
 	margin: 0;
 }
 </style>

@@ -1,43 +1,43 @@
 name: Build and Release
 on:
-  push:
-    tags:
-      - v*.*.*
-  workflow_dispatch:
+    push:
+        tags:
+            - v*.*.*
+    workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+    build:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
+            - name: Setup node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: lts/*
 
-      - name: Install PNPM
-        run: npm i -g pnpm
+            - name: Install PNPM
+              run: npm i -g pnpm
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+            - name: Install dependencies
+              run: pnpm install --no-frozen-lockfile
 
-      - name: Build website
-        run: pnpm build
+            - name: Build website
+              run: pnpm build
 
-      - name: Compress artifact
-        run: zip -r MCSL-Future-Web.zip .output
+            - name: Compress artifact
+              run: zip -r MCSL-Future-Web.zip .output
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: MCSL-Future-Web
-          path: MCSL-Future-Web.zip
+            - name: Upload Artifact
+              uses: actions/upload-artifact@v3
+              with:
+                  name: MCSL-Future-Web
+                  path: MCSL-Future-Web.zip
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          draft: true
-          files: MCSL-Future-Web.zip
+            - name: Release
+              uses: softprops/action-gh-release@v1
+              with:
+                  draft: true
+                  files: MCSL-Future-Web.zip

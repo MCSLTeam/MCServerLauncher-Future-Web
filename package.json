@@ -9,7 +9,7 @@
 		"generate": "nuxt generate",
 		"preview": "nuxt preview",
 		"postinstall": "nuxt prepare",
-		"lint:js": "eslint **/*.vue **/*.ts **/*.js *.vue *.ts *.js",
+		"lint:js": "eslint",
 		"lint:prettier": "prettier --check .",
 		"lint": "pnpm lint:js && pnpm lint:prettier",
 		"lint:fix": "prettier --write --list-different . && pnpm lint:js --fix",
@@ -23,6 +23,7 @@
 		"@vueuse/nuxt": "^10.11.0",
 		"animate.css": "^4.1.1",
 		"axios": "^1.7.2",
+		"chart.js": "^4.4.3",
 		"crypto-js": "^4.2.0",
 		"fs-extra": "^11.2.0",
 		"jsonwebtoken": "^9.0.2",
@@ -32,7 +33,8 @@
 		"typescript-eslint": "^7.16.1",
 		"unstorage": "^1.10.2",
 		"unzipper": "^0.12.2",
-		"vue": "latest"
+		"vue": "latest",
+		"vue-chartjs": "^5.3.1"
 	},
 	"devDependencies": {
 		"@element-plus/nuxt": "^1.0.9",

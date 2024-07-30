@@ -28,6 +28,9 @@ importers:
             axios:
                 specifier: ^1.7.2
                 version: 1.7.2
+            chart.js:
+                specifier: ^4.4.3
+                version: 4.4.3
             crypto-js:
                 specifier: ^4.2.0
                 version: 4.2.0
@@ -58,6 +61,9 @@ importers:
             vue:
                 specifier: latest
                 version: 3.4.31(typescript@5.5.3)
+            vue-chartjs:
+                specifier: ^5.3.1
+                version: 5.3.1(chart.js@4.4.3)(vue@3.4.31(typescript@5.5.3))
         devDependencies:
             '@element-plus/nuxt':
                 specifier: ^1.0.9
@@ -1319,6 +1325,12 @@ packages:
         resolution:
             {
                 integrity: sha512-f3u3TwCsxm+H/jIyDJ7si4ReXFJc8hc8Dw7QX3pcHMOZ8UAXqKV/CQMLmTkQ8EsZiVDuWJo3JDB/ZTwRzJm7uA==,
+            }
+
+    '@kurkle/color@0.3.2':
+        resolution:
+            {
+                integrity: sha512-fuscdXJ9G1qb7W8VdHi+IwRqij3lBkosAm4ydQtEmbY58OzHXqQhvlxqEkoz0yssNVn38bcpRWgA9PP+OGoisw==,
             }
 
     '@kwsites/file-exists@1.1.1':
@@ -2969,6 +2981,13 @@ packages:
                 integrity: sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==,
             }
         engines: { node: ^12.17.0 || ^14.13 || >=16.0.0 }
+
+    chart.js@4.4.3:
+        resolution:
+            {
+                integrity: sha512-qK1gkGSRYcJzqrrzdR6a+I0vQ4/R+SoODXyAjscQ/4mzuNzySaMCd+hyVxitSY1+L2fjPD1Gbn+ibNqRmwQeLw==,
+            }
+        engines: { pnpm: '>=8' }
 
     chokidar@3.6.0:
         resolution:
@@ -7409,6 +7428,15 @@ packages:
                 integrity: sha512-uZ+5ZJdZ/b43gMblWtcpikY6spJd0nERaM/1RtgioXNfWFbjKlUwrS8HlrddN6T2xtptmOouWclxLUkpgcVX3Q==,
             }
 
+    vue-chartjs@5.3.1:
+        resolution:
+            {
+                integrity: sha512-rZjqcHBxKiHrBl0CIvcOlVEBwRhpWAVf6rDU3vUfa7HuSRmGtCslc0Oc8m16oAVuk0erzc1FCtH1VCriHsrz+A==,
+            }
+        peerDependencies:
+            chart.js: ^4.1.1
+            vue: ^3.0.0-0 || ^2.7.0
+
     vue-demi@0.14.8:
         resolution:
             {
@@ -8327,6 +8355,8 @@ snapshots:
             - magicast
             - rollup
             - supports-color
+
+    '@kurkle/color@0.3.2': {}
 
     '@kwsites/file-exists@1.1.1':
         dependencies:
@@ -9680,6 +9710,10 @@ snapshots:
             supports-color: 7.2.0
 
     chalk@5.3.0: {}
+
+    chart.js@4.4.3:
+        dependencies:
+            '@kurkle/color': 0.3.2
 
     chokidar@3.6.0:
         dependencies:
@@ -12503,6 +12537,11 @@ snapshots:
     vue-bundle-renderer@2.1.0:
         dependencies:
             ufo: 1.5.3
+
+    vue-chartjs@5.3.1(chart.js@4.4.3)(vue@3.4.31(typescript@5.5.3)):
+        dependencies:
+            chart.js: 4.4.3
+            vue: 3.4.31(typescript@5.5.3)
 
     vue-demi@0.14.8(vue@3.4.31(typescript@5.5.3)):
         dependencies:

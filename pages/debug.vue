@@ -58,7 +58,10 @@ async function update() {
 </script>
 
 <template>
-	<div>
+	<Page>
+		<template #breadcrumb>
+			<ElBreadcrumbItem>调试</ElBreadcrumbItem>
+		</template>
 		<ElDialog
 			v-if="updateInfo"
 			v-model="showUpdateDialog"
@@ -156,7 +159,7 @@ async function update() {
 				<ElButton @click="checkUpdate">检查更新</ElButton>
 			</ElFormItem>
 		</ElForm>
-	</div>
+	</Page>
 </template>
 
 <style scoped></style>
