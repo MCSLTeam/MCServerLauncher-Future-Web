@@ -2,12 +2,10 @@ export default defineEventHandler(async (event) => {
 	const body = await readBody(event);
 	const token = body.token;
 	try {
-		const expire = await getTokenExpire(token);
+		const data = await getTokenData(token);
 		return {
 			status: 'ok',
-			data: {
-				expire: expire,
-			},
+			data: data,
 			message: '',
 		};
 	} catch (e) {

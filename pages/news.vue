@@ -4,31 +4,47 @@ import {ElNotification} from 'element-plus';
 import {type Ref, ref} from 'vue';
 
 const activeTab = ref(
-	location.href.split('#').length == 2
-		? location.href.split('#')[1]
-		: 'mc-update',
+	useRoute().hash != '' ? useRoute().hash.slice(1) : 'je-update',
 );
 const newsPage = ref(1);
 
+const dialog = ref({
+	open: false,
+	title: null,
+	body: null,
+});
+
 const i18n = useI18n();
-const minecraftUpdates: Ref<any> = ref(null);
+const jeUpdates: Ref<any> = ref(null);
+const beUpdates: Ref<any> = ref(null);
 const minecraftNews: Ref<any> = ref(null);
 
 axios
-	.get('https://launchercontent.mojang.com/javaPatchNotes.json')
+	.get('https://launchercontent.mojang.com/v2/javaPatchNotes.json')
 	.then((res) => {
-		minecraftUpdates.value = res.data;
+		jeUpdates.value = res.data;
 	})
 	.catch(() => {
 		ElNotification({
 			title: i18n.t('notification.warning.title'),
-			message: i18n.t('news.mc-update.load-failed'),
+			message: i18n.t('news.je-update.load-failed'),
 			type: 'warning',
 		});
 	});
-
 axios
-	.get('https://launchercontent.mojang.com/news.json')
+	.get('https://launchercontent.mojang.com/v2/bedrockPatchNotes.json')
+	.then((res) => {
+		beUpdates.value = res.data;
+	})
+	.catch(() => {
+		ElNotification({
+			title: i18n.t('notification.warning.title'),
+			message: i18n.t('news.be-update.load-failed'),
+			type: 'warning',
+		});
+	});
+axios
+	.get('https://launchercontent.mojang.com/v2/news.json')
 	.then((res) => {
 		minecraftNews.value = res.data;
 	})
@@ -39,6 +55,53 @@ axios
 			type: 'warning',
 		});
 	});
+
+function translateNewsCategory(category: string) {
+	switch (category) {
+		case 'Minecraft for Windows':
+			return i18n.t('news.mc-news.tag.be');
+		case 'Minecraft: Java Edition':
+			return i18n.t('news.mc-news.tag.je');
+		case 'Minecraft Dungeons':
+			return i18n.t('news.mc-news.tag.dungeons');
+		case 'Minecraft Legends':
+			return i18n.t('news.mc-news.tag.legends');
+		default:
+			console.log(category);
+			return category;
+	}
+}
+
+function translateNewsTag(tag: string) {
+	switch (tag) {
+		case 'News':
+			return i18n.t('news.mc-news.tag.news');
+		case 'Java Realms':
+		case 'JavaRealms':
+		case 'Minecraft Realms':
+			return i18n.t('news.mc-news.tag.je-realms');
+		case 'Marketplace':
+			return i18n.t('news.mc-news.tag.marketplace');
+		case 'Quick Play':
+			return i18n.t('news.mc-news.tag.quick-play');
+		default:
+			return tag;
+	}
+}
+
+function openDialog(title: string, contentPath: string) {
+	dialog.value.title = title;
+	dialog.value.body = null;
+	dialog.value.open = true;
+	axios
+		.get(contentPath)
+		.then((res) => {
+			dialog.value.body = res.data.body;
+		})
+		.catch(() => {
+			dialog.value.body = i18n.t('news.dialog.load-failed');
+		});
+}
 </script>
 
 <template>
@@ -48,8 +111,38 @@ axios
 		</template>
 		<ElCard class="news__container">
 			<ElTabs v-model="activeTab" @tab-change="newsPage = 1">
-				<ElTabPane :label="$t('news.tabs.mc-update')" name="mc-update">
-					<div v-if="!minecraftUpdates" class="news__loading">
+				<!-- 弹出窗口 -->
+				<ElDialog
+					v-model="dialog.open"
+					width="777px"
+					:title="dialog.title"
+					@close="dialog.title = dialog.body = null">
+					<ElScrollbar height="500px">
+						<ElText
+							v-loading="!dialog.body"
+							element-loading-background="rgba(255, 255, 255, 0.5)">
+							<ElSkeleton v-if="!dialog.body" animated>
+								<template #template>
+									<ElSkeletonItem
+										v-for="index in 27"
+										:key="index"
+										variant="p"
+										:style="{
+											width: randNum(40, 90) + '%',
+										}" />
+								</template>
+							</ElSkeleton>
+							<div
+								v-else
+								class="news__dialog"
+								v-html="dialog.body" />
+						</ElText>
+					</ElScrollbar>
+				</ElDialog>
+
+				<!-- Minecraft Java版更新 -->
+				<ElTabPane :label="$t('news.tabs.je-update')" name="je-update">
+					<div v-if="!jeUpdates" class="news__loading">
 						<div
 							v-loading="true"
 							class="news__loading-icon"
@@ -63,74 +156,63 @@ axios
 										class="news__card">
 										<ElSkeletonItem
 											variant="image"
-											class="news__img"
-											style="height: calc(100% - 80px)" />
-										<br >
+											class="news__card-img"
+											style="
+												height: calc(100% - 80px);
+												margin-bottom: 20px;
+											" />
 										<ElSkeletonItem
 											variant="h3"
-											class="news__title"
-											style="width: 90%" />
+											class="news__card-title"
+											style="width: 100%" />
+										<ElSkeletonItem
+											variant="h3"
+											class="news__card-title"
+											style="width: 100%" />
 										<br >
 										<ElSkeletonItem
 											variant="p"
-											class="news__desc"
-											style="width: 75%" />
+											class="news__card-date"
+											style="width: 50%" />
 									</ElCard>
 								</div>
 							</template>
 						</ElSkeleton>
 					</div>
-
 					<div v-else class="news__tab">
-						<ElDialog
-							v-for="item in minecraftUpdates.entries.slice(
-								(newsPage - 1) * 20,
-								newsPage * 20,
-							)"
-							:key="item.version"
-							v-model="item.openDialog"
-							width="777px"
-							:title="item.title"
-							@close="item.openDialog = false">
-							<ElScrollbar height="500px">
-								<ElText>
-									<span
-										class="news__dialog"
-										v-html="item.body" />
-								</ElText>
-							</ElScrollbar>
-						</ElDialog>
-
 						<ElPagination
 							v-model:current-page="newsPage"
 							layout="prev, pager, next, ->"
 							:page-size="20"
-							:total="minecraftUpdates.entries.length" />
+							:total="jeUpdates.entries.length" />
 						<div class="news__cards">
 							<ElCard
-								v-for="item in minecraftUpdates.entries.slice(
+								v-for="item in jeUpdates.entries.slice(
 									(newsPage - 1) * 20,
 									newsPage * 20,
 								)"
 								:key="item.version"
 								class="news__card"
-								@click="item.openDialog = true">
-								<img
-									class="news__img"
+								@click="
+									openDialog(
+										item.title,
+										'https://launchercontent.mojang.com/v2/' +
+											item.contentPath,
+									)
+								">
+								<ElImage
+									class="news__card-img"
 									:src="
-										'https://launchercontent.mojang.com/' +
+										'https://launchercontent.mojang.com' +
 										item.image.url
 									"
-									:alt="item.image.title" >
-								<h3 class="news__title">
+									:alt="item.image.title" />
+								<h3 class="news__card-title">
 									{{ item.title }}
 								</h3>
-								<p class="news__desc">
+								<p class="news__card-date">
 									{{
-										item.type.slice(0, 1).toUpperCase() +
-										item.type.slice(1) +
-										' ' +
-										item.version
+										new Date(item.date).toLocaleDateString()
 									}}
 								</p>
 							</ElCard>
@@ -139,10 +221,96 @@ axios
 							v-model:current-page="newsPage"
 							layout="prev, pager, next, ->"
 							:page-size="20"
-							:total="minecraftUpdates.entries.length" />
+							:total="jeUpdates.entries.length" />
 					</div>
 				</ElTabPane>
 
+				<!-- Minecraft 基岩版更新 -->
+				<ElTabPane :label="$t('news.tabs.be-update')" name="be-update">
+					<div v-if="!beUpdates" class="news__loading">
+						<div
+							v-loading="true"
+							class="news__loading-icon"
+							element-loading-background="rgba(255, 255, 255, 0.5)" />
+						<ElSkeleton animated>
+							<template #template>
+								<div class="news__cards">
+									<ElCard
+										v-for="index in 25"
+										:key="index"
+										class="news__card">
+										<ElSkeletonItem
+											variant="image"
+											class="news__card-img"
+											style="
+												height: calc(100% - 80px);
+												margin-bottom: 20px;
+											" />
+										<ElSkeletonItem
+											variant="h3"
+											class="news__card-title"
+											style="width: 100%" />
+										<ElSkeletonItem
+											variant="h3"
+											class="news__card-title"
+											style="width: 100%" />
+										<br >
+										<ElSkeletonItem
+											variant="p"
+											class="news__card-date"
+											style="width: 50%" />
+									</ElCard>
+								</div>
+							</template>
+						</ElSkeleton>
+					</div>
+					<div v-else class="news__tab">
+						<ElPagination
+							v-model:current-page="newsPage"
+							layout="prev, pager, next, ->"
+							:page-size="20"
+							:total="beUpdates.entries.length" />
+						<div class="news__cards">
+							<ElCard
+								v-for="item in beUpdates.entries.slice(
+									(newsPage - 1) * 20,
+									newsPage * 20,
+								)"
+								:key="item.version"
+								class="news__card"
+								@click="
+									openDialog(
+										item.title,
+										'https://launchercontent.mojang.com/v2/' +
+											item.contentPath,
+									)
+								">
+								<ElImage
+									class="news__card-img"
+									:src="
+										'https://launchercontent.mojang.com' +
+										item.image.url
+									"
+									:alt="item.image.title" />
+								<h3 class="news__card-title">
+									{{ item.title }}
+								</h3>
+								<p class="news__card-date">
+									{{
+										new Date(item.date).toLocaleDateString()
+									}}
+								</p>
+							</ElCard>
+						</div>
+						<ElPagination
+							v-model:current-page="newsPage"
+							layout="prev, pager, next, ->"
+							:page-size="20"
+							:total="beUpdates.entries.length" />
+					</div>
+				</ElTabPane>
+
+				<!-- Minecraft新闻 -->
 				<ElTabPane :label="$t('news.tabs.mc-news')" name="mc-news">
 					<div v-if="!minecraftNews" class="news__loading">
 						<div
@@ -158,23 +326,23 @@ axios
 										class="news__card">
 										<ElSkeletonItem
 											variant="image"
-											class="news__img"
+											class="news__card-img"
 											style="
 												height: calc(100% - 100px);
 											" />
 										<br >
 										<ElSkeletonItem
 											variant="h3"
-											class="news__title"
+											class="news__card-title"
 											style="width: 100%" />
 										<br >
 										<ElSkeletonItem
-											class="news__desc"
+											class="news__card-desc"
 											variant="p"
 											style="width: 75%" />
 										<br >
 										<ElSkeletonItem
-											class="news__date"
+											class="news__card-date"
 											variant="p"
 											style="width: 50%" />
 									</ElCard>
@@ -182,7 +350,6 @@ axios
 							</template>
 						</ElSkeleton>
 					</div>
-
 					<div v-else class="news__tab">
 						<ElPagination
 							v-model:current-page="newsPage"
@@ -198,20 +365,28 @@ axios
 								:key="item.id"
 								class="news__card"
 								@click="openUrl(item.readMoreLink)">
-								<img
-									class="news__img"
+								<ElImage
+									class="news__card-img"
 									:src="
 										'https://launchercontent.mojang.com/' +
 										item.playPageImage.url
 									"
-									:alt="item.playPageImage.title" >
-								<h3 class="news__title">
+									:alt="item.playPageImage.title" />
+								<h3 class="news__card-title">
 									{{ item.title }}
 								</h3>
-								<p class="news__desc">
+								<div class="news__card-tags">
+									<el-tag type="primary">{{
+										translateNewsCategory(item.category)
+									}}</el-tag>
+									<el-tag v-if="item.tag" type="info">{{
+										translateNewsTag(item.tag)
+									}}</el-tag>
+								</div>
+								<p class="news__card-desc">
 									{{ item.text }}
 								</p>
-								<p class="news__date">
+								<p class="news__card-date">
 									{{ item.date }}
 								</p>
 							</ElCard>
@@ -270,7 +445,7 @@ axios
 
 .news__card {
 	width: 200px;
-	height: 285px;
+	height: 280px;
 	border-radius: 10px;
 	margin: 0 0 10px 0;
 	flex-shrink: 0;
@@ -287,26 +462,34 @@ axios
 	scale: 1.025;
 }
 
-.news__card .news__img {
+.news__card-img {
 	position: relative;
 	left: -20px;
 	margin-bottom: 10px;
 	width: calc(100% + 40px);
 }
 
-.news__card .news__title {
+.news__card-title {
 	font-size: var(--el-font-size-base);
 	color: var(--el-text-color-primary);
 	margin: 0;
 }
 
-.news__card .news__desc {
+.news__card-tags {
+	display: flex;
+	gap: 5px;
+	justify-content: start;
+	align-items: center;
+	margin: 5px 0;
+}
+
+.news__card-desc {
 	font-size: var(--el-font-size-extra-small);
 	margin: 3px 0;
 	color: var(--el-text-color-regular);
 }
 
-.news__card .news__date {
+.news__card-date {
 	margin: 0;
 	color: var(--el-text-color-secondary);
 	font-size: 10px;

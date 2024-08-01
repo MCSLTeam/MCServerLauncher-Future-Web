@@ -125,13 +125,16 @@ export async function getUsernameByToken(token: string) {
 }
 
 /**
- * @description 获取token的有效时间
+ * @description 获取token数据
  * @param token string
  * @throws string 无效Token（过期、未知用户等）则抛出异常
  */
-export async function getTokenExpire(token: string) {
+export async function getTokenData(token: string) {
 	const decoded = await verifyToken(token);
-	return new Date(<number>decoded.exp * 1000).toISOString();
+	return {
+		expire: new Date(<number>decoded.exp * 1000).toISOString(),
+		username: await getUsernameByToken(token),
+	};
 }
 
 export async function verifyToken(token: string) {

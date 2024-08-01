@@ -85,14 +85,22 @@ function closeAnnouncement() {
 					</div>
 				</ElCol>
 				<ElCol :sm="6" :xs="24" class="index__statistic">
-					<ElStatistic
-						:title="$t('index.overview.online')"
-						:value="114" />
+					<div class="index__statistic-info">
+						<InfoDisplay
+							:title="$t('index.overview.daemon-name')"
+							value="某某守护进程" />
+						<InfoDisplay
+							:title="$t('index.overview.daemon-address')"
+							value="example.com:11451" />
+					</div>
 				</ElCol>
 				<ElCol :sm="6" :xs="24" class="index__statistic">
-					<ElStatistic
-						:title="$t('index.overview.online')"
-						:value="514" />
+					<div class="index__statistic-info">
+						<InfoDisplay
+							:title="$t('index.overview.username')"
+							:value="getUsername()" />
+						<InfoDisplay title="不知道写啥" value="114514" />
+					</div>
 				</ElCol>
 			</ElRow>
 		</ElCard>
@@ -162,6 +170,10 @@ function closeAnnouncement() {
 	}
 }
 
+.index__statistic-disabled {
+	opacity: 0.5;
+}
+
 .index__progress,
 .index__progress-title {
 	display: flex;
@@ -204,11 +216,20 @@ h3.index__progress-small {
 	font-size: 10px;
 }
 
-.index__progress-info {
-	font-size: var(--el-font-size-small);
-	font-weight: var(--el-font-weight-primary);
-	color: var(--el-text-color-regular);
-	margin: 0;
+.index__statistic-info {
+	margin: 10px;
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	flex-direction: column;
+	height: 100%;
+	@media (max-width: 768px) {
+		gap: 35px;
+	}
+}
+
+.index__statistic-info .info-display {
+	width: 100%;
 }
 </style>
 

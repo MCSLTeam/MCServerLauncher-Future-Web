@@ -2,6 +2,7 @@ const token = useLocalStorage('token', null);
 const tokenSession = useSessionStorage('token', null);
 let tokenExpires: Date | null = null;
 let adminRegistered: boolean = false;
+let username: string | null = null;
 
 export async function shouldRegister() {
 	if (!adminRegistered) {
@@ -37,6 +38,7 @@ async function refreshTokenExpire() {
 	if (expire.status == 'ok') {
 		if (token.value) {
 			tokenExpires = new Date(expire.data.expire);
+			username = expire.data.username;
 		}
 		return true;
 	} else {
@@ -123,4 +125,8 @@ export async function logout() {
 
 export function getToken() {
 	return token.value ?? tokenSession.value;
+}
+
+export function getUsername() {
+	return username ?? '未知';
 }
