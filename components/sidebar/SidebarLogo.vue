@@ -2,7 +2,7 @@
 
 <template>
 	<div class="sidebar__logo-container">
-		<ElImage src="/assets/img/MCSLFuture.png" alt="" />
+		<ElImage :src="getLogoSrc()" alt="" />
 		<p>
 			{{ $t('app.name.abbr') }}
 			<span>{{ $t('app.name.suffix') }}</span>

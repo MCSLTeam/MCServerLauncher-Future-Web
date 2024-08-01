@@ -12,6 +12,15 @@ useHead({
 			? `${titleChunk} | MCSL Future Web`
 			: 'MCSL Future Web';
 	},
+	link: [
+		{
+			rel: 'icon',
+			type: 'image/png',
+			href: isAprilFoolsDay()
+				? '/assets/img/favicon-aprilfools.png'
+				: '/assets/img/favicon.png',
+		},
+	],
 });
 </script>
 

@@ -11,7 +11,7 @@ import LoadingStatusEnum from '~/utils/enums/loadingStatusEnum';
 					LoadingStatusEnum.LOADING
 				"
 				class="default-layout__loading">
-				<img src="/assets/img/MCSLFuture.png" alt="" >
+				<img :src="getLogoSrc()" alt="" >
 				<h1>
 					{{ $t('app.name') }}
 					<span>{{ $t('app.name.suffix') }}</span>

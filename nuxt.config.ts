@@ -24,13 +24,6 @@ export default defineNuxtConfig({
 						'<div class="noscript"><p>MCSL Future Web 的部分功能需要启用 JavaScript 才可使用！</p></div>',
 				},
 			],
-			link: [
-				{
-					rel: 'icon',
-					type: 'image/png',
-					href: '/assets/img/favicon.png',
-				},
-			],
 		},
 		pageTransition: {
 			name: 'blur',

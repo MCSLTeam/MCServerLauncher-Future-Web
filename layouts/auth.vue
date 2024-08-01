@@ -3,7 +3,7 @@
 <template>
 	<div class="auth__container">
 		<div class="auth__logo">
-			<img src="/assets/img/MCSLFuture.png" alt="logo" >
+			<img :src="getLogoSrc()" alt="logo" >
 			<h1>
 				{{ $t('app.name.abbr') }}
 				<span>{{ $t('app.name.suffix') }}</span>

@@ -23,3 +23,14 @@ export function debounce(func: () => any, delay: number) {
 export function openUrl(url: string) {
 	window.open(url, '_blank');
 }
+
+export function isAprilFoolsDay() {
+	const now = new Date();
+	return now.getMonth() == 3 && now.getDate() == 1;
+}
+
+export function getLogoSrc() {
+	return isAprilFoolsDay()
+		? '/assets/img/MCSLFutureAprilFools.png'
+		: '/assets/img/MCSLFuture.png';
+}
