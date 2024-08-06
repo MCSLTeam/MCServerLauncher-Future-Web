@@ -191,7 +191,13 @@ export async function removeUser(username: string) {
  */
 export async function hasPermission(username: string, permission: string) {
 	for (const perm of (await getUser(username)).permissions) {
-		if (matchPermission(perm, permission)) return true;
+		try{
+			if (matchPermission(perm, permission))
+				return true;
+		} catch (e) {
+			if (e != '用户权限格式错误')
+				throw e;
+		}
 	}
 	return false;
 }
@@ -202,9 +208,11 @@ export async function hasPermission(username: string, permission: string) {
  * @param b 要匹配的权限
  */
 function matchPermission(a: string, b: string): boolean {
-	const pattern =
-		a.replace('.', '\\s').replace('**', '.+').replace('*', '\\S+') +
-		'(\\s.+)?';
+	if (!/^(([a-zA-Z-_]+|\*{1,2})\.)*([a-zA-Z-_]+|\*{1,2})$/.test(a))
+		throw '用户权限格式错误';
+	if (!/^(([a-zA-Z-_]+)\.)*([a-zA-Z-_]+)$/.test(b))
+		throw '匹配权限格式错误';
+	const pattern = a.replace('.', '\\s').replace('**', '.+').replace('*', '\\S+') + '(\\s.+)?';
 	const input = b.replace('.', ' ');
 	const regex = new RegExp('^' + pattern + '$');
 	return regex.test(input);
