@@ -1,3 +1,4 @@
+<!-- 侧边栏 -->
 <script lang="ts" setup>
 import {ref} from 'vue';
 import NewInstance from './NewInstanceDialog.vue';
@@ -6,16 +7,17 @@ import SidebarLogo from '~/components/sidebar/SidebarLogo.vue';
 
 defineProps({
 	isInDrawer: {
+		// 是否为手机端抽屉模式
 		type: Boolean,
 		required: false,
 		default: false,
 	},
 });
 
-const showNewInstance = ref(false);
-const showTasks = ref(false);
-const isCollapsed = useLocalStorage('sidebar-collapsed', false);
-const expandedButtonIndex = ref(0);
+const showNewInstance = ref(false); // 新建实例对话框
+const showTasks = ref(false); // 任务对话框
+const isCollapsed = useLocalStorage('sidebar-collapsed', false); // 侧边栏是否折叠
+const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
 </script>
 
 <template>
@@ -27,9 +29,11 @@ const expandedButtonIndex = ref(0);
 				!isInDrawer && (useScreenWidth().value == 'md' || isCollapsed),
 			sidebar__standalone: !isInDrawer,
 		}">
+		<!-- 标题，手机端模式下不显示（塞到了抽屉的标题部分分开来） -->
 		<SidebarLogo v-if="!isInDrawer" />
 		<div class="sidebar__menu-items">
 			<ElScrollbar>
+				<!-- 上半部分 -->
 				<div>
 					<ElButton
 						class="sidebar__menu-item"
@@ -55,6 +59,7 @@ const expandedButtonIndex = ref(0);
 							$t('sidebar.instances')
 						}}</span>
 					</ElButton>
+
 					<ElButton
 						class="sidebar__menu-item"
 						:class="{
@@ -66,7 +71,8 @@ const expandedButtonIndex = ref(0);
 							$t('sidebar.news')
 						}}</span>
 					</ElButton>
-					<!-- TODO: 生产环境删了 -->
+
+					<!-- 调试工具 TODO: 生产环境删了 -->
 					<ElButton
 						class="sidebar__menu-item"
 						:class="{
@@ -77,6 +83,7 @@ const expandedButtonIndex = ref(0);
 						@click="$router.push('/debug')">
 						<i class="fa fa-bug" /><span>Debug</span>
 					</ElButton>
+
 					<ElButton
 						class="sidebar__menu-item"
 						:class="{
@@ -91,6 +98,7 @@ const expandedButtonIndex = ref(0);
 					</ElButton>
 				</div>
 
+				<!-- 下半部分 -->
 				<div>
 					<ElButton
 						class="sidebar__menu-item-primary sidebar__menu-item"
@@ -99,7 +107,9 @@ const expandedButtonIndex = ref(0);
 							$t('sidebar.newInstance')
 						}}</span>
 					</ElButton>
+					<!-- 新建实例对话框 -->
 					<NewInstance v-model="showNewInstance" />
+
 					<ElBadge
 						style="width: 100%"
 						type="primary"
@@ -118,13 +128,11 @@ const expandedButtonIndex = ref(0);
 							}}</span>
 						</ElButton>
 					</ElBadge>
+					<!-- 任务对话框 -->
 					<TasksDialog v-model="showTasks" />
-					<div
-						class="sidebar__square-item-group"
-						:class="{
-							'sidebar__show-collapse-button':
-								useScreenWidth().value == 'lg',
-						}">
+
+					<!-- 底部折叠按钮，手机端平铺 -->
+					<div class="sidebar__square-item-group">
 						<ElButton
 							class="sidebar__menu-item sidebar__square-item"
 							:class="{
@@ -140,6 +148,8 @@ const expandedButtonIndex = ref(0);
 								$t('sidebar.settings')
 							}}</span>
 						</ElButton>
+
+						<!-- 折叠侧边栏按钮，仅大屏模式下显示 -->
 						<ElButton
 							class="sidebar__menu-item sidebar__menu-item-secondary sidebar__square-item sidebar__collapse-button"
 							:class="{
@@ -152,6 +162,7 @@ const expandedButtonIndex = ref(0);
 								$t('sidebar.collapse')
 							}}</span>
 						</ElButton>
+
 						<ElButton
 							class="sidebar__menu-item sidebar__menu-item-danger sidebar__square-item"
 							:class="{
@@ -289,10 +300,6 @@ const expandedButtonIndex = ref(0);
 	padding-left: 10px;
 }
 
-.sidebar__show-collapse-button .sidebar__square-item-expanded {
-	width: calc(100% - 95px);
-}
-
 .sidebar__collapsed .sidebar__square-item-expanded,
 .sidebar__collapsed .sidebar__menu-item {
 	width: 40px;
@@ -327,8 +334,14 @@ const expandedButtonIndex = ref(0);
 	gap: 0;
 }
 
-.sidebar__show-collapse-button .sidebar__collapse-button {
-	display: flex;
+@media (max-width: 1024px) {
+	.sidebar__collapse-button {
+		display: flex;
+	}
+
+	.sidebar__square-item-expanded {
+		width: calc(100% - 95px);
+	}
 }
 </style>
 

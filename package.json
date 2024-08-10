@@ -14,7 +14,7 @@
 		"lint": "pnpm lint:js && pnpm lint:prettier",
 		"lint:fix": "prettier --write --list-different . && pnpm lint:js --fix",
 		"lint:format": "prettier --write --list-different .",
-		"doc": "typedoc --skipErrorChecking"
+		"docs": "typedoc --skipErrorChecking"
 	},
 	"dependencies": {
 		"@nuxtjs/i18n": "^8.3.1",

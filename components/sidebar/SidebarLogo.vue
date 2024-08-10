@@ -1,3 +1,4 @@
+<!-- 侧边栏标题，手机抽屉模式下将会单独放置在抽屉标题部分 -->
 <script setup lang="ts"></script>
 
 <template>

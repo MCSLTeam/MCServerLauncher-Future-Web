@@ -9,15 +9,30 @@ import {finished} from 'node:stream';
 
 const __filename = fileURLToPath(import.meta.url);
 
+/**
+ * 当前目录（./server/）
+ */
 export const __dirname = path.dirname(__filename);
+/**
+ * 服务器目录（./）
+ */
 export const serverDir = path.resolve(__dirname, '../');
+/**
+ * 数据目录（./mcsl-web）
+ */
 export const dataDir = path.resolve(__dirname, '../mcsl-web');
+/**
+ * 文件存储
+ */
 export const storage = createStorage({
 	driver: fsDriver({ base: dataDir }),
 });
 
 console.log('数据目录：', dataDir);
 
+/**
+ * 备份MCSL Future Web
+ */
 export async function backup() {
 	const backupsDir = path.resolve(serverDir, 'backup');
 	const backupDir = path.resolve(
@@ -36,6 +51,12 @@ export async function backup() {
 	}
 }
 
+/**
+ * 下载文件
+ * @param url - 下载地址
+ * @param path - 保存路径
+ * @throws unknown - 下载失败
+ */
 export async function downloadFile(url: string, path: string): Promise<void> {
 	console.log('正在下载 ' + url + ' 到 ' + path);
 	const writer = createWriteStream(path);

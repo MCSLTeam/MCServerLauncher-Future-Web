@@ -1,3 +1,6 @@
+/**
+ * 登录验证中间件，检测是否需要登录/注册，需要就跳转
+ */
 export default defineNuxtRouteMiddleware(async (to) => {
 	if (await shouldRegister()) {
 		if (to.fullPath != '/auth/register')

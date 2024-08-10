@@ -1,20 +1,21 @@
-import LoadingStatus from '~/utils/loadingStatus';
-import LoadingStatusEnum from '~/utils/enums/loadingStatusEnum';
+import LoadingInfo from '~/utils/loadingInfo';
 
-export const mcslLoadingStatus = new LoadingStatus(
-	LoadingStatusEnum.LOADING,
-	'',
-);
+/**
+ * MCSLFutureWeb加载进度（首次访问时加载）
+ */
+export const mcslLoadingInfo = new LoadingInfo('loading', '');
+/**
+ * 备案号
+ */
 export const beian = ref('');
 
 // TODO: 加载
 (async () => {
-	while (useNuxtApp().$i18n == undefined) {
-		await sleep(100);
-	}
-	mcslLoadingStatus.setMessage(useNuxtApp().$i18n.t('loading.default'));
-	await sleep(2000);
-	beian.value = (await $fetch('/api/getBeian')).data.beian;
-	mcslLoadingStatus.setMessage(useNuxtApp().$i18n.t('loading.success'));
-	mcslLoadingStatus.setLoadingStatus(LoadingStatusEnum.SUCCESS);
+    while (useNuxtApp().$i18n == undefined) {
+        await sleep(100);
+    }
+    mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.default'));
+    beian.value = (await $fetch('/api/getBeian')).data.beian;
+    mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.success'));
+    mcslLoadingInfo.setLoadingStatus('success');
 })();

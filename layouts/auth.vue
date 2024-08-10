@@ -1,3 +1,4 @@
+<!-- 登录/注册页面布局 -->
 <script setup lang="ts"></script>
 
 <template>

@@ -1,15 +1,12 @@
-<script setup lang="ts">
-import LoadingStatusEnum from '~/utils/enums/loadingStatusEnum';
-</script>
+<!-- 默认布局 -->
+<script setup lang="ts"></script>
 
 <template>
 	<div class="default-layout__max-screen">
+		<!-- 加载中 -->
 		<transition name="fade" mode="out-in">
 			<div
-				v-show="
-					mcslLoadingStatus.getLoadingStatus().value ==
-					LoadingStatusEnum.LOADING
-				"
+				v-show="mcslLoadingInfo.getLoadingStatus().value == 'loading'"
 				class="default-layout__loading">
 				<img :src="getLogoSrc()" alt="" >
 				<h1>
@@ -21,18 +18,17 @@ import LoadingStatusEnum from '~/utils/enums/loadingStatusEnum';
 						v-loading="true"
 						class="default-layout__loading-icon" />
 					<p class="default-layout__loading-text">
-						{{ mcslLoadingStatus.getMessage() }}
+						{{ mcslLoadingInfo.getMessage() }}
 					</p>
 				</div>
 			</div>
 		</transition>
+		<!-- 已加载 -->
 		<div
-			v-show="
-				mcslLoadingStatus.getLoadingStatus().value ==
-				LoadingStatusEnum.SUCCESS
-			"
+			v-show="mcslLoadingInfo.getLoadingStatus().value == 'success'"
 			class="default-layout__max-screen">
 			<ElContainer class="default-layout__max-screen">
+				<!-- 侧边栏 -->
 				<Sidebar />
 				<slot />
 			</ElContainer>

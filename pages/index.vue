@@ -98,7 +98,7 @@ function closeAnnouncement() {
 					<div class="index__statistic-info">
 						<InfoDisplay
 							:title="$t('index.overview.username')"
-							:value="getUsername()" />
+							:value="getUsername() ?? '未知'" />
 						<InfoDisplay title="不知道写啥" value="114514" />
 					</div>
 				</ElCol>

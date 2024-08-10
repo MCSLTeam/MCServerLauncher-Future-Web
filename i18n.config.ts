@@ -8,6 +8,10 @@ export default defineI18nConfig(async () => ({
 	},
 }));
 
+/**
+ * 获取当前语言
+ * @returns 当前语言
+ */
 function getLocaleValue() {
 	let locale = useLocalStorage(
 		'locale',

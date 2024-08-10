@@ -1,13 +1,10 @@
+<!-- 新建实例 -->
 <!-- TODO: 本地化 -->
 <script lang="ts" setup>
-import { reactive, type Ref, ref } from 'vue';
-import type { FormInstance, FormRules } from 'element-plus';
-import { pinyin } from 'pinyin-pro';
-import {
-	getMcVersions,
-	getTypeVersions,
-	ServerInstallType,
-} from '~/utils/daemon/serverInstaller';
+import {reactive, type Ref, ref} from 'vue';
+import type {FormInstance, FormRules} from 'element-plus';
+import {pinyin} from 'pinyin-pro';
+import {getMcVersions, getTypeVersions, ServerInstallType,} from '~/utils/daemon/serverInstaller';
 
 const visible = defineModel({
 	type: Boolean,

@@ -4,7 +4,8 @@ import * as crypto from 'crypto';
 import {getConfig} from '~/server/utils/config';
 
 /**
- * @description 返回配置文件中的私钥
+ * 返回配置文件中的私钥
+ * @returns 私钥
  */
 async function getSecret() {
 	return (await getConfig()).auth.secret;
@@ -16,7 +17,7 @@ export async function encode(str: string) {
 }
 
 /**
- * @description 获取所有用户
+ * 获取所有用户
  */
 async function getUsers() {
 	const users: { [key: string]: any } | null =
@@ -29,7 +30,7 @@ async function getUsers() {
 }
 
 /**
- * @description 是否存在用户
+ * 是否存在用户
  * @param username string
  */
 export async function hasUser(username: string) {
@@ -38,7 +39,7 @@ export async function hasUser(username: string) {
 }
 
 /**
- * @description 是否存在管理员
+ * 是否存在管理员
  */
 export async function hasAdmin() {
 	const users = await getUsers();
@@ -49,7 +50,7 @@ export async function hasAdmin() {
 }
 
 /**
- * @description 增加用户
+ * 增加用户
  * @param username string
  * @param password string
  * @param permissions string[]
@@ -70,7 +71,7 @@ export async function addUser(
 }
 
 /**
- * @description 获取指定用户
+ * 获取指定用户
  * @param username string
  */
 export async function getUser(username: string) {
@@ -79,7 +80,7 @@ export async function getUser(username: string) {
 }
 
 /**
- * @description 生成token
+ * 生成token
  * @param username string
  * @param rememberMe boolean
  */
@@ -100,7 +101,7 @@ async function generateToken(username: string, rememberMe: boolean = false) {
 }
 
 /**
- * @description 通过token获取用户名字
+ * 通过token获取用户名字
  * @param token string
  * @throws string 无效Token（过期、未知用户等）则抛出异常
  */
@@ -125,7 +126,7 @@ export async function getUsernameByToken(token: string) {
 }
 
 /**
- * @description 获取token数据
+ * 获取token数据
  * @param token string
  * @throws string 无效Token（过期、未知用户等）则抛出异常
  */
@@ -147,11 +148,11 @@ export async function verifyToken(token: string) {
 }
 
 /**
- * @description 登录
+ * 登录
  * @param username string
  * @param password string
  * @param rememberMe boolean
- * @returns Promise<string> 密码正确返回Token
+ * @returns 密码正确返回Token
  * @throws string 密码错误抛出异常
  */
 export async function login(
@@ -175,7 +176,7 @@ export async function login(
 }
 
 /**
- * @description 删除用户
+ * 删除用户
  * @param username string
  */
 export async function removeUser(username: string) {
@@ -185,35 +186,36 @@ export async function removeUser(username: string) {
 }
 
 /**
- * @description 是否存在此权限，调用{@link matchPermission}
+ * 是否存在此权限，调用{@link matchPermission}
  * @param username string
  * @param permission string
  */
 export async function hasPermission(username: string, permission: string) {
 	for (const perm of (await getUser(username)).permissions) {
-		try{
-			if (matchPermission(perm, permission))
-				return true;
+		try {
+			if (matchPermission(perm, permission)) return true;
 		} catch (e) {
-			if (e != '用户权限格式错误')
-				throw e;
+			if (e != '用户权限格式错误') throw e;
 		}
 	}
 	return false;
 }
 
 /**
- * @description 匹配权限
- * @param a 权限列表中的一项
- * @param b 要匹配的权限
+ * 匹配权限
+ * @param a - 权限列表中的一项
+ * @param b - 要匹配的权限
  */
 function matchPermission(a: string, b: string): boolean {
 	if (!/^(([a-zA-Z-_]+|\*{1,2})\.)*([a-zA-Z-_]+|\*{1,2})$/.test(a))
 		throw '用户权限格式错误';
-	if (!/^(([a-zA-Z-_]+)\.)*([a-zA-Z-_]+)$/.test(b))
-		throw '匹配权限格式错误';
-	const pattern = a.replace('.', '\\s').replace('**', '.+').replace('*', '\\S+') + '(\\s.+)?';
-	const input = b.replace('.', ' ');
+	if (!/^(([a-zA-Z-_]+)\.)*([a-zA-Z-_]+)$/.test(b)) throw '匹配权限格式错误';
+	const pattern =
+		a
+			.replaceAll('.', '\\s')
+			.replaceAll('**', '.+')
+			.replaceAll('*', '\\S+') + '(\\s.+)?';
+	const input = b.replaceAll('.', ' ');
 	const regex = new RegExp('^' + pattern + '$');
 	return regex.test(input);
 }

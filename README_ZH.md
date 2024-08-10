@@ -41,6 +41,14 @@ sudo su -c "curl -sSL https://github.moeyy.xyz/https://raw.githubusercontent.com
 
 ## 贡献
 
+要在本地运行项目，请使用以下命令：
+
+```shell
+pnpm i
+pnpm dev # 测试服务器
+pnpm build # 构建
+```
+
 如需报告问题或提出改进建议，请 [提交 Issue](https://github.com/MCSLTeam/MCServerLauncher-Future/issues/new/choose) 或 [提交 Pull Request](https://github.com/MCSLTeam/MCServerLauncher-Future/compare) 。
 
 ## 联系我们

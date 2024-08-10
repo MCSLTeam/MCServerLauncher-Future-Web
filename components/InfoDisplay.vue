@@ -1,5 +1,5 @@
+<!-- 信息展示，类似ElementPlus的Statistics但是可以放文本 -->
 <script setup lang="ts">
-import type {PropType} from 'vue';
 
 defineProps({
 	title: {
@@ -7,7 +7,7 @@ defineProps({
 		required: true,
 	},
 	value: {
-		type: Object as PropType<string | number>,
+		type: String,
 		required: true,
 	},
 });

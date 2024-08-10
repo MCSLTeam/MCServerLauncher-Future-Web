@@ -41,6 +41,14 @@ sudo su -c "curl -sSL https://raw.githubusercontent.com/MCSLTeam/MCServerLaunche
 
 ## Contribute
 
+To run the project locally, please use the following command:
+
+```shell
+pnpm i
+pnpm dev # start a dev server
+pnpm build # build for production
+```
+
 To report issues or suggest improvements, please [open an issue](https://github.com/MCSLTeam/MCServerLauncher-Future/issues/new/choose) or [submit a pull request](https://github.com/MCSLTeam/MCServerLauncher-Future/compare).
 
 ## Contact

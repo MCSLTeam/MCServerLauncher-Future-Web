@@ -1,3 +1,4 @@
+<!-- 页脚 -->
 <script setup lang="ts"></script>
 
 <template>
@@ -6,17 +7,18 @@
 			Powered by
 			<a
 				href="https://github.com/MCSLTeam/MCServerLauncher-Future-Web"
-				target="_blank"
-				>MCSL Future Web</a
-			>
+				target="_blank">
+				MCSL Future Web
+			</a>
+			<!-- 备案号 -->
 			<span v-if="beian != ''">
-				<span v-if="useScreenWidth().isMdOrBigger()"
-					>&ensp;|&ensp;</span
-				>
+				<span v-if="useScreenWidth().isMdOrBigger()">
+					&ensp;|&ensp;
+				</span>
 				<br v-if="useScreenWidth().value == 'sm'" >
-				<a href="https://beian.miit.gov.cn/" target="_blank">{{
-					beian
-				}}</a>
+				<a href="https://beian.miit.gov.cn/" target="_blank">
+					{{ beian }}
+				</a>
 			</span>
 		</p>
 	</div>

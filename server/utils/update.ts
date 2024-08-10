@@ -6,6 +6,11 @@ import * as unzipper from 'unzipper';
 import * as crypto from 'crypto';
 import axios from 'axios';
 
+/**
+ * 检查更新
+ * @returns 更新信息
+ * @throws unknown - 更新失败
+ */
 export async function checkUpdate() {
 	try {
 		const update = (await axios.get(useAppConfig().updater)).data;
@@ -13,10 +18,15 @@ export async function checkUpdate() {
 			return update;
 		return null;
 	} catch (e) {
-		throw '无法获取更新信息！';
+		throw e;
 	}
 }
 
+/**
+ * 更新
+ * @param update - 更新信息
+ * @param stop - 是否在更新后停止程序
+ */
 export async function update(update: any, stop: boolean = false) {
 	console.log('开始更新MCSL Future Web...');
 	console.log('正在备份...');

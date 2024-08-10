@@ -1,15 +1,18 @@
+<!-- 导航栏 -->
 <script setup lang="ts">
 const showSidebar = ref(false);
 </script>
 
 <template>
 	<ElHeader class="header__container">
+		<!-- 面包屑 -->
 		<div>
 			<ElBreadcrumb separator="/">
 				<slot name="breadcrumb" />
 			</ElBreadcrumb>
 			<slot name="start" />
 		</div>
+		<!-- 手机端侧边栏抽屉 -->
 		<div>
 			<ElDrawer
 				v-if="useScreenWidth().value == 'sm'"
@@ -23,6 +26,7 @@ const showSidebar = ref(false);
 				<Sidebar :is-in-drawer="true" />
 			</ElDrawer>
 			<slot name="end" />
+			<!-- 打开侧边栏按钮 -->
 			<ElButton
 				v-if="useScreenWidth().value == 'sm'"
 				class="header__menu-button"

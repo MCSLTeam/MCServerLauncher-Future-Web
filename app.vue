@@ -4,24 +4,27 @@ import '~/assets/css/style.css';
 import '~/assets/css/fontawesome.min.css';
 import 'element-plus/theme-chalk/dark/css-vars.css';
 
-useDarkMode().loadTheme();
-
 useHead({
 	titleTemplate: (titleChunk) => {
+		// 标题格式
 		return titleChunk
 			? `${titleChunk} | MCSL Future Web`
 			: 'MCSL Future Web';
 	},
 	link: [
 		{
+			// 图标
 			rel: 'icon',
 			type: 'image/png',
-			href: isAprilFoolsDay()
+			href: isAprilFoolsDay() // 判断愚人节，使用愚人节图标
 				? '/assets/img/favicon-aprilfools.png'
 				: '/assets/img/favicon.png',
 		},
 	],
 });
+
+// 加载主题
+useDarkMode().loadTheme();
 </script>
 
 <template>
