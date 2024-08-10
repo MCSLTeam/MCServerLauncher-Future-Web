@@ -46,6 +46,7 @@ To run the project locally, please use the following command:
 ```shell
 pnpm i
 pnpm dev # start a dev server
+pnpm run docs # generate docs
 pnpm build # build for production
 ```
 

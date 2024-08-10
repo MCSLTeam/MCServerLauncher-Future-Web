@@ -46,6 +46,7 @@ sudo su -c "curl -sSL https://github.moeyy.xyz/https://raw.githubusercontent.com
 ```shell
 pnpm i
 pnpm dev # 测试服务器
+pnpm run docs # 生成文档
 pnpm build # 构建
 ```
 
