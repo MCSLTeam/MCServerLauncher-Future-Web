@@ -11,11 +11,11 @@ export const beian = ref('');
 
 // TODO: 加载
 (async () => {
-    while (useNuxtApp().$i18n == undefined) {
-        await sleep(100);
-    }
-    mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.default'));
-    beian.value = (await $fetch('/api/getBeian')).data.beian;
-    mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.success'));
-    mcslLoadingInfo.setLoadingStatus('success');
+	while (useNuxtApp().$i18n == undefined) {
+		await sleep(100);
+	}
+	mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.default'));
+	beian.value = (await $fetch('/api/getBeian')).data.beian;
+	mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.success'));
+	mcslLoadingInfo.setLoadingStatus('success');
 })();

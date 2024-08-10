@@ -1,6 +1,5 @@
 <!-- 信息展示，类似ElementPlus的Statistics但是可以放文本 -->
 <script setup lang="ts">
-
 defineProps({
 	title: {
 		type: String,

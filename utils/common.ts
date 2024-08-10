@@ -5,7 +5,7 @@
  * await sleep(1000); // 1秒后执行
  */
 export function sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -23,10 +23,10 @@ export function sleep(ms: number): Promise<void> {
  * randNum(); // 相当于Math.random()
  */
 export function randNum(min?: number, max?: number) {
-    if (min && !max) return randNum(0, min);
-    else if (min && max)
-        return Math.floor(Math.random() * (max - min)) + min; // 含最小值，不含最大值
-    else return Math.random();
+	if (min && !max) return randNum(0, min);
+	else if (min && max)
+		return Math.floor(Math.random() * (max - min)) + min; // 含最小值，不含最大值
+	else return Math.random();
 }
 
 /**
@@ -43,13 +43,13 @@ export function randNum(min?: number, max?: number) {
  * window.addEventListener('scroll', onScrollDebounce);
  */
 export function debounce(func: () => any, delay: number) {
-    let timer: NodeJS.Timeout | null = null;
-    return function () {
-        if (timer) clearTimeout(timer);
-        timer = setTimeout(() => {
-            func();
-        }, delay);
-    };
+	let timer: NodeJS.Timeout | null = null;
+	return function () {
+		if (timer) clearTimeout(timer);
+		timer = setTimeout(() => {
+			func();
+		}, delay);
+	};
 }
 
 /**
@@ -57,7 +57,7 @@ export function debounce(func: () => any, delay: number) {
  * @param url - 链接
  */
 export function openUrl(url: string) {
-    window.open(url, '_blank');
+	window.open(url, '_blank');
 }
 
 /**
@@ -65,8 +65,8 @@ export function openUrl(url: string) {
  * @returns 是否为愚人节
  */
 export function isAprilFoolsDay() {
-    const now = new Date();
-    return now.getMonth() == 3 && now.getDate() == 1;
+	const now = new Date();
+	return now.getMonth() == 3 && now.getDate() == 1;
 }
 
 /**
@@ -74,7 +74,7 @@ export function isAprilFoolsDay() {
  * @returns logo图片路径
  */
 export function getLogoSrc() {
-    return isAprilFoolsDay()
-        ? '/assets/img/MCSLFutureAprilFools.png'
-        : '/assets/img/MCSLFuture.png';
+	return isAprilFoolsDay()
+		? '/assets/img/MCSLFutureAprilFools.png'
+		: '/assets/img/MCSLFuture.png';
 }
