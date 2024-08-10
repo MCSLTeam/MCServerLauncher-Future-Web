@@ -19,41 +19,60 @@ const jeUpdates: Ref<any> = ref(null);
 const beUpdates: Ref<any> = ref(null);
 const minecraftNews: Ref<any> = ref(null);
 
+function sortByDate(a: any, b: any) {
+	return new Date(b.date).getTime() - new Date(a.date).getTime();
+}
+
 axios
-	.get('https://launchercontent.mojang.com/v2/javaPatchNotes.json')
-	.then((res) => {
-		jeUpdates.value = res.data;
+	.get('https://launchercontent.mojang.com/v2/javaPatchNotes.json', {
+		headers: {
+			'Cache-Control': 'no-cache',
+		},
 	})
-	.catch(() => {
+	.then((res) => {
+		jeUpdates.value = res.data.entries.sort(sortByDate);
+	})
+	.catch((e) => {
 		ElNotification({
 			title: i18n.t('notification.warning.title'),
 			message: i18n.t('news.je-update.load-failed'),
 			type: 'warning',
 		});
+		console.log(i18n.t('news.je-update.load-failed'), e);
 	});
 axios
-	.get('https://launchercontent.mojang.com/v2/bedrockPatchNotes.json')
-	.then((res) => {
-		beUpdates.value = res.data;
+	.get('https://launchercontent.mojang.com/v2/bedrockPatchNotes.json', {
+		headers: {
+			'Cache-Control': 'no-cache',
+		},
 	})
-	.catch(() => {
+	.then((res) => {
+		beUpdates.value = res.data.entries.sort(sortByDate);
+	})
+	.catch((e) => {
 		ElNotification({
 			title: i18n.t('notification.warning.title'),
 			message: i18n.t('news.be-update.load-failed'),
 			type: 'warning',
 		});
+		console.log(i18n.t('news.be-update.load-failed'), e);
 	});
 axios
-	.get('https://launchercontent.mojang.com/v2/news.json')
-	.then((res) => {
-		minecraftNews.value = res.data;
+	.get('https://launchercontent.mojang.com/v2/news.json', {
+		headers: {
+			'Cache-Control': 'no-cache',
+		},
 	})
-	.catch(() => {
+	.then((res) => {
+		minecraftNews.value = res.data.entries.sort(sortByDate);
+	})
+	.catch((e) => {
 		ElNotification({
 			title: i18n.t('notification.warning.title'),
 			message: i18n.t('news.mc-news.load-failed'),
 			type: 'warning',
 		});
+		console.log(i18n.t('news.mc-news.load-failed'), e);
 	});
 
 function translateNewsCategory(category: string) {
@@ -184,10 +203,10 @@ function openDialog(title: string, contentPath: string) {
 							v-model:current-page="newsPage"
 							layout="prev, pager, next, ->"
 							:page-size="20"
-							:total="jeUpdates.entries.length" />
+							:total="jeUpdates.length" />
 						<div class="news__cards">
 							<ElCard
-								v-for="item in jeUpdates.entries.slice(
+								v-for="item in jeUpdates.slice(
 									(newsPage - 1) * 20,
 									newsPage * 20,
 								)"
@@ -221,7 +240,7 @@ function openDialog(title: string, contentPath: string) {
 							v-model:current-page="newsPage"
 							layout="prev, pager, next, ->"
 							:page-size="20"
-							:total="jeUpdates.entries.length" />
+							:total="jeUpdates.length" />
 					</div>
 				</ElTabPane>
 
@@ -269,10 +288,10 @@ function openDialog(title: string, contentPath: string) {
 							v-model:current-page="newsPage"
 							layout="prev, pager, next, ->"
 							:page-size="20"
-							:total="beUpdates.entries.length" />
+							:total="beUpdates.length" />
 						<div class="news__cards">
 							<ElCard
-								v-for="item in beUpdates.entries.slice(
+								v-for="item in beUpdates.slice(
 									(newsPage - 1) * 20,
 									newsPage * 20,
 								)"
@@ -306,7 +325,7 @@ function openDialog(title: string, contentPath: string) {
 							v-model:current-page="newsPage"
 							layout="prev, pager, next, ->"
 							:page-size="20"
-							:total="beUpdates.entries.length" />
+							:total="beUpdates.length" />
 					</div>
 				</ElTabPane>
 
@@ -355,10 +374,10 @@ function openDialog(title: string, contentPath: string) {
 							v-model:current-page="newsPage"
 							layout="prev, pager, next, ->"
 							:page-size="20"
-							:total="minecraftNews.entries.length" />
+							:total="minecraftNews.length" />
 						<div class="news__cards news__cards-masonry">
 							<ElCard
-								v-for="item in minecraftNews.entries.slice(
+								v-for="item in minecraftNews.slice(
 									(newsPage - 1) * 20,
 									newsPage * 20,
 								)"
@@ -376,12 +395,14 @@ function openDialog(title: string, contentPath: string) {
 									{{ item.title }}
 								</h3>
 								<div class="news__card-tags">
-									<el-tag type="primary">{{
-										translateNewsCategory(item.category)
-									}}</el-tag>
-									<el-tag v-if="item.tag" type="info">{{
-										translateNewsTag(item.tag)
-									}}</el-tag>
+									<el-tag type="primary"
+										>{{
+											translateNewsCategory(item.category)
+										}}
+									</el-tag>
+									<el-tag v-if="item.tag" type="info"
+										>{{ translateNewsTag(item.tag) }}
+									</el-tag>
 								</div>
 								<p class="news__card-desc">
 									{{ item.text }}
@@ -395,7 +416,7 @@ function openDialog(title: string, contentPath: string) {
 							v-model:current-page="newsPage"
 							layout="prev, pager, next, ->"
 							:page-size="20"
-							:total="minecraftNews.entries.length" />
+							:total="minecraftNews.length" />
 					</div>
 				</ElTabPane>
 			</ElTabs>
