@@ -160,11 +160,6 @@ export async function login(
 	password: string,
 	rememberMe: boolean,
 ) {
-	console.log(
-		(await getUser(username)).password,
-		password,
-		await encode(password),
-	);
 	if (
 		(await hasUser(username)) &&
 		(await getUser(username)).password == (await encode(password))

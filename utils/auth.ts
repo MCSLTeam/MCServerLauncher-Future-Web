@@ -158,6 +158,7 @@ export async function login(
 			tokenLocalStorage.value = tokenExpires = null;
 			tokenSessionStorage.value = data.data.token;
 		}
+		await refreshTokenExpire();
 		await useRouter().push('/');
 	} else {
 		// 登录失败，登出

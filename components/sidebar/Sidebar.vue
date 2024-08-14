@@ -334,7 +334,7 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
 	gap: 0;
 }
 
-@media (max-width: 1024px) {
+@media (min-width: 1024px) {
 	.sidebar__collapse-button {
 		display: flex;
 	}
