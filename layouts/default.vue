@@ -29,7 +29,7 @@
 			class="default-layout__max-screen">
 			<ElContainer class="default-layout__max-screen">
 				<!-- 侧边栏 -->
-				<Sidebar />
+				<Sidebar class="default-layout__sidebar" />
 				<slot />
 			</ElContainer>
 		</div>
@@ -103,5 +103,9 @@
 .default-layout__max-screen {
 	width: 100%;
 	height: 100%;
+}
+
+.default-layout__sidebar {
+  animation: 0.5s ease-in-out fadeInLeft;
 }
 </style>

@@ -203,7 +203,6 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
 	border-radius: 10px;
 	border: 1px solid var(--el-border-color);
 	box-shadow: var(--el-box-shadow);
-	animation: 0.5s ease-in-out fadeInUp;
 }
 
 .sidebar__collapsed {

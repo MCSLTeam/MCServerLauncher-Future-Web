@@ -428,9 +428,7 @@ function openDialog(title: string, contentPath: string) {
 .news__container {
 	width: calc(100% - 22px);
 	border-radius: 15px;
-	opacity: 0;
 	margin: 10px;
-	animation: 0.5s ease-in-out both fadeIn;
 }
 
 .news__loading {
@@ -471,8 +469,6 @@ function openDialog(title: string, contentPath: string) {
 	margin: 0 0 10px 0;
 	flex-shrink: 0;
 	cursor: pointer;
-	opacity: 0;
-	animation: 0.5s ease-in-out both 0.2s fadeIn;
 	@media (max-width: 768px) {
 		width: 100%;
 		height: fit-content;
