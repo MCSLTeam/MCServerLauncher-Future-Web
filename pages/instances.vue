@@ -1,4 +1,8 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+useHead({
+  title: useI18n().t('sidebar.instances'),
+});
+</script>
 
 <template>
 	<Page>

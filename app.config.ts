@@ -3,6 +3,11 @@ const config = {
 		return (await import('./package.json')).default.version;
 	},
 	updater: 'https://example.com/update.json',
+	locales: [
+		"en-US",
+		"zh-CN",
+		"zh-MEME"
+	]
 };
 
 (async () => {
