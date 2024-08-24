@@ -17,7 +17,7 @@
 	"login.success": "Logged in!",
 	"login.failed": "Login failed! Reason: {reason}",
 	"login.failed.token": "Login verification failed! Reason: {reason}",
-	"register.title": "Creating Administrator Account",
+	"register.title": "Create Administrator Account",
 	"register.username": "Username (2-16 digits, can contain alphanumerics or underscores)",
 	"register.password": "Password (8 or more digits, must contain upper and lower case letters and numbers)’",
 	"register.password-confirm": "Confirm Password",
