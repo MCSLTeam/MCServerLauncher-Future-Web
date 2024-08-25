@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 useHead({
-	title: useI18n().t('sidebar.instances'),
+  title: useI18n().t('sidebar.instances'),
 });
 </script>
 

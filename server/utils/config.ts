@@ -35,11 +35,11 @@ export async function loadConfig() {
 	// 校验配置文件格式
 	if (typeof config !== 'object') {
 		config = defaultConfig;
-		console.warn('Wrong config format! Using default config!');
+		console.warn('配置文件格式错误！已重置为默认配置文件！');
 	}
 	// 填充缺失的配置项
 	fillMissingValues(config, defaultConfig);
-	console.log('Config loaded');
+	console.log('已加载配置文件');
 	await saveConfig(config);
 }
 
@@ -50,7 +50,7 @@ export async function loadConfig() {
 export async function saveConfig(config: any) {
 	await saveDefaultConfig();
 	await storage.setItem('config.json', config);
-	console.log('Saved config!');
+	console.log('已保存配置文件');
 }
 
 /**
@@ -69,20 +69,20 @@ function fillMissingValues(
 			// 键缺失
 			config[key] = defaultConfig[key];
 			console.warn(
-				'Missing key "' +
+				'配置文件缺失键“' +
 					(parentKey == null ? '' : parentKey + '.') +
 					key +
-					'" in config! Defaulting to: ',
+					'”！已重置为：',
 				defaultConfig[key],
 			);
 		} else if (typeof config[key] !== typeof defaultConfig[key]) {
 			// 值类型不同
 			config[key] = defaultConfig[key];
 			console.warn(
-				'Wrong value type for key "' +
+				'配置文件中键“' +
 					(parentKey == null ? '' : parentKey + '.') +
 					key +
-					'"! Defaulting to: ',
+					'”的值类型错误！已重置为：',
 				defaultConfig[key],
 			);
 		} else if (typeof defaultConfig[key] == 'object') {

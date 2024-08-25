@@ -1,11 +1,11 @@
-import { hasAdmin } from '~/server/utils/auth';
+import {getUsers} from '~/server/utils/auth';
 
 export default defineEventHandler(async () => {
 	return {
 		status: 'ok',
 		message: '',
 		data: {
-			has: await hasAdmin(),
-		},
+			users: await getUsers()
+		}
 	};
 });

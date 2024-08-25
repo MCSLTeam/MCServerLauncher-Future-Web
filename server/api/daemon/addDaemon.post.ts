@@ -5,7 +5,8 @@ export default defineEventHandler(async (event) => {
 	const url = body.url;
 	const daemonToken = body.daemonToken;
 	try {
-		if (!name || !url || !daemonToken) throw 'invalid-params';
+		if (!name || !url || !daemonToken)
+			throw '守护进程名称、URL或Token不能为空';
 		await verifyToken(token);
 		if (
 			!(await hasPermission(
@@ -13,7 +14,7 @@ export default defineEventHandler(async (event) => {
 				'mcsl.web.daemon.add',
 			))
 		)
-			throw 'permission-denied';
+			throw '没有权限';
 		await addDaemon(name, url, daemonToken);
 	} catch (e) {
 		return {

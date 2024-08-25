@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
 				'mcsl.web.daemon.remove',
 			))
 		)
-			throw 'permission-denied';
+			throw '没有权限';
 		await removeDaemon(name);
 	} catch (e) {
 		return {
