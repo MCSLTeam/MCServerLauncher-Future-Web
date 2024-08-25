@@ -65,7 +65,9 @@ async function refreshTokenExpire() {
 		// 无效，登出
 		ElMessage({
 			message: useNuxtApp().$i18n.t('login.failed.token', {
-				reason: expire.message,
+				reason: useNuxtApp().$i18n.t(
+					'request.failed.reason.' + expire.message,
+				),
 			}),
 			type: 'warning',
 		});
