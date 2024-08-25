@@ -1,7 +1,7 @@
 {
 	"announcement.close": "Не показывайте этому знаку никакой руды",
 	"announcement.title": "извещать",
-	"app.name": "Лаунчер сервера Майнкрафт",
+	"app.name": "Пусковая установка MCSL",
 	"app.name.abbr": "MCSL",
 	"app.name.suffix": "будущее",
 	"form.invalid.format": "格式错误！",
@@ -14,7 +14,7 @@
 	"index.overview.instances": "实例",
 	"index.overview.instances.desc": "已开启 / 总实例",
 	"index.overview.username": "Web登录用户名称",
-	"language.country": "Россия",
+	"language.country": "中国",
 	"language.name": "Русский",
 	"loading.default": "Погрузка...",
 	"loading.success": "加载成功！",
