@@ -49,7 +49,7 @@
 	"register.password-confirm": "Confirm Password",
 	"register.submit": "Create",
 	"register.success": "Administrator account created! Please login!",
-	"register.title": "Create Administrator Account",
+	"register.title": "Creating Administrator Account",
 	"register.username": "Username (2-16 digits, can contain alphanumerics or underscores)",
 	"request.failed.reason.invalid-matching-permission": "User permissions are formatted incorrectly",
 	"request.failed.reason.invalid-params": "Invalid or incorrect parameters",
