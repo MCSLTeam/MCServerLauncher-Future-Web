@@ -9,7 +9,7 @@ const locale = ref(useLocale().value);
 const updateInfo: Ref<any> = ref(null);
 const stop = ref(false);
 const showUpdateDialog = ref(false);
-const locales: Ref<{ label: string; value: string }[]> = ref([]);
+const locales: Ref<{ label: string, value: string }[]> = ref([]);
 (async () => {
   for (const locale in await getI18nMessages()) {
     const langFile = (await import('../assets/i18n/' + locale + '.json'))
@@ -24,7 +24,6 @@ const locales: Ref<{ label: string; value: string }[]> = ref([]);
     });
   }
 })();
-const i18n = useI18n();
 
 async function checkUpdate() {
   const res = await $fetch('/api/update/check', {
@@ -38,9 +37,8 @@ async function checkUpdate() {
       updateInfo.value = res.data.update;
       showUpdateDialog.value = true;
     } else {
-      // 已是最新版本
       ElMessage({
-        message: i18n.t('request.failed.reason.' + res.message),
+        message: '当前已是最新版本',
         type: 'success',
       });
     }
@@ -78,6 +76,8 @@ async function update() {
     });
   }
 }
+
+
 </script>
 
 <template>

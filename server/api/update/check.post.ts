@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
 				'mcsl.web.update',
 			))
 		)
-			throw 'permission-denied';
+			throw '没有权限';
 		return {
 			status: 'ok',
 			message: '',

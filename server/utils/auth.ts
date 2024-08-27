@@ -19,7 +19,7 @@ export async function encode(str: string) {
 /**
  * 获取所有用户
  */
-async function getUsers() {
+export async function getUsers() {
 	const users: { [key: string]: any } | null =
 		await storage.getItem('users.json');
 	if (users == null || typeof users != 'object') {
@@ -61,7 +61,7 @@ export async function addUser(
 	password: string,
 	permissions: string[],
 ) {
-	if (await hasUser(username)) throw 'user-exists';
+	if (await hasUser(username)) throw '用户已存在';
 	const users = await getUsers();
 	users[username] = {
 		permissions: permissions,
@@ -109,23 +109,19 @@ export async function getUsernameByToken(token: string) {
 	return new Promise<string>((resolve, reject) => {
 		getSecret()
 			.then((secret) => {
-				jwt.verify(
-					token,
-					secret,
-					async (err: Error | null, decoded: any) => {
-						if (decoded && (<JwtPayload>decoded).username)
-							for (const user in await getUsers()) {
-								if (
-									(await encode(user)) ==
-									(<JwtPayload>decoded).username
-								)
-									resolve(user);
-							}
-						reject(err?.message ?? 'invalid-token');
-					},
-				);
+				jwt.verify(token, secret, async (err, decoded) => {
+					if (decoded && (<JwtPayload>decoded).username)
+						for (const user in await getUsers()) {
+							if (
+								(await encode(user)) ==
+								(<JwtPayload>decoded).username
+							)
+								resolve(user);
+						}
+					reject(err?.message ?? '无效的Token');
+				});
 			})
-			.catch((e) => reject(e?.message ?? 'invalid-token'));
+			.catch((e) => reject(e?.message ?? '无效的Token'));
 	});
 }
 
@@ -146,7 +142,7 @@ export async function verifyToken(token: string) {
 	try {
 		await getUsernameByToken(token);
 	} catch (e) {
-		throw 'unknown-user';
+		throw '未知用户';
 	}
 	return <JwtPayload>jwt.verify(token, await getSecret());
 }
@@ -168,10 +164,10 @@ export async function login(
 		(await hasUser(username)) &&
 		(await getUser(username)).password == (await encode(password))
 	) {
-		console.log('User ' + username + ' logged in');
+		console.log('用户' + username + '已登录');
 		return await generateToken(username, rememberMe);
 	}
-	throw 'login-failed';
+	throw '用户名或密码错误';
 }
 
 /**
@@ -194,7 +190,7 @@ export async function hasPermission(username: string, permission: string) {
 		try {
 			if (matchPermission(perm, permission)) return true;
 		} catch (e) {
-			if (e != 'invalid-user-permission') throw e;
+			if (e != '用户权限格式错误') throw e;
 		}
 	}
 	return false;
@@ -207,9 +203,8 @@ export async function hasPermission(username: string, permission: string) {
  */
 function matchPermission(a: string, b: string): boolean {
 	if (!/^(([a-zA-Z-_]+|\*{1,2})\.)*([a-zA-Z-_]+|\*{1,2})$/.test(a))
-		throw 'invalid-user-permission';
-	if (!/^(([a-zA-Z-_]+)\.)*([a-zA-Z-_]+)$/.test(b))
-		throw 'invalid-matching-permission';
+		throw '用户权限格式错误';
+	if (!/^(([a-zA-Z-_]+)\.)*([a-zA-Z-_]+)$/.test(b)) throw '匹配权限格式错误';
 	const pattern =
 		a
 			.replaceAll('.', '\\s')

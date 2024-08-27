@@ -1,13 +1,56 @@
+
 const tokenLocalStorage = useLocalStorage('token', null);
 const tokenSessionStorage = useSessionStorage('token', null);
 let tokenExpires: Date | null = null;
 let adminRegistered: boolean = false;
 let username: string | null = null;
+let isAdmin: boolean = false;
+let users: { [key: string]: any } | null = null;
+
+export async function addUser(
+	username:string,
+	password:string,
+	permissions:[string]
+){
+	const data = await $fetch('/api/user/addUser',{
+		method: 'POST',
+		body: {
+			username: username,
+			password: password,
+			permissions: permissions,
+		},
+	});
+	return data;
+}
+
+export async function removeUser(
+	username:string
+){
+	const data = await $fetch('/api/user/deleteUser',{
+		method: 'post',
+		body: {
+			username: username,
+		},
+	});
+	return data;
+}
+
+export async function hasAdminPermission() {
+	isAdmin = (await $fetch('/api/auth/hasAdmin')).data.has;
+	return isAdmin;
+}
+
+export async function getUsers() {
+	console.log(users);
+	users = (await $fetch('/api/user/getUsers')).data.users;
+	return users;
+}
 
 /**
  * 判断是否需要注册（管理员已注册）
  * @returns 是否需要注册
  */
+
 export async function shouldRegister() {
 	if (!adminRegistered) {
 		adminRegistered = (await $fetch('/api/auth/hasAdmin')).data.has;
@@ -65,9 +108,7 @@ async function refreshTokenExpire() {
 		// 无效，登出
 		ElMessage({
 			message: useNuxtApp().$i18n.t('login.failed.token', {
-				reason: useNuxtApp().$i18n.t(
-					'request.failed.reason.' + expire.message,
-				),
+				reason: expire.message,
 			}),
 			type: 'warning',
 		});

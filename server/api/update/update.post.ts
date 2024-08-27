@@ -4,14 +4,14 @@ export default defineEventHandler(async (event) => {
 	const stop = body.stop;
 	try {
 		await verifyToken(token);
-		if ((await checkUpdate()) == null) throw 'up-to-date';
+		if ((await checkUpdate()) == null) throw '已是最新版本';
 		if (
 			!(await hasPermission(
 				await getUsernameByToken(token),
 				'mcsl.web.update',
 			))
 		)
-			throw 'permission-denied';
+			throw '没有权限';
 		update(await checkUpdate(), stop);
 		return {
 			status: 'async',

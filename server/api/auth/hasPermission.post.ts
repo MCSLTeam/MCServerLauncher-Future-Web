@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
 	const token = body.token;
 	const permission = body.permission;
 	try {
-		if (!permission) throw 'invalid-params';
+		if (!permission) throw '权限名称不能为空';
 		await verifyToken(token);
 		return {
 			status: 'ok',

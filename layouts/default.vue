@@ -106,6 +106,6 @@
 }
 
 .default-layout__sidebar {
-	animation: 0.5s ease-in-out fadeInLeft;
+  animation: 0.5s ease-in-out fadeInLeft;
 }
 </style>

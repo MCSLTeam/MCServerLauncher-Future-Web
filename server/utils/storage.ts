@@ -28,7 +28,7 @@ export const storage = createStorage({
 	driver: fsDriver({ base: dataDir }),
 });
 
-console.log('Data directory: ', dataDir);
+console.log('数据目录：', dataDir);
 
 /**
  * 备份MCSL Future Web
@@ -58,7 +58,7 @@ export async function backup() {
  * @throws unknown - 下载失败
  */
 export async function downloadFile(url: string, path: string): Promise<void> {
-	console.log('Downloading "' + url + '" to "' + path + '"');
+	console.log('正在下载 ' + url + ' 到 ' + path);
 	const writer = createWriteStream(path);
 	const res = await axios.get(url, {
 		responseType: 'stream',
@@ -67,12 +67,10 @@ export async function downloadFile(url: string, path: string): Promise<void> {
 	return new Promise((resolve, reject) => {
 		finished(writer, (err) => {
 			if (err) {
-				console.error(
-					'Failed to download "' + url + '" to "' + path + '"!',
-				);
+				console.error('从' + url + ' 下载文件到 ' + path + '失败！');
 				reject(err);
 			} else {
-				console.log('Downloaded file "' + path + '"!');
+				console.log('文件 ' + path + ' 下载完成！');
 				resolve();
 			}
 		});
