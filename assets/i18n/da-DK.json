@@ -84,5 +84,14 @@
   "update.dialog.update": "下载更新",
   "update.dialog.info": "详细信息",
   "update.dialog.stop-server": "更新完成后关闭MCSL Future Web",
-  "update.dialog.date": "更新发布日期：{date}"
+  "update.dialog.date": "更新发布日期：{date}",
+  "users.warning": "警告",
+  "users.ok": "好的",
+  "users.selectAllUserToDeleteMessage": "您无法删除全部用户",
+  "users.selectNoneUserToDeleteMessage": "您需要选择一个用户",
+  "users.addUserPasswordErrorMessage": "密码不一致",
+  "users.deleteUsersMessage": "您确认删除以下用户吗？",
+  "users.deleteUsersSuccess": "成功删除以下用户",
+  "users.yes": "确认",
+  "users.no": "不确定"
 }
