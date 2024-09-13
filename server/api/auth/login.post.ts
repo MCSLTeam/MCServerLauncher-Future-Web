@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
 	const password = body.password;
 	const rememberMe = body.rememberMe ?? false;
 	try {
-		if (!username || !password) throw 'invalid-params';
+		requireParam(username, password);
 		const token = await login(username, password, rememberMe);
 		return {
 			status: 'ok',

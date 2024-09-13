@@ -5,15 +5,9 @@ export default defineEventHandler(async (event) => {
 	const url = body.url;
 	const daemonToken = body.daemonToken;
 	try {
-		if (!name || !url || !daemonToken) throw 'invalid-params';
-		await verifyToken(token);
-		if (
-			!(await hasPermission(
-				await getUsernameByToken(token),
-				'mcsl.web.daemon.add',
-			))
-		)
-			throw 'permission-denied';
+		requireParam(name, url, daemonToken)
+		await isAuthed(token)
+		await matchTokenPermission('mcsl.web.daemon.add')
 		await addDaemon(name, url, daemonToken);
 	} catch (e) {
 		return {

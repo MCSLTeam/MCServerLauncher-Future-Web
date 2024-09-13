@@ -3,8 +3,8 @@ export default defineEventHandler(async (event) => {
 	const token = body.token;
 	const permission = body.permission;
 	try {
-		if (!permission) throw 'invalid-params';
-		await verifyToken(token);
+		requireParam(permission)
+		await isAuthed(token)
 		return {
 			status: 'ok',
 			data: {

@@ -50,8 +50,8 @@ async function checkUpdate() {
 			message: i18n.t('update.get.failed', {
 				reason:
 					typeof res.message === 'object' &&
-					(<{ name: string }>res.message).name == 'AxiosError'
-						? (<{ message: string }>res.message).message // 服务器无法请求到更新
+					res.message.name == 'AxiosError'
+						? res.message.message // 服务器无法请求到更新
 						: i18n.t('request.failed.reason.' + res.message), // 其他原因
 			}),
 			type: 'error',

@@ -2,14 +2,8 @@ export default defineEventHandler(async (event) => {
 	const body = await readBody(event);
 	const token = body.token;
 	try {
-		await verifyToken(token);
-		if (
-			!(await hasPermission(
-				await getUsernameByToken(token),
-				'mcsl.web.update',
-			))
-		)
-			throw 'permission-denied';
+		await isAuthed(token);
+		await matchTokenPermission('mcsl.web.update')
 		return {
 			status: 'ok',
 			message: '',
