@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
 	const password = body.password;
 	const rememberMe = body.rememberMe ?? false;
 	try {
-		if (!username || !password) throw '用户名和密码不能为空';
+		if (!username || !password) throw 'invalid-params';
 		const token = await login(username, password, rememberMe);
 		return {
 			status: 'ok',

@@ -5,10 +5,10 @@ export default defineEventHandler(async (event) => {
 	const username = body.username;
 	const password = body.password;
 	try {
-		if (!username || !password) throw '用户名和密码不能为空';
-		if (await hasAdmin()) throw '已有管理员用户';
+		if (!username || !password) throw 'invalid-params';
+		if (await hasAdmin()) throw 'registry-disabled';
 		await addUser(username, password, ['admin', '*']);
-		console.log('管理员已注册，用户名：' + username);
+		console.log('Admin registered, username: ' + username);
 		return {
 			status: 'ok',
 			message: '',

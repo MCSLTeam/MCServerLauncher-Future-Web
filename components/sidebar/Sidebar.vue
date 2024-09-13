@@ -96,19 +96,6 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
 							$t('sidebar.help-center')
 						}}</span>
 					</ElButton>
-
-					<ElButton
-						class="sidebar__menu-item"
-						:class="{
-							'sidebar__menu-item-selected':
-								$router.currentRoute.value.fullPath ===
-								'/users',
-						}"
-						@click="$router.push('/users')">
-						<i class="fa fa-users" /><span>{{
-							$t('sidebar.users')
-						}}</span>
-					</ElButton>
 				</div>
 
 				<!-- 下半部分 -->

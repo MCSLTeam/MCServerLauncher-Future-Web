@@ -23,27 +23,27 @@ export async function checkUpdate() {
  * @param stop - 是否在更新后停止程序
  */
 export async function update(update: any, stop: boolean = false) {
-	console.log('开始更新MCSL Future Web...');
-	console.log('正在备份...');
+	console.log('Start updating MCSL Future Web...');
+	console.log('Backing up...');
 	await backup();
-	console.log('正在下载新版本...');
+	console.log('Downloading the latest version...');
 	const updateFilePath = path.resolve(serverDir, 'MCSL_Future_Web.zip');
 	await downloadFile(update.file_url, updateFilePath);
-	console.log('正在校验新版本...');
+	console.log('Verifying...');
 	if ((await sha1Sum(updateFilePath)) != update.file_sha1) {
 		await fse.remove(updateFilePath);
-		console.error('更新文件校验失败！');
-		throw '更新文件校验失败！';
+		console.error('Verification failed!');
+		throw 'verification-failed';
 	}
-	console.log('正在清空旧版MCSL Future Web文件...');
+	console.log('Removing old files...');
 	await emptyServerDir();
-	console.log('正在解压新版本...');
+	console.log('Unzipping update files...');
 	await (
 		await unzipper.Open.file(updateFilePath)
 	).extract({ path: serverDir });
-	console.log('正在删除更新压缩包...');
+	console.log('Deleting update archive...');
 	await fse.remove(updateFilePath);
-	console.log('更新完成，请重启MCSL Future Web以应用更新！');
+	console.log('Done updating!');
 	if (stop) process.exit(0);
 }
 

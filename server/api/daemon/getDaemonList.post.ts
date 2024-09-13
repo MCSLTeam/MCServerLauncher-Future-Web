@@ -5,12 +5,13 @@ export default defineEventHandler(async (event) => {
 		const daemons = [];
 		for (const daemon in await getDaemons()) {
 			if (
-				await hasPermission(
+				!(await hasPermission(
 					await getUsernameByToken(token),
 					'mcsl.web.daemon.' + daemon + '.access',
-				)
+				))
 			)
-				daemons.push(daemon);
+				throw 'permission-denied';
+			daemons.push(daemon);
 		}
 		return {
 			status: 'ok',

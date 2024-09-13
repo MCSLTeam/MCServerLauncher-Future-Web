@@ -81,7 +81,9 @@ async function submit() {
 				},
 				(message) => {
 					ElMessage({
-						message: i18n.t('register.failed', { reason: message }),
+						message: i18n.t('register.failed', {
+							reason: i18n.t('request.failed.reason.' + message),
+						}),
 						type: 'error',
 					});
 				},

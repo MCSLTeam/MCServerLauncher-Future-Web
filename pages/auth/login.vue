@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
-import type { FormInstance, FormRules } from 'element-plus';
+import {reactive} from 'vue';
+import type {FormInstance, FormRules} from 'element-plus';
 
 definePageMeta({
 	layout: 'auth',
@@ -68,7 +68,9 @@ async function submit() {
 				},
 				(message) => {
 					ElMessage({
-						message: i18n.t('login.failed', { reason: message }),
+						message: i18n.t('login.failed', {
+							reason: i18n.t('request.failed.reason.' + message),
+						}),
 						type: 'error',
 					});
 				},
