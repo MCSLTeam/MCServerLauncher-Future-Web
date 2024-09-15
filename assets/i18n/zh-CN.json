@@ -19,6 +19,7 @@
 	"loading.default": "加载中...",
 	"loading.success": "加载成功！",
 	"loading.theme": "正在加载主题...",
+	"loading.meta": "正在加载站点数据...",
 	"login.failed": "登录失败！原因：{reason}",
 	"login.failed.token": "登录验证失败！原因：{reason}",
 	"login.password": "密码",

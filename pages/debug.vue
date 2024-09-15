@@ -45,7 +45,6 @@ async function checkUpdate() {
 			});
 		}
 	} else {
-		console.log(res.message);
 		ElMessage({
 			message: i18n.t('update.get.failed', {
 				reason:
