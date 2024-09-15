@@ -119,7 +119,7 @@ export async function getUsernameByToken(token: string) {
                                 if ((await getUser(user)).id == decoded.userid)
                                     resolve(user);
                             }
-                        reject(err?.message ?? 'invalid-token');
+                        reject(err ? err.message.replace(' ', '-') : 'invalid-token');
                     },
                 );
             })

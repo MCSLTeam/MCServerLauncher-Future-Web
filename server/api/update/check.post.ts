@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
 	const token = body.token;
 	try {
 		await isAuthed(token);
-		await matchTokenPermission('mcsl.web.update')
+		await matchTokenPermission(token, 'mcsl.web.update')
 		return {
 			status: 'ok',
 			message: '',

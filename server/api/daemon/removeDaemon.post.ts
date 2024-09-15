@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
 	try {
 		requireParam(name)
 		await isAuthed(token);
-		await matchTokenPermission('mcsl.web.daemon.remove')
+		await matchTokenPermission(token, 'mcsl.web.daemon.remove')
 		await removeDaemon(name);
 	} catch (e) {
 		return {

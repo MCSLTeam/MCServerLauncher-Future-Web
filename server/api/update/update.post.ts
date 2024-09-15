@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
 	try {
 		await isAuthed(token);
 		if ((await checkUpdate()) == null) throw 'up-to-date';
-		await matchTokenPermission('mcsl.web.update')
+		await matchTokenPermission(token, 'mcsl.web.update')
 		update(await checkUpdate(), stop);
 		return {
 			status: 'async',

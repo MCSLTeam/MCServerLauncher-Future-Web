@@ -9,8 +9,7 @@ export async function isAuthed(token: string) {
 }
 
 export async function matchTokenPermission(token: string, matchingPermission: string) {
-    await verifyToken(token);
-    if (!await checkPermission(await getUsernameByToken(token), matchingPermission)) {
+    if (!await hasPermission(await getUsernameByToken(token), matchingPermission)) {
         throw 'permission-denied';
     }
 }

@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
         const daemons = [];
         for (const daemon in await getDaemons()) {
             try {
-                await matchTokenPermission('mcsl.web.daemon.' + daemon + '.access')
+                await matchTokenPermission(token, 'mcsl.web.daemon.' + daemon + '.access')
                 daemons.push(daemon);
             } catch (ignored) {
             }

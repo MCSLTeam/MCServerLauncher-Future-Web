@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 	try {
 		requireParam(name, url, daemonToken)
 		await isAuthed(token)
-		await matchTokenPermission('mcsl.web.daemon.add')
+		await matchTokenPermission(token, 'mcsl.web.daemon.add')
 		await addDaemon(name, url, daemonToken);
 	} catch (e) {
 		return {
