@@ -92,7 +92,7 @@ async function generateToken(username: string, rememberMe: boolean = false) {
         : config.auth.expire;
     return jwt.sign(
         {
-            username: getUser(username).id,
+            userid: (await getUser(username)).id,
         },
         await getSecret(),
         {
@@ -114,12 +114,9 @@ export async function getUsernameByToken(token: string) {
                     token,
                     secret,
                     async (err: Error | null, decoded: any) => {
-                        if (decoded && (<JwtPayload>decoded).username)
+                        if (decoded && decoded.userid)
                             for (const user in await getUsers()) {
-                                if (
-                                    (await user.id) ==
-                                    (<JwtPayload>decoded).username
-                                )
+                                if ((await getUser(user)).id == decoded.userid)
                                     resolve(user);
                             }
                         reject(err?.message ?? 'invalid-token');
