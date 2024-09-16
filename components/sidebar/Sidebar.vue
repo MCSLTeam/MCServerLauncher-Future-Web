@@ -22,7 +22,7 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
 
 <template>
 	<ElAside
-		v-if="useScreenWidth().isMdOrBigger() || isInDrawer"
+		v-if="useScreenWidth().isMdOrBigger.value || isInDrawer"
 		class="sidebar__aside"
 		:class="{
 			sidebar__collapsed:

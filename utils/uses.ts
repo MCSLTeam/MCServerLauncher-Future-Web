@@ -1,5 +1,5 @@
 /* 主题 */
-const darkModeStorage = useSessionStorage('darkMode', 'auto');
+const darkModeStorage = useLocalStorage('darkMode', 'auto');
 /**
  * 主题类型
  *
@@ -26,7 +26,7 @@ export type DarkModeTransition = 'viewTransition' | 'fade' | 'none';
  */
 export function useDarkMode() {
 	return {
-		value: isDark(<DarkMode>darkModeStorage.value),
+		value: <DarkMode>darkModeStorage.value,
 		loadTheme: () =>
 			changeTheme(
 				<DarkMode>darkModeStorage.value,
@@ -71,14 +71,14 @@ function changeTheme(
 	const darken = isDark(darkMode);
 	if (!force && darken == isDark(<DarkMode>darkModeStorage.value)) return;
 
-	function toggleDark() {
+	const toggleDark = () => {
 		darkModeStorage.value = darkMode;
 		if (darken) {
 			document.documentElement.classList.add('dark');
 		} else {
 			document.documentElement.classList.remove('dark');
 		}
-	}
+	};
 
 	// 添加过渡样式
 	const style = document.createElement('style');
@@ -177,8 +177,8 @@ const screenWidthRef: Ref<ScreenWidth> = ref('sm');
 export function useScreenWidth() {
 	return {
 		value: screenWidthRef.value,
-		isMdOrBigger: () => screenWidthRef.value != 'sm',
-		isMdOrSmaller: () => screenWidthRef.value != 'lg',
+		isMdOrBigger: computed(() => screenWidthRef.value != 'sm'),
+		isMdOrSmaller: computed(() => screenWidthRef.value != 'lg'),
 	};
 }
 
@@ -192,6 +192,7 @@ export function useScreenWidth() {
  * sm - 小屏（屏幕宽度 < 768px）
  */
 export type ScreenWidth = 'lg' | 'md' | 'sm';
+
 function detectScreenWidth() {
 	const screenWidth = window.innerWidth;
 	if (screenWidth >= 1024) {
@@ -208,10 +209,7 @@ detectScreenWidth();
 window.addEventListener('resize', debounce(detectScreenWidth, 250));
 
 /* 语言 */
-const localeStorage = useLocalStorage(
-	'locale',
-	usePreferredLanguages().value[0],
-);
+const localeStorage = useLocalStorage('locale', 'auto');
 
 /**
  * 获取语言信息
@@ -222,19 +220,13 @@ export function useLocale() {
 		availableLocales: computed(() => {
 			return useNuxtApp().$i18n.locales.value;
 		}),
+		getLocale(locale: string) {
+			if (locale == 'auto') locale = usePreferredLanguages().value[0];
+			return locale;
+		},
 		setLocale(locale: string) {
 			localeStorage.value = locale;
-			useNuxtApp().$i18n.setLocale(getLocale(locale));
+			useNuxtApp().$i18n.setLocale(this.getLocale(locale));
 		},
 	};
-}
-
-/**
- * 获取系统语言
- * @param locale - 语言
- * @returns 语言
- */
-function getLocale(locale: string) {
-	if (locale == 'auto') locale = usePreferredLanguages().value[0];
-	return locale;
 }

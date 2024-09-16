@@ -28,10 +28,7 @@ async function getMessages() {
  * @returns 当前语言
  */
 function getLocaleValue() {
-	let locale = useLocalStorage(
-		'locale',
-		usePreferredLanguages().value[0],
-	).value;
+	let locale = useLocalStorage('locale', 'auto').value;
 	if (locale == 'auto') locale = usePreferredLanguages().value[0];
 	return locale;
 }

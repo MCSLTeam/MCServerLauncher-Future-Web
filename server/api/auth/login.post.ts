@@ -4,6 +4,7 @@ export default defineEventHandler(async (event) => {
 	const password = body.password;
 	const rememberMe = body.rememberMe ?? false;
 	try {
+		await requireEula();
 		requireParam(username, password);
 		const token = await login(username, password, rememberMe);
 		return {

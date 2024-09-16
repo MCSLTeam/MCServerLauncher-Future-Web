@@ -3,7 +3,7 @@
 	"language.country": "US",
 	"app.name": "MCServerLauncher",
 	"app.name.abbr": "MCSL",
-	"app.name.suffix": "Future",
+	"app.name.future": "Future",
 	"loading.default": "Loading...",
 	"loading.theme": "Loading themes...",
 	"loading.success": "Successfully loaded!",

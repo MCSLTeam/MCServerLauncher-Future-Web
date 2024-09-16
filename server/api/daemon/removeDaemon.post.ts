@@ -3,9 +3,10 @@ export default defineEventHandler(async (event) => {
 	const token = body.token;
 	const name = body.name;
 	try {
-		requireParam(name)
+		await requireEula();
+		requireParam(name);
 		await isAuthed(token);
-		await matchTokenPermission(token, 'mcsl.web.daemon.remove')
+		await matchTokenPermission(token, 'mcsl.web.daemon.remove');
 		await removeDaemon(name);
 	} catch (e) {
 		return {

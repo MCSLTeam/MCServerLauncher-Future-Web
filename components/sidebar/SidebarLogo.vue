@@ -6,7 +6,7 @@
 		<ElImage :src="getLogoSrc()" alt="" />
 		<p>
 			{{ $t('app.name.abbr') }}
-			<span>{{ $t('app.name.suffix') }}</span>
+			<span>{{ $t('app.name.future') }}</span>
 		</p>
 	</div>
 </template>

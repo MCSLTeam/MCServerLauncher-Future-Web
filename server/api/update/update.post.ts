@@ -3,9 +3,10 @@ export default defineEventHandler(async (event) => {
 	const token = body.token;
 	const stop = body.stop ?? false;
 	try {
+		await requireEula();
 		await isAuthed(token);
 		if ((await checkUpdate()) == null) throw 'up-to-date';
-		await matchTokenPermission(token, 'mcsl.web.update')
+		await matchTokenPermission(token, 'mcsl.web.update');
 		update(await checkUpdate(), stop);
 		return {
 			status: 'async',

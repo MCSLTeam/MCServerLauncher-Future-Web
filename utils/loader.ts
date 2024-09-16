@@ -9,30 +9,36 @@ export const mcslLoadingInfo = new LoadingInfo('loading', '');
  */
 export const meta = ref('');
 
-export const canHideOverlay = ref(false)
+export const canHideOverlay = ref(false);
 
 let startLoad;
 
 // TODO: 加载
 export async function loadApp() {
-    startLoad = Date.now();
-    while (useNuxtApp().$i18n == undefined) {
-        await sleep(100);
-    }
-    mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.default'));
-    mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.meta'));
-    meta.value = (await $fetch('/api/getMeta')).data;
-    document.title = document.title.replace('MCSL Future Web', meta.value.siteTitle)
-    useHead().titleTemplate = (titleChunk) => {
-        return titleChunk
-            ? `${titleChunk} | ` + meta.value.siteTitle
-            : meta.value.siteTitle;
-    };
-    mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.theme'));
-    useDarkMode().loadTheme();
-    mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.success'));
-    mcslLoadingInfo.setLoadingStatus('success');
-    setTimeout(() => {
-        canHideOverlay.value = true
-    }, startLoad + 1000 - Date.now())
+	startLoad = Date.now();
+	while (useNuxtApp().$i18n == undefined) {
+		await sleep(100);
+	}
+	mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.default'));
+	mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.meta'));
+	meta.value = (await $fetch('/api/getMeta')).data;
+	document.title = document.title.replace(
+		'MCSL Future Web',
+		meta.value.siteTitle,
+	);
+	useHead().titleTemplate = (titleChunk) => {
+		return titleChunk
+			? `${titleChunk} | ` + meta.value.siteTitle
+			: meta.value.siteTitle;
+	};
+	mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.theme'));
+	useDarkMode().loadTheme();
+	mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.success'));
+	mcslLoadingInfo.setLoadingStatus('success');
+	setTimeout(
+		() => {
+			canHideOverlay.value = true;
+		},
+		startLoad + 1000 - Date.now(),
+	);
 }

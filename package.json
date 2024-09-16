@@ -28,6 +28,7 @@
 		"crypto-js": "^4.2.0",
 		"fs-extra": "^11.2.0",
 		"jsonwebtoken": "^9.0.2",
+		"marked": "^14.1.2",
 		"nanoid": "^5.0.7",
 		"nuxt": "^3.12.3",
 		"pinyin-pro": "^3.23.1",

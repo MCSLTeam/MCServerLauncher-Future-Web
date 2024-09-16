@@ -12,7 +12,7 @@
 			</a>
 			<!-- 备案号 -->
 			<span v-if="beian != ''">
-				<span v-if="useScreenWidth().isMdOrBigger()">
+				<span v-if="useScreenWidth().isMdOrBigger.value">
 					&ensp;|&ensp;
 				</span>
 				<br v-if="useScreenWidth().value == 'sm'" >

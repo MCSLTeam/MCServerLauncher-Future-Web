@@ -19,7 +19,6 @@ html,
 	width: 100%;
 	height: 100%;
 	margin: 0;
-	background: var(--el-bg-color);
 }
 
 .font-mono {
@@ -120,8 +119,9 @@ html.dark::view-transition-new(root) {
 }
 
 /* Element Plus 魔改 */
-.el-link {
-	transition: ease-in-out 0.3s;
+.el-link,
+.el-button {
+	transition: ease-in-out 0.3s !important;
 }
 
 .el-overlay-dialog {

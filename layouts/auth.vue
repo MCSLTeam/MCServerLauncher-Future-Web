@@ -2,21 +2,30 @@
 <script setup lang="ts"></script>
 
 <template>
-	<div class="auth__container">
-		<div class="auth__logo">
-			<img :src="getLogoSrc()" alt="logo" >
-			<h1>
-				{{ $t('app.name.abbr') }}
-				<span>{{ $t('app.name.suffix') }}</span>
-			</h1>
+	<div class="auth__max-screen">
+		<LoadingOverlay />
+		<div v-show="canHideOverlay" class="auth__container auth__max-screen">
+			<div class="auth__logo">
+				<img :src="getLogoSrc()" alt="logo" >
+				<h1>
+					{{ $t('app.name.abbr') }}
+					<span>{{ $t('app.name.future') }}</span>
+				</h1>
+			</div>
+			<ElCard class="auth__card">
+				<slot />
+				<Footer />
+			</ElCard>
 		</div>
-		<ElCard class="auth__card">
-			<slot />
-		</ElCard>
 	</div>
 </template>
 
 <style scoped>
+.auth__max-screen {
+	width: 100%;
+	height: 100%;
+}
+
 .auth__card {
 	margin: 1rem;
 	border-radius: 1rem;

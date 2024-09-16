@@ -3,6 +3,7 @@ export default defineEventHandler(async (event) => {
 	const username = body.username;
 	const password = body.password;
 	try {
+		await requireEula();
 		requireParam(username, password);
 		if (await hasAdmin()) throw 'registry-disabled';
 		await addUser(username, password, ['admin', '*']);

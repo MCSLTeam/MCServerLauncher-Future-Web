@@ -3,8 +3,9 @@ export default defineEventHandler(async (event) => {
 	const token = body.token;
 	const permission = body.permission;
 	try {
-		requireParam(permission)
-		await isAuthed(token)
+		await requireEula();
+		requireParam(permission);
+		await isAuthed(token);
 		return {
 			status: 'ok',
 			data: {
