@@ -11,7 +11,6 @@ export default defineNuxtConfig({
 	modules: [
 		'@nuxtjs/i18n',
 		'@nuxtjs/eslint-module',
-		'@pinia/nuxt',
 		'@element-plus/nuxt',
 		'@nuxt/eslint',
 		'@vueuse/nuxt',

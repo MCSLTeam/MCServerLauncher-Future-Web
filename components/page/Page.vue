@@ -1,13 +1,10 @@
 <!-- 页面组件（侧边栏右侧） -->
-<script setup lang="ts">
-import Header from '~/components/page/Header.vue';
-import Footer from '~/components/page/Footer.vue';
-</script>
+<script setup lang="ts"></script>
 
 <template>
 	<ElContainer direction="vertical">
 		<!-- 导航栏 -->
-		<Header class="page__header">
+		<PageHeader class="page__header">
 			<template #breadcrumb>
 				<slot name="breadcrumb" />
 			</template>
@@ -17,12 +14,12 @@ import Footer from '~/components/page/Footer.vue';
 			<template #end>
 				<slot name="nav-end" />
 			</template>
-		</Header>
+		</PageHeader>
 		<!-- 页面内容 -->
 		<ElMain class="page__main">
 			<ElScrollbar>
 				<slot name="default" />
-				<Footer />
+				<PageFooter />
 			</ElScrollbar>
 		</ElMain>
 	</ElContainer>

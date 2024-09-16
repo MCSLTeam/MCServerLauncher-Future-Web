@@ -14,9 +14,9 @@
 			</div>
 			<ElCard class="auth__card">
 				<slot />
-				<Footer />
+        <PageFooter class="auth__footer" />
 			</ElCard>
-		</div>
+    </div>
 	</div>
 </template>
 
@@ -73,5 +73,10 @@
 		var(--el-color-primary-dark-2)
 	);
 	background-clip: text;
+}
+
+.auth__footer {
+  padding: 0;
+  width: 100%;
 }
 </style>
