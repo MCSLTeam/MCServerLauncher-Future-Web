@@ -1,5 +1,5 @@
 {
-	"name": "mcsl-future-tauri",
+	"name": "mcsl-future-web",
 	"version": "0.1.0",
 	"private": true,
 	"type": "module",
@@ -43,7 +43,6 @@
 		"@kgierke/nuxt-basic-auth": "^1.6.0",
 		"@nuxt/eslint": "^0.3.13",
 		"@nuxtjs/eslint-module": "^4.1.0",
-		"@tauri-apps/cli": "^1.6.0",
 		"@types/crypto-js": "^4.2.2",
 		"@types/fs-extra": "^11.0.4",
 		"@types/jsonwebtoken": "^9.0.6",
