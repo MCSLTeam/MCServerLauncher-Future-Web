@@ -7,7 +7,7 @@ export const mcslLoadingInfo = new LoadingInfo('loading', '');
 /**
  * 备案号、网站名称等
  */
-export const meta = ref('');
+export const meta = reactive({});
 
 export const canHideOverlay = ref(false);
 
