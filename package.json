@@ -47,7 +47,7 @@
 		"@types/fs-extra": "^11.0.4",
 		"@types/jsonwebtoken": "^9.0.6",
 		"@types/unzipper": "^0.10.9",
-		"element-plus": "^2.7.7",
+		"element-plus": "^2.8.3",
 		"eslint": "^9.7.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-prettier": "^5.1.3",
