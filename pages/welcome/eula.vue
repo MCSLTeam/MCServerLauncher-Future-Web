@@ -67,13 +67,13 @@ async function agree() {
 						<p v-html="marked.parse(md)" />
 					</ElText>
 				</ElScrollbar>
-				<div class="eula__buttons">
-					<ElButton @click="$router.push('/welcome/welcome')">{{
-						$t('welcome.prev')
-					}}</ElButton>
-					<ElButton @click="disagree">{{
-						$t('eula.disagree')
-					}}</ElButton>
+				<div v-if="agreeCountdown != -1" class="eula__buttons">
+					<ElButton @click="$router.push('/welcome/welcome')"
+						>{{ $t('welcome.prev') }}
+					</ElButton>
+					<ElButton @click="disagree"
+						>{{ $t('eula.disagree') }}
+					</ElButton>
 					<ElButton
 						type="primary"
 						:disabled="agreeCountdown != 0"
