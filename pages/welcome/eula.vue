@@ -163,7 +163,7 @@ async function agree() {
 }
 
 .eula__scrollbar a {
-	color: var(--el-text-color-primary);
+	color: var(--el-text-color-regular);
 	text-decoration: underline;
 	transition: 0.3s ease-in-out;
 }

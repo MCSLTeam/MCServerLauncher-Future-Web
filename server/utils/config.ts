@@ -34,7 +34,7 @@ export async function saveDefaultConfig() {
 	// 判断是否存在
 	if (!(await storage.hasItem('config.json'))) {
 		await storage.setItem('config.json', defaultConfig);
-		console.warn('配置文件不存在！已创建新配置文件！');
+		console.warn('Config does not exist! Generating new config!');
 	}
 }
 
