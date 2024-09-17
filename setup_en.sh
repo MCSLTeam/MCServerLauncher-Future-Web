@@ -169,12 +169,12 @@ echo "[Unit]
 
 echo -n "Please enter MCSL Future Web server port (Default: "
 set_format 1
-echo -n "11451"
+echo -n "11452"
 set_format 0
 echo -n "): "
 read -r web_port
 if [ -z "$web_port" ]; then
-  web_port="11451"
+  web_port="11452"
 fi
 
 echo "[Unit]

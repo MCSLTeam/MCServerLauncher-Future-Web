@@ -169,12 +169,12 @@ echo "[Unit]
 
 echo -n "请输入 MCSL Future Web 服务器端口（默认为"
 set_format 1
-echo -n "11451"
+echo -n "11452"
 set_format 0
 echo -n "）："
 read -r web_port
 if [ -z "$web_port" ]; then
-  web_port="11451"
+  web_port="11452"
 fi
 
 echo "[Unit]
