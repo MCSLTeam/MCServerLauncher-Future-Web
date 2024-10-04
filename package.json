@@ -30,7 +30,7 @@
 		"marked": "^14.1.2",
 		"nanoid": "^5.0.7",
 		"nbt-parser": "^0.1.1",
-		"nuxt": "^3.12.3",
+		"nuxt": "^3.13.2",
 		"pinyin-pro": "^3.23.1",
 		"unstorage": "^1.10.2",
 		"unzipper": "^0.12.3",
