@@ -57,8 +57,8 @@ importers:
         specifier: ^1.10.2
         version: 1.10.2(ioredis@5.4.1)
       unzipper:
-        specifier: ^0.12.2
-        version: 0.12.2
+        specifier: ^0.12.3
+        version: 0.12.3
       vue:
         specifier: latest
         version: 3.5.11(typescript@5.5.3)
@@ -4491,8 +4491,8 @@ packages:
   unwasm@0.3.9:
     resolution: {integrity: sha512-LDxTx/2DkFURUd+BU1vUsF/moj0JsoTvl+2tcg2AUOiEzVturhGGx17/IMgGvKUYdZwr33EJHtChCJuhu9Ouvg==}
 
-  unzipper@0.12.2:
-    resolution: {integrity: sha512-ecRhBc+ZfQkYnRr8L7OkxvAAWDkqP3Dun9CHUmYYZx/mErGdy7N7ju6ODJ7uKmm9PD99aAG8grxzl5y9lmEK2A==}
+  unzipper@0.12.3:
+    resolution: {integrity: sha512-PZ8hTS+AqcGxsaQntl3IRBw65QrBI6lxzqDEL7IAo/XCEqRTKGfOX56Vea5TH9SZczRVxuzk1re04z/YjuYCJA==}
 
   upath@2.0.1:
     resolution: {integrity: sha512-1uEe95xksV1O0CYKXo8vQvN1JEbtJp7lb7C5U9HMsIp6IVwntkH/oNUzyVNQSd4S1sYk2FpSSW44FqMc8qee5w==}
@@ -9754,7 +9754,7 @@ snapshots:
       pkg-types: 1.1.3
       unplugin: 1.11.0
 
-  unzipper@0.12.2:
+  unzipper@0.12.3:
     dependencies:
       bluebird: 3.7.2
       duplexer2: 0.1.4
