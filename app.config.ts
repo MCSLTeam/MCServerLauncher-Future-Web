@@ -4,6 +4,7 @@ const config = {
 	},
 	updater: 'https://example.com/update.json',
 	locales: ['en-US', 'zh-CN', 'zh-MEME'],
+	resourcepackFormat: 1,
 };
 
 (async () => {

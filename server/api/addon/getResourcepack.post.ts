@@ -15,7 +15,10 @@ export default defineEventHandler(async (event) => {
 					(resourcepack) => {
 						if (resourcepack.type == 'local')
 							resourcepack.url = path.join('/', resourcepack.url);
-						if (!resourcepack.url.endsWith('addon.json'))
+						if (
+							resourcepack.type != 'system' &&
+							!resourcepack.url.endsWith('addon.json')
+						)
 							resourcepack.url = path.join(
 								resourcepack.url,
 								'addon.json',

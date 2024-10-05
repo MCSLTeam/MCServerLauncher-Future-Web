@@ -3,8 +3,10 @@ import axios from 'axios';
 import {ElNotification} from 'element-plus';
 import {type Ref, ref} from 'vue';
 
+const i18n = useI18n();
+
 useHead({
-	title: useI18n().t('sidebar.news'),
+	title: i18n.t('sidebar.news'),
 });
 
 const activeTab = ref(
@@ -18,7 +20,6 @@ const dialog = ref({
 	body: null,
 });
 
-const i18n = useI18n();
 const jeUpdates: Ref<any> = ref(null);
 const beUpdates: Ref<any> = ref(null);
 const minecraftNews: Ref<any> = ref(null);

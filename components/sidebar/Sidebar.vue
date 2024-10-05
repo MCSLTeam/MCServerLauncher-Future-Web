@@ -72,16 +72,17 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
 						}}</span>
 					</ElButton>
 
-					<!-- 调试工具 TODO: 生产环境删了 -->
 					<ElButton
 						class="sidebar__menu-item"
 						:class="{
 							'sidebar__menu-item-selected':
 								$router.currentRoute.value.fullPath ===
-								'/debug',
+								'/addon',
 						}"
-						@click="$router.push('/debug')">
-						<i class="fa fa-bug" /><span>Debug</span>
+						@click="$router.push('/addon')">
+						<i class="fa fa-puzzle-piece" /><span>{{
+							$t('sidebar.addon')
+						}}</span>
 					</ElButton>
 
 					<ElButton
@@ -95,6 +96,18 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
 						<i class="fa fa-question" /><span>{{
 							$t('sidebar.help-center')
 						}}</span>
+					</ElButton>
+
+					<!-- 调试工具 TODO: 生产环境删了 -->
+					<ElButton
+						class="sidebar__menu-item"
+						:class="{
+							'sidebar__menu-item-selected':
+								$router.currentRoute.value.fullPath ===
+								'/debug',
+						}"
+						@click="$router.push('/debug')">
+						<i class="fa fa-bug" /><span>Debug</span>
 					</ElButton>
 				</div>
 
