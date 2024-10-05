@@ -230,3 +230,26 @@ export function useLocale() {
 		},
 	};
 }
+
+/* 是否加载插件 */
+const loadAddonSessionStorage = useSessionStorage('loadAddon', 'ask');
+const loadAddonLocalStorage = useLocalStorage('loadAddon');
+
+export function useLoadAddon() {
+	return {
+		canLoad(): 'ask' | 'yes' | 'no' {
+			return loadAddonLocalStorage.value == 'true'
+				? 'yes'
+				: loadAddonSessionStorage.value;
+		},
+		doNotLoad() {
+			loadAddonSessionStorage.value = 'false';
+		},
+		confirmLoad() {
+			loadAddonSessionStorage.value = 'true';
+		},
+		loadForever() {
+			loadAddonLocalStorage.value = 'true';
+		},
+	};
+}

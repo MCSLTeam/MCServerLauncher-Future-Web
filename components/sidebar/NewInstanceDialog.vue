@@ -122,7 +122,7 @@ function instanceNameInput() {
 function formatPath(path: string) {
 	path = path.trim();
 	path = pinyin(path, { toneType: 'none', type: 'array' }).join('');
-	path = path.replace(/[^a-zA-Z0-9_]+/g, '-');
+	path = path.replaceAll(/[^a-zA-Z0-9_]+/g, '-');
 	return path;
 }
 

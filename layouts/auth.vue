@@ -14,9 +14,9 @@
 			</div>
 			<ElCard class="auth__card">
 				<slot />
-        <PageFooter class="auth__footer" />
+				<PageFooter class="auth__footer" />
 			</ElCard>
-    </div>
+		</div>
 	</div>
 </template>
 
@@ -76,7 +76,7 @@
 }
 
 .auth__footer {
-  padding: 0;
-  width: 100%;
+	padding: 0;
+	width: 100%;
 }
 </style>

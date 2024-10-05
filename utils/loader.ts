@@ -33,6 +33,10 @@ export async function loadApp() {
 	};
 	mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.theme'));
 	useDarkMode().loadTheme();
+	mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.addon'));
+	while (useLoadAddon().canLoad() == 'ask') {
+		await sleep(100);
+	}
 	mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.success'));
 	mcslLoadingInfo.setLoadingStatus('success');
 	setTimeout(

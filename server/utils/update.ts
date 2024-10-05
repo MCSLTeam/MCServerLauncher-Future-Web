@@ -1,5 +1,4 @@
 import path from 'node:path';
-import {serverDir} from '~/server/utils/storage';
 import * as fs from 'node:fs';
 import * as fse from 'fs-extra';
 import * as unzipper from 'unzipper';

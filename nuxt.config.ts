@@ -21,7 +21,7 @@ export default defineNuxtConfig({
 				{
 					// 没有JavaScript时显示
 					innerHTML:
-						'<div class="noscript"><p>MCSL Future Web 的部分功能需要启用 JavaScript 才可使用！</p></div>',
+						'<div class="noscript"><p>MCSL Future Web 需要启用 JavaScript 才可使用！</p></div>',
 				},
 			],
 		},

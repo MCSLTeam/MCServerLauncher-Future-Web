@@ -114,15 +114,6 @@ async function submit() {
 				:placeholder="$t('register.password-confirm')" />
 		</ElFormItem>
 		<ElFormItem>
-			<p class="auth__copyright">
-				Powered by
-				<ElLink
-					:underline="false"
-					href="https://github.com/MCSL-Future/MCSL2"
-					target="_blank"
-					>MCSL Future Web
-				</ElLink>
-			</p>
 			<ElButton type="primary" @click="submit"
 				>{{ $t('register.submit') }}
 			</ElButton>

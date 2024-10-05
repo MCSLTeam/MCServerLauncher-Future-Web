@@ -1,7 +1,6 @@
 import type {JwtPayload} from 'jsonwebtoken';
 import jwt from 'jsonwebtoken';
 import * as crypto from 'crypto';
-import {getConfig} from '~/server/utils/config';
 
 /**
  * 返回配置文件中的私钥
@@ -121,7 +120,7 @@ export async function getUsernameByToken(token: string) {
 							}
 						reject(
 							err
-								? err.message.replace(' ', '-')
+								? err.message.replaceAll(' ', '-')
 								: 'invalid-token',
 						);
 					},

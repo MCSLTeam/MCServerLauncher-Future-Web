@@ -9,6 +9,11 @@ export interface Config {
 	agreedEula: boolean;
 	beian: string;
 	siteTitle: string;
+	resourcepacks: {
+		url: string;
+		enabled: boolean;
+		type: 'local' | 'remote' | 'system';
+	}[];
 }
 
 /**
@@ -23,6 +28,13 @@ export const defaultConfig: Config = {
 	agreedEula: false,
 	beian: '',
 	siteTitle: 'MCSL Future Web',
+	resourcepacks: [
+		{
+			url: 'plugin-resource',
+			enabled: true,
+			type: 'system',
+		},
+	],
 };
 
 const load = loadConfig();
