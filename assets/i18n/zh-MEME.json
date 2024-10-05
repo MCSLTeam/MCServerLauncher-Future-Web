@@ -62,7 +62,7 @@
 	"request.failed.reason.invalid-params": "参数不太对劲...",
 	"request.failed.reason.invalid-token": "拿着鸡毛当令箭",
 	"request.failed.reason.invalid-user-permission": "你提权了？",
-	"request.failed.reason.login-failed": "考号和校验码填如来佛的",
+	"request.failed.reason.login-failed": "考号和校验码可以填我的",
 	"request.failed.reason.permission-denied": "犬线不够",
 	"request.failed.reason.registry-disabled": "你想谋权篡位？",
 	"request.failed.reason.unknown-user": "不是你谁",
