@@ -4,7 +4,7 @@ const showSidebar = ref(false);
 </script>
 
 <template>
-	<ElHeader class="header__container">
+	<ElHeader class="header__container el-card">
 		<!-- 面包屑 -->
 		<div>
 			<ElBreadcrumb separator="/">
@@ -39,12 +39,12 @@ const showSidebar = ref(false);
 
 <style scoped>
 .header__container {
-	width: calc(100% - 20px);
+	width: calc(100% - 10px);
 	height: 60px;
-	margin: 10px;
-	border-radius: 10px;
+	margin: 10px 10px 0 0;
+	border-radius: 15px;
 	padding: 10px 20px;
-	border: 1px solid var(--el-border-color);
+	border: 1px solid var(--el-card-border-color);
 	box-shadow: var(--el-box-shadow);
 	display: flex;
 	justify-content: space-between;

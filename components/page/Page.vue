@@ -33,5 +33,8 @@
 .page__main {
 	padding: 0;
 	animation: 0.5s ease-in-out fadeIn;
+  width: calc(100% + 10px);
+  position: relative;
+  left: -10px;
 }
 </style>

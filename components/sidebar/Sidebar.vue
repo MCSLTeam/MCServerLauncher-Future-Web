@@ -23,7 +23,7 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
 <template>
 	<ElAside
 		v-if="useScreenWidth().isMdOrBigger.value || isInDrawer"
-		class="sidebar__aside"
+		class="sidebar__aside el-card"
 		:class="{
 			sidebar__collapsed:
 				!isInDrawer && (useScreenWidth().value == 'md' || isCollapsed),
@@ -213,8 +213,8 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
 	padding-top: 10px;
 	width: 17%;
 	height: calc(100% - 20px);
-	border-radius: 10px;
-	border: 1px solid var(--el-border-color);
+	border-radius: 15px;
+	border: 1px solid var(--el-card-border-color);
 	box-shadow: var(--el-box-shadow);
 }
 
