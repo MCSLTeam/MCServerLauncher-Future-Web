@@ -39,9 +39,9 @@ const showSidebar = ref(false);
 
 <style scoped>
 .header__container {
-	width: calc(100% - 10px);
+	width: calc(100% - 40px);
 	height: 60px;
-	margin: 10px 10px 0 0;
+	margin: 20px 20px 10px 20px;
 	border-radius: 15px;
 	padding: 10px 20px;
 	border: 1px solid var(--el-card-border-color);

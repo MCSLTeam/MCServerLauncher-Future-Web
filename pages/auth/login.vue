@@ -117,4 +117,8 @@ async function submit() {
 .auth__card .el-form-item * {
 	justify-content: space-between !important;
 }
+
+.auth__card .el-button {
+  padding: 1.1rem !important;
+}
 </style>

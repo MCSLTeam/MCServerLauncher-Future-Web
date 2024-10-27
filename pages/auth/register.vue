@@ -131,14 +131,10 @@ async function submit() {
 }
 
 .auth__card .el-form-item * {
-	justify-content: space-between !important;
+	justify-content: flex-end !important;
 }
 
 .auth__card .el-button {
-	padding: 1.1rem !important;
-}
-
-.auth__copyright {
-	color: var(--el-text-color-regular);
+  padding: 1.1rem !important;
 }
 </style>

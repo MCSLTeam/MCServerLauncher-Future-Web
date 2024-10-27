@@ -64,7 +64,6 @@ function getTaskStatus(task: SimpleTask) {
 .task-dialog__card {
 	width: calc(100% - 20px);
 	height: 150px;
-	border-radius: 10px;
 	margin: 10px;
 	flex-shrink: 0;
 	opacity: 0;

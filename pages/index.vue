@@ -117,7 +117,7 @@ function closeAnnouncement() {
 	margin: 10px;
 	box-shadow: var(--el-box-shadow-light);
 	width: calc(100% - 20px);
-	border-radius: 10px;
+	border-radius: 15px;
 }
 
 .index__announcement.el-alert--info {

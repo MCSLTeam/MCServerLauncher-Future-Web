@@ -201,6 +201,7 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
 	width: calc(100% - 20px);
 	height: calc(100% - 10px);
 	padding: 0 10px 10px 10px;
+  border: none;
 }
 
 .sidebar__aside,
@@ -209,10 +210,11 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
 }
 
 .sidebar__standalone {
-	margin-top: 10px;
-	padding-top: 10px;
-	width: 17%;
-	height: calc(100% - 20px);
+	margin: 20px 0 20px 20px;
+	padding: 20px;
+	width: 20%;
+  max-width: 17rem;
+	height: calc(100% - 40px);
 	border-radius: 15px;
 	border: 1px solid var(--el-card-border-color);
 	box-shadow: var(--el-box-shadow);
@@ -220,6 +222,7 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
 
 .sidebar__collapsed {
 	width: 65px;
+  padding: 10px;
 }
 
 .sidebar__menu-item i {
