@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type {Ref} from 'vue';
-import {$fetch} from 'ofetch';
+import type { Ref } from 'vue';
+import { $fetch } from 'ofetch';
 
 useHead({
 	title: '调试页面',

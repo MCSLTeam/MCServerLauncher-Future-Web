@@ -1,6 +1,6 @@
 // TODO: 完善任务系统
-import type {Ref} from 'vue';
-import {ref, watch} from 'vue';
+import type { Ref } from 'vue';
+import { ref, watch } from 'vue';
 
 export enum TaskStatus {
 	Done,

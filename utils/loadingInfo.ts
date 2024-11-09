@@ -1,5 +1,5 @@
-import type {Ref} from 'vue';
-import {ref} from 'vue';
+import type { Ref } from 'vue';
+import { ref } from 'vue';
 
 /**
  * 加载状态

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import {ref} from 'vue';
-import {$fetch} from 'ofetch';
+import { ref } from 'vue';
+import { $fetch } from 'ofetch';
 import axios from 'axios';
 
 const i18n = useI18n();
@@ -94,7 +94,7 @@ const activeTab = ref(
 							class="addon__loading-icon"
 							element-loading-background="rgba(255, 255, 255, 0.5)" />
 						<ElSkeleton animated>
-							<template #template/>
+							<template #template />
 						</ElSkeleton>
 					</div>
 					<div v-else class="addon__tab">
@@ -129,7 +129,7 @@ const activeTab = ref(
 								$t('addon.resourcepack.select.search')
 							" />
 					</div>
-					<div v-else class="addon__tab"/>
+					<div v-else class="addon__tab" />
 				</ElTabPane>
 
 				<!-- 插件 -->

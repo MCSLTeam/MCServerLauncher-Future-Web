@@ -1,6 +1,5 @@
 <!-- 登录/注册页面布局 -->
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
 	<div class="auth__max-screen">
@@ -15,8 +14,8 @@
 			</div>
 			<ElCard class="auth__card">
 				<div>
-          <slot />
-        </div>
+					<slot />
+				</div>
 				<PageFooter class="auth__footer" />
 			</ElCard>
 		</div>

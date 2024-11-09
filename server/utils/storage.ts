@@ -1,11 +1,11 @@
-import {createStorage} from 'unstorage';
+import { createStorage } from 'unstorage';
 import fsDriver from 'unstorage/drivers/fs';
 import path from 'node:path';
-import {fileURLToPath} from 'node:url';
+import { fileURLToPath } from 'node:url';
 import * as fs from 'fs-extra';
-import {createWriteStream, readdirSync} from 'node:fs';
+import { createWriteStream, readdirSync } from 'node:fs';
 import axios from 'axios';
-import {finished} from 'node:stream';
+import { finished } from 'node:stream';
 import fsExtra from 'fs-extra/esm';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -105,7 +105,7 @@ export function generateFileId(name: string, path: string) {
 export function getInfoByFileId(id: number): { name: string; path: string } {
 	const item = fileIds[id];
 	if (!item) throw 'unknown-fileid';
-	return fileIds[id];
+	return item;
 }
 
 export function removeFileId(id: number) {

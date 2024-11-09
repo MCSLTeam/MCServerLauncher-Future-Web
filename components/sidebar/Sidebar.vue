@@ -1,6 +1,6 @@
 <!-- 侧边栏 -->
 <script lang="ts" setup>
-import {ref} from 'vue';
+import { ref } from 'vue';
 import NewInstance from './NewInstanceDialog.vue';
 import TasksDialog from './TasksDialog.vue';
 import SidebarLogo from '~/components/sidebar/SidebarLogo.vue';
@@ -201,7 +201,7 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
 	width: calc(100% - 20px);
 	height: calc(100% - 10px);
 	padding: 0 10px 10px 10px;
-  border: none;
+	border: none;
 }
 
 .sidebar__aside,
@@ -213,7 +213,7 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
 	margin: 20px 0 20px 20px;
 	padding: 20px;
 	width: 20%;
-  max-width: 17rem;
+	max-width: 17rem;
 	height: calc(100% - 40px);
 	border-radius: 15px;
 	border: 1px solid var(--el-card-border-color);
@@ -222,7 +222,7 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
 
 .sidebar__collapsed {
 	width: 65px;
-  padding: 10px;
+	padding: 10px;
 }
 
 .sidebar__menu-item i {

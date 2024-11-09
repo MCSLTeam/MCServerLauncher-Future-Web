@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {reactive} from 'vue';
-import type {FormInstance, FormRules} from 'element-plus';
+import { reactive } from 'vue';
+import type { FormInstance, FormRules } from 'element-plus';
 
 definePageMeta({
 	layout: 'auth',
@@ -135,6 +135,6 @@ async function submit() {
 }
 
 .auth__card .el-button {
-  padding: 1.1rem !important;
+	padding: 1.1rem !important;
 }
 </style>

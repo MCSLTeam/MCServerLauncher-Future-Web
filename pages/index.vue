@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type {Ref} from 'vue';
+import type { Ref } from 'vue';
 import MD5 from 'crypto-js/md5';
 
 const i18n = useI18n();

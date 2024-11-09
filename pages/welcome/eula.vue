@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import axios from 'axios';
-import {marked} from 'marked';
+import { marked } from 'marked';
 
 definePageMeta({
 	layout: 'empty',

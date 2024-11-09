@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import axios from 'axios';
-import {ElNotification} from 'element-plus';
-import {type Ref, ref} from 'vue';
+import { ElNotification } from 'element-plus';
+import { type Ref, ref } from 'vue';
 
 const i18n = useI18n();
 
