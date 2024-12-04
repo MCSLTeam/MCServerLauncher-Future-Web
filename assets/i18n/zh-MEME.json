@@ -67,7 +67,7 @@
 	"request.failed.reason.registry-disabled": "你想谋权篡位？",
 	"request.failed.reason.unknown-user": "不是你谁",
 	"request.failed.reason.up-to-date": "头低下，你是最新的",
-	"request.failed.reason.user-exists": "你这辈子已经有了",
+	"request.failed.reason.user-exists": "你已经有了",
 	"settings.general.locale": "兰格位居",
 	"settings.general.locale.auto": "跟着系统",
 	"settings.general.theme": "花里胡哨",
