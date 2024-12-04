@@ -13,12 +13,12 @@ defineProps({
 		<div
 			class="bg__circle bg__circle1"
 			:style="[
-				'background: var(--el-color-success-light-' + light + ')',
+				'background: var(--el-color-primary-light-' + light + ')',
 			]" />
 		<div
 			class="bg__circle bg__circle2"
 			:style="[
-				'background: var(--el-color-primary-light-' + light + ')',
+				'background: var(--el-color-purple-light-' + light + ')',
 			]" />
 	</div>
 </template>

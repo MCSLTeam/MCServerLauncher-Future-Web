@@ -23,9 +23,9 @@ export function sleep(ms: number): Promise<void> {
  * randNum(); // 相当于Math.random()
  */
 export function randNum(min?: number, max?: number) {
-	if (min && !max) return randNum(0, min);
-	else if (min && max)
+	if (min != undefined && max != undefined)
 		return Math.floor(Math.random() * (max - min)) + min; // 含最小值，不含最大值
+	else if (min != undefined) return randNum(0, min);
 	else return Math.random();
 }
 
@@ -44,7 +44,7 @@ export function randNum(min?: number, max?: number) {
  */
 export function debounce(func: () => any, delay: number) {
 	let timer: NodeJS.Timeout | null = null;
-	return function () {
+	return function() {
 		if (timer) clearTimeout(timer);
 		timer = setTimeout(() => {
 			func();

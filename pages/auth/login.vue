@@ -9,7 +9,7 @@ definePageMeta({
 const i18n = useI18n();
 
 useHead({
-	title: i18n.t('login.title'),
+	title: i18n.t('auth.login.title'),
 });
 
 interface RuleForm {
@@ -62,13 +62,13 @@ async function submit() {
 				form.rememberMe,
 				() => {
 					ElMessage({
-						message: i18n.t('login.success'),
+						message: i18n.t('auth.login.success'),
 						type: 'success',
 					});
 				},
 				(message) => {
 					ElMessage({
-						message: i18n.t('login.failed', {
+						message: i18n.t('auth.login.failed', {
 							reason: i18n.t('request.failed.reason.' + message),
 						}),
 						type: 'error',
@@ -81,44 +81,59 @@ async function submit() {
 </script>
 
 <template>
-	<ElForm ref="formRef" :model="form" :rules="rules">
-		<h1>{{ $t('login.title') }}</h1>
+	<ElForm ref="formRef" class="auth__content-card" :model="form" :rules="rules">
+		<h1>{{ $t('auth.login.title') }}</h1>
+		<h2>{{ $t('auth.login.subtitle') }}</h2>
 		<ElFormItem prop="username">
 			<ElInput
 				v-model="form.username"
-				:placeholder="$t('login.username')" />
+				:placeholder="$t('auth.login.username')" />
 		</ElFormItem>
 		<ElFormItem prop="password">
 			<ElInput
 				v-model="form.password"
 				type="password"
-				:placeholder="$t('login.password')" />
+				:placeholder="$t('auth.login.password')" />
 		</ElFormItem>
 		<ElFormItem>
 			<ElCheckbox
 				v-model="form.rememberMe"
-				:label="$t('login.remember-me')" />
+				:label="$t('auth.login.remember-me')" />
 			<ElButton type="primary" @click="submit"
-				>{{ $t('login.submit') }}
+				>{{ $t('auth.login.submit') }}
 			</ElButton>
 		</ElFormItem>
 	</ElForm>
 </template>
 
 <style scoped>
-.auth__card h1 {
+@media (min-width: 768px) {
+	.auth__content-card {
+		width: 75%;
+	}
+}
+
+.auth__right h1 {
 	width: calc(100% - var(--el-card-padding));
 	text-align: center;
 	font-weight: var(--el-font-weight-primary);
 	color: var(--el-text-color-primary);
+	margin: 0.5rem;
+}
+
+.auth__right h2 {
+	width: calc(100% - var(--el-card-padding));
+	text-align: center;
+	font-weight: normal;
+	color: var(--el-text-color-secondary);
+	font-size: var(--el-font-size-small);
 	margin: 0.5rem 0.5rem 2rem 0.5rem;
 }
 
-.auth__card .el-form-item * {
-	justify-content: space-between !important;
-}
-
-.auth__card .el-button {
+.auth__right .el-button {
+	margin-top: 15px;
 	padding: 1.1rem !important;
+	width: 100%;
+	font-size: var(--el-font-size-medium);
 }
 </style>

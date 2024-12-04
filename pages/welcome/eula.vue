@@ -3,20 +3,24 @@ import axios from 'axios';
 import { marked } from 'marked';
 
 definePageMeta({
-	layout: 'empty',
+	layout: 'empty'
+});
+
+useHead({
+	title: useI18n().t('eula.title')
 });
 
 const md = ref('');
 const waitTime = 10000;
 const agreeCountdown = ref(-1);
-let startTime;
+let startTime: number;
 
 function initEula(text: string) {
 	md.value = text.split('---\n').slice(2).join('---\n');
 	startTime = Date.now();
 	const interval = setInterval(() => {
 		agreeCountdown.value = Math.floor(
-			(waitTime - (Date.now() - startTime)) / 1000,
+			(waitTime - (Date.now() - startTime)) / 1000
 		);
 		if (agreeCountdown.value <= 0) {
 			agreeCountdown.value = 0;
@@ -28,6 +32,9 @@ function initEula(text: string) {
 axios
 	.get(
 		'https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Website/main/docs/eula.md',
+		{
+			timeout: 1000
+		}
 	)
 	.then((res) => {
 		initEula(res.data);
@@ -36,7 +43,7 @@ axios
 		console.warn('Failed to fetch eula from GitHub, using mirror', err);
 		axios
 			.get(
-				'https://github.moeyy.xyz/https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Website/main/docs/eula.md',
+				'https://github.moeyy.xyz/https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Website/main/docs/eula.md'
 			)
 			.then((res) => {
 				initEula(res.data);
@@ -48,6 +55,7 @@ axios
 
 function disagree() {
 	location.href = 'about:blank';
+	window.close();
 }
 
 async function agree() {
@@ -57,7 +65,7 @@ async function agree() {
 </script>
 
 <template>
-	<div class="eula__container">
+	<div v-show="canHideOverlay" class="eula__container">
 		<FancyBackground light="7" />
 		<div class="eula__container-inner">
 			<ElCard class="eula__card" body-class="eula__card-body">
@@ -69,10 +77,10 @@ async function agree() {
 				</ElScrollbar>
 				<div v-if="agreeCountdown != -1" class="eula__buttons">
 					<ElButton @click="$router.push('/welcome/welcome')"
-						>{{ $t('welcome.prev') }}
+					>{{ $t('welcome.prev') }}
 					</ElButton>
 					<ElButton @click="disagree"
-						>{{ $t('eula.disagree') }}
+					>{{ $t('eula.disagree') }}
 					</ElButton>
 					<ElButton
 						type="primary"
@@ -81,8 +89,8 @@ async function agree() {
 						{{
 							agreeCountdown != 0
 								? $t('eula.agree.countdown', {
-										time: agreeCountdown,
-									})
+									time: agreeCountdown
+								})
 								: $t('eula.agree')
 						}}
 					</ElButton>
@@ -104,6 +112,8 @@ async function agree() {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	opacity: 0;
+	animation: 0.5s ease-in-out fadeInUp 0.5s both;
 	@media (max-width: 768px) {
 		flex-direction: column;
 	}

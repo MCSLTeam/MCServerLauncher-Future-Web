@@ -2,6 +2,10 @@
 definePageMeta({
 	layout: 'empty',
 });
+
+useHead({
+	title: useI18n().t('welcome.done.title')
+});
 </script>
 
 <template>
@@ -21,8 +25,7 @@ definePageMeta({
 				class="done__button"
 				type="primary"
 				@click="$router.push('/')"
-				>{{ $t('welcome.done.close') }}</ElButton
-			>
+				>{{ $t('welcome.done.close') }}</ElButton>
 		</div>
 	</div>
 </template>
@@ -55,14 +58,11 @@ definePageMeta({
 	align-items: center;
 	justify-content: center;
 	gap: 1rem;
-	margin: 1rem;
+	margin: 0;
 }
 
 .done__logo img {
-	height: 7rem;
-	@media (max-width: 768px) {
-		height: 5rem;
-	}
+	height: 5rem;
 }
 
 .done__logo h1 {
@@ -83,12 +83,12 @@ definePageMeta({
 }
 
 .done__container-inner > h1 {
-	font-size: 3rem;
+	font-size: 3.5rem;
 	color: transparent;
 	background: linear-gradient(
 		135deg,
-		var(--el-color-success),
-		var(--el-color-primary)
+		var(--el-color-primary),
+		var(--el-color-purple)
 	);
 	background-clip: text;
 	margin: 0;
@@ -98,7 +98,7 @@ definePageMeta({
 	font-size: 1.5rem;
 	color: var(--el-text-color-secondary);
 	font-weight: var(--el-font-weight-primary);
-	margin: 0;
+	margin: 0.5rem;
 }
 
 .done__button {

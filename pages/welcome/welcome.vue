@@ -2,24 +2,28 @@
 import type { Ref } from 'vue';
 
 definePageMeta({
-	layout: 'empty',
+	layout: 'empty'
 });
 
 const i18n = useI18n();
+const messages = await getI18nMessages();
+
+useHead({
+	title: i18n.t('welcome.welcome')
+});
 
 const theme = ref(useDarkMode().value);
 const themes: Ref<{ label: string; value: string }[]> = ref([
 	{ label: i18n.t('settings.general.theme.auto'), value: 'auto' },
 	{ label: i18n.t('settings.general.theme.light'), value: 'light' },
-	{ label: i18n.t('settings.general.theme.dark'), value: 'dark' },
+	{ label: i18n.t('settings.general.theme.dark'), value: 'dark' }
 ]);
 
 const locale = ref(useLocale().value);
 const locales: Ref<{ label: string; value: string }[]> = ref([
-	{ label: i18n.t('settings.general.locale.auto'), value: 'auto' },
+	{ label: i18n.t('settings.general.locale.auto'), value: 'auto' }
 ]);
 (async () => {
-	const messages = await getI18nMessages();
 	for (const locale in messages) {
 		locales.value.push({
 			label:
@@ -27,19 +31,68 @@ const locales: Ref<{ label: string; value: string }[]> = ref([
 				' (' +
 				messages[locale]['language.country'] +
 				')',
-			value: locale,
+			value: locale
 		});
 	}
 })();
+
+const welcomeText = ref('');
+const showWelcomeTextCursor = ref(true);
+const interval: any[] = [];
+let currText = messages[useLocale().getLocale(locale.value)]['welcome.welcome'];
+let index = 0;
+let mode: 'append' | 'delete' | 'wait' = 'append';
+
+function changeLocale() {
+	useLocale().setLocale(locale.value);
+	currText = messages[useLocale().getLocale(locale.value)]['welcome.welcome'];
+	index = 0;
+	if (mode != 'wait') mode = 'append';
+	else welcomeText.value = currText;
+}
+
+onMounted(async () => {
+	interval.push(setInterval(() => {
+		showWelcomeTextCursor.value = !showWelcomeTextCursor.value;
+	}, 500));
+	interval.push(setInterval(async () => {
+		if (mode === 'delete') {
+			index--;
+			welcomeText.value = currText.slice(0, index);
+			if (index == 0) {
+				mode = 'append';
+				let temp;
+				do {
+					temp = messages[Object.keys(messages)[randNum(Object.keys(messages).length)]]['welcome.welcome'];
+				} while (temp !== currText);
+				currText = temp;
+			}
+		} else if (mode === 'append') {
+			index++;
+			welcomeText.value = currText.slice(0, index + 1);
+			if (index >= currText.length - 1) {
+				mode = 'wait';
+				await sleep(2000);
+				mode = 'delete';
+			}
+		}
+	}, 250));
+});
+
+onUnmounted(() => {
+	for (const i of interval) {
+		clearInterval(i);
+	}
+});
 </script>
 
 <template>
-	<div class="welcome__container">
+	<div v-show="canHideOverlay" class="welcome__container">
 		<FancyBackground light="7" />
 		<div class="welcome__container-inner">
 			<div class="welcome__section welcome__section-1">
 				<div class="welcome__text">
-					<h2>{{ $t('welcome.title') }}</h2>
+					<h2>{{ welcomeText }}<span v-show="showWelcomeTextCursor">_</span>&nbsp;</h2>
 					<h1>
 						{{ $t('app.name.abbr') }}
 						<span>{{ $t('app.name.future') }}</span>
@@ -67,14 +120,14 @@ const locales: Ref<{ label: string; value: string }[]> = ref([
 								<ElSelectV2
 									v-model="locale"
 									:options="locales"
-									@change="useLocale().setLocale(locale)" />
+									@change="changeLocale" />
 							</ElFormItem>
 						</ElForm>
 					</ElScrollbar>
 					<ElButton
 						type="primary"
 						@click="$router.push('/welcome/eula')"
-						>{{ $t('welcome.next') }}
+					>{{ $t('welcome.next') }}
 					</ElButton>
 				</ElCard>
 			</div>
@@ -114,21 +167,13 @@ const locales: Ref<{ label: string; value: string }[]> = ref([
 	}
 }
 
-@media (max-width: 768px) {
-	.welcome__section-1 {
-		margin-top: 3rem;
-	}
-
-	.welcome__section-2 {
-		height: 100%;
-	}
-}
-
 .welcome__text {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: start;
+	opacity: 0;
+	animation: 0.5s ease-in-out fadeIn 0.5s both;
 	@media (max-width: 768px) {
 		align-items: center;
 		text-align: center;
@@ -183,7 +228,13 @@ const locales: Ref<{ label: string; value: string }[]> = ref([
 	width: 100%;
 	max-width: 30rem;
 	padding: 1rem;
-	height: 100%;
+	height: calc(100% - 1rem);
+	opacity: 0;
+	animation: 0.5s ease-in-out fadeInUp 0.5s both;
+	@media (max-width: 768px) {
+		width: calc(100% - 4rem);
+		height: fit-content;
+	}
 }
 
 .welcome__card h1 {
