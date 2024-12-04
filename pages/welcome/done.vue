@@ -4,7 +4,7 @@ definePageMeta({
 });
 
 useHead({
-	title: useI18n().t('welcome.done.title')
+	title: useI18n().t('welcome.done.title'),
 });
 </script>
 
@@ -25,7 +25,8 @@ useHead({
 				class="done__button"
 				type="primary"
 				@click="$router.push('/')"
-				>{{ $t('welcome.done.close') }}</ElButton>
+				>{{ $t('welcome.done.close') }}</ElButton
+			>
 		</div>
 	</div>
 </template>

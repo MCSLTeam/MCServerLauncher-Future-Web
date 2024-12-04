@@ -24,14 +24,14 @@ export async function loadApp() {
 	meta.value = (await $fetch('/api/getMeta')).data;
 	document.title = document.title.replace(
 		'MCSL Future Web',
-		meta.value.siteTitle
+		meta.value.siteTitle,
 	);
 	useHead({
 		titleTemplate: (titleChunk) => {
 			return titleChunk
 				? `${titleChunk} | ` + meta.value.siteTitle
 				: meta.value.siteTitle;
-		}
+		},
 	});
 	mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.theme'));
 	useDarkMode().loadTheme();
@@ -41,6 +41,6 @@ export async function loadApp() {
 		() => {
 			canHideOverlay.value = true;
 		},
-		startLoad + 1000 - Date.now()
+		startLoad + 1000 - Date.now(),
 	);
 }

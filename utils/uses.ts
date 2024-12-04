@@ -21,7 +21,8 @@ export type DarkMode = 'auto' | 'dark' | 'light';
  */
 export type DarkModeTransition = 'viewTransition' | 'fade' | 'none';
 
-interface MyDocument extends Document { // 防止类型检测报错
+interface MyDocument extends Document {
+	// 防止类型检测报错
 	startViewTransition: any;
 }
 
@@ -36,10 +37,10 @@ export function useDarkMode() {
 				<DarkMode>darkModeStorage.value,
 				undefined,
 				'none',
-				true
+				true,
 			),
 		isDark: isDark,
-		changeTheme: changeTheme
+		changeTheme: changeTheme,
 	};
 }
 
@@ -70,7 +71,7 @@ function changeTheme(
 	darkMode: DarkMode,
 	event?: MouseEvent,
 	transition: DarkModeTransition = 'viewTransition',
-	force: boolean = false
+	force: boolean = false,
 ): void {
 	const darken = isDark(darkMode);
 	if (!force && darken == isDark(<DarkMode>darkModeStorage.value)) return;
@@ -123,7 +124,9 @@ function changeTheme(
                 `;
 
 				// 加载过渡动画
-				const viewTransition = (<MyDocument>document).startViewTransition(() => {
+				const viewTransition = (<MyDocument>(
+					document
+				)).startViewTransition(() => {
 					toggleDark();
 				});
 
@@ -133,26 +136,26 @@ function changeTheme(
 
 				const endRadius = Math.hypot(
 					Math.max(x, innerWidth - x),
-					Math.max(y, innerHeight - y)
+					Math.max(y, innerHeight - y),
 				);
 				viewTransition.ready.then(() => {
 					const clipPath = [
 						`circle(0px at ${x}px ${y}px)`,
-						`circle(${endRadius}px at ${x}px ${y}px)`
+						`circle(${endRadius}px at ${x}px ${y}px)`,
 					];
 					document.documentElement.animate(
 						{
 							clipPath: darken
 								? clipPath
-								: [...clipPath].reverse()
+								: [...clipPath].reverse(),
 						},
 						{
 							duration: 500,
 							easing: 'ease-in-out',
 							pseudoElement: darken
 								? '::view-transition-new(root)'
-								: '::view-transition-old(root)'
-						}
+								: '::view-transition-old(root)',
+						},
 					);
 				});
 			})();
@@ -182,7 +185,7 @@ export function useScreenWidth() {
 	return {
 		value: screenWidthRef.value,
 		isMdOrBigger: computed(() => screenWidthRef.value != 'sm'),
-		isMdOrSmaller: computed(() => screenWidthRef.value != 'lg')
+		isMdOrSmaller: computed(() => screenWidthRef.value != 'lg'),
 	};
 }
 
@@ -231,6 +234,6 @@ export function useLocale() {
 		setLocale(locale: string) {
 			localeStorage.value = locale;
 			useNuxtApp().$i18n.setLocale(this.getLocale(locale));
-		}
+		},
 	};
 }

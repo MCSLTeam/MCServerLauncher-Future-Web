@@ -2,26 +2,26 @@
 import type { Ref } from 'vue';
 
 definePageMeta({
-	layout: 'empty'
+	layout: 'empty',
 });
 
 const i18n = useI18n();
 const messages = await getI18nMessages();
 
 useHead({
-	title: i18n.t('welcome.welcome')
+	title: i18n.t('welcome.welcome'),
 });
 
 const theme = ref(useDarkMode().value);
 const themes: Ref<{ label: string; value: string }[]> = ref([
 	{ label: i18n.t('settings.general.theme.auto'), value: 'auto' },
 	{ label: i18n.t('settings.general.theme.light'), value: 'light' },
-	{ label: i18n.t('settings.general.theme.dark'), value: 'dark' }
+	{ label: i18n.t('settings.general.theme.dark'), value: 'dark' },
 ]);
 
 const locale = ref(useLocale().value);
 const locales: Ref<{ label: string; value: string }[]> = ref([
-	{ label: i18n.t('settings.general.locale.auto'), value: 'auto' }
+	{ label: i18n.t('settings.general.locale.auto'), value: 'auto' },
 ]);
 (async () => {
 	for (const locale in messages) {
@@ -31,7 +31,7 @@ const locales: Ref<{ label: string; value: string }[]> = ref([
 				' (' +
 				messages[locale]['language.country'] +
 				')',
-			value: locale
+			value: locale,
 		});
 	}
 })();
@@ -52,31 +52,40 @@ function changeLocale() {
 }
 
 onMounted(async () => {
-	interval.push(setInterval(() => {
-		showWelcomeTextCursor.value = !showWelcomeTextCursor.value;
-	}, 500));
-	interval.push(setInterval(async () => {
-		if (mode === 'delete') {
-			index--;
-			welcomeText.value = currText.slice(0, index);
-			if (index == 0) {
-				mode = 'append';
-				let temp;
-				do {
-					temp = messages[Object.keys(messages)[randNum(Object.keys(messages).length)]]['welcome.welcome'];
-				} while (temp !== currText);
-				currText = temp;
+	interval.push(
+		setInterval(() => {
+			showWelcomeTextCursor.value = !showWelcomeTextCursor.value;
+		}, 500),
+	);
+	interval.push(
+		setInterval(async () => {
+			if (mode === 'delete') {
+				index--;
+				welcomeText.value = currText.slice(0, index);
+				if (index == 0) {
+					mode = 'append';
+					let temp;
+					do {
+						temp =
+							messages[
+								Object.keys(messages)[
+									randNum(Object.keys(messages).length)
+								]
+							]['welcome.welcome'];
+					} while (temp !== currText);
+					currText = temp;
+				}
+			} else if (mode === 'append') {
+				index++;
+				welcomeText.value = currText.slice(0, index + 1);
+				if (index >= currText.length - 1) {
+					mode = 'wait';
+					await sleep(2000);
+					mode = 'delete';
+				}
 			}
-		} else if (mode === 'append') {
-			index++;
-			welcomeText.value = currText.slice(0, index + 1);
-			if (index >= currText.length - 1) {
-				mode = 'wait';
-				await sleep(2000);
-				mode = 'delete';
-			}
-		}
-	}, 250));
+		}, 250),
+	);
 });
 
 onUnmounted(() => {
@@ -92,7 +101,10 @@ onUnmounted(() => {
 		<div class="welcome__container-inner">
 			<div class="welcome__section welcome__section-1">
 				<div class="welcome__text">
-					<h2>{{ welcomeText }}<span v-show="showWelcomeTextCursor">_</span>&nbsp;</h2>
+					<h2>
+						{{ welcomeText
+						}}<span v-show="showWelcomeTextCursor">_</span>&nbsp;
+					</h2>
 					<h1>
 						{{ $t('app.name.abbr') }}
 						<span>{{ $t('app.name.future') }}</span>
@@ -127,7 +139,7 @@ onUnmounted(() => {
 					<ElButton
 						type="primary"
 						@click="$router.push('/welcome/eula')"
-					>{{ $t('welcome.next') }}
+						>{{ $t('welcome.next') }}
 					</ElButton>
 				</ElCard>
 			</div>

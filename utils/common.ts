@@ -44,7 +44,7 @@ export function randNum(min?: number, max?: number) {
  */
 export function debounce(func: () => any, delay: number) {
 	let timer: NodeJS.Timeout | null = null;
-	return function() {
+	return function () {
 		if (timer) clearTimeout(timer);
 		timer = setTimeout(() => {
 			func();

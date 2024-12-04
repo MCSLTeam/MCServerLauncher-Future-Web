@@ -12,17 +12,17 @@ export default withNuxt(
 		files: ['**/*.{js,mjs,cjs,ts,vue}'],
 		languageOptions: {
 			globals: { ...globals.browser, ...globals.node },
-			parserOptions: { parser: tseslint.parser }
+			parserOptions: { parser: tseslint.parser },
 		},
 		rules: {
 			'vue/multi-word-component-names': 'off',
 			'vue/valid-template-root': 'warn',
 			'vue/no-multiple-template-root': 'warn',
 			'vue/first-attribute-linebreak': 'off',
-			'@typescript-eslint/no-explicit-any': 'off'
-		}
+			'@typescript-eslint/no-explicit-any': 'off',
+		},
 	},
 	{
-		ignores: ['.nuxt/**/*', 'node_modules/**/*']
-	}
+		ignores: ['.nuxt/**/*', 'node_modules/**/*'],
+	},
 );

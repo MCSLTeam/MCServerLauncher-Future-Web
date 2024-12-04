@@ -81,7 +81,11 @@ async function submit() {
 </script>
 
 <template>
-	<ElForm ref="formRef" class="auth__content-card" :model="form" :rules="rules">
+	<ElForm
+		ref="formRef"
+		class="auth__content-card"
+		:model="form"
+		:rules="rules">
 		<h1>{{ $t('auth.login.title') }}</h1>
 		<h2>{{ $t('auth.login.subtitle') }}</h2>
 		<ElFormItem prop="username">

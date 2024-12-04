@@ -3,11 +3,11 @@ import axios from 'axios';
 import { marked } from 'marked';
 
 definePageMeta({
-	layout: 'empty'
+	layout: 'empty',
 });
 
 useHead({
-	title: useI18n().t('eula.title')
+	title: useI18n().t('eula.title'),
 });
 
 const md = ref('');
@@ -20,7 +20,7 @@ function initEula(text: string) {
 	startTime = Date.now();
 	const interval = setInterval(() => {
 		agreeCountdown.value = Math.floor(
-			(waitTime - (Date.now() - startTime)) / 1000
+			(waitTime - (Date.now() - startTime)) / 1000,
 		);
 		if (agreeCountdown.value <= 0) {
 			agreeCountdown.value = 0;
@@ -33,8 +33,8 @@ axios
 	.get(
 		'https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Website/main/docs/eula.md',
 		{
-			timeout: 1000
-		}
+			timeout: 1000,
+		},
 	)
 	.then((res) => {
 		initEula(res.data);
@@ -43,7 +43,7 @@ axios
 		console.warn('Failed to fetch eula from GitHub, using mirror', err);
 		axios
 			.get(
-				'https://github.moeyy.xyz/https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Website/main/docs/eula.md'
+				'https://github.moeyy.xyz/https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Website/main/docs/eula.md',
 			)
 			.then((res) => {
 				initEula(res.data);
@@ -77,10 +77,10 @@ async function agree() {
 				</ElScrollbar>
 				<div v-if="agreeCountdown != -1" class="eula__buttons">
 					<ElButton @click="$router.push('/welcome/welcome')"
-					>{{ $t('welcome.prev') }}
+						>{{ $t('welcome.prev') }}
 					</ElButton>
 					<ElButton @click="disagree"
-					>{{ $t('eula.disagree') }}
+						>{{ $t('eula.disagree') }}
 					</ElButton>
 					<ElButton
 						type="primary"
@@ -89,8 +89,8 @@ async function agree() {
 						{{
 							agreeCountdown != 0
 								? $t('eula.agree.countdown', {
-									time: agreeCountdown
-								})
+										time: agreeCountdown,
+									})
 								: $t('eula.agree')
 						}}
 					</ElButton>

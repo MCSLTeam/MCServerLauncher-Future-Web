@@ -1,12 +1,11 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
 	<!-- 加载中 -->
 	<transition name="fade" mode="out-in">
 		<div v-show="!canHideOverlay" class="loading-overlay__loading">
 			<FancyBackground light="5" />
-			<img :src="getLogoSrc()" alt="">
+			<img :src="getLogoSrc()" alt="" >
 			<h1>
 				{{ $t('app.name') }}
 				<span>{{ $t('app.name.future') }}</span>

@@ -3,13 +3,13 @@ import { reactive } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 
 definePageMeta({
-	layout: 'auth'
+	layout: 'auth',
 });
 
 const i18n = useI18n();
 
 useHead({
-	title: i18n.t('auth.register.title')
+	title: i18n.t('auth.register.title'),
 });
 
 interface RuleForm {
@@ -22,7 +22,7 @@ const formRef = ref<FormInstance>();
 const form = reactive<RuleForm>({
 	username: '',
 	password: '',
-	passwordConfirm: ''
+	passwordConfirm: '',
 });
 
 const rules = reactive<FormRules<RuleForm>>({
@@ -30,25 +30,25 @@ const rules = reactive<FormRules<RuleForm>>({
 		{
 			required: true,
 			message: i18n.t('form.invalid.require'),
-			trigger: 'blur'
+			trigger: 'blur',
 		},
 		{
 			pattern: /[a-zA-Z_]{2,16}/,
 			message: i18n.t('form.invalid.format'),
-			trigger: 'blur'
-		}
+			trigger: 'blur',
+		},
 	],
 	password: [
 		{
 			required: true,
 			message: i18n.t('form.invalid.require'),
-			trigger: 'blur'
+			trigger: 'blur',
 		},
 		{
 			pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d$@!%*?&\-_]{8,}$/,
 			message: i18n.t('form.invalid.format'),
-			trigger: 'blur'
-		}
+			trigger: 'blur',
+		},
 	],
 	passwordConfirm: [
 		{
@@ -56,14 +56,16 @@ const rules = reactive<FormRules<RuleForm>>({
 				if (value == '') {
 					callback(new Error(i18n.t('form.invalid.require')));
 				} else if (value !== form.password) {
-					callback(new Error(i18n.t('auth.register.invalid.confirm')));
+					callback(
+						new Error(i18n.t('auth.register.invalid.confirm')),
+					);
 				} else {
 					callback();
 				}
 			},
-			trigger: 'blur'
-		}
-	]
+			trigger: 'blur',
+		},
+	],
 });
 
 async function submit() {
@@ -76,17 +78,17 @@ async function submit() {
 				() => {
 					ElMessage({
 						message: i18n.t('auth.register.success'),
-						type: 'success'
+						type: 'success',
 					});
 				},
 				(message) => {
 					ElMessage({
 						message: i18n.t('auth.register.failed', {
-							reason: i18n.t('request.failed.reason.' + message)
+							reason: i18n.t('request.failed.reason.' + message),
 						}),
-						type: 'error'
+						type: 'error',
 					});
-				}
+				},
 			);
 		}
 	});
@@ -94,7 +96,11 @@ async function submit() {
 </script>
 
 <template>
-	<ElForm ref="formRef" class="auth__content-card" :model="form" :rules="rules">
+	<ElForm
+		ref="formRef"
+		class="auth__content-card"
+		:model="form"
+		:rules="rules">
 		<h1>{{ $t('auth.register.title') }}</h1>
 		<h2>{{ $t('auth.register.subtitle') }}</h2>
 		<ElFormItem prop="username">
@@ -116,7 +122,7 @@ async function submit() {
 		</ElFormItem>
 		<ElFormItem>
 			<ElButton type="primary" @click="submit"
-			>{{ $t('auth.register.submit') }}
+				>{{ $t('auth.register.submit') }}
 			</ElButton>
 		</ElFormItem>
 	</ElForm>

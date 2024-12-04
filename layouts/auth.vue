@@ -11,11 +11,22 @@ async function onMouseMove(event: MouseEvent) {
 	const rect = icon.value.getBoundingClientRect();
 	const centerX = rect.x + rect.width / 2;
 	const centerY = rect.y + rect.height / 2;
-	const rangeX = [centerX - rect.width / 2 - 50, centerX + rect.width / 2 + 50];
-	const rangeY = [centerY - rect.height / 2 - 50, centerY + rect.height / 2 + 50];
+	const rangeX = [
+		centerX - rect.width / 2 - 50,
+		centerX + rect.width / 2 + 50,
+	];
+	const rangeY = [
+		centerY - rect.height / 2 - 50,
+		centerY + rect.height / 2 + 50,
+	];
 	const mouseX = event.clientX;
 	const mouseY = event.clientY;
-	if (rangeX[0] < mouseX && mouseX < rangeX[1] && rangeY[0] < mouseY && mouseY < rangeY[1]) {
+	if (
+		rangeX[0] < mouseX &&
+		mouseX < rangeX[1] &&
+		rangeY[0] < mouseY &&
+		mouseY < rangeY[1]
+	) {
 		iconX.value = (mouseX - centerX) / (rangeX[1] - centerX);
 		iconY.value = (mouseY - centerY) / (rangeY[1] - centerY);
 	} else {
@@ -24,15 +35,15 @@ async function onMouseMove(event: MouseEvent) {
 }
 
 const icons: Record<string, string> = {
-	'web': 'fa-globe',
-	'jwt': 'fa-key',
-	'ootb': 'fa-download',
+	web: 'fa-globe',
+	jwt: 'fa-key',
+	ootb: 'fa-download',
 	'element-plus': 'fa-paint-roller',
-	'daemon': 'fa-server',
-	'performance': 'fa-bolt',
-	'i18n': 'fa-language',
-	'secure': 'fa-lock',
-	'ease': 'fa-square-plus'
+	daemon: 'fa-server',
+	performance: 'fa-bolt',
+	i18n: 'fa-language',
+	secure: 'fa-lock',
+	ease: 'fa-square-plus',
 };
 
 onMounted(() => {
@@ -64,26 +75,38 @@ onUnmounted(() => {
 			<div class="auth__container auth__max-screen">
 				<div class="auth__left">
 					<div class="auth__logo">
-						<img :src="getLogoSrc()" alt="logo">
+						<img :src="getLogoSrc()" alt="logo" >
 						<h1>
 							{{ $t('app.name.abbr') }}
 							<span>{{ $t('app.name.future') }}</span>
 						</h1>
 					</div>
-					<div class="auth__side" :style="{opacity: showItem ? 1 : 0}">
-						<i class="fa" ref="icon" :class="[icons[item]]" :style="{
-							transform: `translate(${iconX * 10}px, ${iconY * 10}px) rotateX(${iconY * 15}deg) rotateY(${-iconX * 15}deg)`,
-							transition: iconX == 0 && iconY == 0 ? '0.3s ease-in-out' : 'scale 0.3s ease-in-out, 0.1s linear',
-							scale: iconX == 0 && iconY == 0 ? '1' : '1.07',
-							filter: iconX == 0 && iconY == 0 ? 'drop-shadow(0 0 12px var(--shadow-small))' : `drop-shadow(${iconX * 15}px ${iconY * 15}px 12px var(--shadow-big))`
-						}" />
+					<div
+						class="auth__side"
+						:style="{ opacity: showItem ? 1 : 0 }">
+						<i
+							ref="icon"
+							class="fa"
+							:class="[icons[item]]"
+							:style="{
+								transform: `translate(${iconX * 10}px, ${iconY * 10}px) rotateX(${iconY * 15}deg) rotateY(${-iconX * 15}deg)`,
+								transition:
+									iconX == 0 && iconY == 0
+										? '0.3s ease-in-out'
+										: 'scale 0.3s ease-in-out, 0.1s linear',
+								scale: iconX == 0 && iconY == 0 ? '1' : '1.07',
+								filter:
+									iconX == 0 && iconY == 0
+										? 'drop-shadow(0 0 12px var(--shadow-small))'
+										: `drop-shadow(${iconX * 15}px ${iconY * 15}px 12px var(--shadow-big))`,
+							}" />
 						<h2>{{ $t('auth.side.' + item + '.title') }}</h2>
 						<h3>{{ $t('auth.side.' + item + '.desc') }}</h3>
 					</div>
 				</div>
 				<ElCard class="auth__right" body-class="auth__card-body">
 					<div class="auth__logo">
-						<img :src="getLogoSrc()" alt="logo">
+						<img :src="getLogoSrc()" alt="logo" >
 						<h1>
 							{{ $t('app.name.abbr') }}
 							<span>{{ $t('app.name.future') }}</span>
