@@ -1,13 +1,4 @@
 <script setup lang="ts">
-const addonWarningVisible = ref(false);
-const foreverConfirmVisible = ref(false);
-const i18n = useI18n();
-(async () => {
-	while (mcslLoadingInfo.getMessage().value != i18n.t('loading.addon')) {
-		await sleep(100);
-	}
-	addonWarningVisible.value = true;
-})();
 </script>
 
 <template>
@@ -15,7 +6,7 @@ const i18n = useI18n();
 	<transition name="fade" mode="out-in">
 		<div v-show="!canHideOverlay" class="loading-overlay__loading">
 			<FancyBackground light="5" />
-			<img :src="getLogoSrc()" alt="" >
+			<img :src="getLogoSrc()" alt="">
 			<h1>
 				{{ $t('app.name') }}
 				<span>{{ $t('app.name.future') }}</span>
@@ -26,62 +17,6 @@ const i18n = useI18n();
 					{{ mcslLoadingInfo.getMessage() }}
 				</p>
 			</div>
-			<ElDialog
-				v-model="addonWarningVisible"
-				:title="$t('addon.confirm.title')"
-				width="500px"
-				:show-close="false"
-				:close-on-press-escape="false"
-				:close-on-click-modal="false">
-				<ElText>{{ $t('addon.confirm.content') }}</ElText>
-
-				<ElDialog
-					v-model="foreverConfirmVisible"
-					:title="$t('addon.confirm.confirm-forever.title')"
-					width="400px">
-					<ElText>{{
-						$t('addon.confirm.confirm-forever.content')
-					}}</ElText>
-					<template #footer>
-						<ElButton
-							type="primary"
-							@click="foreverConfirmVisible = false"
-							>{{ $t('addon.confirm.confirm-forever.cancel') }}
-						</ElButton>
-						<ElButton
-							type="danger"
-							@click="
-								useLoadAddon().loadForever();
-								foreverConfirmVisible = false;
-							">
-							{{ $t('addon.confirm.confirm-forever.confirm') }}
-						</ElButton>
-					</template>
-				</ElDialog>
-
-				<template #footer>
-					<ElButton
-						type="primary"
-						@click="
-							useLoadAddon().doNotLoad();
-							addonWarningVisible = false;
-						">
-						{{ $t('addon.confirm.cancel') }}
-					</ElButton>
-					<ElButton
-						@click="
-							useLoadAddon().confirmLoad();
-							addonWarningVisible = false;
-						"
-						>{{ $t('addon.confirm.confirm') }}
-					</ElButton>
-					<ElButton
-						type="danger"
-						@click="foreverConfirmVisible = true"
-						>{{ $t('addon.confirm.confirm-forever') }}
-					</ElButton>
-				</template>
-			</ElDialog>
 		</div>
 	</transition>
 </template>

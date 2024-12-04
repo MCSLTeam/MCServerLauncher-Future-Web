@@ -77,19 +77,6 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
 						:class="{
 							'sidebar__menu-item-selected':
 								$router.currentRoute.value.fullPath ===
-								'/addon',
-						}"
-						@click="$router.push('/addon')">
-						<i class="fa fa-puzzle-piece" /><span>{{
-							$t('sidebar.addon')
-						}}</span>
-					</ElButton>
-
-					<ElButton
-						class="sidebar__menu-item"
-						:class="{
-							'sidebar__menu-item-selected':
-								$router.currentRoute.value.fullPath ===
 								'/help-center',
 						}"
 						@click="$router.push('/help-center')">

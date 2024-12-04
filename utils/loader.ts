@@ -7,7 +7,7 @@ export const mcslLoadingInfo = new LoadingInfo('loading', '');
 /**
  * 备案号、网站名称等
  */
-export const meta = reactive({});
+export const meta: any = reactive({});
 
 export const canHideOverlay = ref(false);
 
@@ -24,25 +24,23 @@ export async function loadApp() {
 	meta.value = (await $fetch('/api/getMeta')).data;
 	document.title = document.title.replace(
 		'MCSL Future Web',
-		meta.value.siteTitle,
+		meta.value.siteTitle
 	);
-	useHead().titleTemplate = (titleChunk) => {
-		return titleChunk
-			? `${titleChunk} | ` + meta.value.siteTitle
-			: meta.value.siteTitle;
-	};
+	useHead({
+		titleTemplate: (titleChunk) => {
+			return titleChunk
+				? `${titleChunk} | ` + meta.value.siteTitle
+				: meta.value.siteTitle;
+		}
+	});
 	mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.theme'));
 	useDarkMode().loadTheme();
-	mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.addon'));
-	while (useLoadAddon().canLoad() == 'ask') {
-		await sleep(100);
-	}
 	mcslLoadingInfo.setMessage(useNuxtApp().$i18n.t('loading.success'));
 	mcslLoadingInfo.setLoadingStatus('success');
 	setTimeout(
 		() => {
 			canHideOverlay.value = true;
 		},
-		startLoad + 1000 - Date.now(),
+		startLoad + 1000 - Date.now()
 	);
 }

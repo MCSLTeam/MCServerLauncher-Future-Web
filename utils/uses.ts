@@ -21,6 +21,10 @@ export type DarkMode = 'auto' | 'dark' | 'light';
  */
 export type DarkModeTransition = 'viewTransition' | 'fade' | 'none';
 
+interface MyDocument extends Document { // 防止类型检测报错
+	startViewTransition: any;
+}
+
 /**
  * 获取主题信息
  */
@@ -32,10 +36,10 @@ export function useDarkMode() {
 				<DarkMode>darkModeStorage.value,
 				undefined,
 				'none',
-				true,
+				true
 			),
 		isDark: isDark,
-		changeTheme: changeTheme,
+		changeTheme: changeTheme
 	};
 }
 
@@ -66,7 +70,7 @@ function changeTheme(
 	darkMode: DarkMode,
 	event?: MouseEvent,
 	transition: DarkModeTransition = 'viewTransition',
-	force: boolean = false,
+	force: boolean = false
 ): void {
 	const darken = isDark(darkMode);
 	if (!force && darken == isDark(<DarkMode>darkModeStorage.value)) return;
@@ -104,9 +108,9 @@ function changeTheme(
 			toggleDark();
 			break;
 		case 'viewTransition':
-			// 扩散动画
+			// 扩散动画a
 			(() => {
-				if (!document.startViewTransition) {
+				if (!(<MyDocument>document).startViewTransition) {
 					// 浏览器不支持ViewTransition就使用渐变
 					changeTheme(darkMode, event, 'fade', force);
 					return;
@@ -119,7 +123,7 @@ function changeTheme(
                 `;
 
 				// 加载过渡动画
-				const viewTransition = document.startViewTransition(() => {
+				const viewTransition = (<MyDocument>document).startViewTransition(() => {
 					toggleDark();
 				});
 
@@ -129,26 +133,26 @@ function changeTheme(
 
 				const endRadius = Math.hypot(
 					Math.max(x, innerWidth - x),
-					Math.max(y, innerHeight - y),
+					Math.max(y, innerHeight - y)
 				);
 				viewTransition.ready.then(() => {
 					const clipPath = [
 						`circle(0px at ${x}px ${y}px)`,
-						`circle(${endRadius}px at ${x}px ${y}px)`,
+						`circle(${endRadius}px at ${x}px ${y}px)`
 					];
 					document.documentElement.animate(
 						{
 							clipPath: darken
 								? clipPath
-								: [...clipPath].reverse(),
+								: [...clipPath].reverse()
 						},
 						{
 							duration: 500,
 							easing: 'ease-in-out',
 							pseudoElement: darken
 								? '::view-transition-new(root)'
-								: '::view-transition-old(root)',
-						},
+								: '::view-transition-old(root)'
+						}
 					);
 				});
 			})();
@@ -178,7 +182,7 @@ export function useScreenWidth() {
 	return {
 		value: screenWidthRef.value,
 		isMdOrBigger: computed(() => screenWidthRef.value != 'sm'),
-		isMdOrSmaller: computed(() => screenWidthRef.value != 'lg'),
+		isMdOrSmaller: computed(() => screenWidthRef.value != 'lg')
 	};
 }
 
@@ -206,7 +210,7 @@ function detectScreenWidth() {
 
 // 监听屏幕宽度变化
 detectScreenWidth();
-window.addEventListener('resize', debounce(detectScreenWidth, 250));
+window.addEventListener('resize', debounce(detectScreenWidth, 50));
 
 /* 语言 */
 const localeStorage = useLocalStorage('locale', 'auto');
@@ -227,29 +231,6 @@ export function useLocale() {
 		setLocale(locale: string) {
 			localeStorage.value = locale;
 			useNuxtApp().$i18n.setLocale(this.getLocale(locale));
-		},
-	};
-}
-
-/* 是否加载插件 */
-const loadAddonSessionStorage = useSessionStorage('loadAddon', 'ask');
-const loadAddonLocalStorage = useLocalStorage('loadAddon');
-
-export function useLoadAddon() {
-	return {
-		canLoad(): 'ask' | 'yes' | 'no' {
-			return loadAddonLocalStorage.value == 'true'
-				? 'yes'
-				: loadAddonSessionStorage.value;
-		},
-		doNotLoad() {
-			loadAddonSessionStorage.value = 'false';
-		},
-		confirmLoad() {
-			loadAddonSessionStorage.value = 'true';
-		},
-		loadForever() {
-			loadAddonLocalStorage.value = 'true';
-		},
+		}
 	};
 }
