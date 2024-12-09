@@ -22,7 +22,7 @@
 		"@vueuse/core": "^10.11.1",
 		"@vueuse/nuxt": "^10.11.1",
 		"animate.css": "^4.1.1",
-		"axios": "^1.7.7",
+		"axios": "^1.7.9",
 		"chart.js": "^4.4.4",
 		"crypto-js": "^4.2.0",
 		"dayjs": "^1.11.13",
