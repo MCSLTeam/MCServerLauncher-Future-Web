@@ -7,6 +7,8 @@ import { useScreenWidth } from "../../utils/uses";
 import { tasks, TaskStatus } from "../../utils/tasks";
 import SidebarLogo from "./SidebarLogo.vue";
 import { router } from "../../utils/globals";
+import { useLocalStorage } from "@vueuse/core";
+import { useI18n } from "vue-i18n";
 
 defineProps({
   isInDrawer: {
@@ -17,6 +19,7 @@ defineProps({
   },
 });
 
+const i18n = useI18n();
 const showNewInstance = ref(false); // 新建实例对话框
 const showTasks = ref(false); // 任务对话框
 const isCollapsed = useLocalStorage("sidebar-collapsed", false); // 侧边栏是否折叠
@@ -47,7 +50,7 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
             }"
             @click="router.push('/')"
           >
-            <i class="fa fa-home" /><span>{{ $t("sidebar.home") }}</span>
+            <i class="fa fa-home" /><span>{{ i18n.t("sidebar.home") }}</span>
           </ElButton>
 
           <ElButton
@@ -58,7 +61,9 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
             }"
             @click="router.push('/instances')"
           >
-            <i class="fa fa-server" /><span>{{ $t("sidebar.instances") }}</span>
+            <i class="fa fa-server" /><span>{{
+              i18n.t("sidebar.instances")
+            }}</span>
           </ElButton>
 
           <ElButton
@@ -69,7 +74,9 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
             }"
             @click="router.push('/news')"
           >
-            <i class="fa fa-newspaper" /><span>{{ $t("sidebar.news") }}</span>
+            <i class="fa fa-newspaper" /><span>{{
+              i18n.t("sidebar.news")
+            }}</span>
           </ElButton>
 
           <ElButton
@@ -82,7 +89,7 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
             @click="router.push('/help-center')"
           >
             <i class="fa fa-question" /><span>{{
-              $t("sidebar.help-center")
+              i18n.t("sidebar.help-center")
             }}</span>
           </ElButton>
 
@@ -105,7 +112,9 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
             class="sidebar__menu-item-primary sidebar__menu-item"
             @click="showNewInstance = true"
           >
-            <i class="fa fa-plus" /><span>{{ $t("sidebar.newInstance") }}</span>
+            <i class="fa fa-plus" /><span>{{
+              i18n.t("sidebar.newInstance")
+            }}</span>
           </ElButton>
           <!-- 新建实例对话框 -->
           <NewInstance v-model="showNewInstance" />
@@ -124,7 +133,9 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
               class="sidebar__menu-item-secondary sidebar__menu-item"
               @click="showTasks = true"
             >
-              <i class="fa fa-tasks" /><span>{{ $t("sidebar.tasks") }}</span>
+              <i class="fa fa-tasks" /><span>{{
+                i18n.t("sidebar.tasks")
+              }}</span>
             </ElButton>
           </ElBadge>
           <!-- 任务对话框 -->
@@ -139,7 +150,9 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
               }"
               @mouseenter="expandedButtonIndex = 0"
             >
-              <i class="fa fa-cloud" /><span>{{ $t("sidebar.daemon") }}</span>
+              <i class="fa fa-cloud" /><span>{{
+                i18n.t("sidebar.daemon")
+              }}</span>
             </ElButton>
 
             <ElButton
@@ -152,7 +165,9 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
               @mouseenter="expandedButtonIndex = 1"
               @click="router.push('/settings')"
             >
-              <i class="fa fa-gear" /><span>{{ $t("sidebar.settings") }}</span>
+              <i class="fa fa-gear" /><span>{{
+                i18n.t("sidebar.settings")
+              }}</span>
             </ElButton>
 
             <!-- 折叠侧边栏按钮，仅大屏模式下显示 -->
@@ -165,7 +180,7 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
               @mouseenter="expandedButtonIndex = 2"
             >
               <i class="fa fa-angle-left" /><span>{{
-                $t("sidebar.collapse")
+                i18n.t("sidebar.collapse")
               }}</span>
             </ElButton>
           </div>

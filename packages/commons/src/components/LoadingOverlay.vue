@@ -2,6 +2,9 @@
 import FancyBackground from "./FancyBackground.vue";
 import { canHideOverlay, mcslLoadingInfo } from "../utils/loader";
 import { getLogoSrc } from "../utils/common";
+import { useI18n } from "vue-i18n";
+
+const i18n = useI18n();
 </script>
 
 <template>
@@ -11,8 +14,8 @@ import { getLogoSrc } from "../utils/common";
       <FancyBackground light="5" />
       <img :src="getLogoSrc()" alt="" />
       <h1>
-        {{ $t("app.name") }}
-        <span>{{ $t("app.name.future") }}</span>
+        {{ i18n.t("app.name") }}
+        <span>{{ i18n.t("app.name.future") }}</span>
       </h1>
       <div>
         <div v-loading="true" class="loading-overlay__loading-icon" />

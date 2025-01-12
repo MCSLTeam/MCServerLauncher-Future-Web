@@ -129,7 +129,7 @@ function openDialog(title: string, contentPath: string) {
 <template>
   <Page>
     <template #breadcrumb>
-      <ElBreadcrumbItem>{{ $t("sidebar.news") }}</ElBreadcrumbItem>
+      <ElBreadcrumbItem>{{ i18n.t("sidebar.news") }}</ElBreadcrumbItem>
     </template>
     <ElCard class="news__container">
       <ElTabs v-model="activeTab" @tab-change="newsPage = 1">
@@ -163,7 +163,7 @@ function openDialog(title: string, contentPath: string) {
         </ElDialog>
 
         <!-- Minecraft Java版更新 -->
-        <ElTabPane :label="$t('news.tabs.je-update')" name="je-update">
+        <ElTabPane :label="i18n.t('news.tabs.je-update')" name="je-update">
           <div v-if="!jeUpdates" class="news__loading">
             <div
               v-loading="true"
@@ -245,7 +245,7 @@ function openDialog(title: string, contentPath: string) {
         </ElTabPane>
 
         <!-- Minecraft 基岩版更新 -->
-        <ElTabPane :label="$t('news.tabs.be-update')" name="be-update">
+        <ElTabPane :label="i18n.t('news.tabs.be-update')" name="be-update">
           <div v-if="!beUpdates" class="news__loading">
             <div
               v-loading="true"
@@ -327,7 +327,7 @@ function openDialog(title: string, contentPath: string) {
         </ElTabPane>
 
         <!-- Minecraft新闻 -->
-        <ElTabPane :label="$t('news.tabs.mc-news')" name="mc-news">
+        <ElTabPane :label="i18n.t('news.tabs.mc-news')" name="mc-news">
           <div v-if="!minecraftNews" class="news__loading">
             <div
               v-loading="true"

@@ -1,6 +1,7 @@
 import { computed, type Ref, ref } from "vue";
 import { useDarkMode, useLocale } from "./uses";
 import { sleep } from "./common";
+import { useLocalStorage } from "@vueuse/core";
 
 /**
  * 加载状态
@@ -82,15 +83,15 @@ export async function loadApp(
   customTask: (loadingInfo: LoadingInfo) => Promise<void> = async () => {},
 ) {
   startLoad = Date.now();
-  while (useLocale().getComposer() == undefined) {
+  while (useLocale().getI18n() == undefined) {
     await sleep(100);
   }
-  mcslLoadingInfo.setMessage(useLocale().getComposer().t("loading.theme"));
+  mcslLoadingInfo.setMessage(useLocale().getI18n().t("loading.theme"));
   useDarkMode().loadTheme();
 
   await customTask(mcslLoadingInfo);
 
-  mcslLoadingInfo.setMessage(useLocale().getComposer().t("loading.success"));
+  mcslLoadingInfo.setMessage(useLocale().getI18n().t("loading.success"));
   mcslLoadingInfo.setLoadingStatus("success");
   setTimeout(
     () => {

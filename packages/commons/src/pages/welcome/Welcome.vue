@@ -103,26 +103,29 @@ onUnmounted(() => {
             >&nbsp;
           </h2>
           <h1>
-            {{ $t("app.name.abbr") }}
-            <span>{{ $t("app.name.future") }}</span>
-            {{ $t("app.name.suffix") }}
+            {{ i18n.t("app.name.abbr") }}
+            <span>{{ i18n.t("app.name.future") }}</span>
+            {{ i18n.t("app.name.suffix") }}
           </h1>
-          <h3>{{ $t("welcome.subtitle") }}</h3>
+          <h3>{{ i18n.t("welcome.subtitle") }}</h3>
         </div>
       </div>
       <div class="welcome__section welcome__section-2">
         <ElCard class="welcome__card">
-          <h1>{{ $t("welcome.settings") }}</h1>
+          <h1>{{ i18n.t("welcome.settings") }}</h1>
           <ElScrollbar>
             <ElForm>
-              <ElFormItem :label="$t('settings.general.theme')">
+              <ElFormItem :label="i18n.t('settings.general.theme')">
                 <ElSelectV2
                   v-model="theme"
                   :options="themes"
                   @change="useDarkMode().changeTheme(<DarkMode>theme)"
                 />
               </ElFormItem>
-              <ElFormItem v-if="locales" :label="$t('settings.general.locale')">
+              <ElFormItem
+                v-if="locales"
+                :label="i18n.t('settings.general.locale')"
+              >
                 <ElSelectV2
                   v-model="locale"
                   :options="locales"
@@ -132,7 +135,7 @@ onUnmounted(() => {
             </ElForm>
           </ElScrollbar>
           <ElButton type="primary" @click="router.push('/welcome/eula')"
-            >{{ $t("welcome.next") }}
+            >{{ i18n.t("welcome.next") }}
           </ElButton>
         </ElCard>
       </div>

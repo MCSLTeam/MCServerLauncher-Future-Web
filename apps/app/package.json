@@ -6,6 +6,7 @@
   "scripts": {
     "frontend:dev": "vite",
     "frontend:build": "vue-tsc --noEmit && vite build",
+    "frontend:preview": "vite preview",
     "tauri": "tauri",
     "build": "tauri build",
     "dev": "tauri dev",
@@ -21,7 +22,6 @@
     "element-plus": "^2.8.4",
     "pinia": "^2.3.0",
     "vue": "^3.5.13",
-    "vue-i18n": "^11.0.1",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {

@@ -22,7 +22,7 @@ useHead({
 });
 
 // 加载
-useLocale().injectComposer(useI18n());
+useLocale().injectI18n(useI18n());
 loadApp(async (loadingInfo) => {
   loadingInfo.setMessage("loading.default");
   setRouter(useRouter());

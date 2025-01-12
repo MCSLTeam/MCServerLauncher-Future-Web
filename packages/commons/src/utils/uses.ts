@@ -1,6 +1,10 @@
 import { defineStore } from "pinia";
-import { computed, type Ref, ref } from "vue";
-import { usePreferredColorScheme, usePreferredLanguages } from "@vueuse/core";
+import { computed, getCurrentInstance, type Ref, ref } from "vue";
+import {
+  useLocalStorage,
+  usePreferredColorScheme,
+  usePreferredLanguages,
+} from "@vueuse/core";
 import { debounce } from "./common";
 import { merge } from "lodash";
 import { type Composer } from "vue-i18n";
@@ -230,14 +234,14 @@ export const useLocale = defineStore("locale", () => {
   const locales = ["en-US", "zh-CN", "zh-MEME"];
   const localeStorage = useLocalStorage("locale", "auto");
   let messagesCache = {};
-  let composer: Composer | undefined = undefined;
+  let i18n: Composer | undefined = undefined;
 
-  function injectComposer(c: Composer) {
-    composer = c;
+  function injectI18n(c: Composer) {
+    i18n = c;
   }
 
-  function getComposer() {
-    return composer!;
+  function getI18n() {
+    return i18n!;
   }
 
   async function getConfig(messages: any = {}) {
@@ -264,7 +268,7 @@ export const useLocale = defineStore("locale", () => {
     };
   }
 
-  function getMessages() {
+  function getMessages(): any {
     return messagesCache!;
   }
 
@@ -284,14 +288,14 @@ export const useLocale = defineStore("locale", () => {
 
   function setLocale(locale: string) {
     localeStorage.value = getLocale(locale);
-    getComposer().locale.value = getLocale(locale);
+    getI18n().locale.value = getLocale(locale);
   }
 
   return {
     locales,
     localeStorage,
-    injectComposer,
-    getComposer,
+    injectI18n,
+    getI18n,
     getConfig,
     getMessages,
     getLocaleValue,

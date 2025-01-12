@@ -5,10 +5,12 @@ import { ref } from "vue";
 import { agreedEula, canHideOverlay } from "../../utils/loader";
 import FancyBackground from "../../components/FancyBackground.vue";
 import { router } from "../../utils/globals";
+import { useI18n } from "vue-i18n";
 
 const md = ref("");
 const waitTime = 10000;
 const agreeCountdown = ref(-1);
+const i18n = useI18n();
 let startTime: number;
 
 function initEula(text: string) {
@@ -65,7 +67,7 @@ async function agree() {
     <FancyBackground light="7" />
     <div class="eula__container-inner">
       <ElCard class="eula__card" body-class="eula__card-body">
-        <h1>{{ $t("eula.title") }}</h1>
+        <h1>{{ i18n.t("eula.title") }}</h1>
         <ElScrollbar class="eula__scrollbar">
           <ElText>
             <p v-html="marked.parse(md)" />
@@ -73,9 +75,9 @@ async function agree() {
         </ElScrollbar>
         <div v-if="agreeCountdown != -1" class="eula__buttons">
           <ElButton @click="router.push('/welcome/welcome')"
-            >{{ $t("welcome.prev") }}
+            >{{ i18n.t("welcome.prev") }}
           </ElButton>
-          <ElButton @click="disagree">{{ $t("eula.disagree") }}</ElButton>
+          <ElButton @click="disagree">{{ i18n.t("eula.disagree") }}</ElButton>
           <ElButton
             type="primary"
             :disabled="agreeCountdown != 0"
@@ -83,10 +85,10 @@ async function agree() {
           >
             {{
               agreeCountdown != 0
-                ? $t("eula.agree.countdown", {
+                ? i18n.t("eula.agree.countdown", {
                     time: agreeCountdown,
                   })
-                : $t("eula.agree")
+                : i18n.t("eula.agree")
             }}
           </ElButton>
         </div>

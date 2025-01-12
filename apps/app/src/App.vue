@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import Layout from "@repo/commons/src/Layout.vue";
 import { layout } from "./router.ts";
-import { useLocale } from "@repo/commons/src/utils/uses";
-import { useI18n } from "vue-i18n";
 import WindowButton from "./components/WindowButton.vue";
+import { useI18n } from "vue-i18n";
+import { useLocale } from "@repo/commons/src/utils/uses";
 
-useLocale().injectComposer(useI18n());
+useLocale().injectI18n(useI18n());
 </script>
 
 <template>

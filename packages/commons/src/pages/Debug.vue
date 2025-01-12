@@ -5,7 +5,8 @@ import Page from "../components/page/Page.vue";
 
 const locale = ref(useLocale().localeStorage);
 const locales: Ref<{ label: string; value: string }[]> = ref([]);
-const messages = useLocale().getMessages()(async () => {
+const messages = useLocale().getMessages();
+(async () => {
   for (const locale in messages) {
     const message = messages[locale].default;
     locales.value.push({

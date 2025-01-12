@@ -1,14 +1,17 @@
 <!-- 侧边栏标题，手机抽屉模式下将会单独放置在抽屉标题部分 -->
 <script setup lang="ts">
 import { getLogoSrc } from "../../utils/common.js";
+import { useI18n } from "vue-i18n";
+
+const i18n = useI18n();
 </script>
 
 <template>
   <div class="sidebar__logo-container">
     <ElImage :src="getLogoSrc()" alt="" />
     <p>
-      {{ $t("app.name.abbr") }}
-      <span>{{ $t("app.name.future") }}</span>
+      {{ i18n.t("app.name.abbr") }}
+      <span>{{ i18n.t("app.name.future") }}</span>
     </p>
   </div>
 </template>

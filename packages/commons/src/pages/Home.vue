@@ -3,7 +3,9 @@ import { ref, type Ref } from "vue";
 import MD5 from "crypto-js/md5";
 import Page from "../components/page/Page.vue";
 import InfoDisplay from "../components/InfoDisplay.vue";
+import { useI18n } from "vue-i18n";
 
+const i18n = useI18n();
 const announcement: Ref<any> = ref(null);
 const announcementClosed = ref(localStorage.getItem("announcementClosed"));
 
@@ -28,7 +30,7 @@ function closeAnnouncement() {
 <template>
   <Page>
     <template #breadcrumb>
-      <ElBreadcrumb-item>{{ $t("sidebar.home") }}</ElBreadcrumb-item>
+      <ElBreadcrumb-item>{{ i18n.t("sidebar.home") }}</ElBreadcrumb-item>
     </template>
     <!-- 公告 -->
     <ElAlert
@@ -38,10 +40,10 @@ function closeAnnouncement() {
         announcementClosed != MD5(announcement.text).toString()
       "
       class="index__announcement"
-      :title="$t('announcement.title')"
+      :title="i18n.t('announcement.title')"
       :type="announcement.type"
       :closable="announcement.closable"
-      :close-text="$t('announcement.close')"
+      :close-text="i18n.t('announcement.close')"
       @close="closeAnnouncement"
     >
       <p class="index__announcement-desc" v-html="announcement.text" />
@@ -49,7 +51,7 @@ function closeAnnouncement() {
 
     <!-- 概览 -->
     <ElCard class="index__card">
-      <h1 class="index__card-title">{{ $t("index.overview") }}</h1>
+      <h1 class="index__card-title">{{ i18n.t("index.overview") }}</h1>
       <ElRow class="index__card-row">
         <ElCol :sm="6" :xs="24" class="index__statistic">
           <ElProgress type="dashboard" :percentage="50">
@@ -61,8 +63,8 @@ function closeAnnouncement() {
             </template>
           </ElProgress>
           <div class="index__progress-title">
-            <h2>{{ $t("index.overview.instances") }}</h2>
-            <h3>{{ $t("index.overview.instances.desc") }}</h3>
+            <h2>{{ i18n.t("index.overview.instances") }}</h2>
+            <h3>{{ i18n.t("index.overview.instances.desc") }}</h3>
           </div>
         </ElCol>
         <ElCol :sm="6" :xs="24" class="index__statistic">
@@ -75,18 +77,18 @@ function closeAnnouncement() {
             </template>
           </ElProgress>
           <div class="index__progress-title">
-            <h2>{{ $t("index.overview.disk-usage") }}</h2>
-            <h3>{{ $t("index.overview.disk-usage.desc") }}</h3>
+            <h2>{{ i18n.t("index.overview.disk-usage") }}</h2>
+            <h3>{{ i18n.t("index.overview.disk-usage.desc") }}</h3>
           </div>
         </ElCol>
         <ElCol :sm="6" :xs="24" class="index__statistic">
           <div class="index__statistic-info">
             <InfoDisplay
-              :title="$t('index.overview.daemon-name')"
+              :title="i18n.t('index.overview.daemon-name')"
               value="某某守护进程"
             />
             <InfoDisplay
-              :title="$t('index.overview.daemon-address')"
+              :title="i18n.t('index.overview.daemon-address')"
               value="example.com:11451"
             />
           </div>

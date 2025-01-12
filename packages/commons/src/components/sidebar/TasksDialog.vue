@@ -1,6 +1,9 @@
 <!-- 任务对话框 TODO: 完善任务机制 -->
 <script lang="ts" setup>
 import { ProgressTask, SimpleTask, tasks, TaskStatus } from "../../utils/tasks";
+import { useI18n } from "vue-i18n";
+
+const i18n = useI18n();
 
 const visible = defineModel({
   type: Boolean,
@@ -22,20 +25,20 @@ function getTaskStatus(task: SimpleTask) {
 <template>
   <ElDialog
     v-model="visible"
-    :title="$t('sidebar.tasks')"
+    :title="i18n.t('sidebar.tasks')"
     width="600px"
     @close="visible = false"
   >
-    <ElEmpty v-if="tasks.length === 0" :description="$t('tasks.empty')" />
+    <ElEmpty v-if="tasks.length === 0" :description="i18n.t('tasks.empty')" />
     <ElScrollbar v-else class="task-dialog__scrollbar" height="500px">
       <ElCard v-for="task in tasks" :key="task.id" class="task-dialog__card">
         <h3>{{ task.name }}</h3>
         <h4>{{ task.desc }}</h4>
-        <sup>{{ $t("tasks.id") + task.id }}</sup>
+        <sup>{{ i18n.t("tasks.id") + task.id }}</sup>
         <p class="status">
-          {{ $t("tasks.status") }}
+          {{ i18n.t("tasks.status") }}
           <span :class="['task-dialog__status-' + task.status]">
-            {{ $t("tasks.status." + task.status) }}
+            {{ i18n.t("tasks.status." + task.status) }}
           </span>
         </p>
         <ElProgress

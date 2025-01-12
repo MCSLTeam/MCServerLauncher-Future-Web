@@ -5,7 +5,7 @@ export default [
     ...typescript,
     ...pluginVue.configs['flat/essential'],
     {
-        files: ['**/*.{js,mjs,cjs,ts,vue}'],
+        files: ['**/*.{js,mjs,cjs,ts,mts,cts,vue}'],
         rules: {
             'vue/multi-word-component-names': 'off',
             'vue/valid-template-root': 'warn',

@@ -7,17 +7,19 @@
     "app:dev": "turbo run dev --filter=mcsl-future-tauri",
     "app:fix": "turbo run fix --filter=mcsl-future-tauri",
     "app:lint": "turbo run lint --filter=mcsl-future-tauri",
-    "docs:build": "turbo run build --filter=mcsl-future-docs",
-    "docs:dev": "turbo run dev --filter=mcsl-future-docs",
+    "app:test": "turbo run test --filter=mcsl-future-tauri",
     "daemon:build": "turbo run build --filter=mcsl-future-daemon-rs",
     "daemon:dev": "turbo run dev --filter=mcsl-future-daemon-rs",
+    "daemon:test": "turbo run test --filter=mcsl-future-daemon-rs",
     "web:build": "turbo run build --filter=mcsl-future-web",
     "web:dev": "turbo run dev --filter=mcsl-future-web",
     "web:fix": "turbo run fix --filter=mcsl-future-web",
     "web:lint": "turbo run lint --filter=mcsl-future-web",
+    "web:test": "turbo run test --filter=mcsl-future-web",
     "build": "turbo run build --continue",
     "lint": "turbo run lint --continue",
-    "fix": "turbo run fix --continue"
+    "fix": "turbo run fix --continue",
+    "test": "turbo run test --continue"
   },
   "devDependencies": {
     "prettier": "^3.2.5",

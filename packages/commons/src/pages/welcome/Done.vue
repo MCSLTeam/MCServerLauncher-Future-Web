@@ -2,6 +2,9 @@
 import { getLogoSrc } from "../../utils/common";
 import FancyBackground from "../../components/FancyBackground.vue";
 import { router } from "../../utils/globals";
+import { useI18n } from "vue-i18n";
+
+const i18n = useI18n();
 </script>
 
 <template>
@@ -11,14 +14,14 @@ import { router } from "../../utils/globals";
       <div class="done__logo">
         <img :src="getLogoSrc()" alt="logo" />
         <h1>
-          {{ $t("app.name.abbr") }}
-          <span>{{ $t("app.name.future") }}</span>
+          {{ i18n.t("app.name.abbr") }}
+          <span>{{ i18n.t("app.name.future") }}</span>
         </h1>
       </div>
-      <h1>{{ $t("welcome.done.title") }}</h1>
-      <h2>{{ $t("welcome.done.subtitle") }}</h2>
+      <h1>{{ i18n.t("welcome.done.title") }}</h1>
+      <h2>{{ i18n.t("welcome.done.subtitle") }}</h2>
       <ElButton class="done__button" type="primary" @click="router.push('/')">{{
-        $t("welcome.done.close")
+        i18n.t("welcome.done.close")
       }}</ElButton>
     </div>
   </div>

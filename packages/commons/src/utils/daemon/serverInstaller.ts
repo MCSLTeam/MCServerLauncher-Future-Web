@@ -34,7 +34,7 @@ export async function getTypeVersions(type: string, mcVersion: string) {
           })
           .catch(() => {
             ElNotification({
-              title: useLocale().getComposer().t("notification.warning.title"),
+              title: useLocale().getI18n().t("notification.warning.title"),
               message: "无法加载Fabric版本清单",
               type: "warning",
             });
@@ -54,7 +54,7 @@ export async function getTypeVersions(type: string, mcVersion: string) {
           })
           .catch(() => {
             ElNotification({
-              title: useLocale().getComposer().t("notification.warning.title"),
+              title: useLocale().getI18n().t("notification.warning.title"),
               message: "无法加载Quilt版本清单",
             });
           });
