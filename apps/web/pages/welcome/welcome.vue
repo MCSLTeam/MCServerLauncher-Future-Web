@@ -2,14 +2,12 @@
 import Welcome from "@repo/commons/src/pages/welcome/Welcome.vue";
 
 definePageMeta({
-  layout: 'empty'
+  layout: "empty",
 });
 </script>
 
 <template>
-  <Welcome/>
+  <Welcome />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

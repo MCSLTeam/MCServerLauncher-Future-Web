@@ -1,17 +1,15 @@
 <script lang="ts" setup>
 import axios from "axios";
-import {ElNotification} from "element-plus";
-import {type Ref, ref} from "vue";
-import {useI18n} from "vue-i18n";
+import { ElNotification } from "element-plus";
+import { type Ref, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import Page from "../components/page/Page.vue";
-import {openUrl, randNum} from "../utils/common";
-import {router} from "../utils/globals";
+import { openUrl, randNum } from "../utils/common";
+import { router } from "../utils/globals";
 
 const i18n = useI18n();
-const hash = router.currentRoute.value.hash
-const activeTab = ref(
-    hash != "" ? hash.slice(1) : "je-update",
-);
+const hash = router.currentRoute.value.hash;
+const activeTab = ref(hash != "" ? hash.slice(1) : "je-update");
 const newsPage = ref(1);
 
 const dialog = ref({
@@ -29,56 +27,56 @@ function sortByDate(a: any, b: any) {
 }
 
 axios
-    .get("https://launchercontent.mojang.com/v2/javaPatchNotes.json", {
-      headers: {
-        "Cache-Control": "no-cache",
-      },
-    })
-    .then((res) => {
-      jeUpdates.value = res.data.entries.sort(sortByDate);
-    })
-    .catch((e) => {
-      ElNotification({
-        title: i18n.t("notification.warning.title"),
-        message: i18n.t("news.je-update.load-failed"),
-        type: "warning",
-      });
-      console.log(i18n.t("news.je-update.load-failed"), e);
+  .get("https://launchercontent.mojang.com/v2/javaPatchNotes.json", {
+    headers: {
+      "Cache-Control": "no-cache",
+    },
+  })
+  .then((res) => {
+    jeUpdates.value = res.data.entries.sort(sortByDate);
+  })
+  .catch((e) => {
+    ElNotification({
+      title: i18n.t("notification.warning.title"),
+      message: i18n.t("news.je-update.load-failed"),
+      type: "warning",
     });
+    console.log(i18n.t("news.je-update.load-failed"), e);
+  });
 axios
-    .get("https://launchercontent.mojang.com/v2/bedrockPatchNotes.json", {
-      headers: {
-        "Cache-Control": "no-cache",
-      },
-    })
-    .then((res) => {
-      beUpdates.value = res.data.entries.sort(sortByDate);
-    })
-    .catch((e) => {
-      ElNotification({
-        title: i18n.t("notification.warning.title"),
-        message: i18n.t("news.be-update.load-failed"),
-        type: "warning",
-      });
-      console.log(i18n.t("news.be-update.load-failed"), e);
+  .get("https://launchercontent.mojang.com/v2/bedrockPatchNotes.json", {
+    headers: {
+      "Cache-Control": "no-cache",
+    },
+  })
+  .then((res) => {
+    beUpdates.value = res.data.entries.sort(sortByDate);
+  })
+  .catch((e) => {
+    ElNotification({
+      title: i18n.t("notification.warning.title"),
+      message: i18n.t("news.be-update.load-failed"),
+      type: "warning",
     });
+    console.log(i18n.t("news.be-update.load-failed"), e);
+  });
 axios
-    .get("https://launchercontent.mojang.com/v2/news.json", {
-      headers: {
-        "Cache-Control": "no-cache",
-      },
-    })
-    .then((res) => {
-      minecraftNews.value = res.data.entries.sort(sortByDate);
-    })
-    .catch((e) => {
-      ElNotification({
-        title: i18n.t("notification.warning.title"),
-        message: i18n.t("news.mc-news.load-failed"),
-        type: "warning",
-      });
-      console.log(i18n.t("news.mc-news.load-failed"), e);
+  .get("https://launchercontent.mojang.com/v2/news.json", {
+    headers: {
+      "Cache-Control": "no-cache",
+    },
+  })
+  .then((res) => {
+    minecraftNews.value = res.data.entries.sort(sortByDate);
+  })
+  .catch((e) => {
+    ElNotification({
+      title: i18n.t("notification.warning.title"),
+      message: i18n.t("news.mc-news.load-failed"),
+      type: "warning",
     });
+    console.log(i18n.t("news.mc-news.load-failed"), e);
+  });
 
 function translateNewsCategory(category: string) {
   switch (category) {
@@ -118,13 +116,13 @@ function openDialog(title: string, contentPath: string) {
   dialog.value.body = "";
   dialog.value.open = true;
   axios
-      .get(contentPath)
-      .then((res) => {
-        dialog.value.body = res.data.body;
-      })
-      .catch(() => {
-        dialog.value.body = i18n.t("news.dialog.load-failed");
-      });
+    .get(contentPath)
+    .then((res) => {
+      dialog.value.body = res.data.body;
+    })
+    .catch(() => {
+      dialog.value.body = i18n.t("news.dialog.load-failed");
+    });
 }
 </script>
 
@@ -137,29 +135,29 @@ function openDialog(title: string, contentPath: string) {
       <ElTabs v-model="activeTab" @tab-change="newsPage = 1">
         <!-- 弹出窗口 -->
         <ElDialog
-            v-model="dialog.open"
-            width="777px"
-            :title="dialog.title"
-            @close="dialog.title = dialog.body = ''"
+          v-model="dialog.open"
+          width="777px"
+          :title="dialog.title"
+          @close="dialog.title = dialog.body = ''"
         >
           <ElScrollbar height="500px">
             <ElText
-                v-loading="!dialog.body"
-                element-loading-background="rgba(255, 255, 255, 0.5)"
+              v-loading="!dialog.body"
+              element-loading-background="rgba(255, 255, 255, 0.5)"
             >
               <ElSkeleton v-if="!dialog.body" animated>
                 <template #template>
                   <ElSkeletonItem
-                      v-for="index in 27"
-                      :key="index"
-                      variant="p"
-                      :style="{
+                    v-for="index in 27"
+                    :key="index"
+                    variant="p"
+                    :style="{
                       width: randNum(40, 90) + '%',
                     }"
                   />
                 </template>
               </ElSkeleton>
-              <div v-else class="news__dialog" v-html="dialog.body"/>
+              <div v-else class="news__dialog" v-html="dialog.body" />
             </ElText>
           </ElScrollbar>
         </ElDialog>
@@ -168,34 +166,34 @@ function openDialog(title: string, contentPath: string) {
         <ElTabPane :label="$t('news.tabs.je-update')" name="je-update">
           <div v-if="!jeUpdates" class="news__loading">
             <div
-                v-loading="true"
-                class="news__loading-icon"
-                element-loading-background="rgba(255, 255, 255, 0.5)"
+              v-loading="true"
+              class="news__loading-icon"
+              element-loading-background="rgba(255, 255, 255, 0.5)"
             />
             <ElSkeleton animated>
               <template #template>
                 <div class="news__cards">
                   <ElCard v-for="index in 25" :key="index" class="news__card">
                     <ElSkeletonItem
-                        variant="image"
-                        class="news__card-img"
-                        style="height: calc(100% - 80px); margin-bottom: 20px"
+                      variant="image"
+                      class="news__card-img"
+                      style="height: calc(100% - 80px); margin-bottom: 20px"
                     />
                     <ElSkeletonItem
-                        variant="h3"
-                        class="news__card-title"
-                        style="width: 100%"
+                      variant="h3"
+                      class="news__card-title"
+                      style="width: 100%"
                     />
                     <ElSkeletonItem
-                        variant="h3"
-                        class="news__card-title"
-                        style="width: 100%"
+                      variant="h3"
+                      class="news__card-title"
+                      style="width: 100%"
                     />
-                    <br/>
+                    <br />
                     <ElSkeletonItem
-                        variant="p"
-                        class="news__card-date"
-                        style="width: 50%"
+                      variant="p"
+                      class="news__card-date"
+                      style="width: 50%"
                     />
                   </ElCard>
                 </div>
@@ -204,20 +202,20 @@ function openDialog(title: string, contentPath: string) {
           </div>
           <div v-else class="news__tab">
             <ElPagination
-                v-model:current-page="newsPage"
-                layout="prev, pager, next, ->"
-                :page-size="20"
-                :total="jeUpdates.length"
+              v-model:current-page="newsPage"
+              layout="prev, pager, next, ->"
+              :page-size="20"
+              :total="jeUpdates.length"
             />
             <div class="news__cards">
               <ElCard
-                  v-for="item in jeUpdates.slice(
+                v-for="item in jeUpdates.slice(
                   (newsPage - 1) * 20,
                   newsPage * 20,
                 )"
-                  :key="item.version"
-                  class="news__card"
-                  @click="
+                :key="item.version"
+                class="news__card"
+                @click="
                   openDialog(
                     item.title,
                     'https://launchercontent.mojang.com/v2/' + item.contentPath,
@@ -225,9 +223,9 @@ function openDialog(title: string, contentPath: string) {
                 "
               >
                 <ElImage
-                    class="news__card-img"
-                    :src="'https://launchercontent.mojang.com' + item.image.url"
-                    :alt="item.image.title"
+                  class="news__card-img"
+                  :src="'https://launchercontent.mojang.com' + item.image.url"
+                  :alt="item.image.title"
                 />
                 <h3 class="news__card-title">
                   {{ item.title }}
@@ -238,10 +236,10 @@ function openDialog(title: string, contentPath: string) {
               </ElCard>
             </div>
             <ElPagination
-                v-model:current-page="newsPage"
-                layout="prev, pager, next, ->"
-                :page-size="20"
-                :total="jeUpdates.length"
+              v-model:current-page="newsPage"
+              layout="prev, pager, next, ->"
+              :page-size="20"
+              :total="jeUpdates.length"
             />
           </div>
         </ElTabPane>
@@ -250,34 +248,34 @@ function openDialog(title: string, contentPath: string) {
         <ElTabPane :label="$t('news.tabs.be-update')" name="be-update">
           <div v-if="!beUpdates" class="news__loading">
             <div
-                v-loading="true"
-                class="news__loading-icon"
-                element-loading-background="rgba(255, 255, 255, 0.5)"
+              v-loading="true"
+              class="news__loading-icon"
+              element-loading-background="rgba(255, 255, 255, 0.5)"
             />
             <ElSkeleton animated>
               <template #template>
                 <div class="news__cards">
                   <ElCard v-for="index in 25" :key="index" class="news__card">
                     <ElSkeletonItem
-                        variant="image"
-                        class="news__card-img"
-                        style="height: calc(100% - 80px); margin-bottom: 20px"
+                      variant="image"
+                      class="news__card-img"
+                      style="height: calc(100% - 80px); margin-bottom: 20px"
                     />
                     <ElSkeletonItem
-                        variant="h3"
-                        class="news__card-title"
-                        style="width: 100%"
+                      variant="h3"
+                      class="news__card-title"
+                      style="width: 100%"
                     />
                     <ElSkeletonItem
-                        variant="h3"
-                        class="news__card-title"
-                        style="width: 100%"
+                      variant="h3"
+                      class="news__card-title"
+                      style="width: 100%"
                     />
-                    <br/>
+                    <br />
                     <ElSkeletonItem
-                        variant="p"
-                        class="news__card-date"
-                        style="width: 50%"
+                      variant="p"
+                      class="news__card-date"
+                      style="width: 50%"
                     />
                   </ElCard>
                 </div>
@@ -286,20 +284,20 @@ function openDialog(title: string, contentPath: string) {
           </div>
           <div v-else class="news__tab">
             <ElPagination
-                v-model:current-page="newsPage"
-                layout="prev, pager, next, ->"
-                :page-size="20"
-                :total="beUpdates.length"
+              v-model:current-page="newsPage"
+              layout="prev, pager, next, ->"
+              :page-size="20"
+              :total="beUpdates.length"
             />
             <div class="news__cards">
               <ElCard
-                  v-for="item in beUpdates.slice(
+                v-for="item in beUpdates.slice(
                   (newsPage - 1) * 20,
                   newsPage * 20,
                 )"
-                  :key="item.version"
-                  class="news__card"
-                  @click="
+                :key="item.version"
+                class="news__card"
+                @click="
                   openDialog(
                     item.title,
                     'https://launchercontent.mojang.com/v2/' + item.contentPath,
@@ -307,9 +305,9 @@ function openDialog(title: string, contentPath: string) {
                 "
               >
                 <ElImage
-                    class="news__card-img"
-                    :src="'https://launchercontent.mojang.com' + item.image.url"
-                    :alt="item.image.title"
+                  class="news__card-img"
+                  :src="'https://launchercontent.mojang.com' + item.image.url"
+                  :alt="item.image.title"
                 />
                 <h3 class="news__card-title">
                   {{ item.title }}
@@ -320,10 +318,10 @@ function openDialog(title: string, contentPath: string) {
               </ElCard>
             </div>
             <ElPagination
-                v-model:current-page="newsPage"
-                layout="prev, pager, next, ->"
-                :page-size="20"
-                :total="beUpdates.length"
+              v-model:current-page="newsPage"
+              layout="prev, pager, next, ->"
+              :page-size="20"
+              :total="beUpdates.length"
             />
           </div>
         </ElTabPane>
@@ -332,36 +330,36 @@ function openDialog(title: string, contentPath: string) {
         <ElTabPane :label="$t('news.tabs.mc-news')" name="mc-news">
           <div v-if="!minecraftNews" class="news__loading">
             <div
-                v-loading="true"
-                class="news__loading-icon"
-                element-loading-background="rgba(255, 255, 255, 0.5)"
+              v-loading="true"
+              class="news__loading-icon"
+              element-loading-background="rgba(255, 255, 255, 0.5)"
             />
             <ElSkeleton animated>
               <template #template>
                 <div class="news__cards">
                   <ElCard v-for="index in 25" :key="index" class="news__card">
                     <ElSkeletonItem
-                        variant="image"
-                        class="news__card-img"
-                        style="height: calc(100% - 100px)"
+                      variant="image"
+                      class="news__card-img"
+                      style="height: calc(100% - 100px)"
                     />
-                    <br/>
+                    <br />
                     <ElSkeletonItem
-                        variant="h3"
-                        class="news__card-title"
-                        style="width: 100%"
+                      variant="h3"
+                      class="news__card-title"
+                      style="width: 100%"
                     />
-                    <br/>
+                    <br />
                     <ElSkeletonItem
-                        class="news__card-desc"
-                        variant="p"
-                        style="width: 75%"
+                      class="news__card-desc"
+                      variant="p"
+                      style="width: 75%"
                     />
-                    <br/>
+                    <br />
                     <ElSkeletonItem
-                        class="news__card-date"
-                        variant="p"
-                        style="width: 50%"
+                      class="news__card-date"
+                      variant="p"
+                      style="width: 50%"
                     />
                   </ElCard>
                 </div>
@@ -370,38 +368,38 @@ function openDialog(title: string, contentPath: string) {
           </div>
           <div v-else class="news__tab">
             <ElPagination
-                v-model:current-page="newsPage"
-                layout="prev, pager, next, ->"
-                :page-size="20"
-                :total="minecraftNews.length"
+              v-model:current-page="newsPage"
+              layout="prev, pager, next, ->"
+              :page-size="20"
+              :total="minecraftNews.length"
             />
             <div class="news__cards news__cards-masonry">
               <ElCard
-                  v-for="item in minecraftNews.slice(
+                v-for="item in minecraftNews.slice(
                   (newsPage - 1) * 20,
                   newsPage * 20,
                 )"
-                  :key="item.id"
-                  class="news__card"
-                  @click="openUrl(item.readMoreLink)"
+                :key="item.id"
+                class="news__card"
+                @click="openUrl(item.readMoreLink)"
               >
                 <ElImage
-                    class="news__card-img"
-                    :src="
+                  class="news__card-img"
+                  :src="
                     'https://launchercontent.mojang.com/' +
                     item.playPageImage.url
                   "
-                    :alt="item.playPageImage.title"
+                  :alt="item.playPageImage.title"
                 />
                 <h3 class="news__card-title">
                   {{ item.title }}
                 </h3>
                 <div class="news__card-tags">
                   <el-tag type="primary"
-                  >{{ translateNewsCategory(item.category) }}
+                    >{{ translateNewsCategory(item.category) }}
                   </el-tag>
                   <el-tag v-if="item.tag" type="info"
-                  >{{ translateNewsTag(item.tag) }}
+                    >{{ translateNewsTag(item.tag) }}
                   </el-tag>
                 </div>
                 <p class="news__card-desc">
@@ -413,10 +411,10 @@ function openDialog(title: string, contentPath: string) {
               </ElCard>
             </div>
             <ElPagination
-                v-model:current-page="newsPage"
-                layout="prev, pager, next, ->"
-                :page-size="20"
-                :total="minecraftNews.length"
+              v-model:current-page="newsPage"
+              layout="prev, pager, next, ->"
+              :page-size="20"
+              :total="minecraftNews.length"
             />
           </div>
         </ElTabPane>

@@ -2,12 +2,12 @@
 import Connect from "@repo/commons/src/pages/Connect.vue";
 
 useHead({
-  title: useI18n().t('connect.title'),
+  title: useI18n().t("connect.title"),
 });
 </script>
 
 <template>
-  <Connect/>
+  <Connect />
 </template>
 
 <style scoped></style>

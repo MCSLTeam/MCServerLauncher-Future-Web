@@ -2,14 +2,12 @@
 import News from "@repo/commons/src/pages/News.vue";
 
 useHead({
-  title: useI18n().t('sidebar.news'),
+  title: useI18n().t("sidebar.news"),
 });
 </script>
 
 <template>
-  <News/>
+  <News />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

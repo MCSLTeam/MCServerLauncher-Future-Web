@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import {ref} from 'vue';
-import {getCurrentWindow} from "@tauri-apps/api/window";
-import {exit} from "@tauri-apps/plugin-process";
+import { ref } from "vue";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { exit } from "@tauri-apps/plugin-process";
 
 const maximizeBtnIcon = ref();
 
@@ -15,12 +15,13 @@ async function minimizeApp() {
 
 async function maximizeApp() {
   if (await getCurrentWindow().isMaximized()) {
-    maximizeBtnIcon.value.className = 'fas fa-up-right-and-down-left-from-center';
-    document.body.classList.remove('maximized');
+    maximizeBtnIcon.value.className =
+      "fas fa-up-right-and-down-left-from-center";
+    document.body.classList.remove("maximized");
     await getCurrentWindow().unmaximize();
   } else {
-    maximizeBtnIcon.value.className = 'fas fa-down-left-and-up-right-to-center';
-    document.body.classList.add('maximized');
+    maximizeBtnIcon.value.className = "fas fa-down-left-and-up-right-to-center";
+    document.body.classList.add("maximized");
     await getCurrentWindow().maximize();
   }
 }
@@ -29,9 +30,15 @@ async function maximizeApp() {
 <template>
   <div class="window-button__container">
     <button @click="exitApp"><i class="fas fa-xmark"></i></button>
-    <button @click="minimizeApp" id="window-minimize-button"><i class="fas fa-minus"></i></button>
-    <button @click="maximizeApp" id="window-maximize-button"><i
-        class="fas fa-up-right-and-down-left-from-center" ref="maximizeBtnIcon"></i></button>
+    <button @click="minimizeApp" id="window-minimize-button">
+      <i class="fas fa-minus"></i>
+    </button>
+    <button @click="maximizeApp" id="window-maximize-button">
+      <i
+        class="fas fa-up-right-and-down-left-from-center"
+        ref="maximizeBtnIcon"
+      ></i>
+    </button>
   </div>
 </template>
 

@@ -6,7 +6,7 @@ import TasksDialog from "./TasksDialog.vue";
 import { useScreenWidth } from "../../utils/uses";
 import { tasks, TaskStatus } from "../../utils/tasks";
 import SidebarLogo from "./SidebarLogo.vue";
-import {router} from "../../utils/globals";
+import { router } from "../../utils/globals";
 
 defineProps({
   isInDrawer: {

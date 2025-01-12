@@ -2,14 +2,12 @@
 import Home from "@repo/commons/src/pages/Home.vue";
 
 useHead({
-  title: useI18n().t('sidebar.home'),
+  title: useI18n().t("sidebar.home"),
 });
 </script>
 
 <template>
-  <Home/>
+  <Home />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

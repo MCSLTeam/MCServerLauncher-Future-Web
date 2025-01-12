@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { getLogoSrc } from "../../utils/common";
 import FancyBackground from "../../components/FancyBackground.vue";
-import {router} from "../../utils/globals";
+import { router } from "../../utils/globals";
 </script>
 
 <template>
@@ -17,12 +17,9 @@ import {router} from "../../utils/globals";
       </div>
       <h1>{{ $t("welcome.done.title") }}</h1>
       <h2>{{ $t("welcome.done.subtitle") }}</h2>
-      <ElButton
-        class="done__button"
-        type="primary"
-        @click="router.push('/')"
-        >{{ $t("welcome.done.close") }}</ElButton
-      >
+      <ElButton class="done__button" type="primary" @click="router.push('/')">{{
+        $t("welcome.done.close")
+      }}</ElButton>
     </div>
   </div>
 </template>

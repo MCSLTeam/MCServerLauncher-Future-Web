@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import axios from "axios";
-import {marked} from "marked";
-import {ref} from "vue";
-import {agreedEula, canHideOverlay} from "../../utils/loader";
+import { marked } from "marked";
+import { ref } from "vue";
+import { agreedEula, canHideOverlay } from "../../utils/loader";
 import FancyBackground from "../../components/FancyBackground.vue";
-import {router} from "../../utils/globals";
+import { router } from "../../utils/globals";
 
 const md = ref("");
 const waitTime = 10000;
@@ -16,7 +16,7 @@ function initEula(text: string) {
   startTime = Date.now();
   const interval = setInterval(() => {
     agreeCountdown.value = Math.floor(
-        (waitTime - (Date.now() - startTime)) / 1000,
+      (waitTime - (Date.now() - startTime)) / 1000,
     );
     if (agreeCountdown.value <= 0) {
       agreeCountdown.value = 0;
@@ -26,28 +26,28 @@ function initEula(text: string) {
 }
 
 axios
-    .get(
-        "https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Website/main/docs/eula.md",
-        {
-          timeout: 1000,
-        },
-    )
-    .then((res) => {
-      initEula(res.data);
-    })
-    .catch((err) => {
-      console.warn("Failed to fetch eula from GitHub, using mirror", err);
-      axios
-          .get(
-              "https://github.moeyy.xyz/https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Website/main/docs/eula.md",
-          )
-          .then((res) => {
-            initEula(res.data);
-          })
-          .catch((err) => {
-            console.error("Failed to fetch eula from GitHub mirror", err);
-          });
-    });
+  .get(
+    "https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Website/main/docs/eula.md",
+    {
+      timeout: 1000,
+    },
+  )
+  .then((res) => {
+    initEula(res.data);
+  })
+  .catch((err) => {
+    console.warn("Failed to fetch eula from GitHub, using mirror", err);
+    axios
+      .get(
+        "https://github.moeyy.xyz/https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Website/main/docs/eula.md",
+      )
+      .then((res) => {
+        initEula(res.data);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch eula from GitHub mirror", err);
+      });
+  });
 
 function disagree() {
   location.href = "about:blank";
@@ -62,31 +62,31 @@ async function agree() {
 
 <template>
   <div v-show="canHideOverlay" class="eula__container">
-    <FancyBackground light="7"/>
+    <FancyBackground light="7" />
     <div class="eula__container-inner">
       <ElCard class="eula__card" body-class="eula__card-body">
         <h1>{{ $t("eula.title") }}</h1>
         <ElScrollbar class="eula__scrollbar">
           <ElText>
-            <p v-html="marked.parse(md)"/>
+            <p v-html="marked.parse(md)" />
           </ElText>
         </ElScrollbar>
         <div v-if="agreeCountdown != -1" class="eula__buttons">
           <ElButton @click="router.push('/welcome/welcome')"
-          >{{ $t("welcome.prev") }}
+            >{{ $t("welcome.prev") }}
           </ElButton>
           <ElButton @click="disagree">{{ $t("eula.disagree") }}</ElButton>
           <ElButton
-              type="primary"
-              :disabled="agreeCountdown != 0"
-              @click="agree"
+            type="primary"
+            :disabled="agreeCountdown != 0"
+            @click="agree"
           >
             {{
               agreeCountdown != 0
-                  ? $t("eula.agree.countdown", {
+                ? $t("eula.agree.countdown", {
                     time: agreeCountdown,
                   })
-                  : $t("eula.agree")
+                : $t("eula.agree")
             }}
           </ElButton>
         </div>

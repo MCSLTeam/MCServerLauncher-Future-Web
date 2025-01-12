@@ -79,7 +79,8 @@ html,
   vertical-align: middle;
 }
 
-#__nuxt, #app {
+#__nuxt,
+#app {
   display: flex;
   justify-content: center;
   align-items: center;

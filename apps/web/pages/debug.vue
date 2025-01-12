@@ -2,14 +2,12 @@
 import Debug from "@repo/commons/src/pages/Debug.vue";
 
 useHead({
-	title: '调试页面',
+  title: "调试页面",
 });
 </script>
 
 <template>
-<Debug/>
+  <Debug />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

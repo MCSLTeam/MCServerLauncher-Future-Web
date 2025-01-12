@@ -1,3 +1,3 @@
-import config from '@repo/configs/prettier/base'
+import config from "@repo/configs/prettier/base";
 
 export default config;

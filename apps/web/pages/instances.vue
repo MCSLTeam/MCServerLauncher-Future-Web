@@ -2,12 +2,12 @@
 import Instances from "@repo/commons/src/pages/Instances.vue";
 
 useHead({
-  title: useI18n().t('sidebar.instances'),
+  title: useI18n().t("sidebar.instances"),
 });
 </script>
 
 <template>
-  <Instances/>
+  <Instances />
 </template>
 
 <style scoped></style>

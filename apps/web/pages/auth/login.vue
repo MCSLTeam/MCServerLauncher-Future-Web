@@ -1,143 +1,142 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
-import type { FormInstance, FormRules } from 'element-plus';
+import { reactive } from "vue";
+import type { FormInstance, FormRules } from "element-plus";
 
 definePageMeta({
-	layout: 'auth',
+  layout: "auth",
 });
 
 const i18n = useI18n();
 
 useHead({
-	title: i18n.t('auth.login.title'),
+  title: i18n.t("auth.login.title"),
 });
 
 interface RuleForm {
-	username: string;
-	password: string;
-	rememberMe: boolean;
+  username: string;
+  password: string;
+  rememberMe: boolean;
 }
 
 const formRef = ref<FormInstance>();
 const form = reactive<RuleForm>({
-	username: '',
-	password: '',
-	rememberMe: false,
+  username: "",
+  password: "",
+  rememberMe: false,
 });
 
 const rules = reactive<FormRules<RuleForm>>({
-	username: [
-		{
-			required: true,
-			message: i18n.t('form.invalid.require'),
-			trigger: 'blur',
-		},
-		{
-			pattern: /[a-zA-Z_]{2,16}/,
-			message: i18n.t('form.invalid.format'),
-			trigger: 'blur',
-		},
-	],
-	password: [
-		{
-			required: true,
-			message: i18n.t('form.invalid.require'),
-			trigger: 'blur',
-		},
-		{
-			pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d$@!%*?&\-_]{8,}$/,
-			message: i18n.t('form.invalid.format'),
-			trigger: 'blur',
-		},
-	],
+  username: [
+    {
+      required: true,
+      message: i18n.t("form.invalid.require"),
+      trigger: "blur",
+    },
+    {
+      pattern: /[a-zA-Z_]{2,16}/,
+      message: i18n.t("form.invalid.format"),
+      trigger: "blur",
+    },
+  ],
+  password: [
+    {
+      required: true,
+      message: i18n.t("form.invalid.require"),
+      trigger: "blur",
+    },
+    {
+      pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d$@!%*?&\-_]{8,}$/,
+      message: i18n.t("form.invalid.format"),
+      trigger: "blur",
+    },
+  ],
 });
 
 async function submit() {
-	if (!formRef.value) return;
-	await formRef.value.validate(async (valid) => {
-		if (valid) {
-			await login(
-				form.username,
-				form.password,
-				form.rememberMe,
-				() => {
-					ElMessage({
-						message: i18n.t('auth.login.success'),
-						type: 'success',
-					});
-				},
-				(message) => {
-					ElMessage({
-						message: i18n.t('auth.login.failed', {
-							reason: i18n.t('request.failed.reason.' + message),
-						}),
-						type: 'error',
-					});
-				},
-			);
-		}
-	});
+  if (!formRef.value) return;
+  await formRef.value.validate(async (valid) => {
+    if (valid) {
+      await login(
+        form.username,
+        form.password,
+        form.rememberMe,
+        () => {
+          ElMessage({
+            message: i18n.t("auth.login.success"),
+            type: "success",
+          });
+        },
+        (message) => {
+          ElMessage({
+            message: i18n.t("auth.login.failed", {
+              reason: i18n.t("request.failed.reason." + message),
+            }),
+            type: "error",
+          });
+        },
+      );
+    }
+  });
 }
 </script>
 
 <template>
-	<ElForm
-		ref="formRef"
-		class="auth__content-card"
-		:model="form"
-		:rules="rules">
-		<h1>{{ $t('auth.login.title') }}</h1>
-		<h2>{{ $t('auth.login.subtitle') }}</h2>
-		<ElFormItem prop="username">
-			<ElInput
-				v-model="form.username"
-				:placeholder="$t('auth.login.username')" />
-		</ElFormItem>
-		<ElFormItem prop="password">
-			<ElInput
-				v-model="form.password"
-				type="password"
-				:placeholder="$t('auth.login.password')" />
-		</ElFormItem>
-		<ElFormItem>
-			<ElCheckbox
-				v-model="form.rememberMe"
-				:label="$t('auth.login.remember-me')" />
-			<ElButton type="primary" @click="submit"
-				>{{ $t('auth.login.submit') }}
-			</ElButton>
-		</ElFormItem>
-	</ElForm>
+  <ElForm ref="formRef" class="auth__content-card" :model="form" :rules="rules">
+    <h1>{{ $t("auth.login.title") }}</h1>
+    <h2>{{ $t("auth.login.subtitle") }}</h2>
+    <ElFormItem prop="username">
+      <ElInput
+        v-model="form.username"
+        :placeholder="$t('auth.login.username')"
+      />
+    </ElFormItem>
+    <ElFormItem prop="password">
+      <ElInput
+        v-model="form.password"
+        type="password"
+        :placeholder="$t('auth.login.password')"
+      />
+    </ElFormItem>
+    <ElFormItem>
+      <ElCheckbox
+        v-model="form.rememberMe"
+        :label="$t('auth.login.remember-me')"
+      />
+      <ElButton type="primary" @click="submit"
+        >{{ $t("auth.login.submit") }}
+      </ElButton>
+    </ElFormItem>
+  </ElForm>
 </template>
 
 <style scoped>
 @media (min-width: 768px) {
-	.auth__content-card {
-		width: 75%;
-	}
+  .auth__content-card {
+    width: 75%;
+  }
 }
 
 .auth__right h1 {
-	width: calc(100% - var(--el-card-padding));
-	text-align: center;
-	font-weight: var(--el-font-weight-primary);
-	color: var(--el-text-color-primary);
-	margin: 0.5rem;
+  width: calc(100% - var(--el-card-padding));
+  text-align: center;
+  font-weight: var(--el-font-weight-primary);
+  color: var(--el-text-color-primary);
+  margin: 0.5rem;
 }
 
 .auth__right h2 {
-	width: calc(100% - var(--el-card-padding));
-	text-align: center;
-	font-weight: normal;
-	color: var(--el-text-color-secondary);
-	font-size: var(--el-font-size-small);
-	margin: 0.5rem 0.5rem 2rem 0.5rem;
+  width: calc(100% - var(--el-card-padding));
+  text-align: center;
+  font-weight: normal;
+  color: var(--el-text-color-secondary);
+  font-size: var(--el-font-size-small);
+  margin: 0.5rem 0.5rem 2rem 0.5rem;
 }
 
 .auth__right .el-button {
-	margin-top: 15px;
-	padding: 1.1rem !important;
-	width: 100%;
-	font-size: var(--el-font-size-medium);
+  margin-top: 15px;
+  padding: 1.1rem !important;
+  width: 100%;
+  font-size: var(--el-font-size-medium);
 }
 </style>

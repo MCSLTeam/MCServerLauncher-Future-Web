@@ -2,17 +2,16 @@
 import Done from "@repo/commons/src/pages/welcome/Done.vue";
 
 definePageMeta({
-	layout: 'empty',
+  layout: "empty",
 });
 
 useHead({
-	title: useI18n().t('welcome.done.title'),
+  title: useI18n().t("welcome.done.title"),
 });
 </script>
 
 <template>
-	<Done/>
+  <Done />
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

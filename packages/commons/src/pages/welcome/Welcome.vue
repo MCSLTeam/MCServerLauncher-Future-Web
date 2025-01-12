@@ -1,34 +1,34 @@
 <script setup lang="ts">
-import {onMounted, onUnmounted, ref, type Ref} from "vue";
-import {useI18n} from "vue-i18n";
-import {type DarkMode, useDarkMode, useLocale} from "../../utils/uses";
-import {randNum, sleep} from "../../utils/common";
-import {canHideOverlay} from "../../utils/loader";
+import { onMounted, onUnmounted, ref, type Ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { type DarkMode, useDarkMode, useLocale } from "../../utils/uses";
+import { randNum, sleep } from "../../utils/common";
+import { canHideOverlay } from "../../utils/loader";
 import FancyBackground from "../../components/FancyBackground.vue";
-import {ElSelectV2} from "element-plus";
-import {router} from "../../utils/globals";
+import { ElSelectV2 } from "element-plus";
+import { router } from "../../utils/globals";
 
 const i18n = useI18n();
 const messages = useLocale().getMessages();
 const theme = ref(useDarkMode().mode);
 const themes: Ref<{ label: string; value: string }[]> = ref([
-  {label: i18n.t("settings.general.theme.auto"), value: "auto"},
-  {label: i18n.t("settings.general.theme.light"), value: "light"},
-  {label: i18n.t("settings.general.theme.dark"), value: "dark"},
+  { label: i18n.t("settings.general.theme.auto"), value: "auto" },
+  { label: i18n.t("settings.general.theme.light"), value: "light" },
+  { label: i18n.t("settings.general.theme.dark"), value: "dark" },
 ]);
 
 const locale = ref(useLocale().localeStorage);
 const locales: Ref<{ label: string; value: string }[]> = ref([
-  {label: i18n.t("settings.general.locale.auto"), value: "auto"},
+  { label: i18n.t("settings.general.locale.auto"), value: "auto" },
 ]);
 (async () => {
   for (const locale in messages) {
     locales.value.push({
       label:
-          messages[locale]["language.name"] +
-          " (" +
-          messages[locale]["language.country"] +
-          ")",
+        messages[locale]["language.name"] +
+        " (" +
+        messages[locale]["language.country"] +
+        ")",
       value: locale,
     });
   }
@@ -51,36 +51,36 @@ function changeLocale() {
 
 onMounted(async () => {
   interval.push(
-      setInterval(() => {
-        showWelcomeTextCursor.value = !showWelcomeTextCursor.value;
-      }, 500),
+    setInterval(() => {
+      showWelcomeTextCursor.value = !showWelcomeTextCursor.value;
+    }, 500),
   );
   interval.push(
-      setInterval(async () => {
-        if (mode === "delete") {
-          index--;
-          welcomeText.value = currText.slice(0, index);
-          if (index == 0) {
-            mode = "append";
-            let temp;
-            do {
-              temp =
-                  messages[
-                      Object.keys(messages)[randNum(Object.keys(messages).length)]!
-                      ]["welcome.welcome"];
-            } while (temp !== currText);
-            currText = temp;
-          }
-        } else if (mode === "append") {
-          index++;
-          welcomeText.value = currText.slice(0, index + 1);
-          if (index >= currText.length - 1) {
-            mode = "wait";
-            await sleep(2000);
-            mode = "delete";
-          }
+    setInterval(async () => {
+      if (mode === "delete") {
+        index--;
+        welcomeText.value = currText.slice(0, index);
+        if (index == 0) {
+          mode = "append";
+          let temp;
+          do {
+            temp =
+              messages[
+                Object.keys(messages)[randNum(Object.keys(messages).length)]!
+              ]["welcome.welcome"];
+          } while (temp !== currText);
+          currText = temp;
         }
-      }, 250),
+      } else if (mode === "append") {
+        index++;
+        welcomeText.value = currText.slice(0, index + 1);
+        if (index >= currText.length - 1) {
+          mode = "wait";
+          await sleep(2000);
+          mode = "delete";
+        }
+      }
+    }, 250),
   );
 });
 
@@ -93,12 +93,14 @@ onUnmounted(() => {
 
 <template>
   <div v-show="canHideOverlay" class="welcome__container">
-    <FancyBackground light="7"/>
+    <FancyBackground light="7" />
     <div class="welcome__container-inner">
       <div class="welcome__section welcome__section-1">
         <div class="welcome__text">
           <h2>
-            {{ welcomeText }}<span :style="{ opacity: showWelcomeTextCursor ? 1 : 0 }">_</span>&nbsp;
+            {{ welcomeText
+            }}<span :style="{ opacity: showWelcomeTextCursor ? 1 : 0 }">_</span
+            >&nbsp;
           </h2>
           <h1>
             {{ $t("app.name.abbr") }}
@@ -115,22 +117,22 @@ onUnmounted(() => {
             <ElForm>
               <ElFormItem :label="$t('settings.general.theme')">
                 <ElSelectV2
-                    v-model="theme"
-                    :options="themes"
-                    @change="useDarkMode().changeTheme(<DarkMode>theme)"
+                  v-model="theme"
+                  :options="themes"
+                  @change="useDarkMode().changeTheme(<DarkMode>theme)"
                 />
               </ElFormItem>
               <ElFormItem v-if="locales" :label="$t('settings.general.locale')">
                 <ElSelectV2
-                    v-model="locale"
-                    :options="locales"
-                    @change="changeLocale"
+                  v-model="locale"
+                  :options="locales"
+                  @change="changeLocale"
                 />
               </ElFormItem>
             </ElForm>
           </ElScrollbar>
           <ElButton type="primary" @click="router.push('/welcome/eula')"
-          >{{ $t("welcome.next") }}
+            >{{ $t("welcome.next") }}
           </ElButton>
         </ElCard>
       </div>
@@ -219,9 +221,9 @@ onUnmounted(() => {
   font-weight: bold;
   color: transparent;
   background: linear-gradient(
-      135deg,
-      var(--el-color-primary),
-      var(--el-color-primary-dark-2)
+    135deg,
+    var(--el-color-primary),
+    var(--el-color-primary-dark-2)
   );
   background-clip: text;
 }

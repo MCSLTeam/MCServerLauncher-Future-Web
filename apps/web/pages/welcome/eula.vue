@@ -2,18 +2,16 @@
 import Eula from "@repo/commons/src/pages/welcome/Eula.vue";
 
 definePageMeta({
-  layout: 'empty',
+  layout: "empty",
 });
 
 useHead({
-  title: useI18n().t('eula.title'),
+  title: useI18n().t("eula.title"),
 });
 </script>
 
 <template>
-  <Eula/>
+  <Eula />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
