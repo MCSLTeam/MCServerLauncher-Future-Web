@@ -5,10 +5,19 @@
 
 version: 2
 updates:
-    # Enable version updates for npm
+    # Web
     - package-ecosystem: 'npm'
-      # Look for `package.json` and `lock` files in the `root` directory
-      directory: '/'
-      # Check for updates once a week
+      directory: '/apps/web'
       schedule:
           interval: 'weekly'
+
+    # Commons
+    - package-ecosystem: 'npm'
+      directory: '/package/commons'
+      schedule:
+        interval: 'weekly'
+    # Configs
+    - package-ecosystem: 'npm'
+      directory: '/package/configs'
+      schedule:
+        interval: 'monthly'

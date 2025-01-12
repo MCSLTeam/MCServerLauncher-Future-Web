@@ -1,3 +1,0 @@
-{
-	"entryPoints": ["{middleware,server,utils}/**/*.ts"]
-}

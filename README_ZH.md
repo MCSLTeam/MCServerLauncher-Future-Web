@@ -1,54 +1,8 @@
-![大头图](https://socialify.git.ci/MCSLTeam/MCServerLauncher-Future-Web/image?description=1&descriptionEditable=MCSL%E7%9A%84%E5%85%A8%E6%96%B0%E7%89%88%E6%9C%AC%E3%80%82%E5%AE%8C%E5%85%A8%E9%87%8D%E6%96%B0%E8%AE%BE%E8%AE%A1%EF%BC%8C%E5%8A%9F%E8%83%BD%E5%85%A8%E9%9D%A2%EF%BC%8C%E7%AE%80%E5%8D%95%E4%B8%8A%E6%89%8B%E3%80%82&font=Jost&forks=1&language=1&logo=https%3A%2F%2Fimg.fastmirror.net%2Fs%2F2024%2F07%2F24%2F66a0f36d0242c.png&name=1&pattern=Circuit%20Board&stargazers=1&theme=Auto)  
-中文 | [English](https://github.com/MCSLTeam/MCServerLauncher-Future-Web/tree/main#readme)  
-</br>
-此仓库仅包含 Web面板 的源码。若想了解更多关于 守护进程 和 WPF桌面启动器 的信息，请点击[这里](https://github.com/MCSLTeam/MCServerLauncher-Future)。
+# MCServerLauncher Future Monorepo
 
-## 特色
+这是一个储存 MCServerLauncher Future 项目所有相关代码的仓库。
 
-**高效**：顷刻即可创建新实例。
-
-**全面**：支持大多数控制台应用程序的管理。
-
-**多实例管理**：从一处同时控制多个实例。
-
-## 概览
-
-MCServerLauncher Future 是新一代的服务器管理软件，提供直观的界面来设置、监控和控制多个游戏服务器及控制台应用程序。作为 [MCServerLauncher 2](https://github.com/MCSLTeam/MCSL2) 的下一世代产品，拥有更好的性能、更灵活的架构、更简便的操作、更丰富的体验。
-
-## 组件
-
-[守护进程](https://github.com/MCSLTeam/MCServerLauncher-Future/tree/master/MCServerLauncher.Daemon)：使用 .NET 6.0 C# 构建的核心服务，提供强大的性能和灵活性。
-
-[网页面板](https://github.com/MCSLTeam/MCServerLauncher-Future-Web)：可以通过浏览器访问的仪表板，非常适合非 Windows 用户，当然 Windows 用户也可使用。
-
-[WPF桌面启动器](https://github.com/MCSLTeam/MCServerLauncher-Future/tree/master/MCServerLauncher.WPF)：针对 Windows 用户的最优解决方案。
-
-## 系统需求
-
-Node.js 18 及以上版本。
-
-## 安装
-
-### Windows
-
-WIP
-
-### Linux
-
-```bash
-sudo su -c "curl -sSL https://github.moeyy.xyz/https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Web/main/setup_cn.sh | bash"
-```
-
-## 贡献
-
-要在本地运行项目，请使用以下命令：
-
-```shell
-pnpm i
-pnpm dev # 测试服务器
-pnpm run docs # 生成文档
-pnpm build # 构建
-```
+## 反馈
 
 如需报告问题或提出改进建议，请 [提交 Issue](https://github.com/MCSLTeam/MCServerLauncher-Future/issues/new/choose) 或 [提交 Pull Request](https://github.com/MCSLTeam/MCServerLauncher-Future/compare) 。
 
@@ -60,9 +14,9 @@ QQ群1：[733951376](https://qm.qq.com/q/WtVCQWSBEe)
 
 QQ群2：[819067131](https://qm.qq.com/q/EXBE6a5CF4)
 
-## 开源许可证
+## 许可证
 
-本项目采用 [GNU General Public License Version 3.0](https://github.com/MCSLTeam/MCServerLauncher-Future/blob/master/LICENSE) 进行分发。
+本项目及子项目采用 [GNU General Public License Version 3.0](https://github.com/MCSLTeam/MCServerLauncher-Future/blob/master/LICENSE) 进行分发。
 
 ## 版权
 

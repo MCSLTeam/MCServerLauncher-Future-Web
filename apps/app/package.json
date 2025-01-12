@@ -1,0 +1,39 @@
+{
+  "name": "mcsl-future-tauri",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "frontend:dev": "vite",
+    "frontend:build": "vue-tsc --noEmit && vite build",
+    "tauri": "tauri",
+    "build": "tauri build",
+    "dev": "tauri dev",
+    "test": "vue-tsc --noEmit && cd src-tauri && cargo test --no-run",
+    "lint": "eslint; prettier --check .; cargo check",
+    "fix": "eslint --fix;prettier --write --list-different ."
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-opener": "^2",
+    "@tauri-apps/plugin-os": "^2.2.0",
+    "@tauri-apps/plugin-process": "^2.2.0",
+    "element-plus": "^2.8.4",
+    "pinia": "^2.3.0",
+    "vue": "^3.5.13",
+    "vue-i18n": "^11.0.1",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@repo/commons": "workspace:*",
+    "@repo/configs": "workspace:*",
+    "@tauri-apps/cli": "^2",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.4.2",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.3",
+    "vue-tsc": "^2.1.10"
+  }
+}
