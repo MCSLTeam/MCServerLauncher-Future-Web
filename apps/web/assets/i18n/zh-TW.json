@@ -1,9 +1,9 @@
 {
   "app.name.suffix": "Web",
-  "auth.side.jwt.title": "JWT 验证",
-  "auth.side.ootb.title": "开箱即用",
-  "auth.side.element-plus.title": "Element Plus 强力驱动",
-  "auth.side.element-plus.desc": "舒适的设计，养眼的界面",
+  "auth.side.jwt.title": "JWT 驗證",
+  "auth.side.ootb.title": "開箱即用",
+  "auth.side.element-plus.title": "Element Plus 強力驅動",
+  "auth.side.element-plus.desc": "舒適的設計，養眼的介面",
   "auth.side.performance.title": "性能大提升",
   "auth.side.i18n.title": "多语言支持",
   "auth.side.secure.title": "持久化安全",
