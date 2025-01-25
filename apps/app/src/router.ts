@@ -4,7 +4,6 @@ import Home from "@repo/commons/src/pages/Home.vue";
 import Welcome from "@repo/commons/src/pages/welcome/Welcome.vue";
 import Eula from "@repo/commons/src/pages/welcome/Eula.vue";
 import Done from "@repo/commons/src/pages/welcome/Done.vue";
-import Connect from "@repo/commons/src/pages/Connect.vue";
 import Debug from "@repo/commons/src/pages/Debug.vue";
 import Instances from "@repo/commons/src/pages/Instances.vue";
 import News from "@repo/commons/src/pages/News.vue";
@@ -40,10 +39,6 @@ const router = createRouter({
       meta: {
         layout: "none",
       },
-    },
-    {
-      path: "/connect",
-      component: Connect,
     },
     {
       path: "/debug",
