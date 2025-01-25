@@ -36,6 +36,8 @@
   "auth.register.success": "注册成功！请登录账号！",
   "auth.register.title": "创建神权狗账号",
   "auth.register.username": "用户名（2-16位，可包含字母数字或下划线）",
+  "database.get.failed": "获取数据失败！原因：{reason}",
+  "database.set.failed": "存储数据失败！原因：{reason}",
   "request.failed.reason.eula-not-agreed": "未同意 EULA",
   "request.failed.reason.invalid-matching-permission": "权限好像不太对..",
   "request.failed.reason.invalid-params": "参数不太对劲...",
