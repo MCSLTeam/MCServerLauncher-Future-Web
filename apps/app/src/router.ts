@@ -1,12 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { ref } from "vue";
-import Home from "@repo/commons/src/pages/Home.vue";
-import Welcome from "@repo/commons/src/pages/welcome/Welcome.vue";
-import Eula from "@repo/commons/src/pages/welcome/Eula.vue";
-import Done from "@repo/commons/src/pages/welcome/Done.vue";
-import Debug from "@repo/commons/src/pages/Debug.vue";
-import Instances from "@repo/commons/src/pages/Instances.vue";
-import News from "@repo/commons/src/pages/News.vue";
 
 export type LayoutType = "none" | "default";
 
@@ -17,40 +10,40 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      component: Home,
+      component: () => import("@repo/commons/src/pages/Home.vue"),
     },
     {
       path: "/welcome/welcome",
-      component: Welcome,
+      component: () => import("@repo/commons/src/pages/Welcome/Welcome.vue"),
       meta: {
         layout: "none",
       },
     },
     {
       path: "/welcome/eula",
-      component: Eula,
+      component: () => import("@repo/commons/src/pages/Welcome/Eula.vue"),
       meta: {
         layout: "none",
       },
     },
     {
       path: "/welcome/done",
-      component: Done,
+      component: () => import("@repo/commons/src/pages/Welcome/Done.vue"),
       meta: {
         layout: "none",
       },
     },
     {
       path: "/debug",
-      component: Debug,
+      component: () => import("@repo/commons/src/pages/Debug.vue"),
     },
     {
       path: "/instances",
-      component: Instances,
+      component: () => import("@repo/commons/src/pages/Instances.vue"),
     },
     {
       path: "/news",
-      component: News,
+      component: () => import("@repo/commons/src/pages/News.vue"),
     },
   ],
 });
