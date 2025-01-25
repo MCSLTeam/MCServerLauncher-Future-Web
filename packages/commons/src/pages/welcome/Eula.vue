@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import axios from "axios";
 import { marked } from "marked";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { agreedEula, canHideOverlay } from "../../utils/loader";
 import FancyBackground from "../../components/FancyBackground.vue";
 import { router } from "../../utils/injections.ts";
@@ -27,30 +27,6 @@ function initEula(text: string) {
   }, 500);
 }
 
-axios
-  .get(
-    "https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Website/main/docs/eula.md",
-    {
-      timeout: 1000,
-    },
-  )
-  .then((res) => {
-    initEula(res.data);
-  })
-  .catch((err) => {
-    console.warn("Failed to fetch eula from GitHub, using mirror", err);
-    axios
-      .get(
-        "https://github.moeyy.xyz/https://raw.githubusercontent.com/MCSLTeam/MCServerLauncher-Future-Website/main/docs/eula.md",
-      )
-      .then((res) => {
-        initEula(res.data);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch eula from GitHub mirror", err);
-      });
-  });
-
 function disagree() {
   location.href = "about:blank";
   window.close();
@@ -60,6 +36,41 @@ async function agree() {
   agreedEula.value = true;
   await router.push("/welcome/done");
 }
+
+async function init() {
+  const eulaInfo =
+    (await import("../../assets/eula/" + useI18n().locale.value + ".json")) ??
+    (await import("../../assets/eula/en-US.json"));
+  axios
+    .get(eulaInfo.url)
+    .then((res) => {
+      initEula(res.data);
+    })
+    .catch((err) => {
+      if (eulaInfo.mirror) {
+        console.warn("Failed to fetch eula, using mirror", err);
+        axios
+          .get(eulaInfo.mirror)
+          .then((res) => {
+            initEula(res.data);
+          })
+          .catch((err) => {
+            console.warn(
+              "Failed to fetch eula from mirror, using local eula",
+              err,
+            );
+            initEula(eulaInfo.content);
+          });
+      } else {
+        console.warn("Failed to fetch eula, using local eula", err);
+        initEula(eulaInfo.content);
+      }
+    });
+}
+
+onMounted(() => {
+  init();
+});
 </script>
 
 <template>
@@ -68,7 +79,7 @@ async function agree() {
     <div class="eula__container-inner">
       <ElCard class="eula__card" body-class="eula__card-body">
         <h1>{{ i18n.t("eula.title") }}</h1>
-        <ElScrollbar class="eula__scrollbar">
+        <ElScrollbar class="eula__scrollbar" v-loading="md == ''">
           <ElText>
             <p v-html="marked.parse(md)" />
           </ElText>

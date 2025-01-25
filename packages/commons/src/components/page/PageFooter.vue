@@ -1,9 +1,10 @@
 <!-- 页脚 -->
 <script setup lang="ts">
-import { useLocale, useScreenWidth } from "../../utils/uses.js";
+import { useScreenWidth } from "../../utils/uses.js";
 import { beian } from "../../utils/injections.ts";
+import { useI18n } from "vue-i18n";
 
-const i18n = useLocale().getI18n();
+const i18n = useI18n();
 </script>
 
 <template>
