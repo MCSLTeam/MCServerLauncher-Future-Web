@@ -11,7 +11,7 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint; prettier --check .",
     "fix": "eslint --fix;prettier --write --list-different .",
-    "test": "vue-tsc --noEmit"
+    "test": "nuxi typecheck"
   },
   "dependencies": {
     "@nuxtjs/eslint-module": "^4.1.0",

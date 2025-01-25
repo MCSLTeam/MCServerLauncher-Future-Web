@@ -105,22 +105,6 @@ export async function registerAdmin(
 }
 
 /**
- * 判断用户是否有权限
- * @param permission - 权限名称
- * @returns 是否拥有权限
- */
-export async function hasPermission(permission: string): Promise<boolean> {
-  const data = await $fetch("/api/auth/hasPermission", {
-    method: "POST",
-    body: {
-      token: getToken(),
-      permission: permission,
-    },
-  });
-  return data.status == "ok" && (<{ data: any }>data).data.has;
-}
-
-/**
  * 登录
  * @param username - 用户名
  * @param password - 密码

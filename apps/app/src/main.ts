@@ -42,11 +42,9 @@ import { useLocalStorage } from "@vueuse/core";
     } else {
       document.body.classList.add("tauri-mobile");
     }
-    useDatabase().injectDatabaseManager(
-      async <T>(key: string, defaultValue: T) => {
-        return useLocalStorage<T>(key, defaultValue);
-      },
-    );
+    useDatabase().injectDatabaseManager(<T>(key: string, defaultValue: T) => {
+      return useLocalStorage<T>(key, defaultValue);
+    });
     if (!agreedEula.value) await router.push("/welcome/welcome");
   });
 });

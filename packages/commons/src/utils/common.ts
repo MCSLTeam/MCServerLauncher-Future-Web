@@ -1,5 +1,3 @@
-import { useLocale } from "./uses.ts";
-
 /**
  * 推迟执行
  * @param ms - 推迟时长（毫秒）
@@ -45,7 +43,7 @@ export function randNum(min?: number, max?: number) {
  * window.addEventListener('scroll', onScrollDebounce);
  */
 export function debounce(func: () => void, delay: number) {
-  let timer: number | null = null;
+  let timer: any = null;
   return function () {
     if (timer) clearTimeout(timer);
     timer = setTimeout(() => {

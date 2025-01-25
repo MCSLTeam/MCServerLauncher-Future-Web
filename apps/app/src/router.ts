@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { ref } from "vue";
-import { agreedEula } from "@repo/commons/src/utils/loader.ts";
 import Home from "@repo/commons/src/pages/Home.vue";
 import Welcome from "@repo/commons/src/pages/welcome/Welcome.vue";
 import Eula from "@repo/commons/src/pages/welcome/Eula.vue";

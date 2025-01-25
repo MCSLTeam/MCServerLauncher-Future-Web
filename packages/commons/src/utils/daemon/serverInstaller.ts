@@ -21,7 +21,7 @@ export async function getMcVersions() {
 }
 
 // TODO: 调用daemon获取版本列表，先用这个顶着
-export async function getTypeVersions(type: string, mcVersion: string) {
+export async function getTypeVersions(type: string, _mcVersion: string) {
   switch (type) {
     case "fabric":
       return (() => {

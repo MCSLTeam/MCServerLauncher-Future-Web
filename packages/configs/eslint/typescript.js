@@ -8,12 +8,13 @@ export default [
     {
         files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
         languageOptions: {
-            globals: {...globals.browser, ...globals.node},
+            globals: {...globals.browser, ...globals.node, ...globals.es2020,},
             parserOptions: {parser: tseslint.parser},
         },
         rules: {
             '@typescript-eslint/no-explicit-any': 'off',
             '@typescript-eslint/no-unused-vars': 'warn',
+            '@typescript-eslint/consistent-type-imports': 'error'
         },
     },
     {

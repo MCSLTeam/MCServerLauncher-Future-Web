@@ -31,7 +31,7 @@ const typeVersions: Ref<string[] | undefined> = ref([]);
 (async () => {
   try {
     mcVersions.value = await getMcVersions();
-  } catch (e) {
+  } catch (_) {
     ElNotification({
       title: useI18n().t("notification.warning.title"),
       message: useI18n().t("dialog.new-instance.failed.load-mc-versions"),
