@@ -36,6 +36,8 @@
   "auth.register.success": "註冊成功！請登錄賬號！",
   "auth.register.title": "創建管理員賬號",
   "auth.register.username": "用戶名（2-16位，可包含字母數字或下劃線）",
+  "database.get.failed": "获取数据失败！原因：{reason}",
+  "database.set.failed": "存储数据失败！原因：{reason}",
   "request.failed.reason.eula-not-agreed": "為同意 EULA",
   "request.failed.reason.invalid-matching-permission": "用戶許可權格式錯誤",
   "request.failed.reason.invalid-params": "無效或錯誤的參數",
