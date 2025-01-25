@@ -68,7 +68,7 @@ onMounted(async () => {
               messages[
                 Object.keys(messages)[randNum(Object.keys(messages).length)]!
               ]["welcome.welcome"];
-          } while (temp !== currText);
+          } while (temp == currText);
           currText = temp;
         }
       } else if (mode === "append") {

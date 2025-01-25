@@ -38,9 +38,14 @@ async function agree() {
 }
 
 async function init() {
-  const eulaInfo =
-    (await import("../../assets/eula/" + useI18n().locale.value + ".json")) ??
-    (await import("../../assets/eula/en-US.json"));
+  let eulaInfo;
+  try {
+    eulaInfo = await import(
+      "../../assets/eula/" + useI18n().locale.value + ".json"
+    );
+  } catch (_) {
+    eulaInfo = await import("../../assets/eula/en-US.json");
+  }
   axios
     .get(eulaInfo.url)
     .then((res) => {

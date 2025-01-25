@@ -136,7 +136,7 @@ export async function getTokenData(token: string) {
 export async function verifyToken(token: string) {
   try {
     await getUsernameByToken(token);
-  } catch (e) {
+  } catch (_) {
     throw "unknown-user";
   }
   return <JwtPayload>jwt.verify(token, await getSecret());
