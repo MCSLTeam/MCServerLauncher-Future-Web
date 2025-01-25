@@ -6,7 +6,7 @@
   "app.name.future": "Future",
   "daemon.connect.title": "连接守护进程",
   "daemon.connect.name": "守护进程名称",
-  "daemon.connect.name.placeholder": "给守护进程取个名字吧！",
+  "daemon.connect.name.placeholder": "请为守护进程命名...",
   "daemon.connect.host": "主机名",
   "daemon.connect.host.placeholder": "请输入主机名...",
   "daemon.connect.port": "端口",
