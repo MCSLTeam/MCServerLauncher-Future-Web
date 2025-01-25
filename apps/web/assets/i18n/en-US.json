@@ -36,6 +36,8 @@
   "auth.register.success": "Administrator account created! Please login!",
   "auth.register.title": "Creating Administrator Account",
   "auth.register.username": "Username (2-16 digits, can contain alphanumerics or underscores)",
+  "database.get.failed": "获取数据失败！原因：{reason}",
+  "database.set.failed": "存储数据失败！原因：{reason}",
   "request.failed.reason.eula-not-agreed": "EULA not agreed",
   "request.failed.reason.invalid-matching-permission": "Wrong user permission format",
   "request.failed.reason.invalid-params": "Invalid or incorrect parameters",
