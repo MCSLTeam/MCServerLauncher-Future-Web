@@ -4,6 +4,7 @@ import { isAprilFoolsDay } from "@repo/commons/src/utils/common";
 import { setBeian, setRouter } from "@repo/commons/src/utils/injections.ts";
 import { useLocale } from "@repo/commons/src/utils/uses";
 import { initDatabase } from "~/utils/db.ts";
+import { useAccount } from "~/utils/auth.ts";
 
 let siteName = "MCSL Future Web";
 
@@ -27,6 +28,7 @@ useLocale().injectI18n(useI18n());
 loadApp(async (loadingInfo) => {
   loadingInfo.setMessage("loading.default");
   setRouter(useRouter());
+  await useAccount().init();
   await initDatabase();
   const meta = (await $fetch("/api/getMeta")).data;
   siteName = meta.siteName;

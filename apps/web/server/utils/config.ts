@@ -114,5 +114,10 @@ function fillMissingValues(
  */
 export async function getConfig(): Promise<Config> {
   await load;
-  return <Config>(await storage.getItem("config.json"))!;
+  const config = <Config | null>await storage.getItem("config.json");
+  if (config == null) {
+    await loadConfig();
+    return getConfig();
+  }
+  return config;
 }

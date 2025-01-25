@@ -13,7 +13,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     if (to.fullPath.startsWith("/welcome")) return abortNavigation();
   }
 
-  if (await shouldRegister()) {
+  if (!(await useAccount().adminRegistered())) {
     // 未注册
     if (to.fullPath != "/auth/register") return navigateTo("/auth/register");
     return;
@@ -21,7 +21,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     if (to.fullPath == "/auth/register") return abortNavigation();
   }
 
-  if (await shouldLogin()) {
+  if (!useAccount().loggedIn) {
     // 未登录
     if (to.fullPath != "/auth/login") return navigateTo("/auth/login");
     return;

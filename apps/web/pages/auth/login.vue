@@ -16,14 +16,14 @@ useHead({
 interface RuleForm {
   username: string;
   password: string;
-  rememberMe: boolean;
+  remember: boolean;
 }
 
 const formRef = ref<FormInstance>();
 const form = reactive<RuleForm>({
   username: "",
   password: "",
-  rememberMe: false,
+  remember: false,
 });
 
 const rules = reactive<FormRules<RuleForm>>({
@@ -54,20 +54,15 @@ const rules = reactive<FormRules<RuleForm>>({
 });
 
 async function submit() {
-  if (!formRef.value) return;
-  await formRef.value.validate(async (valid) => {
+  await formRef.value?.validate(async (valid) => {
     if (valid) {
-      await login(
-        form.username,
-        form.password,
-        form.rememberMe,
-        () => {
-          ElMessage.success(i18n.t("auth.login.success"));
-        },
-        (message) => {
-          ElMessage.error(formatError("auth.login.failed", message));
-        },
-      );
+      try {
+        await useAccount().login(form.username, form.password, form.remember);
+        ElMessage.success(i18n.t("auth.login.success"));
+        await useRouter().push("/");
+      } catch (e: any) {
+        ElMessage.error(formatError("auth.login.failed", e));
+      }
     }
   });
 }
@@ -90,9 +85,9 @@ async function submit() {
         :placeholder="$t('auth.login.password')"
       />
     </ElFormItem>
-    <ElFormItem>
+    <ElFormItem prop="remember">
       <ElCheckbox
-        v-model="form.rememberMe"
+        v-model="form.remember"
         :label="$t('auth.login.remember-me')"
       />
       <ElButton type="primary" @click="submit"

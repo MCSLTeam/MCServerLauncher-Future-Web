@@ -11,7 +11,7 @@ const i18n = useI18n();
   <!-- 加载中 -->
   <transition name="fade" mode="out-in">
     <div v-show="!canHideOverlay" class="loading-overlay__loading">
-      <FancyBackground light="5" />
+      <FancyBackground />
       <img :src="getLogoSrc()" alt="" />
       <h1>
         {{ i18n.t("app.name") }}

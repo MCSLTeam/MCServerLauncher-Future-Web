@@ -2,7 +2,6 @@
 <script setup lang="ts">
 import { getLogoSrc, randNum, sleep } from "@repo/commons/src/utils/common";
 import { canHideOverlay } from "@repo/commons/src/utils/loader";
-import LoadingOverlay from "@repo/commons/src/components/LoadingOverlay.vue";
 import FancyBackground from "@repo/commons/src/components/FancyBackground.vue";
 import PageFooter from "@repo/commons/src/components/page/PageFooter.vue";
 
@@ -72,7 +71,6 @@ onUnmounted(() => {
 
 <template>
   <div class="auth__max-screen">
-    <LoadingOverlay />
     <div v-show="canHideOverlay" class="auth__max-screen">
       <FancyBackground light="5" />
       <div class="auth__container auth__max-screen">

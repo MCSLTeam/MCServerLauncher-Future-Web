@@ -45,5 +45,10 @@ export async function saveDatabase(database: any) {
  */
 export async function getDatabase(): Promise<any> {
   await load;
-  return (await storage.getItem("database.json"))!;
+  const db = <any>await storage.getItem("database.json");
+  if (db == null) {
+    await loadDatabase();
+    return await getDatabase();
+  }
+  return db;
 }

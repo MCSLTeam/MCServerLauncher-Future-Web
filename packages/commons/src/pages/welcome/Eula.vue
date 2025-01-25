@@ -33,8 +33,8 @@ function disagree() {
 }
 
 async function agree() {
-  agreedEula.value = true;
   await router.push("/welcome/done");
+  agreedEula.value = true;
 }
 
 async function init() {

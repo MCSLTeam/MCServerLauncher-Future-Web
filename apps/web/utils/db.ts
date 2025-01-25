@@ -8,19 +8,21 @@ let dataCache: any = {};
 let lastFetch = 0;
 
 async function fetchData() {
-  lastFetch = Date.now();
-  const res: any = await $fetch("/api/database/get", {
-    method: "POST",
-    body: {
-      token: getToken(),
-    },
-  });
-  if (res.status == "ok") {
-    dataCache = res.data;
-    return true;
-  } else {
-    ElMessage.error(formatError("database.get.failed", res.message));
-    return false;
+  if (useAccount().loggedIn) {
+    lastFetch = Date.now();
+    const res: any = await $fetch("/api/database/get", {
+      method: "POST",
+      body: {
+        token: useAccount().token,
+      },
+    });
+    if (res.status == "ok") {
+      dataCache = res.data;
+      return true;
+    } else {
+      ElMessage.error(formatError("database.get.failed", res.message));
+      return false;
+    }
   }
 }
 
@@ -29,7 +31,7 @@ async function setData() {
     const res: any = await $fetch("/api/database/set", {
       method: "POST",
       body: {
-        token: getToken(),
+        token: useAccount().token,
         data: dataCache,
       },
     });
@@ -57,5 +59,5 @@ export async function initDatabase() {
   );
   setInterval(() => {
     if (lastFetch + fetchInterval < Date.now()) fetchData();
-  }, fetchInterval / 4);
+  }, fetchInterval / 10);
 }

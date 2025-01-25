@@ -31,6 +31,7 @@ export default [
             'vue/valid-template-root': 'warn',
             'vue/no-multiple-template-root': 'warn',
             'vue/first-attribute-linebreak': 'off',
+            'vue/ html-self-closing': 'off' // 交给 prettier 处理
         },
     },
     {

@@ -1,174 +1,149 @@
 import { formatError } from "~/utils/common.ts";
+import { useLocale } from "@repo/commons/src/utils/uses";
 
-const tokenLocalStorage = useLocalStorage("token", null);
-const tokenSessionStorage = useSessionStorage("token", null);
-let tokenExpires: Date | null = null;
-let adminRegistered: boolean = false;
-let username: string | null = null;
+export const useAccount = defineStore("account", () => {
+  const tokenPermanent = useLocalStorage<string | null>("token", null);
+  const tokenTemporary = useSessionStorage<string | null>("token", null);
+  let timeout: any;
+  let adminRegisteredStorage: boolean | undefined = undefined;
 
-/**
- * 判断是否需要注册（管理员已注册）
- * @returns 是否需要注册
- */
-export async function shouldRegister() {
-  if (!adminRegistered) {
-    adminRegistered = (<{ data: any }>await $fetch("/api/auth/hasAdmin")).data
-      .has;
-  }
-  return !adminRegistered;
-}
+  const tokenInfo = ref({
+    expire: "",
+    username: "",
+  });
 
-/**
- * 判断是否需要登录（已注册且无令牌/令牌无效）
- * @returns 是否需要登录
- */
-export async function shouldLogin() {
-  return !(await shouldRegister()) && !(await isTokenValid());
-}
-
-/**
- * 判断令牌是否有效
- * @returns 是否有效
- */
-export async function isTokenValid() {
-  // 无令牌
-  if (!getToken()) {
-    return false;
-  }
-  // 令牌有效期不存在，获取令牌有效期
-  if (!tokenExpires) {
-    if (!(await refreshTokenExpire())) {
-      // 令牌无效
-      return false;
+  async function adminRegistered() {
+    if (adminRegisteredStorage == undefined) {
+      await refreshAdminRegistered();
     }
-  } else if (!tokenExpires || tokenExpires.getTime() < Date.now()) {
-    // 令牌有效期存在，但过期
-    return false;
+    return adminRegisteredStorage!;
   }
-  return true;
-}
 
-/**
- * 获取并刷新令牌有效期
- * @returns 令牌是否有效
- */
-async function refreshTokenExpire() {
-  const expire = await $fetch("/api/auth/verifyToken", {
-    method: "POST",
-    body: {
-      token: getToken(),
-    },
-  });
-  if (expire.status == "ok") {
-    // 有效，记录信息
-    tokenExpires = new Date((<{ data: any }>expire).data.expire);
-    username = (<{ data: any }>expire).data.username;
-    return true;
-  } else {
-    // 无效，登出
-    ElMessage.error(formatError("auth.login.failed.token", expire.message));
-    await logout();
-    return false;
+  async function refreshAdminRegistered() {
+    adminRegisteredStorage = (<any>await $fetch("/api/auth/hasAdmin")).data.has;
   }
-}
 
-/**
- * 注册管理员
- * @param username - 用户名
- * @param password - 密码
- * @param successCallback - 注册成功回调
- * @param errorCallback - 注册失败回调
- */
-export async function registerAdmin(
-  username: string,
-  password: string,
-  successCallback: () => void = () => {},
-  errorCallback: (message: string) => void = () => {},
-) {
-  const data = await $fetch("/api/auth/registerAdmin", {
-    method: "POST",
-    body: {
-      username: username,
-      password: password,
-    },
+  const token = computed(() => {
+    return tokenPermanent.value ?? tokenTemporary.value;
   });
-  if (data.status == "ok") {
-    // 注册成功
-    successCallback();
-    await useRouter().push("/auth/login");
-  } else {
-    // 注册失败
-    errorCallback(data.message);
+
+  const loggedIn = computed(() => {
+    return token.value != null;
+  });
+
+  async function init() {
+    await refreshAdminRegistered();
+    await scheduleRefresh();
   }
-  // 登出并跳转登录页面
-  await logout();
-}
 
-/**
- * 登录
- * @param username - 用户名
- * @param password - 密码
- * @param rememberMe - 是否记住
- * @param successCallback - 登录成功回调
- * @param errorCallback - 登录失败回调
- */
-export async function login(
-  username: string,
-  password: string,
-  rememberMe: boolean = false,
-  successCallback: (token: string) => void = () => {},
-  errorCallback: (message: string) => void = () => {},
-) {
-  const data = await $fetch("/api/auth/login", {
-    method: "POST",
-    body: {
-      username: username,
-      password: password,
-      rememberMe: rememberMe,
-    },
-  });
-  if (data.status == "ok") {
-    // 登录成功
-    successCallback((<{ data: any }>data).data.token);
-    if (rememberMe) {
-      // 记住此设备，数据长期存储到localstorage
-      tokenSessionStorage.value = null;
-      tokenLocalStorage.value = (<{ data: any }>data).data.token;
-      await refreshTokenExpire();
+  function requireLogin(loggedIn: boolean) {
+    if (loggedIn != loggedIn) {
+      throw new Error(`用户${loggedIn ? "已" : "未"}登录`);
+    }
+  }
+
+  function setToken(token: string | null, isPermanent?: boolean) {
+    if (isPermanent == true || isPermanent == undefined) {
+      tokenPermanent.value = token;
+    }
+    if (isPermanent == false || isPermanent == undefined) {
+      tokenTemporary.value = token;
+    }
+  }
+
+  async function registerAdmin(username: string, password: string) {
+    requireLogin(false);
+    const res = await $fetch("/api/auth/registerAdmin", {
+      method: "POST",
+      body: {
+        username: username,
+        password: password,
+      },
+    });
+    if (res.status == "ok") {
+      await init();
     } else {
-      // 不记住此设备，数据短期存储到sessionStorage
-      tokenLocalStorage.value = tokenExpires = null;
-      tokenSessionStorage.value = (<{ data: any }>data).data.token;
+      throw res.message;
     }
-    await refreshTokenExpire();
-    await useRouter().push("/");
-  } else {
-    // 登录失败，登出
-    errorCallback(data.message);
-    await logout();
   }
-}
 
-/**
- * 登出
- */
-export async function logout() {
-  tokenLocalStorage.value = tokenExpires = tokenSessionStorage.value = null;
-  await useRouter().push("/");
-}
+  async function login(
+    username: string | null,
+    password: string,
+    remember: boolean,
+  ) {
+    requireLogin(false);
+    const res: any = await $fetch("/api/auth/login", {
+      method: "POST",
+      body: {
+        username: username,
+        password: password,
+        rememberMe: remember,
+      },
+    });
+    if (res.status == "ok") {
+      setToken(res.data.token, remember);
+      await init();
+    } else {
+      await logout();
+      throw res.message;
+    }
+  }
 
-/**
- * 获取令牌
- * @returns 令牌
- */
-export function getToken(): string | null {
-  return tokenLocalStorage.value ?? tokenSessionStorage.value;
-}
+  async function logout() {
+    setToken(null);
+    await scheduleRefresh();
+    await useRouter().push("/");
+  }
 
-/**
- * 获取用户名
- * @returns 用户名
- */
-export function getUsername() {
-  return username;
-}
+  async function refreshTokenInfo() {
+    const res: any = await $fetch("/api/auth/getTokenInfo", {
+      method: "POST",
+      body: {
+        token: token.value,
+      },
+    });
+    if (res.status == "ok") {
+      tokenInfo.value = res.data;
+    } else {
+      throw res.message;
+    }
+  }
+
+  async function scheduleRefresh() {
+    if (timeout) clearTimeout(timeout);
+    if (loggedIn.value) {
+      try {
+        await refreshTokenInfo();
+        const delay =
+          new Date(tokenInfo.value.expire).getTime() - Date.now() - 60000;
+        if (delay > 2147483647) {
+          timeout = setTimeout(async () => {
+            await scheduleRefresh();
+          }, 2147483647);
+        } else {
+          timeout = setTimeout(async () => {
+            await logout();
+            ElMessage.warning(
+              useLocale().getI18n().t("auth.login.failed.expired"),
+            );
+          }, delay);
+        }
+      } catch (e: any) {
+        ElMessage.error(formatError("auth.login.failed.verify", e));
+        await logout();
+      }
+    }
+  }
+
+  return {
+    init,
+    token,
+    loggedIn,
+    adminRegistered,
+    tokenInfo,
+    registerAdmin,
+    login,
+    logout,
+  };
+});

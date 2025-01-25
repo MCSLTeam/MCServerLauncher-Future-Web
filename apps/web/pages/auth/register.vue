@@ -68,19 +68,15 @@ const rules = reactive<FormRules<RuleForm>>({
 });
 
 async function submit() {
-  if (!formRef.value) return;
-  await formRef.value.validate(async (valid) => {
+  await formRef.value?.validate(async (valid) => {
     if (valid) {
-      await registerAdmin(
-        form.username,
-        form.password,
-        () => {
-          ElMessage.success(i18n.t("auth.register.success"));
-        },
-        (message) => {
-          ElMessage.error(formatError("auth.register.failed", message));
-        },
-      );
+      try {
+        await useAccount().registerAdmin(form.username, form.password);
+        ElMessage.success(i18n.t("auth.register.success"));
+        await useRouter().push("/auth/login");
+      } catch (e: any) {
+        ElMessage.error(formatError("auth.register.failed", e));
+      }
     }
   });
 }
