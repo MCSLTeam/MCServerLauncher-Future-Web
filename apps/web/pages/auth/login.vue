@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { reactive } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
+import { formatError } from "~/utils/common.ts";
 
 definePageMeta({
   layout: "auth",
@@ -61,18 +62,10 @@ async function submit() {
         form.password,
         form.rememberMe,
         () => {
-          ElMessage({
-            message: i18n.t("auth.login.success"),
-            type: "success",
-          });
+          ElMessage.success(i18n.t("auth.login.success"));
         },
         (message) => {
-          ElMessage({
-            message: i18n.t("auth.login.failed", {
-              reason: i18n.t("request.failed.reason." + message),
-            }),
-            type: "error",
-          });
+          ElMessage.error(formatError("auth.login.failed", message));
         },
       );
     }

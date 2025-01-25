@@ -53,6 +53,13 @@ html,
   font-family: var(--font-minecraft);
 }
 
+code {
+  background: var(--el-bg-color-page);
+  border: 1px solid var(--el-border-color);
+  padding: 0 0.5rem;
+  border-radius: var(--el-border-radius-base);
+}
+
 .noscript {
   position: fixed;
   top: 0;
@@ -133,7 +140,12 @@ html.dark::view-transition-new(root) {
   opacity: 0;
 }
 
-/* MC字体 */
+/* 字体 */
+@font-face {
+  font-family: "MiSans VF";
+  src: url("../font/MiSans VF.ttf") format("truetype");
+}
+
 @font-face {
   font-family: "Minecraft";
   src: url("../font/Minecraft.woff") format("woff");

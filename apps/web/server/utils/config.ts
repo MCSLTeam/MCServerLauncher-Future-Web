@@ -8,11 +8,6 @@ export interface Config {
   };
   beian: string;
   siteName: string;
-  resourcepacks: {
-    url: string;
-    enabled: boolean;
-    type: "local" | "remote" | "system";
-  }[];
 }
 
 /**
@@ -26,13 +21,6 @@ export const defaultConfig: Config = {
   },
   beian: "",
   siteName: "MCSL Future Web",
-  resourcepacks: [
-    {
-      url: "plugin-resource",
-      enabled: true,
-      type: "system",
-    },
-  ],
 };
 
 const load = loadConfig();

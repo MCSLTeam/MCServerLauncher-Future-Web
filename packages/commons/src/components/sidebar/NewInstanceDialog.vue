@@ -138,8 +138,7 @@ function formatPath(path: string) {
 }
 
 function createInstance() {
-  if (!formRef.value) return;
-  formRef.value.validate(async (valid) => {
+  formRef.value?.validate(async (valid) => {
     if (valid) {
       // TODO: 创建服务器示例
       ElMessage("正在创建实例... 可在后台任务中查看安装进度");
@@ -150,8 +149,7 @@ function createInstance() {
 }
 
 function resetForm() {
-  if (!formRef.value) return;
-  formRef.value.resetFields();
+  formRef.value?.resetFields();
 }
 
 async function getTypeVersion() {

@@ -32,6 +32,9 @@ importers:
       '@tauri-apps/plugin-process':
         specifier: ^2.2.0
         version: 2.2.0
+      '@vueuse/core':
+        specifier: ^12.4.0
+        version: 12.4.0(typescript@5.6.3)
       element-plus:
         specifier: ^2.8.4
         version: 2.9.2(vue@3.5.13(typescript@5.6.3))
@@ -111,6 +114,9 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
+      nanoid:
+        specifier: ^5.0.9
+        version: 5.0.9
       nuxt:
         specifier: ^3.15.1
         version: 3.15.1(@parcel/watcher@2.5.0)(@types/node@22.10.5)(db0@0.2.1)(eslint@9.18.0(jiti@2.4.2))(ioredis@5.4.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.30.1)(terser@5.37.0)(typescript@5.7.3)(vite@6.0.7(@types/node@22.10.5)(jiti@2.4.2)(terser@5.37.0)(yaml@2.7.0))(yaml@2.7.0)
@@ -193,6 +199,12 @@ importers:
       marked:
         specifier: ^15.0.6
         version: 15.0.6
+      mfp-client:
+        specifier: ^0.1.1
+        version: 0.1.1
+      nanoid:
+        specifier: ^5.0.9
+        version: 5.0.9
       pinia:
         specifier: ^2.3.0
         version: 2.3.0(typescript@5.7.3)(vue@3.5.13(typescript@5.7.3))
@@ -3308,6 +3320,9 @@ packages:
   merge2@1.4.1:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
     engines: {node: '>= 8'}
+
+  mfp-client@0.1.1:
+    resolution: {integrity: sha512-Rt1odEjqnZMLTQ7OC2F60AiC8wKIEdq2bajWJGbsdwOL1vyHqNT/SdIYvoHiR52BFzao8grN0qpkaRPRcOR0fg==}
 
   micromatch@4.0.8:
     resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
@@ -6657,6 +6672,15 @@ snapshots:
       typescript: 5.7.3
       vue: 3.5.13(typescript@5.7.3)
 
+  '@vueuse/core@12.4.0(typescript@5.6.3)':
+    dependencies:
+      '@types/web-bluetooth': 0.0.20
+      '@vueuse/metadata': 12.4.0
+      '@vueuse/shared': 12.4.0(typescript@5.6.3)
+      vue: 3.5.13(typescript@5.6.3)
+    transitivePeerDependencies:
+      - typescript
+
   '@vueuse/core@12.4.0(typescript@5.7.3)':
     dependencies:
       '@types/web-bluetooth': 0.0.20
@@ -6702,6 +6726,12 @@ snapshots:
       - magicast
       - rollup
       - supports-color
+      - typescript
+
+  '@vueuse/shared@12.4.0(typescript@5.6.3)':
+    dependencies:
+      vue: 3.5.13(typescript@5.6.3)
+    transitivePeerDependencies:
       - typescript
 
   '@vueuse/shared@12.4.0(typescript@5.7.3)':
@@ -8373,6 +8403,13 @@ snapshots:
   merge-stream@2.0.0: {}
 
   merge2@1.4.1: {}
+
+  mfp-client@0.1.1:
+    dependencies:
+      axios: 1.7.9
+      nanoid: 5.0.9
+    transitivePeerDependencies:
+      - debug
 
   micromatch@4.0.8:
     dependencies:

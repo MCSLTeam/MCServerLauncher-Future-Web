@@ -4,7 +4,7 @@ import { marked } from "marked";
 import { ref } from "vue";
 import { agreedEula, canHideOverlay } from "../../utils/loader";
 import FancyBackground from "../../components/FancyBackground.vue";
-import { router } from "../../utils/globals";
+import { router } from "../../utils/injections.ts";
 import { useI18n } from "vue-i18n";
 
 const md = ref("");

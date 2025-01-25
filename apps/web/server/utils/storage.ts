@@ -23,19 +23,12 @@ export const serverDir = path.resolve(__dirname, "../");
  */
 export const dataDir = path.resolve(__dirname, "../mcsl-web");
 export const cacheDir = path.resolve(dataDir, "cache");
-export const addonDir = path.resolve(dataDir, "addon");
-export const resourcepackDir = path.resolve(addonDir, "resourcepack");
-export const pluginDir = path.resolve(addonDir, "plugin");
-const fileIds: ({ name: string; path: string } | undefined | null)[] = [];
 
 console.log("Data directory: ", dataDir);
 fsExtra.removeSync(cacheDir);
 console.log("Cleaned cache");
 fs.ensureDirSync(dataDir);
 fs.ensureDirSync(cacheDir);
-fs.ensureDirSync(addonDir);
-fs.ensureDirSync(resourcepackDir);
-fs.ensureDirSync(pluginDir);
 console.log("Ensured directory");
 
 /**
@@ -90,22 +83,4 @@ export async function downloadFile(url: string, path: string): Promise<void> {
       }
     });
   });
-}
-
-export function generateFileId(name: string, path: string) {
-  fileIds.push({
-    name: name,
-    path: path,
-  });
-  return fileIds.length - 1;
-}
-
-export function getInfoByFileId(id: number): { name: string; path: string } {
-  const item = fileIds[id];
-  if (!item) throw "unknown-fileid";
-  return item;
-}
-
-export function removeFileId(id: number) {
-  fileIds[id] = null;
 }

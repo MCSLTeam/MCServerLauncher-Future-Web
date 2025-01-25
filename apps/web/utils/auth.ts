@@ -1,3 +1,5 @@
+import { formatError } from "~/utils/common.ts";
+
 const tokenLocalStorage = useLocalStorage("token", null);
 const tokenSessionStorage = useSessionStorage("token", null);
 let tokenExpires: Date | null = null;
@@ -64,12 +66,7 @@ async function refreshTokenExpire() {
     return true;
   } else {
     // 无效，登出
-    ElMessage({
-      message: useNuxtApp().$i18n.t("auth.login.failed.token", {
-        reason: useNuxtApp().$i18n.t("request.failed.reason." + expire.message),
-      }),
-      type: "warning",
-    });
+    ElMessage.error(formatError("auth.login.failed.token", expire.message));
     await logout();
     return false;
   }

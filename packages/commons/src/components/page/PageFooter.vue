@@ -1,7 +1,9 @@
 <!-- 页脚 -->
 <script setup lang="ts">
-import { useScreenWidth } from "../../utils/uses.js";
-import { beian } from "../../utils/globals";
+import { useLocale, useScreenWidth } from "../../utils/uses.js";
+import { beian } from "../../utils/injections.ts";
+
+const i18n = useLocale().getI18n();
 </script>
 
 <template>
@@ -12,7 +14,8 @@ import { beian } from "../../utils/globals";
         href="https://github.com/MCSLTeam/MCServerLauncher-Future-Web"
         target="_blank"
       >
-        MCSL Future Web
+        {{ i18n.t("app.name.abbr") }} {{ i18n.t("app.name.future") }}
+        {{ i18n.t("app.name.suffix") }}
       </a>
       <!-- 备案号 | Web only -->
       <span v-if="beian">

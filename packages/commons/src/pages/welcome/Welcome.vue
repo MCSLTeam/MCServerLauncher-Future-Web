@@ -6,7 +6,7 @@ import { randNum, sleep } from "../../utils/common";
 import { canHideOverlay } from "../../utils/loader";
 import FancyBackground from "../../components/FancyBackground.vue";
 import { ElSelectV2 } from "element-plus";
-import { router } from "../../utils/globals";
+import { router } from "../../utils/injections.ts";
 
 const i18n = useI18n();
 const messages = useLocale().getMessages();

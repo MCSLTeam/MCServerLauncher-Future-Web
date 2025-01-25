@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { computed, getCurrentInstance, type Ref, ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 import {
   useLocalStorage,
   usePreferredColorScheme,
@@ -301,5 +301,25 @@ export const useLocale = defineStore("locale", () => {
     getLocaleValue,
     getLocale,
     setLocale,
+  };
+});
+
+/* ========== [ 数据存储 ]========== */
+export const useDatabase = defineStore("data", () => {
+  let manager: <T>(key: string, defaultValue: T) => Ref<T>;
+
+  function injectDatabaseManager(
+    m: <T>(key: string, defaultValue: T) => Ref<T>,
+  ) {
+    manager = m;
+  }
+
+  function data<T>(key: string, defaultValue: T): Ref<T> {
+    return manager(key, defaultValue);
+  }
+
+  return {
+    injectDatabaseManager,
+    data,
   };
 });

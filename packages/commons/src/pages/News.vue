@@ -5,7 +5,7 @@ import { type Ref, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import Page from "../components/page/Page.vue";
 import { openUrl, randNum } from "../utils/common";
-import { router } from "../utils/globals";
+import { router } from "../utils/injections.ts";
 
 const i18n = useI18n();
 const hash = router.currentRoute.value.hash;

@@ -3,11 +3,12 @@ import App from "./App.vue";
 import ElementPlus from "element-plus";
 import { createPinia } from "pinia";
 import { agreedEula, loadApp } from "@repo/commons/src/utils/loader";
-import { setRouter } from "@repo/commons/src/utils/globals";
+import { setRouter } from "@repo/commons/src/utils/injections.ts";
 import router from "./router";
 import { createI18n } from "vue-i18n";
-import { useLocale } from "@repo/commons/src/utils/uses";
+import { useDatabase, useLocale } from "@repo/commons/src/utils/uses";
 import { type } from "@tauri-apps/plugin-os";
+import { useLocalStorage } from "@vueuse/core";
 
 (async () => {
   const app = createApp(App);
@@ -41,6 +42,11 @@ import { type } from "@tauri-apps/plugin-os";
     } else {
       document.body.classList.add("tauri-mobile");
     }
+    useDatabase().injectDatabaseManager(
+      async <T>(key: string, defaultValue: T) => {
+        return useLocalStorage<T>(key, defaultValue);
+      },
+    );
     if (!agreedEula.value) await router.push("/welcome/welcome");
   });
 });

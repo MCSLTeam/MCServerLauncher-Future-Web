@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { getLogoSrc } from "../../utils/common";
 import FancyBackground from "../../components/FancyBackground.vue";
-import { router } from "../../utils/globals";
+import { router } from "../../utils/injections.ts";
 import { useI18n } from "vue-i18n";
 
 const i18n = useI18n();
