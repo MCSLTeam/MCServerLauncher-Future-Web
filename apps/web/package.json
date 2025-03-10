@@ -25,7 +25,7 @@
     "fs-extra": "^11.2.0",
     "jsonwebtoken": "^9.0.2",
     "nanoid": "^5.0.9",
-    "nuxt": "^3.15.1",
+    "nuxt": "^3.16.0",
     "pinia": "^2.3.0",
     "unstorage": "^1.14.4",
     "unzipper": "^0.12.3",
