@@ -4,9 +4,6 @@
   "app.name": "MCServerLauncher",
   "app.name.abbr": "MCSL",
   "app.name.future": "Future",
-  "daemon.add.failed": "守护进程 {name} 添加失败！原因：{reason}",
-  "daemon.update.failed": "守护进程 {name} 修改失败！原因：{reason}",
-  "daemon.remove.failed": "守护进程 {name} 移除失败！原因：{reason}",
   "daemon.connect.title": "連接守護進程",
   "daemon.connect.name": "守護進程名稱",
   "daemon.connect.name.placeholder": "請為守護進程命名...",
@@ -101,14 +98,7 @@
   "upload.success": "文件上傳成功！",
   "welcome.done.close": "進入 MCSL",
   "welcome.done.subtitle": "立即開始使用 MCSL Future 吧！",
-  "welcome.done.title": "好耶！ 大功告成！",
-  "welcome.next": "下一步",
-  "welcome.prev": "上一步",
   "welcome.settings": "配置 MCSL Future",
   "welcome.subtitle": "請先配置 MCSL Future",
-  "welcome.welcome": "歡迎！",
-  "fail.daemon-not-found": "守护进程不存在",
-  "fail.eula-not-agreed": "未同意 EULA",
-  "fail.invalid-params": "无效或错误的参数",
-  "fail.up-to-date": "当前已是最新版本"
+  "welcome.welcome": "歡迎！"
 }
