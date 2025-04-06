@@ -4,7 +4,7 @@ on:
     branches:
       - main
     paths:
-      - .github/workflows/build-app.yml
+      - .github/workflows/build-web.yml
       - 'apps/web/**'
       - 'packages/commons/**'
       - 'packages/configs/**'
@@ -12,7 +12,7 @@ on:
     branches:
       - main
     paths:
-      - .github/workflows/build-app.yml
+      - .github/workflows/build-web.yml
       - 'apps/web/**'
       - 'packages/commons/**'
       - 'packages/configs/**'

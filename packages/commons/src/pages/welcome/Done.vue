@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { getLogoSrc } from "../../utils/common";
+import {getLogoSrc} from "../../utils/common";
 import FancyBackground from "../../components/FancyBackground.vue";
-import { router } from "../../utils/injections.ts";
-import { useI18n } from "vue-i18n";
+import {router} from "../../utils/injections.ts";
+import {useI18n} from "vue-i18n";
 
 const i18n = useI18n();
 </script>
 
 <template>
   <div class="done__container">
-    <FancyBackground light="7" />
+    <FancyBackground light="7"/>
     <div class="done__container-inner">
       <div class="done__logo">
-        <img :src="getLogoSrc()" alt="logo" />
+        <img :src="getLogoSrc()" alt="logo"/>
         <h1>
           {{ i18n.t("app.name.abbr") }}
           <span>{{ i18n.t("app.name.future") }}</span>
@@ -21,8 +21,9 @@ const i18n = useI18n();
       <h1>{{ i18n.t("welcome.done.title") }}</h1>
       <h2>{{ i18n.t("welcome.done.subtitle") }}</h2>
       <ElButton class="done__button" type="primary" @click="router.push('/')">{{
-        i18n.t("welcome.done.close")
-      }}</ElButton>
+          i18n.t("welcome.done.close")
+        }}
+      </ElButton>
     </div>
   </div>
 </template>
@@ -72,9 +73,9 @@ const i18n = useI18n();
   font-weight: bold;
   color: transparent;
   background: linear-gradient(
-    135deg,
-    var(--el-color-primary),
-    var(--el-color-primary-dark-2)
+      135deg,
+      var(--el-color-primary),
+      var(--el-color-primary-dark-2)
   );
   background-clip: text;
 }
@@ -83,9 +84,9 @@ const i18n = useI18n();
   font-size: 3.5rem;
   color: transparent;
   background: linear-gradient(
-    135deg,
-    var(--el-color-primary),
-    var(--el-color-purple)
+      135deg,
+      var(--el-color-primary),
+      var(--el-color-purple)
   );
   background-clip: text;
   margin: 0;

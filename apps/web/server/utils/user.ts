@@ -44,7 +44,7 @@ export async function hasUser(username: string) {
 export async function hasAdmin() {
   const users = await getUsers();
   for (const key in users) {
-    if (users[key].permissions.includes("admin")) return true;
+    if (users[key].permissions.includes("*")) return true;
   }
   return false;
 }
@@ -77,6 +77,7 @@ export async function addUser(
  */
 export async function getUser(username: string) {
   const users = await getUsers();
+  if(!users[username]) throw 'unknown-user'
   return users[username];
 }
 

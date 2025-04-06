@@ -20,7 +20,7 @@
         "minHeight": 700,
         "minWidth": 1100,
         "resizable": true,
-        "title": "MCSL Future",
+        "title": "MCSL Future Tauri",
         "visible": true,
         "decorations": false,
         "transparent": true

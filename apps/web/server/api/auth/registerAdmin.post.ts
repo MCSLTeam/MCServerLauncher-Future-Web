@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   try {
     requireParam(username, password);
     if (await hasAdmin()) throw "registry-disabled";
-    await addUser(username, password, ["admin", "*"]);
+    await addUser(username, password, ["*"]);
     console.log("Admin registered, username: " + username);
     return {
       status: "ok",

@@ -1,35 +1,47 @@
 <script setup lang="ts">
-import { useI18n } from "vue-i18n";
-import { computed, reactive, ref } from "vue";
-import { ElMessage, type FormInstance, type FormRules } from "element-plus";
-import MFPClient from "mfp-client/dist";
-import { nanoid } from "nanoid";
-import { daemonStorage } from "../../utils/daemon/daemons.ts";
-import { sleep } from "../../utils/common.ts";
+import {useI18n} from "vue-i18n";
+import {computed, type PropType, reactive, ref} from "vue";
+import {ElMessage, type FormInstance, type FormRules} from "element-plus";
+import MFPClient from "mfp-client";
+import {formatError} from "../../utils/common.ts";
+import type {DaemonInfo, DaemonStorage, DaemonUpdate} from "../../utils/daemon/daemons.ts";
 
-const visible = defineModel({
+const props = defineProps({
+  edit: {
+    type: Object as PropType<DaemonInfo | undefined>,
+    required: false,
+    default: () => undefined,
+  },
+  saveDaemon: {
+    type: Function,
+    required: true
+  }
+})
+
+const visible = defineModel("visible", {
   type: Boolean,
-  required: true,
-});
+  required: true
+})
 
 const url = computed(() => {
-  return `${form.secure ? "wss" : "ws"}://${form.host}:${form.port}/api/v1`;
+  return `${form.secure ? "wss" : "ws"}://${form.host}:${form.port}/`;
 });
 
-let testId = "";
+let testId = 0;
 
 const tested = ref<"no" | "testing" | "yes">("no");
 
 const i18n = useI18n();
 
 const formRef = ref<FormInstance>();
-const form = reactive({
+const form = reactive<DaemonUpdate>(props.edit ? {
+  ...props.edit,
+} : {
   name: "",
   secure: false,
   host: "",
   port: 11451,
-  username: "",
-  password: "",
+  token: "",
 });
 
 function resetTest() {
@@ -61,24 +73,24 @@ const rules = reactive<FormRules<typeof form>>({
       validator(_, value) {
         return value >= 0 && value <= 65535;
       },
-      message: i18n.t("form.invalid.range", { min: 0, max: 65535 }),
+      message: i18n.t("form.invalid.range", {min: 0, max: 65535}),
       trigger: "blur",
     },
   ],
-  username: [
+  token: [
     {
-      required: true,
+      required: props.edit == undefined,
       message: i18n.t("form.invalid.require"),
       trigger: "blur",
     },
-  ],
-  password: [
     {
-      required: true,
-      message: i18n.t("form.invalid.require"),
+      validator(_, value) {
+        return !/^([a-zA-Z0-9-_]+)\.([a-zA-Z0-9-_]+)\.([a-zA-Z0-9-_]+)$/gm.test(value); // not jwt
+      },
+      message: i18n.t("daemon.connect.token.invalid"),
       trigger: "blur",
-    },
-  ],
+    }
+  ]
 });
 
 function resetForm() {
@@ -86,139 +98,115 @@ function resetForm() {
   resetTest();
 }
 
-async function test(timeout: number = 10000) {
-  const id = nanoid(4);
+async function test() {
+  try {
+    await formRef.value?.validate()
+  } catch (_) {
+    return
+  }
+  const id = testId + 1;
   testId = id;
   tested.value = "testing";
-  const client = new MFPClient({
-    host: form.host,
-    port: form.port,
-    username: form.username,
-    password: form.password,
-    secure: form.secure,
-    reconnectOnClose: false,
-  });
+  const client = new MFPClient(<DaemonStorage>form, false);
   try {
     await client.connect();
-    const start = Date.now();
-    while (start + timeout > Date.now()) {
-      if (client.connected()) {
-        if (testId == id) {
-          tested.value = "yes";
-          ElMessage.success(i18n.t("daemon.connect.test.success"));
-        }
-        client.close();
-        return;
-      }
-      await sleep(timeout / 20);
+    if (testId == id) {
+      tested.value = "yes";
+      ElMessage.success(i18n.t("daemon.connect.test.success"));
     }
-  } finally {
+    client.close();
+  } catch (e) {
     if (testId == id && tested.value == "testing") {
       tested.value = "no";
-      ElMessage.error(i18n.t("daemon.connect.test.failed"));
+      ElMessage.error(formatError("daemon.connect.test.failed", e));
+      console.error(formatError("daemon.connect.test.failed", e), e);
     }
   }
 }
 
-function save() {
-  daemonStorage.value[form.name] = {
-    host: form.host,
-    port: form.port,
-    secure: form.secure,
-    username: form.username,
-    password: form.password,
-  };
+async function save() {
+  if (props.edit && form.token == "")
+    form.token = undefined
+  await props.saveDaemon(form);
+  visible.value = false;
 }
 </script>
 
 <template>
   <ElDialog
-    v-model="visible"
-    :title="i18n.t('daemon.connect.title')"
-    width="825px"
-    @close="visible = false"
-    @open="resetForm"
+      v-model="visible"
+      :title="i18n.t('daemon.connect.title')"
+      width="825px"
+      @open="resetForm"
   >
     <ElForm
-      ref="formRef"
-      v-model="form"
-      label-width="120px"
-      :model="form"
-      :rules="rules"
+        ref="formRef"
+        v-model="form"
+        label-width="120px"
+        :model="form"
+        :rules="rules"
     >
       <ElFormItem :label="i18n.t('daemon.connect.name')" prop="name" required>
         <ElInput
-          v-model="form.name"
-          :placeholder="i18n.t('daemon.connect.name.placeholder')"
+            v-model="form.name"
+            :placeholder="i18n.t('daemon.connect.name.placeholder')"
         />
       </ElFormItem>
       <ElFormItem :label="i18n.t('daemon.connect.host')" prop="host" required>
         <ElInput
-          @input="resetTest"
-          v-model="form.host"
-          :placeholder="i18n.t('daemon.connect.host.placeholder')"
+            @input="resetTest"
+            v-model="form.host"
+            :placeholder="i18n.t('daemon.connect.host.placeholder')"
         />
       </ElFormItem>
       <ElFormItem :label="i18n.t('daemon.connect.port')" prop="port" required>
         <ElInput
-          @input="resetTest"
-          type="number"
-          v-model="form.port"
-          :placeholder="i18n.t('daemon.connect.port.placeholder')"
+            @input="resetTest"
+            type="number"
+            v-model="form.port"
+            :placeholder="i18n.t('daemon.connect.port.placeholder')"
         />
       </ElFormItem>
       <ElFormItem
-        :label="i18n.t('daemon.connect.secure')"
-        prop="secure"
-        required
+          :label="i18n.t('daemon.connect.secure')"
+          prop="secure"
+          required
       >
-        <ElCheckbox @change="resetTest" v-model="form.secure" />
+        <ElCheckbox @change="resetTest" v-model="form.secure"/>
       </ElFormItem>
       <ElFormItem
-        :label="i18n.t('daemon.connect.username')"
-        prop="username"
-        required
-      >
-        <ElInput
-          @input="resetTest"
-          v-model="form.username"
-          :placeholder="i18n.t('daemon.connect.username.placeholder')"
-        />
-      </ElFormItem>
-      <ElFormItem
-        :label="i18n.t('daemon.connect.password')"
-        prop="password"
-        required
+          :label="i18n.t('daemon.connect.token')"
+          prop="token"
+          required
       >
         <ElInput
-          @input="resetTest"
-          type="password"
-          v-model="form.password"
-          :placeholder="i18n.t('daemon.connect.password.placeholder')"
+            @input="resetTest"
+            v-model="form.token"
+            :placeholder="i18n.t('daemon.connect.token.placeholder' + (edit ? '.edit' : ''))"
         />
       </ElFormItem>
-      <br />
+      <br/>
       <ElFormItem :label="i18n.t('daemon.connect.preview')">
         <code class="font-mono daemon-connect__preview">{{ url }}</code>
       </ElFormItem>
       <ElFormItem>
         <ElButton type="primary" v-if="tested == 'yes'" @click="save"
-          >{{ i18n.t("daemon.connect.save") }}
+        >{{ i18n.t("daemon.connect.save") }}
         </ElButton>
         <ElButton
-          type="primary"
-          v-else
-          @click="test()"
-          :disabled="tested == 'testing'"
+            type="primary"
+            v-else
+            @click="test()"
+            :disabled="tested == 'testing'"
         >
           {{
             tested == "testing"
-              ? i18n.t("daemon.connect.test.testing")
-              : i18n.t("daemon.connect.test.test")
+                ? i18n.t("daemon.connect.test.testing")
+                : i18n.t("daemon.connect.test.test")
           }}
         </ElButton>
         <ElButton @click="visible = false"
-          >{{ i18n.t("dialog.cancel") }}
+        >{{ i18n.t("dialog.cancel") }}
         </ElButton>
       </ElFormItem>
     </ElForm>

@@ -9,7 +9,7 @@ const showSidebar = ref(false);
 </script>
 
 <template>
-  <ElHeader class="header__container el-card">
+  <ElHeader class="header__container el-card" data-tauri-drag-region>
     <!-- 面包屑 -->
     <div>
       <ElBreadcrumb separator="/">

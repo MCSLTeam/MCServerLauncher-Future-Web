@@ -50,23 +50,17 @@ async function init() {
       .then((res) => {
         initEula(res.data);
       })
-      .catch((err) => {
+      .catch(() => {
         if (eulaInfo.mirror) {
-          console.warn("Failed to fetch eula, using mirror", err);
           axios
               .get(eulaInfo.mirror)
               .then((res) => {
                 initEula(res.data);
               })
-              .catch((err) => {
-                console.warn(
-                    "Failed to fetch eula from mirror, using local eula",
-                    err,
-                );
+              .catch(() => {
                 initEula(eulaInfo.content);
               });
         } else {
-          console.warn("Failed to fetch eula, using local eula", err);
           initEula(eulaInfo.content);
         }
       });
@@ -178,6 +172,7 @@ onMounted(() => {
 }
 
 .eula__scrollbar {
+  width: 100%;
   height: calc(100% - 42px - 5rem);
   @media (max-width: 768px) {
     height: calc(100% - 42px - 4.75rem);

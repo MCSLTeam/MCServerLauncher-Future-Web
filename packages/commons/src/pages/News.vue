@@ -41,7 +41,7 @@ axios
       message: i18n.t("news.je-update.load-failed"),
       type: "warning",
     });
-    console.log(i18n.t("news.je-update.load-failed"), e);
+    console.warn(i18n.t("news.je-update.load-failed"), e);
   });
 axios
   .get("https://launchercontent.mojang.com/v2/bedrockPatchNotes.json", {
@@ -58,7 +58,7 @@ axios
       message: i18n.t("news.be-update.load-failed"),
       type: "warning",
     });
-    console.log(i18n.t("news.be-update.load-failed"), e);
+    console.warn(i18n.t("news.be-update.load-failed"), e);
   });
 axios
   .get("https://launchercontent.mojang.com/v2/news.json", {
@@ -75,7 +75,7 @@ axios
       message: i18n.t("news.mc-news.load-failed"),
       type: "warning",
     });
-    console.log(i18n.t("news.mc-news.load-failed"), e);
+    console.warn(i18n.t("news.mc-news.load-failed"), e);
   });
 
 function translateNewsCategory(category: string) {
@@ -89,7 +89,6 @@ function translateNewsCategory(category: string) {
     case "Minecraft Legends":
       return i18n.t("news.mc-news.tag.legends");
     default:
-      console.log(category);
       return category;
   }
 }
@@ -395,12 +394,12 @@ function openDialog(title: string, contentPath: string) {
                   {{ item.title }}
                 </h3>
                 <div class="news__card-tags">
-                  <el-tag type="primary"
+                  <ElTag type="primary"
                     >{{ translateNewsCategory(item.category) }}
-                  </el-tag>
-                  <el-tag v-if="item.tag" type="info"
+                  </ElTag>
+                  <ElTag v-if="item.tag" type="info"
                     >{{ translateNewsTag(item.tag) }}
-                  </el-tag>
+                  </ElTag>
                 </div>
                 <p class="news__card-desc">
                   {{ item.text }}
