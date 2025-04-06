@@ -1,4 +1,4 @@
-import {useLocale} from "./uses.ts";
+import { useLocale } from "./uses.ts";
 
 /**
  * 推迟执行
@@ -7,7 +7,7 @@ import {useLocale} from "./uses.ts";
  * await sleep(1000); // 1秒后执行
  */
 export function sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -25,10 +25,10 @@ export function sleep(ms: number): Promise<void> {
  * randNum(); // 相当于Math.random()
  */
 export function randNum(min?: number, max?: number) {
-    if (min != undefined && max != undefined)
-        return Math.floor(Math.random() * (max - min)) + min; // 含最小值，不含最大值
-    else if (min != undefined) return randNum(0, min);
-    else return Math.random();
+  if (min != undefined && max != undefined)
+    return Math.floor(Math.random() * (max - min)) + min; // 含最小值，不含最大值
+  else if (min != undefined) return randNum(0, min);
+  else return Math.random();
 }
 
 /**
@@ -45,13 +45,13 @@ export function randNum(min?: number, max?: number) {
  * window.addEventListener('scroll', onScrollDebounce);
  */
 export function debounce(func: () => void, delay: number) {
-    let timer: any = null;
-    return function () {
-        if (timer) clearTimeout(timer);
-        timer = setTimeout(() => {
-            func();
-        }, delay);
-    };
+  let timer: any = null;
+  return function () {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      func();
+    }, delay);
+  };
 }
 
 /**
@@ -59,7 +59,7 @@ export function debounce(func: () => void, delay: number) {
  * @param url - 链接
  */
 export function openUrl(url: string) {
-    window.open(url, "_blank");
+  window.open(url, "_blank");
 }
 
 /**
@@ -67,8 +67,8 @@ export function openUrl(url: string) {
  * @returns 是否为愚人节
  */
 export function isAprilFoolsDay() {
-    const now = new Date();
-    return now.getMonth() == 3 && now.getDate() == 1;
+  const now = new Date();
+  return now.getMonth() == 3 && now.getDate() == 1;
 }
 
 /**
@@ -76,15 +76,18 @@ export function isAprilFoolsDay() {
  * @returns logo图片路径
  */
 export function getLogoSrc() {
-    return isAprilFoolsDay()
-        ? "/assets/img/MCSLFutureAprilFools.png"
-        : "/assets/img/MCSLFuture.png";
+  return isAprilFoolsDay()
+    ? "/assets/img/MCSLFutureAprilFools.png"
+    : "/assets/img/MCSLFuture.png";
 }
 
 export function formatError(key: string, e: any, named?: any) {
-    const i18n = useLocale().getI18n();
-    const message = e.message ?? e;
-    const reasonKey = "fail." + message;
-    const reason = i18n.t(reasonKey);
-    return i18n.t(key, {reason: reason == reasonKey ? message : reason, ...named});
+  const i18n = useLocale().getI18n();
+  const message = e.message ?? e;
+  const reasonKey = "fail." + message;
+  const reason = i18n.t(reasonKey);
+  return i18n.t(key, {
+    reason: reason == reasonKey ? message : reason,
+    ...named,
+  });
 }

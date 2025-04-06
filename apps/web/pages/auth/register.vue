@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {reactive} from "vue";
-import type {FormInstance, FormRules} from "element-plus";
-import {formatError} from "@repo/commons/src/utils/common.ts";
+import { reactive } from "vue";
+import type { FormInstance, FormRules } from "element-plus";
+import { formatError } from "@repo/commons/src/utils/common.ts";
 
 definePageMeta({
   layout: "auth",
@@ -76,7 +76,7 @@ async function submit() {
         await useRouter().push("/auth/login");
       } catch (e: any) {
         ElMessage.error(formatError("auth.register.failed", e));
-        console.error(formatError("auth.register.failed", e), e)
+        console.error(formatError("auth.register.failed", e), e);
       }
     }
   });
@@ -89,27 +89,27 @@ async function submit() {
     <h2>{{ $t("auth.register.subtitle") }}</h2>
     <ElFormItem prop="username">
       <ElInput
-          v-model="form.username"
-          :placeholder="$t('auth.register.username')"
+        v-model="form.username"
+        :placeholder="$t('auth.register.username')"
       />
     </ElFormItem>
     <ElFormItem prop="password">
       <ElInput
-          v-model="form.password"
-          type="password"
-          :placeholder="$t('auth.register.password')"
+        v-model="form.password"
+        type="password"
+        :placeholder="$t('auth.register.password')"
       />
     </ElFormItem>
     <ElFormItem prop="passwordConfirm">
       <ElInput
-          v-model="form.passwordConfirm"
-          type="password"
-          :placeholder="$t('auth.register.password-confirm')"
+        v-model="form.passwordConfirm"
+        type="password"
+        :placeholder="$t('auth.register.password-confirm')"
       />
     </ElFormItem>
     <ElFormItem>
       <ElButton type="primary" @click="submit"
-      >{{ $t("auth.register.submit") }}
+        >{{ $t("auth.register.submit") }}
       </ElButton>
     </ElFormItem>
   </ElForm>

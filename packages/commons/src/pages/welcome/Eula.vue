@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import axios from "axios";
-import {marked} from "marked";
-import {onMounted, ref} from "vue";
-import {agreedEula, canHideOverlay} from "../../utils/loader";
+import { marked } from "marked";
+import { onMounted, ref } from "vue";
+import { agreedEula, canHideOverlay } from "../../utils/loader";
 import FancyBackground from "../../components/FancyBackground.vue";
-import {quit, router} from "../../utils/injections.ts";
-import {useI18n} from "vue-i18n";
+import { quit, router } from "../../utils/injections.ts";
+import { useI18n } from "vue-i18n";
 
 const md = ref("");
 const waitTime = 10000;
@@ -18,7 +18,7 @@ function initEula(text: string) {
   startTime = Date.now();
   const interval = setInterval(() => {
     agreeCountdown.value = Math.floor(
-        (waitTime - (Date.now() - startTime)) / 1000,
+      (waitTime - (Date.now() - startTime)) / 1000,
     );
     if (agreeCountdown.value <= 0) {
       agreeCountdown.value = 0;
@@ -28,7 +28,7 @@ function initEula(text: string) {
 }
 
 function disagree() {
-  quit()
+  quit();
 }
 
 async function agree() {
@@ -40,30 +40,30 @@ async function init() {
   let eulaInfo;
   try {
     eulaInfo = await import(
-    "../../assets/eula/" + useI18n().locale.value + ".json"
-        );
+      "../../assets/eula/" + useI18n().locale.value + ".json"
+    );
   } catch (_) {
     eulaInfo = await import("../../assets/eula/en-US.json");
   }
   axios
-      .get(eulaInfo.url)
-      .then((res) => {
-        initEula(res.data);
-      })
-      .catch(() => {
-        if (eulaInfo.mirror) {
-          axios
-              .get(eulaInfo.mirror)
-              .then((res) => {
-                initEula(res.data);
-              })
-              .catch(() => {
-                initEula(eulaInfo.content);
-              });
-        } else {
-          initEula(eulaInfo.content);
-        }
-      });
+    .get(eulaInfo.url)
+    .then((res) => {
+      initEula(res.data);
+    })
+    .catch(() => {
+      if (eulaInfo.mirror) {
+        axios
+          .get(eulaInfo.mirror)
+          .then((res) => {
+            initEula(res.data);
+          })
+          .catch(() => {
+            initEula(eulaInfo.content);
+          });
+      } else {
+        initEula(eulaInfo.content);
+      }
+    });
 }
 
 onMounted(() => {
@@ -73,31 +73,31 @@ onMounted(() => {
 
 <template>
   <div v-show="canHideOverlay" class="eula__container">
-    <FancyBackground light="7"/>
+    <FancyBackground light="7" />
     <div class="eula__container-inner">
       <ElCard class="eula__card" body-class="eula__card-body">
         <h1>{{ i18n.t("eula.title") }}</h1>
         <ElScrollbar class="eula__scrollbar" v-loading="md == ''">
           <ElText>
-            <p v-html="marked.parse(md)"/>
+            <p v-html="marked.parse(md)" />
           </ElText>
         </ElScrollbar>
         <div v-if="agreeCountdown != -1" class="eula__buttons">
           <ElButton @click="router.push('/welcome/welcome')"
-          >{{ i18n.t("welcome.prev") }}
+            >{{ i18n.t("welcome.prev") }}
           </ElButton>
           <ElButton @click="disagree">{{ i18n.t("eula.disagree") }}</ElButton>
           <ElButton
-              type="primary"
-              :disabled="agreeCountdown != 0"
-              @click="agree"
+            type="primary"
+            :disabled="agreeCountdown != 0"
+            @click="agree"
           >
             {{
               agreeCountdown != 0
-                  ? i18n.t("eula.agree.countdown", {
+                ? i18n.t("eula.agree.countdown", {
                     time: agreeCountdown,
                   })
-                  : i18n.t("eula.agree")
+                : i18n.t("eula.agree")
             }}
           </ElButton>
         </div>

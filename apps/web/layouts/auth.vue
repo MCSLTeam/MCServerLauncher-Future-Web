@@ -1,7 +1,7 @@
 <!-- 登录/注册页面布局 -->
 <script setup lang="ts">
-import {getLogoSrc, randNum, sleep} from "@repo/commons/src/utils/common";
-import {canHideOverlay} from "@repo/commons/src/utils/loader";
+import { getLogoSrc, randNum, sleep } from "@repo/commons/src/utils/common";
+import { canHideOverlay } from "@repo/commons/src/utils/loader";
 import FancyBackground from "@repo/commons/src/components/FancyBackground.vue";
 import PageFooter from "@repo/commons/src/components/page/PageFooter.vue";
 
@@ -24,10 +24,10 @@ async function onMouseMove(event: MouseEvent) {
   const mouseX = event.clientX;
   const mouseY = event.clientY;
   if (
-      rangeX[0] < mouseX &&
-      mouseX < rangeX[1] &&
-      rangeY[0] < mouseY &&
-      mouseY < rangeY[1]
+    rangeX[0] < mouseX &&
+    mouseX < rangeX[1] &&
+    rangeY[0] < mouseY &&
+    mouseY < rangeY[1]
   ) {
     iconX.value = (mouseX - centerX) / (rangeX[1] - centerX);
     iconY.value = (mouseY - centerY) / (rangeY[1] - centerY);
@@ -72,11 +72,11 @@ onUnmounted(() => {
 <template>
   <div class="auth__max-screen">
     <div v-show="canHideOverlay" class="auth__max-screen">
-      <FancyBackground light="5"/>
+      <FancyBackground light="5" />
       <div class="auth__container auth__max-screen">
         <div class="auth__left">
           <div class="auth__logo">
-            <img :src="getLogoSrc()" alt="logo">
+            <img :src="getLogoSrc()" alt="logo" />
             <h1>
               {{ $t("app.name.abbr") }}
               <span>{{ $t("app.name.future") }}</span>
@@ -84,10 +84,10 @@ onUnmounted(() => {
           </div>
           <div class="auth__side" :style="{ opacity: showItem ? 1 : 0 }">
             <i
-                ref="icon"
-                class="fa"
-                :class="[icons[item]]"
-                :style="{
+              ref="icon"
+              class="fa"
+              :class="[icons[item]]"
+              :style="{
                 transform: `translate(${iconX * 10}px, ${iconY * 10}px) rotateX(${iconY * 15}deg) rotateY(${-iconX * 15}deg)`,
                 transition:
                   iconX == 0 && iconY == 0
@@ -106,16 +106,16 @@ onUnmounted(() => {
         </div>
         <ElCard class="auth__right" body-class="auth__card-body">
           <div class="auth__logo">
-            <img :src="getLogoSrc()" alt="logo">
+            <img :src="getLogoSrc()" alt="logo" />
             <h1>
               {{ $t("app.name.abbr") }}
               <span>{{ $t("app.name.future") }}</span>
             </h1>
           </div>
           <div class="auth__content">
-            <slot/>
+            <slot />
           </div>
-          <PageFooter class="auth__footer"/>
+          <PageFooter class="auth__footer" />
         </ElCard>
       </div>
     </div>
@@ -203,9 +203,9 @@ onUnmounted(() => {
   font-weight: bold;
   color: transparent;
   background: linear-gradient(
-      135deg,
-      var(--el-color-primary),
-      var(--el-color-primary-dark-2)
+    135deg,
+    var(--el-color-primary),
+    var(--el-color-primary-dark-2)
   );
   background-clip: text;
 }
@@ -237,9 +237,9 @@ onUnmounted(() => {
   margin: 1rem;
   color: transparent;
   background: linear-gradient(
-      135deg,
-      var(--el-color-primary),
-      var(--el-color-purple)
+    135deg,
+    var(--el-color-primary),
+    var(--el-color-purple)
   );
   background-clip: text;
   transition: 0.3s ease-in-out;

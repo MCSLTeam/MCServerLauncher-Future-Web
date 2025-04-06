@@ -77,7 +77,7 @@ export async function addUser(
  */
 export async function getUser(username: string) {
   const users = await getUsers();
-  if(!users[username]) throw 'unknown-user'
+  if (!users[username]) throw "unknown-user";
   return users[username];
 }
 

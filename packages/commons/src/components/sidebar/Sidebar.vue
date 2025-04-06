@@ -1,15 +1,15 @@
 <!-- 侧边栏 -->
 <script lang="ts" setup>
-import {ref} from "vue";
+import { ref } from "vue";
 import NewInstanceDialog from "./NewInstanceDialog.vue";
 import TasksDialog from "./TasksDialog.vue";
-import {useScreenWidth} from "../../utils/uses";
-import {tasks, TaskStatus} from "../../utils/tasks";
+import { useScreenWidth } from "../../utils/uses";
+import { tasks, TaskStatus } from "../../utils/tasks";
 import SidebarLogo from "./SidebarLogo.vue";
-import {router} from "../../utils/injections.ts";
-import {useLocalStorage} from "@vueuse/core";
-import {useI18n} from "vue-i18n";
-import {showDaemonList} from "../../utils/daemon/daemons.ts";
+import { router } from "../../utils/injections.ts";
+import { useLocalStorage } from "@vueuse/core";
+import { useI18n } from "vue-i18n";
+import { showDaemonList } from "../../utils/daemon/daemons.ts";
 
 defineProps({
   isInDrawer: {
@@ -29,159 +29,159 @@ const expandedButtonIndex = ref(0); // 当前展开的底部按钮索引
 
 <template>
   <ElAside
-      v-if="useScreenWidth().isMdOrBigger || isInDrawer"
-      class="sidebar__aside el-card"
-      :class="{
+    v-if="useScreenWidth().isMdOrBigger || isInDrawer"
+    class="sidebar__aside el-card"
+    :class="{
       sidebar__collapsed:
         !isInDrawer && (useScreenWidth().width == 'md' || isCollapsed),
       sidebar__standalone: !isInDrawer,
     }"
   >
     <!-- 标题，手机端模式下不显示（塞到了抽屉的标题部分分开来） -->
-    <SidebarLogo v-if="!isInDrawer"/>
+    <SidebarLogo v-if="!isInDrawer" />
     <div class="sidebar__menu-items">
       <ElScrollbar>
         <!-- 上半部分 -->
         <div>
           <ElButton
-              class="sidebar__menu-item"
-              :class="{
+            class="sidebar__menu-item"
+            :class="{
               'sidebar__menu-item-selected':
                 router.currentRoute.value.fullPath === '/',
             }"
-              @click="router.push('/')"
+            @click="router.push('/')"
           >
-            <i class="fa fa-home"/><span>{{ i18n.t("sidebar.home") }}</span>
+            <i class="fa fa-home" /><span>{{ i18n.t("sidebar.home") }}</span>
           </ElButton>
 
           <ElButton
-              class="sidebar__menu-item"
-              :class="{
+            class="sidebar__menu-item"
+            :class="{
               'sidebar__menu-item-selected':
                 router.currentRoute.value.fullPath === '/instances',
             }"
-              @click="router.push('/instances')"
+            @click="router.push('/instances')"
           >
-            <i class="fa fa-server"/><span>{{
+            <i class="fa fa-server" /><span>{{
               i18n.t("sidebar.instances")
             }}</span>
           </ElButton>
 
           <ElButton
-              class="sidebar__menu-item"
-              :class="{
+            class="sidebar__menu-item"
+            :class="{
               'sidebar__menu-item-selected':
                 router.currentRoute.value.fullPath === '/news',
             }"
-              @click="router.push('/news')"
+            @click="router.push('/news')"
           >
-            <i class="fa fa-newspaper"/><span>{{
+            <i class="fa fa-newspaper" /><span>{{
               i18n.t("sidebar.news")
             }}</span>
           </ElButton>
 
           <ElButton
-              class="sidebar__menu-item"
-              :class="{
+            class="sidebar__menu-item"
+            :class="{
               'sidebar__menu-item-selected':
                 router.currentRoute.value.fullPath === '/help-center',
             }"
-              disabled
-              @click="router.push('/help-center')"
+            disabled
+            @click="router.push('/help-center')"
           >
-            <i class="fa fa-question"/><span>{{
+            <i class="fa fa-question" /><span>{{
               i18n.t("sidebar.help-center")
             }}</span>
           </ElButton>
 
           <!-- 调试工具 TODO: 生产环境删了 -->
           <ElButton
-              class="sidebar__menu-item"
-              :class="{
+            class="sidebar__menu-item"
+            :class="{
               'sidebar__menu-item-selected':
                 router.currentRoute.value.fullPath === '/debug',
             }"
-              @click="router.push('/debug')"
+            @click="router.push('/debug')"
           >
-            <i class="fa fa-bug"/><span>Debug</span>
+            <i class="fa fa-bug" /><span>Debug</span>
           </ElButton>
         </div>
 
         <!-- 下半部分 -->
         <div>
           <ElButton
-              class="sidebar__menu-item-primary sidebar__menu-item"
-              @click="showNewInstance = true"
+            class="sidebar__menu-item-primary sidebar__menu-item"
+            @click="showNewInstance = true"
           >
-            <i class="fa fa-plus"/><span>{{
+            <i class="fa fa-plus" /><span>{{
               i18n.t("sidebar.newInstance")
             }}</span>
           </ElButton>
           <!-- 新建实例对话框 -->
-          <NewInstanceDialog v-model="showNewInstance"/>
+          <NewInstanceDialog v-model="showNewInstance" />
 
           <ElBadge
-              style="width: 100%"
-              type="primary"
-              :offset="[-30, 22]"
-              :show-zero="false"
-              :value="
+            style="width: 100%"
+            type="primary"
+            :offset="[-30, 22]"
+            :show-zero="false"
+            :value="
               tasks.filter((t) => t.status.value === TaskStatus.Processing)
                 .length
             "
           >
             <ElButton
-                class="sidebar__menu-item-secondary sidebar__menu-item"
-                @click="showTasks = true"
+              class="sidebar__menu-item-secondary sidebar__menu-item"
+              @click="showTasks = true"
             >
-              <i class="fa fa-tasks"/><span>{{
+              <i class="fa fa-tasks" /><span>{{
                 i18n.t("sidebar.tasks")
               }}</span>
             </ElButton>
           </ElBadge>
           <!-- 任务对话框 -->
-          <TasksDialog v-model="showTasks"/>
+          <TasksDialog v-model="showTasks" />
 
           <!-- 底部折叠按钮，手机端平铺 -->
           <div class="sidebar__square-item-group">
             <ElButton
-                class="sidebar__menu-item sidebar__square-item"
-                :class="{
+              class="sidebar__menu-item sidebar__square-item"
+              :class="{
                 'sidebar__square-item-expanded': expandedButtonIndex == 0,
               }"
-                @mouseenter="expandedButtonIndex = 0"
-                @click="showDaemonList = true"
+              @mouseenter="expandedButtonIndex = 0"
+              @click="showDaemonList = true"
             >
-              <i class="fa fa-cloud"/><span>{{
+              <i class="fa fa-cloud" /><span>{{
                 i18n.t("sidebar.daemon")
               }}</span>
             </ElButton>
 
             <ElButton
-                class="sidebar__menu-item sidebar__square-item"
-                :class="{
+              class="sidebar__menu-item sidebar__square-item"
+              :class="{
                 'sidebar__menu-item-selected':
                   router.currentRoute.value.fullPath === '/settings',
                 'sidebar__square-item-expanded': expandedButtonIndex == 1,
               }"
-                @mouseenter="expandedButtonIndex = 1"
-                @click="router.push('/settings')"
+              @mouseenter="expandedButtonIndex = 1"
+              @click="router.push('/settings')"
             >
-              <i class="fa fa-gear"/><span>{{
+              <i class="fa fa-gear" /><span>{{
                 i18n.t("sidebar.settings")
               }}</span>
             </ElButton>
 
             <!-- 折叠侧边栏按钮，仅大屏模式下显示 -->
             <ElButton
-                class="sidebar__menu-item sidebar__menu-item-secondary sidebar__square-item sidebar__collapse-button"
-                :class="{
+              class="sidebar__menu-item sidebar__menu-item-secondary sidebar__square-item sidebar__collapse-button"
+              :class="{
                 'sidebar__square-item-expanded': expandedButtonIndex == 2,
               }"
-                @click="isCollapsed = !isCollapsed"
-                @mouseenter="expandedButtonIndex = 2"
+              @click="isCollapsed = !isCollapsed"
+              @mouseenter="expandedButtonIndex = 2"
             >
-              <i class="fa fa-angle-left"/><span>{{
+              <i class="fa fa-angle-left" /><span>{{
                 i18n.t("sidebar.collapse")
               }}</span>
             </ElButton>

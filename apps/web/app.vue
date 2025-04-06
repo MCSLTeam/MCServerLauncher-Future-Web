@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import {loadApp} from "@repo/commons/src/utils/loader";
-import {isAprilFoolsDay} from "@repo/commons/src/utils/common";
-import {setBeian, setRouter} from "@repo/commons/src/utils/injections.ts";
-import {useLocale} from "@repo/commons/src/utils/uses";
-import {useAccount} from "~/utils/auth.ts";
-import {setDaemonManager} from "@repo/commons/src/utils/daemon/daemons.ts";
+import { loadApp } from "@repo/commons/src/utils/loader";
+import { isAprilFoolsDay } from "@repo/commons/src/utils/common";
+import { setBeian, setRouter } from "@repo/commons/src/utils/injections.ts";
+import { useLocale } from "@repo/commons/src/utils/uses";
+import { useAccount } from "~/utils/auth.ts";
+import { setDaemonManager } from "@repo/commons/src/utils/daemon/daemons.ts";
 
 let siteName = "MCSL Future Web";
 
 useHead({
   titleTemplate: (titleChunk) =>
-      titleChunk ? `${titleChunk} | ` + siteName : siteName,
+    titleChunk ? `${titleChunk} | ` + siteName : siteName,
   link: [
     {
       // 图标
       rel: "icon",
       type: "image/png",
       href: isAprilFoolsDay() // 判断愚人节，使用愚人节图标
-          ? "/assets/img/favicon-aprilfools.png"
-          : "/assets/img/favicon.png",
+        ? "/assets/img/favicon-aprilfools.png"
+        : "/assets/img/favicon.png",
     },
   ],
 });
@@ -38,8 +38,7 @@ loadApp(async (loadingInfo) => {
           info,
         },
       });
-      if (res.status != "ok")
-        throw res.message
+      if (res.status != "ok") throw res.message;
     },
     getDaemonList: async () => {
       const res: any = await $fetch("/api/daemon/list", {
@@ -48,8 +47,7 @@ loadApp(async (loadingInfo) => {
           token: useAccount().token,
         },
       });
-      if (res.status != "ok")
-        throw res.message
+      if (res.status != "ok") throw res.message;
       return res.data;
     },
     getToken: async (id) => {
@@ -60,8 +58,7 @@ loadApp(async (loadingInfo) => {
           id,
         },
       });
-      if (res.status != "ok")
-        throw res.message
+      if (res.status != "ok") throw res.message;
       return res.data.token;
     },
     updateDaemon: async (id, info) => {
@@ -73,8 +70,7 @@ loadApp(async (loadingInfo) => {
           info,
         },
       });
-      if (res.status != "ok")
-        throw res.message
+      if (res.status != "ok") throw res.message;
     },
     removeDaemon: async (id) => {
       const res: any = await $fetch("/api/daemon/remove", {
@@ -84,12 +80,11 @@ loadApp(async (loadingInfo) => {
           id,
         },
       });
-      if (res.status != "ok")
-        throw res.message
+      if (res.status != "ok") throw res.message;
     },
-  })
+  });
 
-  loadingInfo.setMessage("loading.meta")
+  loadingInfo.setMessage("loading.meta");
   const meta = (await $fetch("/api/getMeta")).data;
   siteName = meta.siteName;
   setBeian(meta.beian);
@@ -98,7 +93,7 @@ loadApp(async (loadingInfo) => {
 
 <template>
   <NuxtLayout>
-    <NuxtPage/>
+    <NuxtPage />
   </NuxtLayout>
 </template>
 

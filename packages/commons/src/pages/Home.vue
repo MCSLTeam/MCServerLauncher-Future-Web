@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import {ref, type Ref} from "vue";
+import { ref, type Ref } from "vue";
 import MD5 from "crypto-js/md5";
 import Page from "../components/page/Page.vue";
 import InfoDisplay from "../components/InfoDisplay.vue";
-import {useI18n} from "vue-i18n";
-import {username} from "../utils/injections.ts";
+import { useI18n } from "vue-i18n";
+import { username } from "../utils/injections.ts";
 
 const i18n = useI18n();
 const announcement: Ref<any> = ref(null);
@@ -35,23 +35,27 @@ function closeAnnouncement() {
     </template>
     <!-- 公告 -->
     <ElAlert
-        v-if="
+      v-if="
         !announcement.closable ||
         !announcementClosed ||
         announcementClosed != MD5(announcement.text).toString()
       "
-        class="home__announcement"
-        :title="i18n.t('announcement.title')"
-        :type="announcement.type"
-        :closable="announcement.closable"
-        :close-text="i18n.t('announcement.close')"
-        @close="closeAnnouncement"
+      class="home__announcement"
+      :title="i18n.t('announcement.title')"
+      :type="announcement.type"
+      :closable="announcement.closable"
+      :close-text="i18n.t('announcement.close')"
+      @close="closeAnnouncement"
     >
-      <p class="home__announcement-desc" v-html="announcement.text"/>
+      <p class="home__announcement-desc" v-html="announcement.text" />
     </ElAlert>
 
     <div class="home__header">
-      <h1>欢迎回来{{ username ? '，' : '' }}<span>{{ username ? username : '' }}</span>！</h1>
+      <h1>
+        欢迎回来{{ username ? "，" : ""
+        }}<span>{{ username ? username : "" }}</span
+        >！
+      </h1>
       <ElSelect>
         <ElOption>awa</ElOption>
       </ElSelect>
@@ -92,19 +96,19 @@ function closeAnnouncement() {
         <ElCol :sm="6" :xs="24" class="home__statistic">
           <div class="home__statistic-info">
             <InfoDisplay
-                :title="i18n.t('index.overview.daemon-name')"
-                value="某某守护进程"
+              :title="i18n.t('index.overview.daemon-name')"
+              value="某某守护进程"
             />
             <InfoDisplay
-                :title="i18n.t('index.overview.daemon-address')"
-                value="example.com:11451"
+              :title="i18n.t('index.overview.daemon-address')"
+              value="example.com:11451"
             />
           </div>
         </ElCol>
         <ElCol :sm="6" :xs="24" class="home__statistic">
           <div class="home__statistic-info">
-            <InfoDisplay title="不知道写啥" value="114514"/>
-            <InfoDisplay title="不知道写啥" value="114514"/>
+            <InfoDisplay title="不知道写啥" value="114514" />
+            <InfoDisplay title="不知道写啥" value="114514" />
           </div>
         </ElCol>
       </ElRow>
