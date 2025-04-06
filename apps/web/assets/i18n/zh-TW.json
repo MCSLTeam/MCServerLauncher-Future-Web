@@ -6,6 +6,7 @@
   "auth.side.element-plus.desc": "舒適的設計，養眼的介面",
   "auth.side.performance.title": "性能大提昇",
   "auth.side.i18n.title": "多語言支持",
+  "auth.side.secure.title": "持久化安全",
   "auth.side.secure.desc": "獨特通訊協議，數據加密護航",
   "auth.side.ease.title": "簡易化部署",
   "auth.side.ease.desc": "步驟簡明，輕鬆開服",
@@ -35,5 +36,13 @@
   "auth.register.subtitle": "請註冊管理員賬號以開始使用 MCSL Future Web",
   "auth.register.success": "註冊成功！請登錄賬號！",
   "auth.register.title": "創建管理員賬號",
-  "auth.register.username": "用戶名（2-16位，可包含字母數字或下劃線）"
+  "auth.register.username": "用戶名（2-16位，可包含字母數字或下劃線）",
+  "fail.invalid-matching-permission": "用戶許可權格式錯誤",
+  "fail.invalid-user-permission": "匹配許可權格式錯誤",
+  "fail.login-failed": "用戶名或密碼錯誤",
+  "fail.permission-denied": "許可權不足",
+  "fail.registry-disabled": "已有管理員",
+  "fail.unknown-user": "未知用戶",
+  "fail.user-exists": "用戶已存在",
+  "fail.invalid-token": "無效令牌"
 }
