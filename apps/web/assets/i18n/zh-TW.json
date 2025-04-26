@@ -15,7 +15,7 @@
   "auth.side.i18n.desc": "官方支持 30 种語言\n國際化無壓力",
   "auth.side.performance.desc": "使用 Nuxt.js 完全重寫\n佔用小，運行快",
   "auth.side.ootb.desc": "不再侷限於 Windows 客戶端\n網頁面板同樣流光異彩",
-  "auth.side.jwt.desc": "安全性極高的用戶驗證\n守護您的每一份數據",
+  "auth.side.jwt.desc": "安全性極高的使用者驗證\n守護您的每一份數據",
   "auth.side.web.desc": "開服不再侷限，便利盡在手邊",
   "auth.side.web.title": "Web 網頁面板",
   "auth.login.failed": "登錄失敗！原因：{reason}",
