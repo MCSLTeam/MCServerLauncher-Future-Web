@@ -20,7 +20,7 @@
   "auth.side.web.title": "Web 网页面板",
   "auth.login.failed": "Login failed! Reason: {reason}",
   "auth.login.failed.verify": "Login verification failed! Reason: {reason}",
-  "auth.login.failed.expired": "登录过期！请重新登录！",
+  "auth.login.failed.expired": "Login expired! Please log in again!",
   "auth.login.password": "Password",
   "auth.login.remember-me": "Remember Me",
   "auth.login.submit": "Login",
