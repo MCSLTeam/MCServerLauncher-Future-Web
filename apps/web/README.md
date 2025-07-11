@@ -1,31 +1,10 @@
-English | [中文](https://github.com/MCSLTeam/MCServerLauncher-Future-Web/blob/main/README_ZH.md)  
-</br>
-
-## Feature
-
-**Efficient Instance Setup**: Simplified methods for creating new server instances.
-
-**Console Program Compatibility**: Supports a wide range of console applications.
-
-**Multi-instance Management**: Control multiple servers simultaneously from a single interface.
-
-## Overview
-
-MCServerLauncher Future is the next generation of server management software, providing an intuitive interface for setting up, monitoring, and controlling multiple game servers and console applications. It's the evolution of [MCServerLauncher 2](https://github.com/MCSLTeam/MCSL2), offering enhanced compatibility and efficiency.
-
-## Components
-
-[Daemon](https://github.com/MCSLTeam/MCServerLauncher-Future/tree/master/MCServerLauncher.Daemon): The core service built with .NET 6.0 C#, delivering robust performance and flexibility.
-
-[Web Panel](https://github.com/MCSLTeam/MCServerLauncher-Future-Web): A browser-accessible dashboard, ideal for non-Windows users.
-
-[WPF Desktop Launcher](https://github.com/MCSLTeam/MCServerLauncher-Future/tree/master/MCServerLauncher.WPF): A Windows-specific interface for connecting to daemons.
+# Sources of Web Panel
 
 ## System Requirements
 
 Node.js 18 or above.
 
-## Installation
+## Installation (WIP)
 
 ### For Windows
 
@@ -47,3 +26,26 @@ pnpm dev # start a dev server
 pnpm run docs # generate docs
 pnpm build # build for production
 ```
+
+Also, we are actively working on internationalization through Weblate. If you have expertise in this area, please visit <https://translate.mcsl.com.cn/engage/mcsl-future/> to contribute your efforts.  
+
+To report issues or suggest improvements,
+please [open an issue](https://github.com/MCSLTeam/MCServerLauncher-Future/issues/new/choose)
+or [submit a pull request](https://github.com/MCSLTeam/MCServerLauncher-Future/compare).
+
+## Contact
+
+Email: [services@mcsl.com.cn](mailto:services@mcsl.com.cn)
+
+QQ Group 1: [733951376](https://qm.qq.com/q/WtVCQWSBEe)
+
+QQ Group 2: [819067131](https://qm.qq.com/q/EXBE6a5CF4)
+
+## Open Source License
+
+This project is distributed under
+the [GNU General Public License Version 3.0](https://github.com/MCSLTeam/MCServerLauncher-Future/blob/master/LICENSE).
+
+## Copyright
+
+Copyright © 2022-2025 MCSLTeam. All rights reserved.
