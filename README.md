@@ -1,5 +1,5 @@
 ![Header Image](https://socialify.git.ci/MCSLTeam/MCServerLauncher-Future/image?description=1&descriptionEditable=Future%20version%20of%20MCSL.%20Redefined%2C%20Versatile%2C%20Easy%20to%20use.&font=Jost&logo=https%3A%2F%2Fimages.mcsl.com.cn%2Fnew%2FMCServerLauncherFuture.png&name=1&pattern=Circuit%20Board&theme=Auto)  
-English | [中文](https://github.com/MCSLTeam/MCServerLauncher-Future/blob/master/README_ZH.md)  
+English | [中文](https://github.com/MCSLTeam/MCServerLauncher-Future-Web/blob/master/README_ZH.md)  
 </br>
 This repository only includes sources of the <u>**Web Panel** and **Tauri Launcher**</u>. If you want to know more about <u>**Daemon** and the **WPF Launcher**</u>, just click [here](https://github.com/MCSLTeam/MCServerLauncher-Future).
 
