@@ -1,0 +1,37 @@
+{
+    "name": "app",
+    "private": true,
+    "version": "0.1.0",
+    "type": "module",
+    "scripts": {
+        "dev": "tauri dev",
+        "build": "tauri build",
+        "tauri": "tauri",
+        "frontend:dev": "vite",
+        "frontend:build": "vue-tsc --noEmit && vite build",
+        "frontend:preview": "vite preview",
+        "lint": "eslint; prettier --check .",
+        "fix": "eslint --fix;prettier --write --list-different .",
+        "test": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@repo/shared": "workspace:*",
+        "@repo/ui": "workspace:*",
+        "@tauri-apps/api": "^2",
+        "@tauri-apps/plugin-opener": "^2",
+        "eslint": "^9.29.0",
+        "floating-vue": "^5.2.2",
+        "pinia": "^3.0.3",
+        "vite-svg-loader": "^5.1.0",
+        "vue": "^3.5.13",
+        "vue-i18n": "^11.1.11",
+        "vue-router": "^4.5.1"
+    },
+    "devDependencies": {
+        "@tauri-apps/cli": "^2",
+        "@vitejs/plugin-vue": "^5.2.1",
+        "typescript": "~5.6.2",
+        "vite": "^6.0.3",
+        "vue-tsc": "^2.1.10"
+    }
+}

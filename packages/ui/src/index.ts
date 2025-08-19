@@ -5,6 +5,7 @@ import { useLocale, useTheme } from "./utils/stores.ts";
 import { setLocale } from "yup";
 import { getYupLocale } from "./utils/yup.ts";
 import type { Composer } from "vue-i18n";
+import "./assets/css/style.scss";
 
 dayjs.extend(RelativeTime);
 dayjs.locale("zh-cn");
