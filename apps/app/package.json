@@ -15,23 +15,23 @@
         "test": "tsc --noEmit"
     },
     "dependencies": {
+        "@repo/configs": "workspace:*",
         "@repo/shared": "workspace:*",
-        "@repo/ui": "workspace:*",
-        "@tauri-apps/api": "^2",
-        "@tauri-apps/plugin-opener": "^2",
-        "eslint": "^9.29.0",
+        "@tauri-apps/api": "^2.8.0",
+        "@tauri-apps/plugin-opener": "^2.4.0",
+        "eslint": "^9.33.0",
         "floating-vue": "^5.2.2",
         "pinia": "^3.0.3",
         "vite-svg-loader": "^5.1.0",
-        "vue": "^3.5.13",
+        "vue": "^3.5.18",
         "vue-i18n": "^11.1.11",
         "vue-router": "^4.5.1"
     },
     "devDependencies": {
-        "@tauri-apps/cli": "^2",
-        "@vitejs/plugin-vue": "^5.2.1",
-        "typescript": "~5.6.2",
-        "vite": "^6.0.3",
-        "vue-tsc": "^2.1.10"
+        "@tauri-apps/cli": "^2.8.1",
+        "@vitejs/plugin-vue": "^5.2.4",
+        "typescript": "^5.9.2",
+        "vite": "^6.3.5",
+        "vue-tsc": "^2.2.12"
     }
 }

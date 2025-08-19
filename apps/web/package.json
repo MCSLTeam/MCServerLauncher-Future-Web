@@ -16,6 +16,7 @@
         "@nuxt/eslint": "1.9.0",
         "@nuxtjs/i18n": "10.0.5",
         "@pinia/nuxt": "^0.11.2",
+        "@repo/configs": "workspace:*",
         "@repo/shared": "workspace:*",
         "@repo/ui": "workspace:*",
         "eslint": "^9.29.0",
