@@ -41,7 +41,7 @@ jobs:
         run: pnpm web:build
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: MCSL-Future-Web
           path: ./apps/web/.output
