@@ -1,0 +1,274 @@
+@use "./colors" as *;
+@use "../utils";
+@use "sass:map";
+
+$dynamic-vars: (
+  primary: (
+    "light": "blue",
+    "dark": "blue",
+  ),
+  surface: (
+    "light": "slate",
+    "dark": "zinc",
+  ),
+  success: (
+    "light": "lime",
+    "dark": "green",
+  ),
+  warning: (
+    "light": "orange",
+    "dark": "amber",
+  ),
+  danger: (
+    "light": "red",
+    "dark": "rose",
+  ),
+  help: (
+    "light": "purple",
+    "dark": "violet",
+  ),
+);
+
+$default-step: (
+  "light": 500,
+  "dark": 500,
+);
+
+$named-steps: (
+  "light": (
+    "light": map.get($default-step, "light") - 100,
+    "dark": map.get($default-step, "dark") + 100,
+  ),
+  "lighter": (
+    "light": map.get($default-step, "light") - 200,
+    "dark": map.get($default-step, "dark") + 200,
+  ),
+  "lightest": (
+    "light": map.get($default-step, "light") - 300,
+    "dark": map.get($default-step, "dark") + 300,
+  ),
+  "dark": (
+    "light": map.get($default-step, "light") + 100,
+    "dark": map.get($default-step, "dark") - 100,
+  ),
+  "darker": (
+    "light": map.get($default-step, "light") + 200,
+    "dark": map.get($default-step, "dark") - 200,
+  ),
+  "darkest": (
+    "light": map.get($default-step, "light") + 300,
+    "dark": map.get($default-step, "dark") - 300,
+  ),
+);
+
+$box-shadow-default: (
+  "light": #000000,
+  "dark": #ffffff,
+);
+
+$color-vars: (
+  // 背景
+  "bg-color-main": (
+    "light": [ "surface",
+      50],
+    "dark": [ "surface",
+      950],
+  ),
+  "bg-color-overlay": (
+    "light": [ "surface",
+    0],
+    "dark": [ "surface",
+    900],
+  ),
+  "bg-color-dark": (
+    "light": [ "surface",
+    100],
+    "dark": [ "surface",
+    800],
+  ),
+  "bg-color-darker": (
+    "light": [ "surface",
+    200],
+    "dark": [ "surface",
+    700],
+  ),
+  "bg-color-overlay-opposite": (
+    "light": [ "surface",
+    900],
+    "dark": [ "surface",
+    0],
+  ),
+  // 滚动条
+  "scrollbar-color": (
+    "light": [ "surface",
+      300],
+    "dark": [ "surface",
+      700],
+  ),
+  // 描边
+  "border-color-light": (
+    "light": [ "surface",
+      100],
+    "dark": [ "surface",
+      800],
+  ),
+  "border-color-base": (
+    "light": [ "surface",
+    200],
+    "dark": [ "surface",
+    700],
+  ),
+  "border-color-dark": (
+    "light": [ "surface",
+    300],
+    "dark": [ "surface",
+    600],
+  ),
+  // 字体
+  "text-color-primary": (
+    "light": [ "surface",
+      950],
+    "dark": [ "surface",
+      0],
+  ),
+  "text-color-regular": (
+    "light": [ "surface",
+    800],
+    "dark": [ "surface",
+    200],
+  ),
+  "text-color-secondary": (
+    "light": [ "surface",
+    700],
+    "dark": [ "surface",
+    300],
+  ),
+  "text-color-gray": (
+    "light": [ "surface",
+    500],
+    "dark": [ "surface",
+    500],
+  ),
+  "text-color-opposite": (
+    "light": [ "surface",
+    0],
+    "dark": [ "surface",
+    800],
+  )
+);
+
+$other-vars: (
+  "spacing": (
+    "4xl": 2.25rem,
+    "2xl": 2rem,
+    "xl": 1.75rem,
+    "lg": 1.5rem,
+    "md": 1.25rem,
+    "sm": 1rem,
+    "xs": 0.75rem,
+    "2xs": 0.5rem,
+    "4xs": 0.25rem,
+  ),
+  "border-radius": (
+    "full": calc(infinity * 1px),
+    "4xl": 1.75rem,
+    "2xl": 1.5rem,
+    "xl": 1.25rem,
+    "lg": 1rem,
+    "md": 0.75rem,
+    "sm": 0.5rem,
+    "xs": 0.25rem,
+  ),
+  "font-weight": (
+    "bolder": 600,
+    "bold": 500,
+    "base": 400,
+    "light": 300,
+    "lighter": 200,
+  ),
+  "font-size": (
+    "8xl": 4rem,
+    "4xl": 2rem,
+    "2xl": 1.5rem,
+    "xl": 1.25rem,
+    "lg": 1rem,
+    "md": 0.875rem,
+    "sm": 0.75rem,
+    "xs": 0.625rem,
+    "2xs": 0.5rem,
+  ),
+);
+
+:root {
+  // 主题动态变量
+  @each $theme in ("light", "dark") {
+    $theme-default-step: map.get($default-step, $theme);
+    &.#{$theme} {
+      // 颜色变量
+      @each $name, $palette in $colors {
+        --mcsl-color-#{$name}: var(
+            --mcsl-color-#{$name}-#{$theme-default-step}
+        );
+        @each $step-name,
+        $var in utils.generate-bg(
+            "var(--mcsl-color-#{$name}-#{$theme-default-step})"
+        ) {
+          --mcsl-color-#{$name}-shadow-#{$step-name}: #{$var};
+        }
+        @each $step-name, $step-values in $named-steps {
+          --mcsl-color-#{$name}-#{$step-name}: var(
+              --mcsl-color-#{$name}-#{$theme-default-step}
+          );
+        }
+      }
+
+      @each $name, $value in $dynamic-vars {
+        @each $step, $_ in map.get($colors, map.get($value, $theme)) {
+          --mcsl-color-#{$name}-#{$step}: var(
+              --mcsl-color-#{map.get($value, $theme)}-#{$step}
+          );
+        }
+        --mcsl-color-#{$name}-shadow-lighter: var(
+            --mcsl-color-#{map.get($value, $theme)}-shadow-lighter
+        );
+        --mcsl-color-#{$name}-shadow-light: var(
+            --mcsl-color-#{map.get($value, $theme)}-shadow-light
+        );
+        --mcsl-color-#{$name}-shadow-base: var(
+            --mcsl-color-#{map.get($value, $theme)}-shadow-base
+        );
+        --mcsl-color-#{$name}-shadow-dark: var(
+            --mcsl-color-#{map.get($value, $theme)}-shadow-dark
+        );
+        --mcsl-color-#{$name}-shadow-darker: var(
+            --mcsl-color-#{map.get($value, $theme)}-shadow-darker
+        );
+        @each $step-name, $step-values in $named-steps {
+          --mcsl-color-#{$name}-#{$step-name}: var(
+              --mcsl-color-#{$name}-#{map.get($step-values, $theme)}
+          );
+        }
+        --mcsl-color-#{$name}: var(
+            --mcsl-color-#{$name}-#{$theme-default-step}
+        );
+      }
+
+      @each $step-name,
+      $var in utils.generate-bg-surface(map.get($box-shadow-default, $theme)) {
+        --mcsl-box-shadow-#{$step-name}: #{$var};
+      }
+
+      // 常用变量
+      @each $name, $value in $color-vars {
+        --mcsl-#{$name}: #{utils.get-color-var(map.get($value, $theme))};
+      }
+    }
+  }
+
+  // 其他变量
+  @each $name, $group in $other-vars {
+    @each $step, $value in $group {
+      --mcsl-#{$name}-#{$step}: #{$value};
+    }
+  }
+}

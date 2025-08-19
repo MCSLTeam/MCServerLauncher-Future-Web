@@ -1,0 +1,60 @@
+@use "sass:map";
+@use "sass:list";
+
+$sizes: ("small", "middle", "large");
+
+@function get-color-var($list) {
+  @return var(--mcsl-color-#{list.nth($list, 1)}-#{list.nth($list, 2)});
+}
+
+@function transparent($color-var, $opacity) {
+  @return color-mix(in srgb, transparent, #{$color-var} #{$opacity});
+}
+
+@function get-size-var($name, $size, $vars) {
+  @return map.get(map.get($vars, $name), $size);
+}
+
+@function smaller-size($size) {
+  $index: index($sizes, $size);
+  @if ($index > 1) {
+    @return smaller-size(list.nth($sizes, $index - 1));
+  }
+  @return "small";
+}
+
+@function bigger-size($size) {
+  $index: index($sizes, $size);
+  @if ($index < length($sizes)) {
+    @return bigger-size(list.nth($sizes, $index + 1));
+  }
+  @return "large";
+}
+
+@function generate-bg($color-var) {
+  @return (
+    "light": "0 1px 2px 0 #{transparent($color-var, 20%)}",
+    "lighter":
+    "0 1px 3px 0 #{transparent($color-var, 20%)}, 0 1px 2px -1px #{transparent($color-var, 20%)}",
+    "base":
+    "0 4px 6px -1px #{transparent($color-var, 20%)}, 0 2px 4px -2px #{transparent($color-var, 20%)}",
+    "dark":
+    "0 10px 15px -3px #{transparent($color-var, 20%)}, 0 4px 6px -4px #{transparent($color-var, 25%)}",
+    "darker":
+    "0 20px 25px -5px #{transparent($color-var, 20%)}, 0 8px 10px -6px #{transparent($color-var, 30%)}"
+  );
+}
+
+@function generate-bg-surface($color-var) {
+  @return (
+    "light": "0 1px 2px 0 #{transparent($color-var, 10%)}",
+    "lighter":
+    "0 1px 3px 0 #{transparent($color-var, 10%)}, 0 1px 2px -1px #{transparent($color-var, 10%)}",
+    "base":
+    "0 4px 6px -1px #{transparent($color-var, 10%)}, 0 2px 4px -2px #{transparent($color-var, 10%)}",
+    "dark":
+    "0 10px 15px -3px #{transparent($color-var, 10%)}, 0 4px 6px -4px #{transparent($color-var, 12%)}",
+    "darker":
+    "0 20px 25px -5px #{transparent($color-var, 10%)}, 0 8px 10px -6px #{transparent($color-var, 15%)}"
+  );
+}

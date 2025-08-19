@@ -1,8 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": [
-    "./base.json",
-    "@vue/tsconfig/tsconfig.dom.json"
+    "@vue/tsconfig/tsconfig.dom.json",
+    "./base.json"
   ],
   "compilerOptions": {
     "moduleResolution": "Bundler"

@@ -1,6 +1,6 @@
 ![Header Image](https://socialify.git.ci/MCSLTeam/MCServerLauncher-Future/image?description=1&descriptionEditable=Future%20version%20of%20MCSL.%20Redefined%2C%20Versatile%2C%20Easy%20to%20use.&font=Jost&logo=https%3A%2F%2Fimages.mcsl.com.cn%2Fnew%2FMCServerLauncherFuture.png&name=1&pattern=Circuit%20Board&theme=Auto)  
-English | [中文](https://github.com/MCSLTeam/MCServerLauncher-Future-Web/blob/master/README_ZH.md)  
-</br>
+English | [中文](https://github.com/MCSLTeam/MCServerLauncher-Future-Web/blob/master/README_ZH.md)
+<br>
 This repository only includes sources of the <u>**Web Panel** and **Tauri Launcher**</u>. If you want to know more about <u>**Daemon** and the **WPF Launcher**</u>, just click [here](https://github.com/MCSLTeam/MCServerLauncher-Future).
 
 [![GPLv3](https://img.shields.io/badge/License-GPLv3-blue?color=#4ec820)](LICENSE)
@@ -8,11 +8,11 @@ This repository only includes sources of the <u>**Web Panel** and **Tauri Launch
 
 ## Feature
 
-**Efficient Instance Setup**: Simplified methods for creating new server instances.  
+**Efficient Instance Setup**: Simplified methods for creating new server instances.
 
-**Console Program Compatibility**: Supports a wide range of console applications.  
+**Console Program Compatibility**: Supports a wide range of console applications.
 
-**Multi-language Support**: Officially supports 6 languages, making internationalization effortless.  
+**Multi-language Support**: Officially supports 6 languages, making internationalization effortless.
 
 **Multi-instance Management**: Control multiple servers simultaneously from a single interface.
 
@@ -36,7 +36,8 @@ Windows-specific interface for connecting to daemons.
 [Tauri Launcher](https://github.com/MCSLTeam/MCServerLauncher-Future-Web/tree/main/apps/app): A
 cross-platform interface for connecting to daemons.
 
-[Web Panel](https://github.com/MCSLTeam/MCServerLauncher-Future-Web/tree/main/apps/web): A browser-accessible dashboard, ideal for
+[Web Panel](https://github.com/MCSLTeam/MCServerLauncher-Future-Web/tree/main/apps/web): A browser-accessible dashboard,
+ideal for
 non-Windows users.
 
 ## System Requirements
@@ -66,7 +67,8 @@ pnpm run docs # generate docs
 pnpm build # build for production
 ```
 
-Also, we are actively working on internationalization through Weblate. If you have expertise in this area, please visit <https://translate.mcsl.com.cn/engage/mcsl-future/> to contribute your efforts.  
+Also, we are actively working on internationalization through Weblate. If you have expertise in this area, please
+visit <https://translate.mcsl.com.cn/engage/mcsl-future/> to contribute your efforts.
 
 To report issues or suggest improvements,
 please [open an issue](https://github.com/MCSLTeam/MCServerLauncher-Future/issues/new/choose)

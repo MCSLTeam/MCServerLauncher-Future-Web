@@ -18,15 +18,14 @@ coverage
 # Turbo
 .turbo
 
+# Vercel
+.vercel
+
 # Build Outputs
-out
+.next/
+out/
 build
 dist
-.output
-.data
-.nuxt
-.nitro
-.cache
 
 # Debug
 npm-debug.log*
@@ -36,6 +35,8 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# IDEs
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
@@ -45,6 +46,9 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+*.iml
+*.ipr
+*.iws
 
 # Cargo
 /target

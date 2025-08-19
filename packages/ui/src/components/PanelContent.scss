@@ -1,0 +1,12 @@
+$vars: (
+  "spacing": (
+    "small": var(--mcsl-spacing-4xs),
+    "middle": var(--mcsl-spacing-2xs),
+    "large": var(--mcsl-spacing-xs),
+  ),
+  "border-radius": (
+    "small": var(--mcsl-border-radius-xs),
+    "middle": var(--mcsl-border-radius-sm),
+    "large": var(--mcsl-border-radius-md),
+  ),
+);

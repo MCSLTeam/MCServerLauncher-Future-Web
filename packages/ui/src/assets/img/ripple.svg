@@ -1,0 +1,31 @@
+<svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+    <circle fill="none" cx="400" cy="400" stroke="var(--mcsl-spinner__color)">
+        <animate
+                attributeName="r"
+                calcMode="spline"
+                dur="1s"
+                values="1;300"
+                keyTimes="0; 1"
+                keySplines="0 0.55 0.45 1"
+                repeatCount="indefinite"
+        />
+        <animate
+                attributeName="stroke-width"
+                calcMode="spline"
+                dur="1s"
+                values="0;60px"
+                keyTimes="0; 1"
+                keySplines="0 0.55 0.45 1"
+                repeatCount="indefinite"
+        />
+        <animate
+                attributeName="stroke-opacity"
+                calcMode="spline"
+                dur="1s"
+                values="1;0"
+                keyTimes="0; 1"
+                keySplines="0 0.55 0.45 1"
+                repeatCount="indefinite"
+        />
+    </circle>
+</svg>

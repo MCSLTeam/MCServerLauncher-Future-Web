@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(1.142857, 0, 0, 1.142857, 200.000031, 200.000031)">
+    <rect width="50" height="50" x="50" y="50" color="var(--mcsl-spinner__color)">
+      <animate attributeName="display" values="inline;inline;none;none" begin="-0.9375s" dur="1s" fill="freeze" calcMode="discrete" keyTimes="0; 0.5; 0.505; 1" repeatCount="indefinite"/>
+    </rect>
+    <rect width="50" height="50" x="100" color="var(--mcsl-spinner__color)">
+      <animate attributeName="display" values="inline;inline;none;none" begin="-0.875s" dur="1s" fill="freeze" calcMode="discrete" keyTimes="0; 0.5; 0.505; 1" repeatCount="indefinite"/>
+    </rect>
+    <rect width="50" height="50" x="150" color="var(--mcsl-spinner__color)">
+      <animate attributeName="display" values="inline;inline;none;none" begin="-0.8125s" dur="1s" fill="freeze" calcMode="discrete" keyTimes="0; 0.5; 0.505; 1" repeatCount="indefinite"/>
+    </rect>
+    <rect width="50" height="50" x="200" color="var(--mcsl-spinner__color)">
+      <animate attributeName="display" values="inline;inline;none;none" begin="-0.75s" dur="1s" fill="freeze" calcMode="discrete" keyTimes="0; 0.5; 0.505; 1" repeatCount="indefinite"/>
+    </rect>
+    <rect width="50" height="50" x="250" y="50" color="var(--mcsl-spinner__color)">
+      <animate attributeName="display" values="inline;inline;none;none" begin="-0.6875s" dur="1s" fill="freeze" calcMode="discrete" keyTimes="0; 0.5; 0.505; 1" repeatCount="indefinite"/>
+    </rect>
+    <rect width="50" height="50" x="300" y="100" color="var(--mcsl-spinner__color)">
+      <animate attributeName="display" values="inline;inline;none;none" begin="-0.625s" dur="1s" fill="freeze" calcMode="discrete" keyTimes="0; 0.5; 0.505; 1" repeatCount="indefinite"/>
+    </rect>
+    <rect width="50" height="50" x="300" y="150" color="var(--mcsl-spinner__color)">
+      <animate attributeName="display" values="inline;inline;none;none" begin="-0.5625s" dur="1s" fill="freeze" calcMode="discrete" keyTimes="0; 0.5; 0.505; 1" repeatCount="indefinite"/>
+    </rect>
+    <rect width="50" height="50" x="300" y="200" color="var(--mcsl-spinner__color)">
+      <animate attributeName="display" values="inline;inline;none;none" begin="-0.5s" dur="1s" fill="freeze" calcMode="discrete" keyTimes="0; 0.5; 0.505; 1" repeatCount="indefinite"/>
+    </rect>
+    <rect width="50" height="50" x="250" y="250" color="var(--mcsl-spinner__color)">
+      <animate attributeName="display" values="inline;inline;none;none" begin="-0.4375s" dur="1s" fill="freeze" calcMode="discrete" keyTimes="0; 0.5; 0.505; 1" repeatCount="indefinite"/>
+    </rect>
+    <rect width="50" height="50" x="200" y="300" color="var(--mcsl-spinner__color)">
+      <animate attributeName="display" values="inline;inline;none;none" begin="-0.375s" dur="1s" fill="freeze" calcMode="discrete" keyTimes="0; 0.5; 0.505; 1" repeatCount="indefinite"/>
+    </rect>
+    <rect width="50" height="50" x="150" y="300" color="var(--mcsl-spinner__color)">
+      <animate attributeName="display" values="inline;inline;none;none" begin="-0.3125s" dur="1s" fill="freeze" calcMode="discrete" keyTimes="0; 0.5; 0.505; 1" repeatCount="indefinite"/>
+    </rect>
+    <rect width="50" height="50" x="100" y="300" color="var(--mcsl-spinner__color)">
+      <animate attributeName="display" values="inline;inline;none;none" begin="-0.25s" dur="1s" fill="freeze" calcMode="discrete" keyTimes="0; 0.5; 0.505; 1" repeatCount="indefinite"/>
+    </rect>
+    <rect width="50" height="50" x="50" y="250" color="var(--mcsl-spinner__color)">
+      <animate attributeName="display" values="inline;inline;none;none" begin="-0.1875s" dur="1s" fill="freeze" calcMode="discrete" keyTimes="0; 0.5; 0.505; 1" repeatCount="indefinite"/>
+    </rect>
+    <rect width="50" height="50" y="200" color="var(--mcsl-spinner__color)">
+      <animate attributeName="display" values="inline;inline;none;none" begin="-0.125s" dur="1s" fill="freeze" calcMode="discrete" keyTimes="0; 0.5; 0.505; 1" repeatCount="indefinite"/>
+    </rect>
+    <rect width="50" height="50" y="150" color="var(--mcsl-spinner__color)">
+      <animate attributeName="display" values="inline;inline;none;none" begin="-0.0625s" dur="1s" fill="freeze" calcMode="discrete" keyTimes="0; 0.5; 0.505; 1" repeatCount="indefinite"/>
+    </rect>
+    <rect width="50" height="50" y="100" color="var(--mcsl-spinner__color)">
+      <animate attributeName="display" values="inline;inline;none;none" begin="0s" dur="1s" fill="freeze" calcMode="discrete" keyTimes="0; 0.5; 0.505; 1" repeatCount="indefinite"/>
+    </rect>
+  </g>
+</svg>

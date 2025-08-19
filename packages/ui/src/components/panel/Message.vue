@@ -1,0 +1,229 @@
+<script setup lang="ts">
+import { computed, withCtx } from "vue";
+import type { Size } from "../../utils/types.ts";
+import { animatedVisibilityExists, getSize } from "../../utils/internal.ts";
+import {
+  ColorData,
+  type ColorType,
+  getColorVar,
+  getStatusIcon,
+} from "../../utils/css.ts";
+import Button from "../form/button/Button.vue";
+import ChangeSize from "../misc/ChangeSize.vue";
+
+const props = withDefaults(
+  defineProps<{
+    color?: ColorType;
+    variant?: "text" | "outlined" | "default";
+    icon?: string;
+    inAnim?: string;
+    outAnim?: string;
+    closeable?: boolean;
+    title?: string;
+    shadow?: boolean;
+    size?: Size;
+  }>(),
+  {
+    color: "primary",
+    variant: "default",
+    inAnim: "stretchInDown",
+    outAnim: "stretchOutUp",
+    shadow: false,
+    closeable: false,
+  },
+);
+
+const size: Size = withCtx(() => getSize(props.size))();
+
+const actualIcon = computed(() => props.icon ?? getStatusIcon(props.color));
+
+const visible = defineModel<boolean>("visible", {
+  default: true,
+});
+
+const { exist } = animatedVisibilityExists(visible, 500);
+
+const isSurface = computed(() => props.color == "surface");
+
+function open() {
+  visible.value = true;
+}
+
+function close() {
+  visible.value = false;
+}
+
+defineExpose({
+  open,
+  close,
+});
+</script>
+
+<template>
+  <div
+    class="mcsl-message"
+    v-if="exist"
+    :class="[
+      `mcsl-size-${size}`,
+      `mcsl-message__variant-${variant}`,
+      ...(visible ? [`mcsl-message__visible`] : []),
+      ...(title ? [`mcsl-message__with-title`] : []),
+      ...(shadow ? [`mcsl-message__shadowed`] : []),
+    ]"
+    :style="{
+      '--mcsl-message__title-color': isSurface
+        ? 'var(--mcsl-text-color-primary)'
+        : getColorVar(color),
+      '--mcsl-message__text-color': isSurface
+        ? 'var(--mcsl-text-color-regular)'
+        : getColorVar(color),
+      '--mcsl-message__bg-color': getColorVar(
+        new ColorData(color, 'default', 0.05),
+      ),
+      '--mcsl-message__border-color': isSurface
+        ? 'var(--mcsl-border-color-base)'
+        : getColorVar(new ColorData(color, 'light')),
+      '--mcsl-message__box-shadow': isSurface
+        ? 'var(--mcsl-box-shadow-base)'
+        : new ColorData(color).getShadow('base'),
+      '--mcsl-message__anim-in': inAnim,
+      '--mcsl-message__anim-out': outAnim,
+    }"
+  >
+    <slot name="contextmenu" />
+    <div class="mcsl-message__content">
+      <i v-if="actualIcon" :class="actualIcon" />
+      <div>
+        <h3 v-if="title" class="mcsl-message__title">{{ title }}</h3>
+        <slot :open="open" :close="close" />
+        <div v-if="$slots.buttons" class="mcsl-message__buttons">
+          <ChangeSize size="smaller">
+            <slot name="buttons" :open="open" :close="close" />
+          </ChangeSize>
+        </div>
+      </div>
+      <Button
+        v-if="closeable"
+        class="mcsl-message__close-btn"
+        type="text"
+        icon="fa fa-xmark"
+        rounded
+        :color="color"
+        @click="close"
+      />
+    </div>
+  </div>
+</template>
+
+<style scoped lang="scss">
+@use "../../assets/css/utils";
+@use "../PanelContent" as *;
+
+@each $size in utils.$sizes {
+  .mcsl-size-#{$size}.mcsl-message {
+    --mcsl-message__spacing: #{utils.get-size-var("spacing", $size, $vars)};
+    border-radius: utils.get-size-var("border-radius", $size, $vars);
+
+    &.mcsl-message__variant-text {
+      --mcsl-message__spacing: 0;
+    }
+
+    & > .mcsl-message__content {
+      $spacing: var(--mcsl-message__spacing);
+      gap: $spacing;
+      padding: $spacing;
+
+      & .mcsl-message__title {
+        margin-bottom: calc($spacing / 2);
+      }
+
+      & > .mcsl-message__close-btn {
+        top: $spacing;
+        right: $spacing;
+      }
+
+      & .mcsl-message__buttons {
+        gap: $spacing;
+      }
+    }
+  }
+}
+
+.mcsl-message {
+  opacity: 0;
+  transform: translate(0);
+  animation:
+    0.2s ease-in-out both var(--mcsl-message__anim-out),
+    0.5s 0.2s cubic-bezier(0, 1, 0, 1) collapseOutVertical;
+
+  &.mcsl-message__visible {
+    animation:
+      0.8s ease-in-out collapseInVertical,
+      0.2s 0.2s ease-in-out both var(--mcsl-message__anim-in);
+  }
+}
+
+.mcsl-message__content {
+  display: flex;
+
+  .mcsl-message__with-title & {
+    --mcsl-message__icon-font-size: var(--mcsl-font-size-h3);
+  }
+
+  --mcsl-message__icon-font-size: var(--mcsl-font-size-all);
+  $size: calc(var(--mcsl-message__icon-font-size) * 1.2);
+
+  & > i {
+    width: $size;
+    height: $size;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  & > div {
+    flex-grow: 1;
+  }
+
+  & > .mcsl-message__close-btn {
+    position: absolute;
+    min-width: 0;
+    width: $size;
+    height: $size;
+    padding: 0;
+
+    &:not(:hover):not(:active) {
+      background: transparent;
+    }
+  }
+
+  & .mcsl-message__buttons {
+    display: flex;
+    justify-content: end;
+  }
+}
+
+.mcsl-message__variant-text {
+  & .mcsl-message__title {
+    color: var(--mcsl-message__title-color);
+  }
+
+  & * {
+    color: var(--mcsl-message__text-color);
+  }
+}
+
+.mcsl-message__variant-outlined {
+  @extend .mcsl-message__variant-text;
+  border: 1px solid var(--mcsl-message__border-color);
+
+  &.mcsl-message__shadowed {
+    box-shadow: var(--mcsl-message__box-shadow);
+  }
+}
+
+.mcsl-message__variant-default {
+  @extend .mcsl-message__variant-outlined;
+  background: var(--mcsl-message__bg-color);
+}
+</style>

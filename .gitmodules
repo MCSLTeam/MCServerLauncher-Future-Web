@@ -1,0 +1,6 @@
+[submodule "packages/locales"]
+	path = packages/locales
+	url = https://github.com/MCSLTeam/MCServerLauncher.Translations.Web.git
+[submodule "packages/mfp-client"]
+	path = packages/mfp-client
+	url = https://github.com/MCSLTeam/mfp-client-nodejs

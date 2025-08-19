@@ -1,0 +1,17 @@
+$vars: (
+  "box-shadow": (
+    "small": var(--mcsl-box-shadow-light),
+    "middle": var(--mcsl-box-shadow-base),
+    "large": var(--mcsl-box-shadow-dark),
+  ),
+  "spacing": (
+    "small": var(--mcsl-spacing-sm),
+    "middle": var(--mcsl-spacing-md),
+    "large": var(--mcsl-spacing-lg),
+  ),
+  "border-radius": (
+    "small": var(--mcsl-border-radius-md),
+    "middle": var(--mcsl-border-radius-lg),
+    "large": var(--mcsl-border-radius-2xl),
+  ),
+);

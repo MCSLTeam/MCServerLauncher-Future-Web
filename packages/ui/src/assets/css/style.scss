@@ -1,0 +1,350 @@
+@use "./fontawesome.min.css";
+@use "animate.css";
+@use "floating-vue/dist/style.css";
+@use "./vars/colors";
+@use "./vars/theme";
+@use "utils";
+
+:root {
+  --font-sans:
+    "MiSans VF", Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen,
+    Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  --font-minecraft: "Minecraft", "GNU Unifont", sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono,
+    monospace;
+}
+
+html {
+  &.light {
+    color-scheme: light;
+  }
+
+  &.dark {
+    color-scheme: dark;
+  }
+}
+
+/* 基本样式 */
+html,
+body,
+#app,
+#__nuxt {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-size: var(--mcsl-font-size-md);
+  background: var(--mcsl-bg-color-main) !important;
+}
+
+body {
+  overflow: auto;
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.font-minecraft {
+  font-family: var(--font-minecraft);
+}
+
+/* 主题切换动画 */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html.dark::view-transition-old(root) {
+  z-index: 1;
+}
+
+html.dark::view-transition-new(root) {
+  z-index: 999;
+}
+
+::view-transition-old(root) {
+  z-index: 999;
+}
+
+::view-transition-new(root) {
+  z-index: 1;
+}
+
+/* 排版 */
+* {
+  color: var(--mcsl-text-color-regular);
+  font-family: var(--font-sans);
+  font-weight: var(--mcsl-font-weight-base);
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+strong {
+  font-weight: var(--mcsl-font-weight-bold);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a {
+  margin: 0;
+}
+
+a,
+a * {
+  color: var(--mcsl-text-color-primary);
+  transition: 0.2s ease-in-out;
+
+  &:hover {
+    color: var(--mcsl-color-primary);
+  }
+}
+
+label {
+  font-weight: var(--mcsl-font-weight-bold);
+}
+
+h1 {
+  font-size: var(--mcsl-font-size-h1, var(--mcsl-font-size-4xl));
+}
+
+h2 {
+  font-size: var(--mcsl-font-size-2xl);
+}
+
+h3 {
+  font-size: var(--mcsl-font-size-xl);
+}
+
+h4 {
+  font-size: var(--mcsl-font-size-lg);
+}
+
+h5 {
+  font-size: var(--mcsl-font-size-lg);
+}
+
+h6 {
+  font-size: var(--mcsl-font-size-md);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: var(--mcsl-font-weight-bolder);
+}
+
+h5,
+h6 {
+  font-weight: var(--mcsl-font-weight-bold);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--mcsl-text-color-primary);
+}
+
+.mcsl-typography {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: var(--mcsl-spacing-xs) 0;
+  }
+}
+
+/* 滚动条 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--mcsl-scrollbar-color) var(--mcsl-bg-color-main);
+}
+
+/* 大小 */
+$font-size-vars: (
+  "small": (
+    "h1": var(--mcsl-font-size-2xl),
+    "h2": var(--mcsl-font-size-xl),
+    "h3": var(--mcsl-font-size-lg),
+    "h4": var(--mcsl-font-size-md),
+    "h5": var(--mcsl-font-size-md),
+    "h6": var(--mcsl-font-size-sm),
+    "p": var(--mcsl-font-size-sm),
+  ),
+  "middle": (
+    "h1": var(--mcsl-font-size-4xl),
+    "h2": var(--mcsl-font-size-2xl),
+    "h3": var(--mcsl-font-size-xl),
+    "h4": var(--mcsl-font-size-lg),
+    "h5": var(--mcsl-font-size-lg),
+    "h6": var(--mcsl-font-size-md),
+    "all": var(--mcsl-font-size-md),
+  ),
+  "large": (
+    "h1": var(--mcsl-font-size-4xl),
+    "h2": var(--mcsl-font-size-4xl),
+    "h3": var(--mcsl-font-size-2xl),
+    "h4": var(--mcsl-font-size-xl),
+    "h5": var(--mcsl-font-size-xl),
+    "h6": var(--mcsl-font-size-lg),
+    "all": var(--mcsl-font-size-lg),
+  ),
+);
+
+@each $size, $vars in $font-size-vars {
+  .mcsl-size-#{$size} {
+    @each $name, $value in $vars {
+      --mcsl-font-size-#{$name}: #{$value};
+    }
+  }
+}
+
+/* 动画 */
+@keyframes stretchInUp {
+  from {
+    scale: 1 0.5;
+    opacity: 0;
+    transform-origin: bottom;
+  }
+  to {
+    scale: 1;
+    opacity: 1;
+    transform-origin: bottom;
+  }
+}
+
+@keyframes stretchInDown {
+  from {
+    scale: 1 0.5;
+    opacity: 0;
+    transform-origin: top;
+  }
+  to {
+    scale: 1;
+    opacity: 1;
+    transform-origin: top;
+  }
+}
+
+@keyframes stretchOutUp {
+  from {
+    scale: 1;
+    opacity: 1;
+    transform-origin: top;
+  }
+  to {
+    scale: 1 0.5;
+    opacity: 0;
+    transform-origin: top;
+  }
+}
+
+@keyframes stretchOutDown {
+  from {
+    scale: 1;
+    opacity: 1;
+    transform-origin: bottom;
+  }
+  to {
+    scale: 1 0.5;
+    opacity: 0;
+    transform-origin: bottom;
+  }
+}
+
+@keyframes collapseInVertical {
+  from {
+    max-height: 0;
+  }
+  to {
+    max-height: 1000px;
+  }
+}
+
+@keyframes collapseOutVertical {
+  from {
+    max-height: 1000px;
+  }
+  to {
+    max-height: 0;
+  }
+}
+
+/* 字体 */
+@font-face {
+  font-family: "MiSans VF";
+  src: url("../font/MiSans VF.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Minecraft";
+  src: url("../font/Minecraft.woff") format("woff");
+}
+
+@font-face {
+  font-family: "GNU Unifont";
+  src: url("../font/unifont-16.0.04.otf") format("opentype");
+}
+
+/* Floating Vue  */
+// Tooltip
+.light {
+  --mcsl-tooltip__bg-opacity: 80%;
+}
+
+.dark {
+  --mcsl-tooltip__bg-opacity: 90%;
+}
+
+.v-popper--theme-tooltip .v-popper__inner {
+  background: utils.transparent(
+    var(--mcsl-bg-color-overlay-opposite),
+    var(--mcsl-tooltip__bg-opacity)
+  );
+  border-radius: var(--mcsl-border-radius-sm);
+  padding: var(--mcsl-spacing-2xs) var(--mcsl-spacing-xs);
+
+  & * {
+    color: var(--mcsl-text-color-opposite) !important;
+  }
+}
+
+.v-popper--theme-tooltip .v-popper__arrow-outer {
+  border-color: utils.transparent(
+    var(--mcsl-bg-color-overlay-opposite),
+    var(--mcsl-tooltip__bg-opacity)
+  );
+}
+
+// Dropdown
+.v-popper--theme-dropdown .v-popper__inner {
+  background: var(--mcsl-bg-color-overlay);
+  border: 1px solid var(--mcsl-border-color-base);
+  border-radius: var(--mcsl-border-radius-sm);
+  box-shadow: var(--mcsl-box-shadow-light);
+  padding: var(--mcsl-spacing-2xs) var(--mcsl-spacing-xs);
+}
+
+.v-popper--theme-dropdown .v-popper__arrow-inner {
+  border-color: var(--mcsl-bg-color-overlay);
+}
+
+.v-popper--theme-dropdown .v-popper__arrow-outer {
+  border-color: var(--mcsl-border-color-base);
+}

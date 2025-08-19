@@ -5,19 +5,32 @@
 
 version: 2
 updates:
-    # Web
-    - package-ecosystem: 'npm'
-      directory: '/apps/web'
-      schedule:
-          interval: 'weekly'
+  # App
+  - package-ecosystem: 'npm'
+    directory: '/apps/app'
+    schedule:
+    interval: 'weekly'
 
-    # Commons
-    - package-ecosystem: 'npm'
-      directory: '/package/commons'
-      schedule:
-        interval: 'weekly'
-    # Configs
-    - package-ecosystem: 'npm'
-      directory: '/package/configs'
-      schedule:
-        interval: 'monthly'
+  # Web
+  - package-ecosystem: 'npm'
+    directory: '/apps/web'
+    schedule:
+      interval: 'weekly'
+
+  # Common
+  - package-ecosystem: 'npm'
+    directory: '/package/common'
+    schedule:
+      interval: 'weekly'
+
+  # UI
+  - package-ecosystem: 'npm'
+    directory: '/package/ui'
+    schedule:
+      interval: 'weekly'
+
+  # Configs
+  - package-ecosystem: 'npm'
+    directory: '/package/configs'
+    schedule:
+      interval: 'monthly'

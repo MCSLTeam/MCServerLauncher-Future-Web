@@ -1,0 +1,13 @@
+@use "sass:map";
+@use "PanelContent";
+
+$vars: map.merge(
+  PanelContent.$vars,
+  (
+    "font-size": (
+      "small": var(--mcsl-font-size-xs),
+      "middle": var(--mcsl-font-size-sm),
+      "large": var(--mcsl-font-size-md),
+    ),
+  )
+);

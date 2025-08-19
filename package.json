@@ -1,32 +1,30 @@
 {
-  "name": "mcsl-future-monorepo",
-  "license": "GPL-3.0-only",
+  "name": "mcsl-future-web",
   "private": true,
+  "license": "GPL-3.0-only",
   "scripts": {
-    "app:build": "turbo run build --filter=mcsl-future-tauri",
-    "app:dev": "turbo run dev --filter=mcsl-future-tauri",
+    "app:build": "turbo run app#build",
+    "app:dev": "turbo run app#dev",
     "app:fix": "turbo run fix --filter=mcsl-future-tauri",
-    "app:lint": "turbo run lint --filter=mcsl-future-tauri",
-    "app:test": "turbo run test --filter=mcsl-future-tauri",
-    "daemon:build": "turbo run build --filter=mcsl-future-daemon-rs",
-    "daemon:dev": "turbo run dev --filter=mcsl-future-daemon-rs",
-    "daemon:test": "turbo run test --filter=mcsl-future-daemon-rs",
-    "web:build": "turbo run build --filter=mcsl-future-web",
-    "web:dev": "turbo run dev --filter=mcsl-future-web",
+    "app:lint": "turbo run app#lint",
+    "web:build": "turbo run web#build",
+    "web:build:nuxt": "turbo run web#build:nuxt",
+    "web:build:docker": "turbo run web#build:docker",
+    "web:dev": "turbo run web#dev",
     "web:fix": "turbo run fix --filter=mcsl-future-web",
-    "web:lint": "turbo run lint --filter=mcsl-future-web",
-    "web:test": "turbo run test --filter=mcsl-future-web",
-    "build": "turbo run build --continue",
-    "lint": "turbo run lint --continue",
-    "fix": "turbo run fix --continue",
-    "test": "turbo run test --continue"
+    "web:lint": "turbo run web#lint",
+    "ui:lint": "turbo run ui#lint",
+    "shared:lint": "turbo run shared#lint",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "fix": "turbo run fix"
   },
   "devDependencies": {
-    "prettier": "^3.2.5",
-    "turbo": "^2.3.4",
-    "typescript": "5.5.4"
+    "prettier": "^3.5.3",
+    "turbo": "^2.5.4",
+    "typescript": "5.8.2"
   },
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@10.13.1",
   "engines": {
     "node": ">=18"
   }

@@ -1,0 +1,42 @@
+<svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+    <circle
+            cx="400"
+            cy="400"
+            r="200"
+            fill="#fff"
+            stroke-width="50"
+            stroke-linecap="round"
+            stroke-dasharray="700, 1400"
+            stroke="var(--mcsl-spinner__color)"
+            style="transform-origin: 50% 50%"
+    >
+        <animateTransform
+                type="rotate"
+                additive="sum"
+                attributeName="transform"
+                values="0;360"
+                begin="0s"
+                dur="2s"
+                repeatCount="indefinite"
+                keyTimes="0; 1"
+        />
+        <animate
+                attributeName="stroke-dasharray"
+                values="157.5, 1260;945, 1260;157.5, 1260"
+                begin="0s"
+                dur="2s"
+                keyTimes="0; 0.5; 1"
+                repeatCount="indefinite"
+        />
+        <animateTransform
+                type="rotate"
+                additive="sum"
+                attributeName="transform"
+                values="0;225;225;450;450;675;675;900;900;1125;1125;1350;1350;1575;1575;1800;1800"
+                dur="16s"
+                keyTimes="0; 0.0625; 0.125; 0.1875; 0.25; 0.3125; 0.375; 0.4375; 0.5; 0.5625; 0.625; 0.6875; 0.75; 0.8125; 0.875; 0.9375; 1"
+                repeatCount="indefinite"
+                begin="1s"
+        />
+    </circle>
+</svg>
