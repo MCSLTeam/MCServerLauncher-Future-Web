@@ -19,7 +19,7 @@ updates:
 
   # Common
   - package-ecosystem: 'npm'
-    directory: '/package/common'
+    directory: '/package/shared'
     schedule:
       interval: 'weekly'
 
