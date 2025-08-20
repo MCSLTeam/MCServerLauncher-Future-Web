@@ -87,6 +87,9 @@ importers:
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      eslint:
+        specifier: ^9.33.0
+        version: 9.33.0(jiti@2.5.1)
       floating-vue:
         specifier: ^5.2.2
         version: 5.2.2(@nuxt/kit@3.18.1(magicast@0.3.5))(vue@3.5.18(typescript@5.9.2))
@@ -118,6 +121,9 @@ importers:
       vite:
         specifier: ^6.3.5
         version: 6.3.5(@types/node@24.3.0)(jiti@2.5.1)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
+      vite-plugin-dynamic-import:
+        specifier: ^1.6.0
+        version: 1.6.0
       vue-tsc:
         specifier: ^2.2.12
         version: 2.2.12(typescript@5.9.2)
