@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import { createPinia } from "pinia";
-import { createI18n, I18nOptions } from "vue-i18n";
+import { createI18n, type I18nOptions } from "vue-i18n";
 import { useLocale } from "@repo/ui/src/utils/stores.ts";
 import { load } from "@repo/shared/src";
 import router from "./router.ts";

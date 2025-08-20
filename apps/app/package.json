@@ -17,6 +17,7 @@
     "dependencies": {
         "@repo/configs": "workspace:*",
         "@repo/shared": "workspace:*",
+        "@repo/ui": "workspace:*",
         "@tauri-apps/api": "^2.8.0",
         "@tauri-apps/plugin-opener": "^2.4.0",
         "eslint": "^9.33.0",
@@ -32,6 +33,7 @@
         "@vitejs/plugin-vue": "^5.2.4",
         "typescript": "^5.9.2",
         "vite": "^6.3.5",
+        "vite-plugin-dynamic-import": "^1.6.0",
         "vue-tsc": "^2.2.12"
     }
 }

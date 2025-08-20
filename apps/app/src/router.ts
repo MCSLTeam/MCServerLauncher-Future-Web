@@ -6,7 +6,7 @@ export type LayoutType = "none" | "default";
 export const layout = ref<LayoutType>("default");
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [],
 });
 

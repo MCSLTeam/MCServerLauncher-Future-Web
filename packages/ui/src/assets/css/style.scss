@@ -6,13 +6,11 @@
 @use "utils";
 
 :root {
-  --font-sans:
-    "MiSans VF", Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen,
-    Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  --font-sans: "MiSans VF", Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen,
+  Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   --font-minecraft: "Minecraft", "GNU Unifont", sans-serif;
-  --font-mono:
-    ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono,
-    monospace;
+  --font-mono: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono,
+  monospace;
 }
 
 html {
@@ -314,8 +312,8 @@ $font-size-vars: (
 
 .v-popper--theme-tooltip .v-popper__inner {
   background: utils.transparent(
-    var(--mcsl-bg-color-overlay-opposite),
-    var(--mcsl-tooltip__bg-opacity)
+      var(--mcsl-bg-color-overlay-opposite),
+      var(--mcsl-tooltip__bg-opacity)
   );
   border-radius: var(--mcsl-border-radius-sm);
   padding: var(--mcsl-spacing-2xs) var(--mcsl-spacing-xs);
@@ -327,8 +325,8 @@ $font-size-vars: (
 
 .v-popper--theme-tooltip .v-popper__arrow-outer {
   border-color: utils.transparent(
-    var(--mcsl-bg-color-overlay-opposite),
-    var(--mcsl-tooltip__bg-opacity)
+      var(--mcsl-bg-color-overlay-opposite),
+      var(--mcsl-tooltip__bg-opacity)
   );
 }
 
