@@ -6,7 +6,8 @@ on:
     paths:
       - .github/workflows/build-app.yml
       - 'apps/app/**'
-      - 'packages/commons/**'
+      - 'packages/shared/**'
+      - 'packages/ui/**'
       - 'packages/configs/**'
   pull_request:
     branches:
@@ -14,8 +15,8 @@ on:
     paths:
       - .github/workflows/build-app.yml
       - 'apps/app/**'
-      - 'packages/commons/**'
-      - 'packages/configs/**'
+      - 'packages/ui/**'
+      - 'packages/shared/**'
   workflow_dispatch:
 
 jobs:
