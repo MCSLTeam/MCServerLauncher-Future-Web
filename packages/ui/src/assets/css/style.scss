@@ -6,11 +6,13 @@
 @use "utils";
 
 :root {
-  --font-sans: "MiSans VF", Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen,
-  Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  --font-sans:
+    "MiSans VF", Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen,
+    Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   --font-minecraft: "Minecraft", "GNU Unifont", sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono,
-  monospace;
+  --font-mono:
+    ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono,
+    monospace;
 }
 
 html {
@@ -35,7 +37,6 @@ body,
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  font-size: var(--mcsl-font-size-md);
   background: var(--mcsl-bg-color-main) !important;
 }
 
@@ -81,6 +82,7 @@ html.dark::view-transition-new(root) {
   font-weight: var(--mcsl-font-weight-base);
   line-height: 1.2;
   flex-shrink: 0;
+  font-size: var(--mcsl-font-size-all, var(--mcsl-font-size-md));
 }
 
 strong {
@@ -117,23 +119,23 @@ h1 {
 }
 
 h2 {
-  font-size: var(--mcsl-font-size-2xl);
+  font-size: var(--mcsl-font-size-h2, var(--mcsl-font-size-2xl));
 }
 
 h3 {
-  font-size: var(--mcsl-font-size-xl);
+  font-size: var(--mcsl-font-size-h3, var(--mcsl-font-size-xl));
 }
 
 h4 {
-  font-size: var(--mcsl-font-size-lg);
+  font-size: var(--mcsl-font-size-h4, var(--mcsl-font-size-lg));
 }
 
 h5 {
-  font-size: var(--mcsl-font-size-lg);
+  font-size: var(--mcsl-font-size-h5, var(--mcsl-font-size-lg));
 }
 
 h6 {
-  font-size: var(--mcsl-font-size-md);
+  font-size: var(--mcsl-font-size-h6, var(--mcsl-font-size-md));
 }
 
 h1,
@@ -183,7 +185,7 @@ $font-size-vars: (
     "h4": var(--mcsl-font-size-md),
     "h5": var(--mcsl-font-size-md),
     "h6": var(--mcsl-font-size-sm),
-    "p": var(--mcsl-font-size-sm),
+    "all": var(--mcsl-font-size-sm),
   ),
   "middle": (
     "h1": var(--mcsl-font-size-4xl),
@@ -312,8 +314,8 @@ $font-size-vars: (
 
 .v-popper--theme-tooltip .v-popper__inner {
   background: utils.transparent(
-      var(--mcsl-bg-color-overlay-opposite),
-      var(--mcsl-tooltip__bg-opacity)
+    var(--mcsl-bg-color-overlay-opposite),
+    var(--mcsl-tooltip__bg-opacity)
   );
   border-radius: var(--mcsl-border-radius-sm);
   padding: var(--mcsl-spacing-2xs) var(--mcsl-spacing-xs);
@@ -325,8 +327,8 @@ $font-size-vars: (
 
 .v-popper--theme-tooltip .v-popper__arrow-outer {
   border-color: utils.transparent(
-      var(--mcsl-bg-color-overlay-opposite),
-      var(--mcsl-tooltip__bg-opacity)
+    var(--mcsl-bg-color-overlay-opposite),
+    var(--mcsl-tooltip__bg-opacity)
   );
 }
 

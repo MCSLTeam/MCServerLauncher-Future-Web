@@ -103,7 +103,8 @@ $container-padding: var(--mcsl-spacing-2xs);
 .mcsl-tab__container > button {
   z-index: 7;
   border: none;
-  outline: 2px solid transparent;
+  outline: 0 solid transparent;
+  outline-offset: 1px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -125,7 +126,7 @@ $container-padding: var(--mcsl-spacing-2xs);
   }
 
   &:focus-visible {
-    outline-color: var(--mcsl-tab__hover-bg);
+    outline: 3px solid var(--mcsl-color-help);
   }
 
   &:disabled {

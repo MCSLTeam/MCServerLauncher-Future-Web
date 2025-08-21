@@ -6,6 +6,7 @@ import { useLocale } from "@repo/ui/src/utils/stores.ts";
 import { load } from "@repo/shared/src";
 import router from "./router.ts";
 import FloatingVue from "floating-vue";
+import { vSizeDirective } from "@repo/ui/src";
 
 (async () => {
   const app = createApp(App);
@@ -13,8 +14,14 @@ import FloatingVue from "floating-vue";
   app.use(FloatingVue);
   app.use(pinia);
   app.use(router);
+
   const i18n = createI18n((await useLocale().generateConfig()) as I18nOptions);
   app.use(i18n);
-  load(<any>i18n.global);
+  useLocale().injectI18n(i18n as any);
+
+  app.directive("size", vSizeDirective);
+
+  load();
+
   app.mount("#app");
 })();

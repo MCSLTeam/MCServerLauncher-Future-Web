@@ -28,7 +28,7 @@ const props = withDefaults(
   },
 );
 
-withCtx(() => getSize(props.size))();
+const size = withCtx(() => getSize(props.size))();
 
 const id = Math.random().toString(36).slice(-8);
 
@@ -91,6 +91,7 @@ provide("formItem", {
   <div
     class="form-item"
     :class="[
+      `mcsl-size-${size}`,
       `form-item__label-${labelPos}`,
       ...(width == 'fit' ? ['form-item__width-fit'] : []),
     ]"

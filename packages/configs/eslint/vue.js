@@ -3,10 +3,7 @@ import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
 import globals from "globals";
 
-export default [
-  pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
-  ...pluginVue.configs["flat/essential"],
+export const customVueConfig = [
   {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts,vue}"],
     languageOptions: {
@@ -35,6 +32,13 @@ export default [
     },
   },
   {
-    ignores: ["node_modules/**/*"],
+    ignores: ["node_modules/**/*", "dist/**/*", ".nuxt/**/*", ".output/**/*"],
   },
+];
+
+export default [
+  pluginJs.configs.recommended,
+  ...tseslint.configs.recommended,
+  ...pluginVue.configs["flat/essential"],
+  ...customVueConfig,
 ];

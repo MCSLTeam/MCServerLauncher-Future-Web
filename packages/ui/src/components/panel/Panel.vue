@@ -37,11 +37,11 @@ const hasHeader = computed(
 <template>
   <div
     class="mcsl-panel"
-    :class="[
-      `mcsl-size-${size}`,
-      ...(shadow !== 'never' ? [`mcsl-panel__shadow-${shadow}`] : []),
-      ...(!headerDivider ? ['mcsl-panel__no-divider'] : []),
-    ]"
+    :class="{
+      [`mcsl-size-${size}`]: true,
+      [`mcsl-panel__shadow-${shadow}`]: shadow !== 'never',
+      'mcsl-panel__no-divider': !headerDivider,
+    }"
   >
     <slot name="contextmenu" />
     <div

@@ -26,7 +26,7 @@ pnpm dev # start a dev server
 pnpm build # build for production
 ```
 
-Also, we are actively working on internationalization through Weblate. If you have expertise in this area, please visit <https://translate.mcsl.com.cn/engage/mcsl-future/> to contribute your efforts.  
+Also, we are actively working on internationalization through Weblate. If you have expertise in this area, please visit <https://translate.mcsl.com.cn/engage/mcsl-future/> to contribute your efforts.
 
 To report issues or suggest improvements,
 please [open an issue](https://github.com/MCSLTeam/MCServerLauncher-Future/issues/new/choose)

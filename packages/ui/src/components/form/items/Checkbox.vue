@@ -82,14 +82,15 @@ watch(model, (value) => {
 
 @each $size in utils.$sizes {
   .mcsl-size-#{$size}.mcsl-checkbox {
-    $spacing: utils.get-size-var("spacing", $size, $vars);
+    $size-num: calc(utils.get-size-var("spacing", $size, $vars) * 2);
     border-radius: utils.get-size-var("border-radius", $size, $vars);
-    padding: $spacing;
+    width: calc($size-num + 2px);
+    height: calc($size-num + 2px);
     font-size: utils.get-size-var("font-size", $size, $vars);
 
     &::before {
-      width: calc($spacing * 2);
-      height: calc($spacing * 2);
+      width: $size-num;
+      height: calc($size-num + 1px);
     }
   }
 }
@@ -98,6 +99,8 @@ watch(model, (value) => {
   margin: 0;
   appearance: none;
   border: 1px solid var(--mcsl-border-color-base);
+  outline: 0 solid transparent;
+  outline-offset: 2px;
   transform: translate(0);
   transition: 0.2s ease-in-out;
 
@@ -110,6 +113,10 @@ watch(model, (value) => {
     align-items: center;
     color: var(--mcsl-text-color-opposite);
     visibility: hidden;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--mcsl-color-help);
   }
 }
 

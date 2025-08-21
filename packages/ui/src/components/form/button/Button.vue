@@ -80,14 +80,14 @@ const onClick = computed(() =>
 <template>
   <button
     class="mcsl-button"
-    :class="[
-      `mcsl-button__icon-${iconPos}`,
-      `mcsl-size-${size}`,
-      `mcsl-button__shadow-${shadow}`,
-      `mcsl-button__type-${type}`,
-      ...(rounded ? ['mcsl-button__rounded'] : []),
-      ...(squared ? ['mcsl-button__squared'] : []),
-    ]"
+    :class="{
+      [`mcsl-size-${size}`]: true,
+      [`mcsl-button__icon-${iconPos}`]: true,
+      [`mcsl-button__shadow-${shadow}`]: true,
+      [`mcsl-button__type-${type}`]: true,
+      'mcsl-button__rounded': rounded,
+      'mcsl-button__squared': squared,
+    }"
     :disabled="disabled || loading"
     :style="{
       // Shadow
@@ -129,11 +129,6 @@ const onClick = computed(() =>
       '--mcsl-button__border-disabled': isSurface
         ? 'var(--mcsl-border-color-light)'
         : 'var(--mcsl-border-color-base)',
-      // Outline
-      '--mcsl-button__outline-focus': isSurface
-        ? 'var(--mcsl-color-primary-dark)'
-        : `var(--mcsl-color-${color}-dark)`,
-
       // Primary text
       '--mcsl-button__primary-text-color-light': isSurface
         ? 'var(--mcsl-text-color-opposite)'
@@ -152,10 +147,6 @@ const onClick = computed(() =>
         ? 'var(--mcsl-text-color-primary)'
         : `var(--mcsl-color-${color}-darker)`,
       '--mcsl-button__primary-bg-disabled': 'var(--mcsl-bg-color-darker)',
-      // Primary outline
-      '--mcsl-button__primary-outline-focus': isSurface
-        ? 'var(--mcsl-color-primary)'
-        : `var(--mcsl-text-color-secondary)`,
     }"
     @click="onClick"
   >
@@ -189,7 +180,7 @@ const onClick = computed(() =>
 .mcsl-button {
   border: none;
   outline: 0 solid transparent;
-  outline-offset: var(--mcsl-spacing-4xs);
+  outline-offset: 2px;
   width: fit-content;
   display: flex;
   align-items: center;
@@ -282,8 +273,7 @@ const onClick = computed(() =>
   }
 
   &:focus-visible {
-    outline: 2px solid var(--mcsl-button__outline-focus);
-    outline-offset: 0;
+    outline: 3px solid var(--mcsl-color-help);
   }
 }
 
@@ -346,8 +336,7 @@ const onClick = computed(() =>
   }
 
   &:focus-visible {
-    outline: 2px solid var(--mcsl-button__primary-outline-focus);
-    outline-offset: 0;
+    outline: 3px solid var(--mcsl-color-help);
   }
 }
 </style>

@@ -1,37 +1,37 @@
 {
-    "name": "@repo/ui",
-    "type": "module",
-    "private": true,
-    "scripts": {
-        "lint": "eslint; prettier --check .",
-        "fix": "eslint --fix; prettier --write --list-different .",
-        "test": "tsc --noEmit"
-    },
-    "devDependencies": {
-        "@eslint/js": "^9.33.0",
-        "@repo/configs": "workspace:*",
-        "@repo/locales": "workspace:*",
-        "@types/lodash": "^4.17.20",
-        "@types/markdown-it": "^14.1.2",
-        "eslint-config-prettier": "^10.1.8",
-        "eslint-plugin-prettier": "^5.5.4",
-        "prettier": "^3.6.2",
-        "sass": "^1.90.0",
-        "typescript": "^5.9.2"
-    },
-    "dependencies": {
-        "@vueuse/core": "^13.7.0",
-        "animate.css": "^4.1.1",
-        "dayjs": "^1.11.13",
-        "floating-vue": "^5.2.2",
-        "highlight.js": "^11.11.1",
-        "lodash": "^4.17.21",
-        "markdown-it": "^14.1.0",
-        "pinia": "^3.0.3",
-        "vue": "^3.5.18",
-        "vue-i18n": "^11.1.11",
-        "vue-router": "^4.5.1",
-        "xss": "^1.0.15",
-        "yup": "^1.7.0"
-    }
+  "name": "@repo/ui",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "lint": "eslint; prettier --check .",
+    "fix": "eslint --fix; prettier --write --list-different .",
+    "test": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "@repo/configs": "workspace:*",
+    "@repo/locales": "workspace:*",
+    "@types/lodash": "^4.17.20",
+    "@types/markdown-it": "^14.1.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "prettier": "^3.6.2",
+    "sass": "^1.90.0",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "@vueuse/core": "^13.7.0",
+    "animate.css": "^4.1.1",
+    "dayjs": "^1.11.13",
+    "floating-vue": "^5.2.2",
+    "highlight.js": "^11.11.1",
+    "lodash": "^4.17.21",
+    "markdown-it": "^14.1.0",
+    "pinia": "^3.0.3",
+    "vue": "^3.5.18",
+    "vue-i18n": "^11.1.11",
+    "vue-router": "^4.5.1",
+    "xss": "^1.0.15",
+    "yup": "^1.7.0"
+  }
 }

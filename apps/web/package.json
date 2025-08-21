@@ -1,32 +1,32 @@
 {
-    "name": "web",
-    "type": "module",
-    "private": true,
-    "scripts": {
-        "build": "nuxt build",
-        "dev": "nuxt dev",
-        "generate": "nuxt generate",
-        "preview": "nuxt preview",
-        "postinstall": "nuxt prepare",
-        "lint": "eslint; prettier --check .",
-        "fix": "eslint --fix;prettier --write --list-different .",
-        "test": "nuxi typecheck"
-    },
-    "dependencies": {
-        "@nuxt/eslint": "1.9.0",
-        "@nuxtjs/i18n": "10.0.5",
-        "@pinia/nuxt": "^0.11.2",
-        "@repo/configs": "workspace:*",
-        "@repo/shared": "workspace:*",
-        "@repo/ui": "workspace:*",
-        "eslint": "^9.29.0",
-        "floating-vue": "^5.2.2",
-        "nuxt": "^4.0.3",
-        "nuxt-svgo-loader": "0.6.3",
-        "pinia": "^3.0.3",
-        "vue": "^3.5.18"
-    },
-    "devDependencies": {
-        "vite-plugin-dynamic-import": "^1.6.0"
-    }
+  "name": "web",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint; prettier --check .",
+    "fix": "eslint --fix;prettier --write --list-different .",
+    "test": "nuxi typecheck"
+  },
+  "dependencies": {
+    "@nuxt/eslint": "1.9.0",
+    "@nuxtjs/i18n": "10.0.5",
+    "@pinia/nuxt": "^0.11.2",
+    "@repo/configs": "workspace:*",
+    "@repo/shared": "workspace:*",
+    "@repo/ui": "workspace:*",
+    "eslint": "^9.29.0",
+    "floating-vue": "^5.2.2",
+    "nuxt": "^4.0.3",
+    "nuxt-svgo-loader": "0.6.3",
+    "pinia": "^3.0.3",
+    "vue": "^3.5.18"
+  },
+  "devDependencies": {
+    "vite-plugin-dynamic-import": "^1.6.0"
+  }
 }

@@ -23,11 +23,11 @@ const size: Size = withCtx(() => getSize(props.size))();
 <template>
   <div
     class="mcsl-tag"
-    :class="[
-      `mcsl-size-${size}`,
-      ...(rounded ? ['mcsl-tag__rounded'] : []),
-      ...(color != 'default' ? [`mcsl-tag__colored`] : []),
-    ]"
+    :class="{
+      [`mcsl-size-${size}`]: true,
+      'mcsl-tag__rounded': rounded,
+      'mcsl-tag__colored': color != 'default',
+    }"
     :style="{
       '--mcsl-tag__color': color != 'default' ? getColorVar(color) : '',
     }"

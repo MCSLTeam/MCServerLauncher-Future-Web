@@ -26,7 +26,7 @@ pnpm dev # 测试服务器
 pnpm build # 构建
 ```
 
-与此同时，我们正在通过 Weblate 进行如火如荼的国际化工作。如果您有这方面的特长，欢迎前往 <https://translate.mcsl.com.cn/engage/mcsl-future/> 贡献您的一份力量。  
+与此同时，我们正在通过 Weblate 进行如火如荼的国际化工作。如果您有这方面的特长，欢迎前往 <https://translate.mcsl.com.cn/engage/mcsl-future/> 贡献您的一份力量。
 
 如需报告问题或提出改进建议，请 [提交 Issue](https://github.com/MCSLTeam/MCServerLauncher-Future/issues/new/choose) 或 [提交 Pull Request](https://github.com/MCSLTeam/MCServerLauncher-Future/compare) 。
 
