@@ -6,7 +6,7 @@ const props = defineProps<{
   form: FormInstance<any>;
 }>();
 
-const emits = defineEmits<{
+const emit = defineEmits<{
   (e: "submit"): void;
 }>();
 
@@ -19,7 +19,7 @@ if (inject("form", undefined) != undefined) {
 provide("form", props.form);
 
 async function submit() {
-  if (await props.form.validate()) emits("submit");
+  if (await props.form.validate()) emit("submit");
 }
 
 onMounted(() => {

@@ -1,7 +1,7 @@
 import * as yup from "yup";
 import { computed, type ComputedRef, ref, type WritableComputedRef } from "vue";
 
-export type ValidateTrigger = "change" | "blur" | "submit";
+export type ValidationTrigger = "input" | "change" | "blur" | "submit";
 
 export type FormFieldInstance = {
   value: WritableComputedRef<any>;
@@ -16,7 +16,7 @@ export type FormInstance<T extends Record<string, any>> = {
   value: WritableComputedRef<T>;
   validate: () => Promise<boolean>;
   validateField: (field: string) => Promise<boolean>;
-  validateTrigger: ValidateTrigger;
+  validationTrigger: ValidationTrigger;
   reset: () => void;
   resetField: (field: string) => void;
   __fieldMap__: Map<string, FormFieldInstance>;
@@ -26,7 +26,7 @@ export type FormInstance<T extends Record<string, any>> = {
 export function useForm<T extends Record<string, any>>(
   defaultValues: T,
   schema: yup.ObjectSchema<T>,
-  validateTrigger: ValidateTrigger = "change",
+  validationTrigger: ValidationTrigger = "input",
 ): FormInstance<T> {
   const formRef = ref(defaultValues);
   const fieldMap = new Map<string, FormFieldInstance>();
@@ -59,7 +59,7 @@ export function useForm<T extends Record<string, any>>(
         return false;
       }
     },
-    validateTrigger,
+    validationTrigger,
     reset() {
       formRef.value = defaultValues;
       fieldMap.forEach((instance) => {

@@ -1,149 +1,88 @@
 <script setup lang="ts">
-import { inject, provide, ref, watch, withCtx } from "vue";
-import type { FormFieldInstance, FormInstance } from "../../utils/form.ts";
-import Message from "../panel/Message.vue";
 import type { Size } from "../../utils/types.ts";
-import { getSize } from "../../utils/internal.ts";
+import FormEntry from "./FormEntry.vue";
+import { useForm } from "../../utils/form.ts";
+import * as yup from "yup";
+import { computed, type ComputedRef, provide, watch } from "vue";
 
-export type FormItemData = {
-  id: string;
-  field: FormFieldInstance;
-  parser: (value: any) => any;
-  validate(type: "blur" | "change"): void;
+const props = defineProps<{
+  schema?: yup.Schema;
+  validationTrigger?: "input" | "change" | "blur";
+  width?: number | "fit";
+  labelPos?: "left" | "right" | "top";
+  parser?: (value: any) => any;
+  size?: Size;
+}>();
+
+type EventData = {
+  value: any;
+  reset: () => void;
+  validate: () => Promise<boolean>;
+  error: ComputedRef<string | null>;
 };
 
-const props = withDefaults(
-  defineProps<{
-    name: string;
-    width?: number | "fit";
-    labelPos?: "left" | "right" | "top";
-    parser?: (value: any) => any;
-    size?: Size;
-  }>(),
-  {
-    required: false,
-    width: 100,
-    labelPos: "top",
-    parser: (value: any) => value,
-  },
-);
+defineEmits<{
+  (e: "change", data: EventData, event: Event): void;
+  (e: "input", data: EventData, event: Event): void;
+  (e: "blur", data: EventData, event: Event): void;
+  (e: "focus", data: EventData, event: Event): void;
+  (e: "validated", data: EventData, event: Event): void;
+}>();
 
-const size = withCtx(() => getSize(props.size))();
-
-const id = Math.random().toString(36).slice(-8);
-
-if (inject("formItem", undefined) != undefined) {
-  console.warn(
-    "[MCSL-UI] A <FormItem> component is nested inside another <FormItem> component. This might cause unexpected issues.",
-  );
-}
-
-const form = inject("form", undefined) as FormInstance<any> | undefined;
-
-if (form == undefined) {
-  console.error(
-    "[MCSL-UI] A <FormItem> component is not nested inside a <Form> component.",
-  );
-  throw new Error(
-    "A <FormItem> component is not nested inside a <Form> component",
-  );
-}
-
-const field = form.__getField__(props.name);
-
-if (field == undefined) {
-  console.error(
-    "[MCSL-UI] The name of a <FormItem> component is not found in the form!",
-  );
-  throw new Error(
-    "The name of a <FormItem> component is not found in the form",
-  );
-}
-
-// 错误消息延后0.2秒等Message收缩再消失
-
-const errMsg = ref<string | null>(null);
-let timeout = -1;
-
-watch(field.error, (err) => {
-  if (err != null) {
-    errMsg.value = err;
-    return;
-  }
-  const old = errMsg.value;
-  clearTimeout(timeout);
-  timeout = setTimeout(() => {
-    if (errMsg.value == old) errMsg.value = null;
-  }, 200);
+const model = defineModel<any>({
+  required: true,
 });
 
-provide("formItem", {
-  id,
-  field,
-  parser: props.parser,
-  validate(type: "blur" | "change") {
-    if (form.validateTrigger == type) field.validate();
+const form = useForm(
+  {
+    value: model.value,
   },
+  yup.object({
+    value: props.schema ?? yup.mixed(),
+  }),
+  props.validationTrigger,
+);
+
+const field = form.__getField__("value");
+
+watch(field.value, (value) => {
+  if (value != model.value) model.value = value;
+});
+
+watch(model, (value) => {
+  if (value != field.value.value) field.value.value = value;
+});
+
+const data = computed(() => ({
+  value: field.value.value,
+  reset: form.reset,
+  validate: form.validate,
+  error: field.error,
+}));
+
+provide("form", form);
+
+defineExpose({
+  reset: form.reset,
+  validate: form.validate,
+  error: field.error,
 });
 </script>
 
 <template>
-  <div
-    class="form-item"
-    :class="[
-      `mcsl-size-${size}`,
-      `form-item__label-${labelPos}`,
-      ...(width == 'fit' ? ['form-item__width-fit'] : []),
-    ]"
-    :style="{
-      width: width != 'fit' ? `${width}%` : undefined,
-    }"
+  <FormEntry
+    name="value"
+    :label-pos="labelPos"
+    :parser="parser"
+    :size="size"
+    @input="$emit('input', data, $event)"
+    @change="$emit('change', data, $event)"
+    @focus="$emit('focus', data, $event)"
+    @blur="$emit('blur', data, $event)"
+    @validated="$emit('validated', data, $event)"
   >
-    <div>
-      <label v-if="field.label" :for="id">{{ field.label }}</label>
-      <slot />
-    </div>
-    <Message variant="text" :visible="field.error.value != null" color="danger">
-      {{ errMsg }}
-    </Message>
-  </div>
+    <slot />
+  </FormEntry>
 </template>
 
-<style scoped lang="scss">
-.form-item {
-  & > .mcsl-message {
-    margin-top: var(--mcsl-spacing-2xs);
-  }
-
-  & > div {
-    display: flex;
-    gap: var(--mcsl-spacing-4xs);
-  }
-}
-
-.form-item__width-fit {
-  flex-grow: 1;
-}
-
-.form-item__label-top > div {
-  flex-direction: column;
-}
-
-.form-item__label-top,
-.form-item__label-left {
-  & > div > label {
-    order: 0;
-  }
-}
-
-.form-item__label-right > div > label {
-  order: 2;
-}
-
-.form-item__label-left,
-.form-item__label-right {
-  & > div {
-    align-items: center;
-  }
-}
-</style>
+<style scoped lang="scss"></style>

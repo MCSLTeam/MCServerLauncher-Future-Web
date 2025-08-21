@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { inject, watch, withCtx } from "vue";
-import type { FormItemData } from "../FormItem.vue";
+import type { FormFieldData } from "../FormEntry.vue";
 import { ColorData, type ColorType, getColorVar } from "../../../utils/css.ts";
 import type { Size } from "../../../utils/types.ts";
 import { getSize } from "../../../utils/internal.ts";
@@ -21,24 +21,17 @@ const props = withDefaults(
   },
 );
 
-defineEmits<{
-  (e: "change", event: Event): void;
-  (e: "input", event: Event): void;
-  (e: "focus", event: Event): void;
-  (e: "blur", event: Event): void;
-}>();
-
-const size: Size = withCtx(() => getSize(props.size))();
-
 const model = defineModel<boolean>({
   required: false,
   default: false,
 });
 
-const formItem = inject("formItem", undefined) as FormItemData | undefined;
+const size: Size = withCtx(() => getSize(props.size))();
 
-if (formItem) {
-  if (typeof formItem.field.value.value != "boolean") {
+const formField = inject("formField", undefined) as FormFieldData | undefined;
+
+if (formField) {
+  if (typeof formField.field.value.value != "boolean") {
     console.error(
       "[MCSL-UI] The type of the value for a <Checkbox> component is not boolean.",
     );
@@ -46,14 +39,12 @@ if (formItem) {
       "The type of the value for a <Checkbox> component is not boolean.",
     );
   }
-  model.value = formItem?.field.value.value ?? model.value;
-}
 
-watch(model, (value) => {
-  if (formItem) {
-    formItem.field.value.value = formItem.parser(value);
-  }
-});
+  model.value = formField.field.value.value;
+  watch(model, (value) => {
+    formField.field.value.value = value;
+  });
+}
 </script>
 
 <template>
@@ -65,21 +56,17 @@ watch(model, (value) => {
       '--mcsl-checkbox__color-dark': getColorVar(new ColorData(color, 'dark')),
     }"
     type="checkbox"
-    :id="formItem?.id"
+    :id="formField?.id"
     :disabled="disabled"
     :aria-invalid="
-      invalid || formItem?.field?.error?.value ? 'true' : undefined
+      invalid || formField?.field?.error?.value ? 'true' : undefined
     "
     @change="
-      formItem?.validate('change');
-      $emit('change', $event);
+      formField.onChange($event);
+      formField.onInput($event);
     "
-    @blur="
-      formItem?.validate('blur');
-      $emit('blur', $event);
-    "
-    @input="$emit('input', $event)"
-    @focus="$emit('focus', $event)"
+    @blur="formField.onBlur"
+    @focus="formField.onFocus"
     v-model="model"
   />
 </template>
