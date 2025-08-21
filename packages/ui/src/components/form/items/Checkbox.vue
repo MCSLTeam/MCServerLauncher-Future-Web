@@ -10,12 +10,14 @@ const props = withDefaults(
     icon?: string;
     color?: ColorType;
     invalid?: boolean;
+    disabled?: boolean;
     size?: Size;
   }>(),
   {
     icon: "fas fa-check",
     color: "primary",
     invalid: false,
+    disabled: false,
   },
 );
 
@@ -57,19 +59,17 @@ watch(model, (value) => {
 <template>
   <input
     class="mcsl-checkbox"
-    :class="[
-      `mcsl-size-${size}`,
-      ...icon.split(' '),
-      ...(props.invalid || formItem?.field?.error?.value
-        ? [`mcsl-checkbox__invalid`]
-        : []),
-    ]"
+    :class="[`mcsl-size-${size}`, ...icon.split(' ')]"
     :style="{
       '--mcsl-checkbox__color': getColorVar(color),
       '--mcsl-checkbox__color-dark': getColorVar(new ColorData(color, 'dark')),
     }"
     type="checkbox"
     :id="formItem?.id"
+    :disabled="disabled"
+    :aria-invalid="
+      invalid || formItem?.field?.error?.value ? 'true' : undefined
+    "
     @change="
       formItem?.validate('change');
       $emit('change', $event);
@@ -148,10 +148,23 @@ watch(model, (value) => {
   box-shadow: var(--mcsl-box-shadow-base);
 }
 
-.mcsl-checkbox.mcsl-checkbox__invalid {
+.mcsl-checkbox:disabled {
+  border-color: var(--mcsl-border-color-dark);
+  cursor: not-allowed;
+  background: var(--mcsl-border-color-base);
+  box-shadow: var(--mcsl-box-shadow-lighter);
+
+  &:checked {
+    border-color: var(--mcsl-border-color-dark);
+    background: var(--mcsl-border-color-dark);
+  }
+}
+
+.mcsl-checkbox[aria-invalid="true"] {
   &,
   &:hover,
-  &:checked {
+  &:checked,
+  &:disabled {
     border-color: var(--mcsl-color-danger);
   }
 }

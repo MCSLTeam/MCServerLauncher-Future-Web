@@ -9,11 +9,13 @@ const props = withDefaults(
   defineProps<{
     color?: ColorType;
     invalid?: boolean;
+    disabled?: boolean;
     size?: Size;
   }>(),
   {
     color: "primary",
     invalid: false,
+    disabled: false,
   },
 );
 
@@ -55,16 +57,16 @@ watch(model, (value) => {
 <template>
   <input
     class="mcsl-switch"
-    :class="{
-      [`mcsl-size-${size}`]: true,
-      'mcsl-switch__invalid': props.invalid || formItem?.field?.error?.value,
-    }"
+    :class="[`mcsl-size-${size}`]"
     :style="{
       '--mcsl-switch__color': getColorVar(color),
       '--mcsl-switch__color-dark': getColorVar(new ColorData(color, 'dark')),
     }"
     type="checkbox"
-    :id="formItem?.id"
+    :disabled="disabled"
+    :aria-invalid="
+      invalid || formItem?.field?.error?.value ? 'true' : undefined
+    "
     @change="
       formItem?.validate('change');
       $emit('change', $event);
@@ -89,8 +91,8 @@ $vars: map.merge(
   (
     "height": (
       "small": 1rem,
-      "middle": 1.5rem,
-      "large": 2rem,
+      "middle": 1.25rem,
+      "large": 1.5rem,
     ),
   )
 );
@@ -98,8 +100,8 @@ $vars: map.merge(
 @each $size in utils.$sizes {
   .mcsl-size-#{$size}.mcsl-switch {
     $height: calc(utils.get-size-var("height", $size, $vars));
-    width: calc($height * 1.75);
-    height: $height;
+    width: calc($height * 1.75 + 2px); // 加上border宽度
+    height: calc($height + 2px);
     font-size: utils.get-size-var("font-size", $size, $vars);
 
     &::before {
@@ -116,6 +118,7 @@ $vars: map.merge(
 .mcsl-switch {
   margin: 0;
   appearance: none;
+  border: 1px solid transparent;
   outline: 0 solid transparent;
   outline-offset: 2px;
   border-radius: var(--mcsl-border-radius-full);
@@ -153,10 +156,25 @@ $vars: map.merge(
   background: var(--mcsl-switch__color-dark);
 }
 
-.mcsl-switch.mcsl-switch__invalid {
+.mcsl-switch:disabled {
+  cursor: not-allowed;
+  background: var(--mcsl-border-color-base);
+  box-shadow: var(--mcsl-box-shadow-lighter);
+
+  &:checked {
+    background: var(--mcsl-border-color-dark);
+  }
+
+  &::before {
+    background: var(--mcsl-bg-color-dark);
+  }
+}
+
+.mcsl-switch[aria-invalid="true"] {
   &,
   &:hover,
-  &:checked {
+  &:checked,
+  &:disabled {
     border-color: var(--mcsl-color-danger);
   }
 }
