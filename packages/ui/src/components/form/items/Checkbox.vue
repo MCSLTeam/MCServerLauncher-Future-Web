@@ -21,6 +21,13 @@ const props = withDefaults(
   },
 );
 
+defineEmits<{
+  (e: "change", event: Event): void;
+  (e: "input", event: Event): void;
+  (e: "blur", event: Event): void;
+  (e: "focus", event: Event): void;
+}>();
+
 const model = defineModel<boolean>({
   required: false,
   default: false,
@@ -62,11 +69,19 @@ if (formField) {
       invalid || formField?.field?.error?.value ? 'true' : undefined
     "
     @change="
-      formField.onChange($event);
-      formField.onInput($event);
+      $emit('change', $event);
+      $emit('input', $event); // input会导致在validate执行后才更改value
+      formField?.onChange($event);
+      formField?.onInput($event);
     "
-    @blur="formField.onBlur"
-    @focus="formField.onFocus"
+    @blur="
+      $emit('blur', $event);
+      formField?.onBlur($event);
+    "
+    @focus="
+      $emit('focus', $event);
+      formField?.onFocus($event);
+    "
     v-model="model"
   />
 </template>
