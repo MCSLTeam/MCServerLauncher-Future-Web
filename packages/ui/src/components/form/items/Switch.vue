@@ -8,10 +8,12 @@ import { getSize } from "../../../utils/internal.ts";
 const props = withDefaults(
   defineProps<{
     color?: ColorType;
+    invalid?: boolean;
     size?: Size;
   }>(),
   {
     color: "primary",
+    invalid: false,
   },
 );
 
@@ -52,11 +54,14 @@ watch(model, (value) => {
 
 <template>
   <input
-    class="mcsl-checkbox"
-    :class="[`mcsl-size-${size}`]"
+    class="mcsl-switch"
+    :class="{
+      [`mcsl-size-${size}`]: true,
+      'mcsl-switch__invalid': props.invalid || formItem?.field?.error?.value,
+    }"
     :style="{
-      '--mcsl-checkbox__color': getColorVar(color),
-      '--mcsl-checkbox__color-dark': getColorVar(new ColorData(color, 'dark')),
+      '--mcsl-switch__color': getColorVar(color),
+      '--mcsl-switch__color-dark': getColorVar(new ColorData(color, 'dark')),
     }"
     type="checkbox"
     :id="formItem?.id"
@@ -91,7 +96,7 @@ $vars: map.merge(
 );
 
 @each $size in utils.$sizes {
-  .mcsl-size-#{$size}.mcsl-checkbox {
+  .mcsl-size-#{$size}.mcsl-switch {
     $height: calc(utils.get-size-var("height", $size, $vars));
     width: calc($height * 1.75);
     height: $height;
@@ -108,7 +113,7 @@ $vars: map.merge(
   }
 }
 
-.mcsl-checkbox {
+.mcsl-switch {
   margin: 0;
   appearance: none;
   outline: 0 solid transparent;
@@ -134,17 +139,25 @@ $vars: map.merge(
   }
 }
 
-.mcsl-checkbox:hover {
+.mcsl-switch:hover {
   &::before {
     box-shadow: var(--mcsl-box-shadow-base);
   }
 }
 
-.mcsl-checkbox:checked {
-  background: var(--mcsl-checkbox__color);
+.mcsl-switch:checked {
+  background: var(--mcsl-switch__color);
 }
 
-.mcsl-checkbox:hover:checked {
-  background: var(--mcsl-checkbox__color-dark);
+.mcsl-switch:hover:checked {
+  background: var(--mcsl-switch__color-dark);
+}
+
+.mcsl-switch.mcsl-switch__invalid {
+  &,
+  &:hover,
+  &:checked {
+    border-color: var(--mcsl-color-danger);
+  }
 }
 </style>

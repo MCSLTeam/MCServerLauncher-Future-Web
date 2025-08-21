@@ -9,11 +9,13 @@ const props = withDefaults(
   defineProps<{
     icon?: string;
     color?: ColorType;
+    invalid?: boolean;
     size?: Size;
   }>(),
   {
     icon: "fas fa-check",
     color: "primary",
+    invalid: false,
   },
 );
 
@@ -55,7 +57,13 @@ watch(model, (value) => {
 <template>
   <input
     class="mcsl-checkbox"
-    :class="[`mcsl-size-${size}`, ...icon.split(' ')]"
+    :class="[
+      `mcsl-size-${size}`,
+      ...icon.split(' '),
+      ...(props.invalid || formItem?.field?.error?.value
+        ? [`mcsl-checkbox__invalid`]
+        : []),
+    ]"
     :style="{
       '--mcsl-checkbox__color': getColorVar(color),
       '--mcsl-checkbox__color-dark': getColorVar(new ColorData(color, 'dark')),
@@ -138,5 +146,13 @@ watch(model, (value) => {
   border-color: var(--mcsl-checkbox__color-dark);
   background: var(--mcsl-checkbox__color-dark);
   box-shadow: var(--mcsl-box-shadow-base);
+}
+
+.mcsl-checkbox.mcsl-checkbox__invalid {
+  &,
+  &:hover,
+  &:checked {
+    border-color: var(--mcsl-color-danger);
+  }
 }
 </style>
