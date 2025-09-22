@@ -19,7 +19,7 @@
     "@repo/configs": "workspace:*",
     "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",
-    "eslint": "^9.29.0",
+    "eslint": "^9.36.0",
     "floating-vue": "^5.2.2",
     "nuxt": "^4.0.3",
     "nuxt-svgo-loader": "0.6.3",
