@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { inject, watch, withCtx } from "vue";
+<script lang="ts" setup>
+import { inject, watch } from "vue";
 import type { FormFieldData } from "../FormEntry.vue";
 import { ColorData, type ColorType, getColorVar } from "../../../utils/css.ts";
 import type { Size } from "../../../utils/types.ts";
@@ -20,7 +20,6 @@ const props = withDefaults(
 );
 
 defineEmits<{
-  (e: "change", event: Event): void;
   (e: "input", event: Event): void;
   (e: "blur", event: Event): void;
   (e: "focus", event: Event): void;
@@ -31,7 +30,7 @@ const model = defineModel<boolean>({
   default: false,
 });
 
-const size: Size = withCtx(() => getSize(props.size))();
+const size = getSize(props.size);
 
 const formField = inject("formField", undefined) as FormFieldData | undefined;
 
@@ -54,36 +53,42 @@ if (formField) {
 
 <template>
   <input
-    class="mcsl-switch"
+    v-model="model"
+    :aria-invalid="
+      invalid || formField?.field?.error?.value ? 'true' : undefined
+    "
+    :id="formField?.id"
     :class="[`mcsl-size-${size}`]"
+    :disabled="disabled"
     :style="{
       '--mcsl-switch__color': getColorVar(color),
       '--mcsl-switch__color-dark': getColorVar(new ColorData(color, 'dark')),
     }"
+    class="mcsl-switch"
     type="checkbox"
-    :disabled="disabled"
-    :aria-invalid="
-      invalid || formField?.field?.error?.value ? 'true' : undefined
-    "
-    @change="
-      $emit('change', $event);
-      $emit('input', $event); // input会导致在validate执行后才更改value
-      formField?.onChange($event);
-      formField?.onInput($event);
-    "
     @blur="
       $emit('blur', $event);
       formField?.onBlur($event);
+    "
+    @input="
+      (e) => {
+        $emit('input', e);
+        if (formField) {
+          formField.field.value.value = model = (
+            e.currentTarget as HTMLInputElement
+          ).checked;
+          formField.onInput(e);
+        }
+      }
     "
     @focus="
       $emit('focus', $event);
       formField?.onFocus($event);
     "
-    v-model="model"
   />
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @use "sass:map";
 @use "../../../assets/css/utils";
 @use "../../SmallerPanelContent";

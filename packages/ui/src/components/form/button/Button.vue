@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { computed, withCtx } from "vue";
+<script lang="ts" setup>
+import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { ColorData, type ColorType } from "../../../utils/css.ts";
 import type { Size } from "../../../utils/types.ts";
@@ -45,17 +45,15 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits<{
-  (e: "click", event: MouseEvent): void;
-}>();
+const emit = defineEmits<(e: "click", event: MouseEvent) => void>();
 
-const size: Size = withCtx(() => getSize(props.size))();
+const size = getSize(props.size);
 
 const icon = computed(() => (props.loading ? props.loadingIcon : props.icon));
 const iconPos = computed(() =>
-  props.loading && !(props.loadingIconPos == "same")
-    ? props.loadingIconPos
-    : props.iconPos,
+  props.loading && props.loadingIconPos == "same"
+    ? props.iconPos
+    : props.loadingIconPos,
 );
 const isSurface = computed(() => props.color == "surface");
 
@@ -79,7 +77,6 @@ const onClick = computed(() =>
 
 <template>
   <button
-    class="mcsl-button"
     :class="{
       [`mcsl-size-${size}`]: true,
       [`mcsl-button__icon-${iconPos}`]: true,
@@ -87,6 +84,7 @@ const onClick = computed(() =>
       [`mcsl-button__type-${type}`]: true,
       'mcsl-button__rounded': rounded,
       'mcsl-button__squared': squared,
+      'mcsl-button__block': block,
     }"
     :disabled="disabled || loading"
     :style="{
@@ -148,15 +146,17 @@ const onClick = computed(() =>
         : `var(--mcsl-color-${color}-darker)`,
       '--mcsl-button__primary-bg-disabled': 'var(--mcsl-bg-color-darker)',
     }"
+    class="mcsl-button"
+    :type="btnType"
     @click="onClick"
   >
     <slot name="contextmenu" />
-    <i v-if="icon != ''" class="mcsl-button__icon" :class="icon.split(' ')" />
-    <span class="mcsl-button__label" v-if="$slots.default"><slot /></span>
+    <i v-if="icon != ''" :class="icon.split(' ')" class="mcsl-button__icon" />
+    <span v-if="$slots.default" class="mcsl-button__label"><slot /></span>
   </button>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @use "../../../assets/css/utils";
 @use "../../PanelContent" as *;
 

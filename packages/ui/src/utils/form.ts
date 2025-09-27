@@ -1,7 +1,7 @@
 import * as yup from "yup";
 import { computed, type ComputedRef, ref, type WritableComputedRef } from "vue";
 
-export type ValidationTrigger = "input" | "change" | "blur" | "submit";
+export type ValidationTrigger = "input" | "blur" | "submit";
 
 export type FormFieldInstance = {
   value: WritableComputedRef<any>;
@@ -23,7 +23,7 @@ export type FormInstance<T extends Record<string, any>> = {
   __getField__: (name: string) => FormFieldInstance;
 };
 
-export function useForm<T extends Record<string, any>>(
+export function createForm<T extends Record<string, any>>(
   defaultValues: T,
   schema: yup.ObjectSchema<T>,
   validationTrigger: ValidationTrigger = "input",

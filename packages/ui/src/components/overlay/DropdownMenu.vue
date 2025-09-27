@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import Menu, { type MenuInfo } from "../panel/Menu.vue";
 import type { Size } from "../../utils/types.ts";
 import DropdownContent from "./DropdownContent.vue";
@@ -39,23 +39,23 @@ withDefaults(
   >
     <template #triggerer="{ open, close, toggle, opened, relocate }">
       <slot
-        :open="open"
         :close="close"
-        :toggle="toggle"
+        :open="open"
         :opened="opened"
         :relocate="relocate"
+        :toggle="toggle"
       />
     </template>
     <Menu
-      v-bind="$attrs"
-      :menu="menu"
-      :header="header"
-      :headerDivider="headerDivider"
-      :size="size"
-      :headerClass="headerClass"
-      :headerStyle="headerStyle"
       :bodyClass="bodyClass"
       :bodyStyle="bodyStyle"
+      :header="header"
+      :headerClass="headerClass"
+      :headerDivider="headerDivider"
+      :headerStyle="headerStyle"
+      :menu="menu"
+      :size="size"
+      v-bind="$attrs"
     >
       <template #header>
         <slot name="header" />

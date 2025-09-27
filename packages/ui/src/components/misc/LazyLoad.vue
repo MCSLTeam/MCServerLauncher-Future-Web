@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import { throttle as throttleFunc } from "../../utils/util.ts";
 
@@ -27,9 +27,7 @@ export type ScrollInfo = {
   type: "in" | "out";
 };
 
-const emit = defineEmits<{
-  (e: "update", info: ScrollInfo): void;
-}>();
+const emit = defineEmits<(e: "update", info: ScrollInfo) => void>();
 
 const wrapper = ref();
 const visible = ref(false);
@@ -97,4 +95,4 @@ onUnmounted(() => {
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style lang="scss" scoped></style>

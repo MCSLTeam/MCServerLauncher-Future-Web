@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { type Color, getColorVar } from "../../utils/css.ts";
 
 withDefaults(
@@ -17,12 +17,12 @@ withDefaults(
 
 <template>
   <div
-    class="mcsl-bg__container"
     :style="{
       '--mcsl-bg__base-color': getColorVar(baseColor),
       '--mcsl-bg__primary-color': getColorVar(primaryColor),
       '--mcsl-bg__secondary-color': getColorVar(secondaryColor),
     }"
+    class="mcsl-bg__container"
   >
     <div
       v-for="i in 4"
@@ -35,7 +35,7 @@ withDefaults(
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @use "../../assets/css/utils";
 
 .mcsl-bg__container {

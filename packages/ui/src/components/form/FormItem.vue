@@ -1,16 +1,15 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import type { Size } from "../../utils/types.ts";
 import FormEntry from "./FormEntry.vue";
-import { useForm } from "../../utils/form.ts";
+import { createForm } from "../../utils/form.ts";
 import * as yup from "yup";
 import { computed, type ComputedRef, provide, watch } from "vue";
 
 const props = defineProps<{
   schema?: yup.Schema;
-  validationTrigger?: "input" | "change" | "blur";
+  validationTrigger?: "input" | "blur";
   width?: number | "fit";
   labelPos?: "left" | "right" | "top";
-  parser?: (value: any) => any;
   size?: Size;
 }>();
 
@@ -22,7 +21,6 @@ type EventData = {
 };
 
 defineEmits<{
-  (e: "change", data: EventData, event: Event): void;
   (e: "input", data: EventData, event: Event): void;
   (e: "blur", data: EventData, event: Event): void;
   (e: "focus", data: EventData, event: Event): void;
@@ -33,7 +31,7 @@ const model = defineModel<any>({
   required: true,
 });
 
-const form = useForm(
+const form = createForm(
   {
     value: model.value,
   },
@@ -71,18 +69,16 @@ defineExpose({
 
 <template>
   <FormEntry
-    name="value"
     :label-pos="labelPos"
-    :parser="parser"
     :size="size"
-    @input="$emit('input', data, $event)"
-    @change="$emit('change', data, $event)"
-    @focus="$emit('focus', data, $event)"
+    name="value"
     @blur="$emit('blur', data, $event)"
+    @input="$emit('input', data, $event)"
+    @focus="$emit('focus', data, $event)"
     @validated="$emit('validated', data, $event)"
   >
     <slot />
   </FormEntry>
 </template>
 
-<style scoped lang="scss"></style>
+<style lang="scss" scoped></style>

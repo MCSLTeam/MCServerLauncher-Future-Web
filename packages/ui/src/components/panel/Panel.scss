@@ -5,13 +5,13 @@ $vars: (
     "large": var(--mcsl-box-shadow-dark),
   ),
   "spacing": (
-    "small": var(--mcsl-spacing-sm),
-    "middle": var(--mcsl-spacing-md),
-    "large": var(--mcsl-spacing-lg),
+    "small": var(--mcsl-spacing-md),
+    "middle": var(--mcsl-spacing-lg),
+    "large": var(--mcsl-spacing-xl),
   ),
   "border-radius": (
-    "small": var(--mcsl-border-radius-md),
-    "middle": var(--mcsl-border-radius-lg),
+    "small": var(--mcsl-border-radius-lg),
+    "middle": var(--mcsl-border-radius-xl),
     "large": var(--mcsl-border-radius-2xl),
   ),
 );

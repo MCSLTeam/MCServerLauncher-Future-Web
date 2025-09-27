@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import CollapsablePanel from "../CollapsablePanel.vue";
 import type { Size } from "../../../utils/types.ts";
 
@@ -26,24 +26,24 @@ defineEmits<{
 
 <template>
   <CollapsablePanel
-    class="mcsl-accordion-panel"
+    :body-class="bodyClass"
+    :body-style="bodyStyle"
     :collapsed="!($parent as any).isActive(name)"
-    @expand="
-      ($parent as any).activate(name);
-      $emit('expand');
-    "
+    :disabled="disabled"
+    :header="header"
+    :header-class="headerClass"
+    :header-style="headerStyle"
+    :headerDivider="false"
+    class="mcsl-accordion-panel"
+    shadow="never"
     @collapse="
       ($parent as any).deactivate(name);
       $emit('collapse');
     "
-    shadow="never"
-    :header="header"
-    :headerDivider="false"
-    :disabled="disabled"
-    :body-class="bodyClass"
-    :body-style="bodyStyle"
-    :header-class="headerClass"
-    :header-style="headerStyle"
+    @expand="
+      ($parent as any).activate(name);
+      $emit('expand');
+    "
   >
     <template #header>
       <slot name="header" />
@@ -55,7 +55,7 @@ defineEmits<{
   </CollapsablePanel>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .mcsl-accordion-panel.mcsl-collapsable-panel.mcsl-panel {
   border-radius: 0;
   border-top: none;

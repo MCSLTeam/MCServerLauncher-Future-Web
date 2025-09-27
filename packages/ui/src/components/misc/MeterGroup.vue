@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { computed, withCtx } from "vue";
+<script lang="ts" setup>
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { type Color, ColorData, getColorVar } from "../../utils/css.ts";
 import type { Size } from "../../utils/types.ts";
@@ -24,7 +24,7 @@ const props = defineProps<{
   size?: Size;
 }>();
 
-const size: Size = withCtx(() => getSize(props.size))();
+const size = getSize(props.size);
 
 const i18n = useI18n();
 
@@ -59,27 +59,27 @@ const actualValues = computed(() => {
 </script>
 
 <template>
-  <div class="mcsl-meter-group" :class="[`mcsl-size-${size}`]">
+  <div :class="[`mcsl-size-${size}`]" class="mcsl-meter-group">
     <div class="mcsl-meter-group__bar">
       <div
         v-for="(item, index) in actualValues"
         :key="index"
-        class="mcsl-meter-group__item"
+        v-tooltip="getLabel(item)"
         :style="{
           '--mcsl-meter-group__width': (item.length / meter.length) * 100 + '%',
           '--mcsl-meter-group__color': getColorVar(item.type!),
         }"
-        v-tooltip="getLabel(item)"
+        class="mcsl-meter-group__item"
       />
     </div>
     <div class="mcsl-meter-group__label">
       <span
         v-for="(item, index) in actualValues"
         :key="index"
-        class="mcsl-meter-group__label-item"
         :style="{
           '--mcsl-meter-group__color': getColorVar(item.type!),
         }"
+        class="mcsl-meter-group__label-item"
       >
         {{ getLabel(item) }}
       </span>
@@ -87,7 +87,7 @@ const actualValues = computed(() => {
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @use "../../assets/css/utils";
 
 $vars: (

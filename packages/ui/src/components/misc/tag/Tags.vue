@@ -1,22 +1,21 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import type { Size } from "../../../utils/types.ts";
 import { getSize } from "../../../utils/internal.ts";
-import { withCtx } from "vue";
 
 const props = defineProps<{
   size?: Size;
 }>();
 
-const size: Size = withCtx(() => getSize(props.size))();
+const size = getSize(props.size);
 </script>
 
 <template>
-  <div class="mcsl-tags" :class="[`mcsl-size-${size}`]">
+  <div :class="[`mcsl-size-${size}`]" class="mcsl-tags">
     <slot />
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @use "../../../assets/css/utils";
 @use "../../SmallerPanelContent" as *;
 

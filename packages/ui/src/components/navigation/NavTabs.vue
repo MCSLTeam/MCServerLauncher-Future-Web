@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { onMounted, ref, watchEffect } from "vue";
 import { type RouteLocationRaw, useRouter } from "vue-router";
 import { type Color, getColorVar } from "../../utils/css.ts";
@@ -53,17 +53,17 @@ defineExpose({
 
 <template>
   <div
-    class="mcsl-tab__container"
     :style="{
       '--mcsl-tab__hover-bg': getColorVar(variant),
     }"
+    class="mcsl-tab__container"
   >
     <slot name="contextmenu" />
     <button
       v-for="(info, index) in tabs"
       :key="index"
-      :class="{ 'mcsl-tab__btn-active': activeTab === index }"
       ref="tabRefs"
+      :class="{ 'mcsl-tab__btn-active': activeTab === index }"
       :disabled="info.disabled == true"
       @click="
         () => {
@@ -75,16 +75,16 @@ defineExpose({
       {{ info.label }}
     </button>
     <div
-      class="mcsl-tab__hover-bg"
       :style="{
         transform: `translateX(${offsetLeft}px)`,
         width: `${offsetWidth}px`,
       }"
+      class="mcsl-tab__hover-bg"
     />
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 $container-padding: var(--mcsl-spacing-2xs);
 
 .mcsl-tab__container {

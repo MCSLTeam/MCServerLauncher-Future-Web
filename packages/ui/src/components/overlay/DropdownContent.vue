@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {
   computed,
   type ComputedRef,
@@ -131,26 +131,26 @@ defineExpose({
   <div ref="wrapperEl" class="mcsl-dropdown-content">
     <div ref="triggererEl">
       <slot
-        name="triggerer"
-        :open="open"
         :close="close"
-        :toggle="toggle"
+        :open="open"
         :opened="opened"
         :relocate="relocate"
+        :toggle="toggle"
+        name="triggerer"
       />
     </div>
     <FloatingContent
-      position="absolute"
-      :locator="locator"
-      :in-anim="`0.2s ease-in-out both ${inAnim}`"
-      :out-anim="`0.2s ease-in-out both reverse ${inAnim}`"
       ref="floatingContentEl"
-      class="mcsl-dropdown-content__dropdown"
+      :in-anim="`0.2s ease-in-out both ${inAnim}`"
+      :locator="locator"
+      :out-anim="`0.2s ease-in-out both reverse ${inAnim}`"
       :style="{
         '--mcsl-menu__width': followWidth
           ? `${triggererEl.value.getBoundingClientRect().width}px`
           : undefined,
       }"
+      class="mcsl-dropdown-content__dropdown"
+      position="absolute"
     >
       <slot name="default" />
     </FloatingContent>

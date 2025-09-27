@@ -1,6 +1,6 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed } from "vue";
-import { type Color, getColorVar } from "../../utils/css.ts";
+import { type Color } from "../../utils/css.ts";
 
 const props = withDefaults(
   defineProps<{
@@ -37,19 +37,19 @@ const actuallyVisible = computed(
 
 <template>
   <div
-    class="mcsl-badge"
     :class="{
       'mcsl-badge__visible': actuallyVisible,
       'mcsl-badge__dot': !value,
     }"
+    class="mcsl-badge"
   >
     <slot />
     <div
-      class="mcsl-badge__badge"
       :style="{
         backgroundColor: getColorVar(color),
         transform: `translate(${actualOffsetX}, ${actualOffsetY})`,
       }"
+      class="mcsl-badge__badge"
     >
       <template v-if="actuallyVisible">
         {{ value }}
@@ -58,7 +58,7 @@ const actuallyVisible = computed(
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .mcsl-badge {
   width: fit-content;
   position: relative;

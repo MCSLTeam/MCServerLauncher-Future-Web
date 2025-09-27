@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { McLoadingIcon, RippleIcon, SpinnerIcon } from "../../../utils/icons";
 import { type Color, getColorVar } from "../../../utils/css.ts";
 
@@ -20,11 +20,11 @@ withDefaults(
 
 <template>
   <div
-    class="mcsl-spinner"
     :class="[`mcsl-spinner__label-${labelPos}`]"
     :style="{
       '--mcsl-spinner__color': getColorVar(color),
     }"
+    class="mcsl-spinner"
   >
     <McLoadingIcon v-if="type == 'mc'" />
     <RippleIcon v-else-if="type == 'ripples'" />
@@ -33,7 +33,7 @@ withDefaults(
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .mcsl-spinner {
   overflow: hidden;
   display: flex;

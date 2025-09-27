@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {
   type ComputedRef,
   onMounted,
@@ -113,18 +113,18 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="mcsl-contextmenu" ref="wrapperEl">
-    <FloatingContent transition :locator="locator" ref="floatingContentEl">
+  <div ref="wrapperEl" class="mcsl-contextmenu">
+    <FloatingContent ref="floatingContentEl" :locator="locator" transition>
       <Menu
-        shadow
-        :menu="menu"
-        :header="header"
-        :headerDivider="headerDivider"
-        :size="size"
-        :headerClass="headerClass"
-        :headerStyle="headerStyle"
         :bodyClass="bodyClass"
         :bodyStyle="bodyStyle"
+        :header="header"
+        :headerClass="headerClass"
+        :headerDivider="headerDivider"
+        :headerStyle="headerStyle"
+        :menu="menu"
+        :size="size"
+        shadow
         v-bind="$attrs"
       >
         <template #header>

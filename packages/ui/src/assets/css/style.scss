@@ -80,9 +80,12 @@ html.dark::view-transition-new(root) {
   color: var(--mcsl-text-color-regular);
   font-family: var(--font-sans);
   font-weight: var(--mcsl-font-weight-base);
+  font-size: var(--mcsl-font-size-all, var(--mcsl-font-size-md));
   line-height: 1.2;
   flex-shrink: 0;
-  font-size: var(--mcsl-font-size-all, var(--mcsl-font-size-md));
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--mcsl-scrollbar-color) var(--mcsl-bg-color-main);
 }
 
 strong {
@@ -157,6 +160,11 @@ h4,
 h5,
 h6 {
   color: var(--mcsl-text-color-primary);
+
+  & * {
+    font-size: unset;
+    font-weight: unset;
+  }
 }
 
 .mcsl-typography {
@@ -168,12 +176,6 @@ h6 {
   h6 {
     margin: var(--mcsl-spacing-xs) 0;
   }
-}
-
-/* 滚动条 */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--mcsl-scrollbar-color) var(--mcsl-bg-color-main);
 }
 
 /* 大小 */

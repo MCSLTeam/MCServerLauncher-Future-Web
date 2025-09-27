@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {
   computed,
   type ComputedRef,
@@ -122,7 +122,6 @@ defineExpose({
   <div
     v-if="exist"
     ref="wrapperEl"
-    class="mcsl-floating-content"
     :class="{
       'mcsl-floating-content__visible': visible,
       'mcsl-floating-content__transition': status == 'show' && transition,
@@ -134,12 +133,13 @@ defineExpose({
       animation:
         status == 'in' ? inAnim : status == 'out' ? outAnim : undefined,
     }"
+    class="mcsl-floating-content"
   >
     <slot v-bind="$attrs" />
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .mcsl-floating-content {
   top: -9999px;
   left: -9999px;

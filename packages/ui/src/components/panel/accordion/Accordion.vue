@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { onMounted, watchEffect } from "vue";
 
 const props = withDefaults(
@@ -53,4 +53,4 @@ defineExpose({ activate, deactivate, isActive, toggle, active });
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style lang="scss" scoped></style>

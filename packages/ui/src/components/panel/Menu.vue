@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import Panel from "./Panel.vue";
 import Button from "../form/button/Button.vue";
 import type { ColorType } from "../../utils/css.ts";
@@ -37,25 +37,21 @@ withDefaults(
 );
 
 function getButtonVarient(varient: "default" | "primary" = "default") {
-  switch (varient) {
-    case "default":
-      return "text";
-    default:
-      return varient;
-  }
+  if (varient === "default") return "text";
+  else return varient;
 }
 </script>
 
 <template>
   <Panel
-    :shadow="shadow ? 'always' : 'never'"
-    :size="size"
     :body-class="bodyClass"
     :body-style="bodyStyle"
     :header="header"
-    :header-divider="headerDivider"
     :header-class="headerClass"
+    :header-divider="headerDivider"
     :header-style="headerStyle"
+    :shadow="shadow ? 'always' : 'never'"
+    :size="size"
     class="mcsl-menu"
   >
     <template #header>
@@ -77,12 +73,12 @@ function getButtonVarient(varient: "default" | "primary" = "default") {
         <Button
           v-for="button in item.items"
           :key="button.label"
+          :btn-type="button.buttonType"
+          :color="button.type"
+          :disabled="button.disabled"
           :icon="button.icon"
           :icon-pos="button.iconPos"
-          :color="button.type"
-          :btn-type="button.buttonType"
           :type="getButtonVarient(button.variant)"
-          :disabled="button.disabled"
           @click="button.onClick"
         >
           {{ button.label }}
@@ -92,7 +88,7 @@ function getButtonVarient(varient: "default" | "primary" = "default") {
   </Panel>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @use "../../assets/css/utils";
 @use "Panel" as *;
 @use "../PanelContent";

@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { computed, withCtx } from "vue";
+<script lang="ts" setup>
+import { computed } from "vue";
 import { getSize } from "../../utils/internal.ts";
 import type { Size } from "../../utils/types.ts";
 import Button from "../form/button/Button.vue";
@@ -9,11 +9,9 @@ const props = defineProps<{
   size?: Size;
 }>();
 
-const emit = defineEmits<{
-  (e: "change", newPage: number): void;
-}>();
+const emit = defineEmits<(e: "change", newPage: number) => void>();
 
-const size: Size = withCtx(() => getSize(props.size))();
+const size = getSize(props.size);
 
 const page = defineModel<number>("page", {
   default: 1,
@@ -63,22 +61,22 @@ function go(p: number) {
 </script>
 
 <template>
-  <nav class="mcsl-pagination" :class="[`mcsl-size-${size}`]">
+  <nav :class="[`mcsl-size-${size}`]" class="mcsl-pagination">
     <Button
       v-if="page > 1"
-      type="text"
-      rounded
       icon="fa fa-angle-left"
+      rounded
+      type="text"
       @click="go(page - 1)"
     />
     <template v-for="(p, index) in visiblePages" :key="index">
       <i v-if="p == '-'" class="fa fa-ellipsis" />
       <Button
         v-else
+        :color="p == page ? 'primary' : 'surface'"
+        :squared="p < 1000"
         :type="p == page ? 'primary' : 'text'"
         rounded
-        :squared="p < 1000"
-        :color="p == page ? 'primary' : 'surface'"
         @click="go(p)"
       >
         {{ p }}
@@ -86,15 +84,15 @@ function go(p: number) {
     </template>
     <Button
       v-if="page < length"
-      type="text"
-      rounded
       icon="fa fa-angle-right"
+      rounded
+      type="text"
       @click="go(page + 1)"
     />
   </nav>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @use "../PanelContent" as *;
 @use "../../assets/css/utils";
 

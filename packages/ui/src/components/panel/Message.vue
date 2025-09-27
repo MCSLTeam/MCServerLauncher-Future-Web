@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { computed, withCtx } from "vue";
+<script lang="ts" setup>
+import { computed } from "vue";
 import type { Size } from "../../utils/types.ts";
 import { animatedVisibilityExists, getSize } from "../../utils/internal.ts";
 import {
@@ -9,7 +9,7 @@ import {
   getStatusIcon,
 } from "../../utils/css.ts";
 import Button from "../form/button/Button.vue";
-import ChangeSize from "../misc/ChangeSize.vue";
+import { ChangeSize } from "../Components.ts";
 
 const props = withDefaults(
   defineProps<{
@@ -33,7 +33,7 @@ const props = withDefaults(
   },
 );
 
-const size: Size = withCtx(() => getSize(props.size))();
+const size = getSize(props.size);
 
 const actualIcon = computed(() => props.icon ?? getStatusIcon(props.color));
 
@@ -61,7 +61,6 @@ defineExpose({
 
 <template>
   <div
-    class="mcsl-message"
     v-if="exist"
     :class="[
       `mcsl-size-${size}`,
@@ -89,33 +88,34 @@ defineExpose({
       '--mcsl-message__anim-in': inAnim,
       '--mcsl-message__anim-out': outAnim,
     }"
+    class="mcsl-message"
   >
     <slot name="contextmenu" />
     <div class="mcsl-message__content">
       <i v-if="actualIcon" :class="actualIcon" />
       <div>
         <h3 v-if="title" class="mcsl-message__title">{{ title }}</h3>
-        <slot :open="open" :close="close" />
+        <slot :close="close" :open="open" />
         <div v-if="$slots.buttons" class="mcsl-message__buttons">
           <ChangeSize size="smaller">
-            <slot name="buttons" :open="open" :close="close" />
+            <slot :close="close" :open="open" name="buttons" />
           </ChangeSize>
         </div>
       </div>
       <Button
         v-if="closeable"
+        :color="color"
         class="mcsl-message__close-btn"
-        type="text"
         icon="fa fa-xmark"
         rounded
-        :color="color"
+        type="text"
         @click="close"
       />
     </div>
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @use "../../assets/css/utils";
 @use "../PanelContent" as *;
 

@@ -1,6 +1,4 @@
-<script setup lang="ts">
-import { withCtx } from "vue";
-import { getSize } from "../../utils/internal.ts";
+<script lang="ts" setup>
 import type { Size } from "../../utils/types.ts";
 import Pagination from "./Pagination.vue";
 
@@ -10,11 +8,7 @@ const props = defineProps<{
   size?: Size;
 }>();
 
-const emit = defineEmits<{
-  (e: "change", newPage: number): void;
-}>();
-
-const size: Size = withCtx(() => getSize(props.size))();
+const emit = defineEmits<(e: "change", newPage: number) => void>();
 
 const page = defineModel<number>("page", {
   default: 1,
@@ -33,4 +27,4 @@ const page = defineModel<number>("page", {
   />
 </template>
 
-<style scoped lang="scss"></style>
+<style lang="scss" scoped></style>

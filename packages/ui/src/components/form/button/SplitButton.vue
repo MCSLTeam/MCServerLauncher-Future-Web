@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import type { ColorType } from "../../../utils/css.ts";
 import type { Size } from "../../../utils/types.ts";
 import Button from "./Button.vue";
@@ -55,48 +55,46 @@ withDefaults(
   },
 );
 
-defineEmits<{
-  (e: "click", event: MouseEvent): void;
-}>();
+defineEmits<(e: "click", event: MouseEvent) => void>();
 </script>
 
 <template>
   <div class="mcsl-split-button">
     <Button
-      class="mcsl-split-button__btn1"
+      :block="block"
+      :btn-type="btnType"
+      :color="color"
       :disabled="disabled"
       :icon="icon"
       :icon-pos="iconPos"
+      :link="link"
+      :link-target="linkTarget"
       :loading="loading"
       :loading-icon="loadingIcon"
       :loading-icon-pos="loadingIconPos"
-      :link="link"
-      :link-target="linkTarget"
-      :router-link="routerLink"
-      :color="color"
-      :type="type"
-      :size="size"
       :rounded="rounded"
-      :block="block"
+      :router-link="routerLink"
       :shadow="shadow"
-      :btn-type="btnType"
+      :size="size"
+      :type="type"
+      class="mcsl-split-button__btn1"
       @click="$emit('click', $event)"
     >
       <slot />
     </Button>
-    <DropdownMenu :menu="dropdownMenu" :default-pos="dropdownDefaultPos">
+    <DropdownMenu :default-pos="dropdownDefaultPos" :menu="dropdownMenu">
       <template #default="{ toggle }">
         <Button
-          class="mcsl-split-button__btn2"
-          :disabled="disabled"
           :color="color"
-          :type="type"
-          :size="size"
-          :shadow="shadow"
+          :disabled="disabled"
           :icon="dropdownIcon(dropdownDefaultPos)"
           :loading="loading && dropdownLoad"
           :loading-icon="loadingIcon"
           :loading-icon-pos="loadingIconPos"
+          :shadow="shadow"
+          :size="size"
+          :type="type"
+          class="mcsl-split-button__btn2"
           @click="toggle"
         />
       </template>
@@ -104,7 +102,7 @@ defineEmits<{
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .mcsl-split-button {
   display: flex;
   justify-content: center;

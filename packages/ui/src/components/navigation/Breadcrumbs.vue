@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed } from "vue";
 
 export type BreadcrumbItem = {
@@ -34,7 +34,7 @@ const actuallyIconSeperator = computed(() =>
   </nav>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .mcsl-breadcrumbs {
   display: flex;
   gap: var(--mcsl-spacing-2xs);

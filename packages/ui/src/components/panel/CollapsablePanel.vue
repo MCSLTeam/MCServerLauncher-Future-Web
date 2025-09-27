@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import Panel from "./Panel.vue";
 import type { Size } from "../../utils/types.ts";
 
@@ -50,19 +50,19 @@ defineExpose({
 
 <template>
   <Panel
-    class="mcsl-collapsable-panel"
+    :body-class="bodyClass"
+    :body-style="bodyStyle"
     :class="{
       'mcsl-collapsable-panel__collapsed': collapsed,
       'mcsl-collapsable-panel__disabled': disabled,
     }"
-    :shadow="shadow"
-    :size="size"
     :header="header"
-    :headerDivider="headerDivider"
     :header-class="headerClass"
     :header-style="headerStyle"
-    :body-class="bodyClass"
-    :body-style="bodyStyle"
+    :headerDivider="headerDivider"
+    :shadow="shadow"
+    :size="size"
+    class="mcsl-collapsable-panel"
   >
     <template #header>
       <div
@@ -89,7 +89,7 @@ defineExpose({
   </Panel>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .mcsl-collapsable-panel {
   border-color: var(--mcsl-border-color-dark);
   transition: 0.2s ease-in-out;

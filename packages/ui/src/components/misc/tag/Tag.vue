@@ -1,8 +1,7 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import type { Size } from "../../../utils/types.ts";
 import { type Color, getColorVar } from "../../../utils/css.ts";
 import { getSize } from "../../../utils/internal.ts";
-import { withCtx } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -17,12 +16,11 @@ const props = withDefaults(
   },
 );
 
-const size: Size = withCtx(() => getSize(props.size))();
+const size = getSize(props.size);
 </script>
 
 <template>
   <div
-    class="mcsl-tag"
     :class="{
       [`mcsl-size-${size}`]: true,
       'mcsl-tag__rounded': rounded,
@@ -31,6 +29,7 @@ const size: Size = withCtx(() => getSize(props.size))();
     :style="{
       '--mcsl-tag__color': color != 'default' ? getColorVar(color) : '',
     }"
+    class="mcsl-tag"
   >
     <i v-if="icon" :class="icon" />
     <p>
@@ -39,7 +38,7 @@ const size: Size = withCtx(() => getSize(props.size))();
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @use "../../../assets/css/utils";
 @use "../../SmallerPanelContent" as *;
 

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { watch } from "vue";
 import Button from "../form/button/Button.vue";
 import Panel from "../panel/Panel.vue";
@@ -72,36 +72,36 @@ defineExpose({
 <template>
   <div v-if="exist" class="mcsl-modal">
     <div
-      data-tauri-drag-region
       :class="{
         'mcsl-modal__overlay-visible': visible,
       }"
-      class="mcsl-modal__overlay"
       :style="{
         '--mcsl-modal__overlay-bg': getColorVar(color),
       }"
+      class="mcsl-modal__overlay"
+      data-tauri-drag-region
       @click="() => (closeOnClickOutside && closable ? close() : {})"
     />
     <Panel
-      v-bind="$attrs"
-      class="mcsl-modal__card"
       :class="{ 'mcsl-modal__container-visible': visible }"
+      class="mcsl-modal__card"
       size="large"
+      v-bind="$attrs"
     >
       <template #header>
         <div class="mcsl-modal__header">
-          <slot name="header" :open="open" :close="close" :visible="visible">
+          <slot :close="close" :open="open" :visible="visible" name="header">
             <h2>{{ header }}</h2>
           </slot>
-          <Button v-if="closable" @click="close" rounded icon="fas fa-xmark" />
+          <Button v-if="closable" icon="fas fa-xmark" rounded @click="close" />
         </div>
       </template>
-      <slot :open="open" :close="close" :visible="visible" />
+      <slot :close="close" :open="open" :visible="visible" />
     </Panel>
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @use "../../assets/css/utils";
 
 .mcsl-modal {

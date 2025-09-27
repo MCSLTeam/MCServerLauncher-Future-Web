@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed, ref } from "vue";
 import LazyLoad, { type ScrollInfo } from "./LazyLoad.vue";
 
@@ -58,25 +58,25 @@ const animation = computed(() => {
 <template>
   <LazyLoad
     :mode="lazyload == 'no' ? 'always-show' : lazyload"
-    @update="info = $event"
     :throttle="5"
+    @update="info = $event"
   >
     <div
-      v-bind="$attrs"
-      :style="{
-        '--mcsl-animate-on-scroll__animation': animation,
-      }"
       :class="{
         'mcsl-animate-on-scroll__wrap': !nowrap,
         'mcsl-animate-on-scroll__nowrap': nowrap,
       }"
+      :style="{
+        '--mcsl-animate-on-scroll__animation': animation,
+      }"
+      v-bind="$attrs"
     >
       <slot />
     </div>
   </LazyLoad>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .mcsl-animate-on-scroll__wrap {
   animation: var(--mcsl-animate-on-scroll__animation);
 }

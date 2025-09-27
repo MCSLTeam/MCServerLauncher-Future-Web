@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { computed, withCtx } from "vue";
+<script lang="ts" setup>
+import { computed } from "vue";
 import type { LoadingStatus, Size } from "../../../utils/types.ts";
 import { getSize } from "../../../utils/internal.ts";
 import { getStatusIcon } from "../../../utils/css.ts";
@@ -23,7 +23,7 @@ const props = withDefaults(
   },
 );
 
-const size: Size = withCtx(() => getSize(props.size))();
+const size = getSize(props.size);
 
 const format =
   props.formatLabel ??
@@ -39,7 +39,6 @@ const icon = computed(() =>
 
 <template>
   <div
-    class="mcsl-progress-bar"
     :class="[
       `mcsl-progress-bar__mode-${variant}`,
       `mcsl-progress-bar__status-${status}`,
@@ -51,6 +50,7 @@ const icon = computed(() =>
       '--mcsl-progress-bar__progress-decimal':
         status == 'success' ? 1 : progress / 100,
     }"
+    class="mcsl-progress-bar"
   >
     <div
       v-if="variant == 'line' || variant == 'indeterminate'"
@@ -58,7 +58,7 @@ const icon = computed(() =>
     >
       <div />
       <span v-if="icon || label">
-        <i :class="icon" v-if="icon" />
+        <i v-if="icon" :class="icon" />
         <template v-else>{{ label }}</template>
       </span>
     </div>
@@ -68,14 +68,14 @@ const icon = computed(() =>
         <circle r="0" />
       </svg>
       <span v-if="icon || label">
-        <i :class="icon" v-if="icon" />
+        <i v-if="icon" :class="icon" />
         <template v-else>{{ label }}</template>
       </span>
     </div>
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @use "sass:map";
 @use "sass:math";
 @use "../../../assets/css/utils";

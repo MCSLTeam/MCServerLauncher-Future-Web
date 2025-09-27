@@ -1,10 +1,10 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": [
-    "@vue/tsconfig/tsconfig.dom.json",
-    "./base.json"
-  ],
-  "compilerOptions": {
-    "moduleResolution": "Bundler"
-  }
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "extends": [
+        "@vue/tsconfig/tsconfig.dom.json",
+        "./base.json"
+    ],
+    "compilerOptions": {
+        "moduleResolution": "Bundler"
+    }
 }

@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { computed, useSlots, withCtx } from "vue";
+<script lang="ts" setup>
+import { computed, useSlots } from "vue";
 import type { Size } from "../../utils/types.ts";
 import { getSize } from "../../utils/internal.ts";
 import Divider from "../misc/Divider.vue";
@@ -25,30 +25,29 @@ const props = withDefaults(
   },
 );
 
-const size: Size = withCtx(() => getSize(props.size))();
+const size = getSize(props.size);
 
 const hasHeader = computed(
   () =>
-    props.header ||
-    (useSlots().header && (useSlots().header!()[0]?.children?.length ?? 0 > 0)),
+    props.header || (useSlots().header && useSlots().header!()[0]?.children),
 );
 </script>
 
 <template>
   <div
-    class="mcsl-panel"
     :class="{
       [`mcsl-size-${size}`]: true,
       [`mcsl-panel__shadow-${shadow}`]: shadow !== 'never',
       'mcsl-panel__no-divider': !headerDivider,
     }"
+    class="mcsl-panel"
   >
     <slot name="contextmenu" />
     <div
       v-if="hasHeader"
-      class="mcsl-panel__header"
       :class="headerClass"
       :style="headerStyle"
+      class="mcsl-panel__header"
     >
       <slot name="header">
         <h2>{{ header }}</h2>
@@ -56,14 +55,14 @@ const hasHeader = computed(
     </div>
     <div class="mcsl-panel__body-wrapper">
       <Divider v-if="hasHeader && headerDivider" />
-      <div class="mcsl-panel__body" :class="bodyClass" :style="bodyStyle">
+      <div :class="bodyClass" :style="bodyStyle" class="mcsl-panel__body">
         <slot />
       </div>
     </div>
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @use "Panel" as *;
 @use "../../assets/css/utils";
 

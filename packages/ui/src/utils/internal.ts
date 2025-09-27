@@ -80,8 +80,8 @@ export function animatedVisibilityExists(
   return { exist, status: computed(() => status.value) };
 }
 
-export function getSize(sizeProp?: Size) {
-  let size = inject("size", "middle");
+export function getSize(sizeProp: Size | undefined) {
+  let size = inject("size", "middle") as Size;
   if (sizeProp) {
     switch (sizeProp) {
       case "smaller":
@@ -107,7 +107,7 @@ export function getSize(sizeProp?: Size) {
       default:
         size = sizeProp;
     }
-    provide("size", size);
   }
+  provide("size", size);
   return size;
 }

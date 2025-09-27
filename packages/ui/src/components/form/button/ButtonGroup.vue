@@ -1,4 +1,4 @@
-<script setup lang="ts"></script>
+<script lang="ts" setup></script>
 
 <template>
   <div class="mcsl-button-group">
@@ -6,7 +6,7 @@
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .mcsl-button-group {
   display: flex;
   justify-content: center;

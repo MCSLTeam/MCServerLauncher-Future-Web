@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 withDefaults(
   defineProps<{
     spacing?: "4xs" | "2xs" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "4xl";
@@ -17,7 +17,6 @@ withDefaults(
 
 <template>
   <div
-    class="mcsl-divider"
     :class="[
       'mcsl-divider__varient-' + variant,
       'mcsl-divider__type-' + type,
@@ -26,6 +25,7 @@ withDefaults(
     :style="{
       '--mcsl-divider__spacing': `var(--mcsl-spacing-${spacing})`,
     }"
+    class="mcsl-divider"
   >
     <div class="mcsl-divider__text">
       <slot />
@@ -33,7 +33,7 @@ withDefaults(
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .mcsl-divider {
   display: flex;
   justify-content: center;

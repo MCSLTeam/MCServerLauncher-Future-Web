@@ -11,5 +11,5 @@ import { useI18n } from "#imports";
 import { useLocale } from "@repo/ui/src/utils/stores.ts";
 
 useLocale().injectI18n(useI18n());
-load();
+load("web");
 </script>
