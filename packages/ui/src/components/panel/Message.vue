@@ -9,29 +9,28 @@ import {
   getStatusIcon,
 } from "../../utils/css.ts";
 import Button from "../form/button/Button.vue";
-import { ChangeSize } from "../Components.ts";
+import ChangeSize from "../misc/ChangeSize.ts";
 
-const props = withDefaults(
-  defineProps<{
-    color?: ColorType;
-    variant?: "text" | "outlined" | "default";
-    icon?: string;
-    inAnim?: string;
-    outAnim?: string;
-    closeable?: boolean;
-    title?: string;
-    shadow?: boolean;
-    size?: Size;
-  }>(),
-  {
-    color: "primary",
-    variant: "default",
-    inAnim: "stretchInDown",
-    outAnim: "stretchOutUp",
-    shadow: false,
-    closeable: false,
-  },
-);
+export type MessageProps = {
+  color?: ColorType;
+  variant?: "text" | "outlined" | "default";
+  icon?: string;
+  inAnim?: string;
+  outAnim?: string;
+  closeable?: boolean;
+  title?: string;
+  shadow?: boolean;
+  size?: Size;
+};
+
+const props = withDefaults(defineProps<MessageProps>(), {
+  color: "primary",
+  variant: "default",
+  inAnim: "stretchInDown",
+  outAnim: "stretchOutUp",
+  shadow: false,
+  closeable: false,
+});
 
 const size = getSize(props.size);
 
@@ -76,9 +75,7 @@ defineExpose({
       '--mcsl-message__text-color': isSurface
         ? 'var(--mcsl-text-color-regular)'
         : getColorVar(color),
-      '--mcsl-message__bg-color': getColorVar(
-        new ColorData(color, 'default', 0.05),
-      ),
+      '--mcsl-message__bg-color': getColorVar(color),
       '--mcsl-message__border-color': isSurface
         ? 'var(--mcsl-border-color-base)'
         : getColorVar(new ColorData(color, 'light')),
@@ -87,6 +84,7 @@ defineExpose({
         : new ColorData(color).getShadow('base'),
       '--mcsl-message__anim-in': inAnim,
       '--mcsl-message__anim-out': outAnim,
+      '--mcsl-message__spacing': variant == 'text' ? '0' : undefined,
     }"
     class="mcsl-message"
   >
@@ -94,7 +92,7 @@ defineExpose({
     <div class="mcsl-message__content">
       <i v-if="actualIcon" :class="actualIcon" />
       <div>
-        <h3 v-if="title" class="mcsl-message__title">{{ title }}</h3>
+        <h4 v-if="title" class="mcsl-message__title">{{ title }}</h4>
         <slot :close="close" :open="open" />
         <div v-if="$slots.buttons" class="mcsl-message__buttons">
           <ChangeSize size="smaller">
@@ -123,10 +121,6 @@ defineExpose({
   .mcsl-size-#{$size}.mcsl-message {
     --mcsl-message__spacing: #{utils.get-size-var("spacing", $size, $vars)};
     border-radius: utils.get-size-var("border-radius", $size, $vars);
-
-    &.mcsl-message__variant-text {
-      --mcsl-message__spacing: 0;
-    }
 
     & > .mcsl-message__content {
       $spacing: var(--mcsl-message__spacing);
@@ -167,7 +161,7 @@ defineExpose({
   display: flex;
 
   .mcsl-message__with-title & {
-    --mcsl-message__icon-font-size: var(--mcsl-font-size-h3);
+    --mcsl-message__icon-font-size: var(--mcsl-font-size-h4);
   }
 
   --mcsl-message__icon-font-size: var(--mcsl-font-size-all);
@@ -224,6 +218,11 @@ defineExpose({
 
 .mcsl-message__variant-default {
   @extend .mcsl-message__variant-outlined;
-  background: var(--mcsl-message__bg-color);
+  background: color-mix(
+      in srgb,
+      var(--mcsl-message__bg-color),
+      transparent 90%
+  );
+  backdrop-filter: blur(5px);
 }
 </style>

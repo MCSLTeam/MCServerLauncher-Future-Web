@@ -69,11 +69,11 @@ $box-shadow-default: (
 $color-vars: (
   // 背景
   "bg-color-main": (
-      "light": [ "surface",
+    "light": [ "surface",
       50],
-      "dark": [ "surface",
+    "dark": [ "surface",
       950],
-    ),
+  ),
   "bg-color-overlay": (
     "light": [ "surface",
     0],
@@ -100,18 +100,18 @@ $color-vars: (
   ),
   // 滚动条
   "scrollbar-color": (
-      "light": [ "surface",
+    "light": [ "surface",
       300],
-      "dark": [ "surface",
+    "dark": [ "surface",
       700],
-    ),
+  ),
   // 描边
   "border-color-light": (
-      "light": [ "surface",
+    "light": [ "surface",
       100],
-      "dark": [ "surface",
+    "dark": [ "surface",
       800],
-    ),
+  ),
   "border-color-base": (
     "light": [ "surface",
     200],
@@ -126,11 +126,11 @@ $color-vars: (
   ),
   // 字体
   "text-color-primary": (
-      "light": [ "surface",
+    "light": [ "surface",
       950],
-      "dark": [ "surface",
+    "dark": [ "surface",
       0],
-    ),
+  ),
   "text-color-regular": (
     "light": [ "surface",
     800],
@@ -207,61 +207,73 @@ $other-vars: (
       // 颜色变量
       @each $name, $palette in $colors {
         --mcsl-color-#{$name}: var(
-          --mcsl-color-#{$name}-#{$theme-default-step}
+            --mcsl-color-#{$name}-#{$theme-default-step}
         );
         @each $step-name,
-          $var
-            in utils.generate-shadow(
-              "var(--mcsl-color-#{$name}-#{$theme-default-step})"
-            )
-        {
+        $var in utils.generate-shadow(
+            "var(--mcsl-color-#{$name}-#{$theme-default-step})"
+        ) {
           --mcsl-color-#{$name}-shadow-#{$step-name}: #{$var};
         }
         @each $step-name, $step-values in $named-steps {
           --mcsl-color-#{$name}-#{$step-name}: var(
-            --mcsl-color-#{$name}-#{$theme-default-step}
+              --mcsl-color-#{$name}-#{$theme-default-step}
           );
         }
       }
+    }
+  }
+}
 
+:root {
+  // 主题动态变量
+  @each $theme in ("light", "dark") {
+    $theme-default-step: map.get($default-step, $theme);
+    &.#{$theme} {
+      // 阴影变量
       @each $name, $value in $dynamic-vars {
         @each $step, $_ in map.get($colors, map.get($value, $theme)) {
           --mcsl-color-#{$name}-#{$step}: var(
-            --mcsl-color-#{map.get($value, $theme)}-#{$step}
+              --mcsl-color-#{map.get($value, $theme)}-#{$step}
           );
         }
         --mcsl-color-#{$name}-shadow-lighter: var(
-          --mcsl-color-#{map.get($value, $theme)}-shadow-lighter
+            --mcsl-color-#{map.get($value, $theme)}-shadow-lighter
         );
         --mcsl-color-#{$name}-shadow-light: var(
-          --mcsl-color-#{map.get($value, $theme)}-shadow-light
+            --mcsl-color-#{map.get($value, $theme)}-shadow-light
         );
         --mcsl-color-#{$name}-shadow-base: var(
-          --mcsl-color-#{map.get($value, $theme)}-shadow-base
+            --mcsl-color-#{map.get($value, $theme)}-shadow-base
         );
         --mcsl-color-#{$name}-shadow-dark: var(
-          --mcsl-color-#{map.get($value, $theme)}-shadow-dark
+            --mcsl-color-#{map.get($value, $theme)}-shadow-dark
         );
         --mcsl-color-#{$name}-shadow-darker: var(
-          --mcsl-color-#{map.get($value, $theme)}-shadow-darker
+            --mcsl-color-#{map.get($value, $theme)}-shadow-darker
         );
         @each $step-name, $step-values in $named-steps {
           --mcsl-color-#{$name}-#{$step-name}: var(
-            --mcsl-color-#{$name}-#{map.get($step-values, $theme)}
+              --mcsl-color-#{$name}-#{map.get($step-values, $theme)}
           );
         }
         --mcsl-color-#{$name}: var(
-          --mcsl-color-#{$name}-#{$theme-default-step}
+            --mcsl-color-#{$name}-#{$theme-default-step}
         );
       }
 
       @each $step-name,
-        $var
-          in utils.generate-shadow-surface(map.get($box-shadow-default, $theme))
-      {
+      $var in utils.generate-shadow-surface(map.get($box-shadow-default, $theme)) {
         --mcsl-box-shadow-#{$step-name}: #{$var};
       }
+    }
+  }
+}
 
+:root {
+  // 主题动态变量
+  @each $theme in ("light", "dark") {
+    &.#{$theme} {
       // 常用变量
       @each $name, $value in $color-vars {
         --mcsl-#{$name}: #{utils.get-color-var(map.get($value, $theme))};

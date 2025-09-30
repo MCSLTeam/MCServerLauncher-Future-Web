@@ -40,7 +40,7 @@ const props = withDefaults(
     rounded: false,
     squared: false,
     block: false,
-    shadow: "never",
+    shadow: "hover",
     btnType: "button",
   },
 );
