@@ -32,7 +32,9 @@ const model = defineModel<boolean>({
 
 const size = getSize(props.size);
 
-const formField = inject("formField", undefined) as FormFieldData | undefined;
+const formField = inject("mcsl-form-field", undefined) as
+  | FormFieldData
+  | undefined;
 
 if (formField) {
   if (typeof formField.field.value.value != "boolean") {
@@ -166,7 +168,7 @@ $vars: map.merge(
 .mcsl-switch:disabled {
   cursor: not-allowed;
   background: var(--mcsl-border-color-base);
-  box-shadow: var(--mcsl-box-shadow-lighter);
+  box-shadow: none;
 
   &:checked {
     background: var(--mcsl-border-color-dark);

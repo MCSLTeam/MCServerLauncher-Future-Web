@@ -37,13 +37,13 @@ const size = getSize(props.size);
 
 const id = Math.random().toString(36).slice(-8);
 
-if (inject("formField", undefined) != undefined) {
+if (inject("mcsl-form-field", undefined) != undefined) {
   console.warn(
     "[MCSL-UI] A <FormEntry> component is nested inside another <FormEntry> component. This might cause unexpected issues.",
   );
 }
 
-const form = inject("form", undefined) as FormInstance<any> | undefined;
+const form = inject("mcsl-form", undefined) as FormInstance<any> | undefined;
 
 if (form == undefined) {
   console.error(
@@ -82,7 +82,7 @@ watch(field.error, (err) => {
   }, 200);
 });
 
-provide("formField", {
+provide("mcsl-form-field", {
   id,
   field,
   async onBlur(event: Event) {

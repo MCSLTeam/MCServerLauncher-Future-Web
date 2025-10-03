@@ -58,7 +58,7 @@ const data = computed(() => ({
   error: field.error,
 }));
 
-provide("form", form);
+provide("mcsl-form", form);
 
 defineExpose({
   reset: form.reset,

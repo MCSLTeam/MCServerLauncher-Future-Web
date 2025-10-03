@@ -36,7 +36,9 @@ const model = defineModel<string>({
 
 const size = getSize(props.size);
 
-const formField = inject("formField", undefined) as FormFieldData | undefined;
+const formField = inject("mcsl-form-field", undefined) as
+  | FormFieldData
+  | undefined;
 
 if (formField) {
   if (typeof formField.field.value.value != "string") {
@@ -74,7 +76,7 @@ if (formField) {
       ),
     }"
     :placeholder="placeholder"
-    class="mcsl-input-text"
+    class="mcsl-input mcsl-input-text"
     :type="password ? 'password' : 'text'"
     @blur="
       $emit('blur', $event);
@@ -146,24 +148,21 @@ if (formField) {
 
 .mcsl-input-text:disabled {
   cursor: not-allowed;
+  border-color: var(--mcsl-border-color-dark);
   background: var(--mcsl-border-color-base);
-  box-shadow: var(--mcsl-box-shadow-lighter);
-
-  &:checked {
-    background: var(--mcsl-border-color-dark);
-  }
-
-  &::before {
-    background: var(--mcsl-bg-color-dark);
-  }
+  box-shadow: none;
 }
 
 .mcsl-input-text[aria-invalid="true"] {
   &,
   &:hover,
-  &:checked,
   &:disabled {
+    outline-offset: 1px;
     border-color: var(--mcsl-color-danger);
+
+    &::placeholder {
+      color: var(--mcsl-color-danger);
+    }
   }
 }
 </style>

@@ -81,7 +81,7 @@ export function animatedVisibilityExists(
 }
 
 export function getSize(sizeProp: Size | undefined) {
-  let size = inject("size", "middle") as Size;
+  let size = inject("mcsl-size", "middle") as Size;
   if (sizeProp) {
     switch (sizeProp) {
       case "smaller":
@@ -108,6 +108,6 @@ export function getSize(sizeProp: Size | undefined) {
         size = sizeProp;
     }
   }
-  provide("size", size);
+  provide("mcsl-size", size);
   return size;
 }

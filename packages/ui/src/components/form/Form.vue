@@ -9,13 +9,13 @@ const props = defineProps<{
 
 const emit = defineEmits<(e: "submit") => void>();
 
-if (inject("form", undefined) != undefined) {
+if (inject("mcsl-form", undefined) != undefined) {
   console.warn(
     "[MCSL-UI] A <Form> component is nested inside another <Form> component. This might cause unexpected issues.",
   );
 }
 
-provide("form", props.form);
+provide("mcsl-form", props.form);
 
 async function submit() {
   if (await props.form.validate()) emit("submit");

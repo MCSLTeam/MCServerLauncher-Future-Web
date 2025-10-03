@@ -219,9 +219,9 @@ defineExpose({
 .mcsl-message__variant-default {
   @extend .mcsl-message__variant-outlined;
   background: color-mix(
-      in srgb,
-      var(--mcsl-message__bg-color),
-      transparent 90%
+    in srgb,
+    var(--mcsl-message__bg-color),
+    transparent 90%
   );
   backdrop-filter: blur(5px);
 }

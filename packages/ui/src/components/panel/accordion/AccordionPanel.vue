@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import CollapsablePanel from "../CollapsablePanel.vue";
 import type { Size } from "../../../utils/types.ts";
+import { inject } from "vue";
 
 withDefaults(
   defineProps<{
@@ -18,6 +19,8 @@ withDefaults(
   },
 );
 
+const { activate, deactivate, isActive } = inject("mcsl-accordion") as any;
+
 defineEmits<{
   (e: "collapse"): void;
   (e: "expand"): void;
@@ -28,7 +31,7 @@ defineEmits<{
   <CollapsablePanel
     :body-class="bodyClass"
     :body-style="bodyStyle"
-    :collapsed="!($parent as any).isActive(name)"
+    :collapsed="!isActive(name)"
     :disabled="disabled"
     :header="header"
     :header-class="headerClass"
@@ -37,11 +40,11 @@ defineEmits<{
     class="mcsl-accordion-panel"
     shadow="never"
     @collapse="
-      ($parent as any).deactivate(name);
+      deactivate(name);
       $emit('collapse');
     "
     @expand="
-      ($parent as any).activate(name);
+      activate(name);
       $emit('expand');
     "
   >

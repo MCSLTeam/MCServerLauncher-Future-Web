@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, watchEffect } from "vue";
+import { onMounted, provide, watchEffect } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -44,6 +44,7 @@ function refresh() {
 onMounted(() => refresh());
 watchEffect(() => refresh());
 
+provide("mcsl-accordion", { activate, deactivate, isActive });
 defineExpose({ activate, deactivate, isActive, toggle, active });
 </script>
 
