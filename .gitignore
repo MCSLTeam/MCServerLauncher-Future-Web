@@ -40,7 +40,8 @@ yarn-error.log*
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
-.idea
+.idea/*
+!.idea/icon.*
 *.suo
 *.ntvs*
 *.njsproj
