@@ -24,7 +24,7 @@
     "nuxt": "^4.0.3",
     "nuxt-svgo-loader": "0.6.3",
     "pinia": "^3.0.3",
-    "vue": "^3.5.18"
+    "vue": "^3.5.22"
   },
   "devDependencies": {
     "vite-plugin-dynamic-import": "^1.6.0"
