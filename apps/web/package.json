@@ -21,7 +21,7 @@
     "@repo/ui": "workspace:*",
     "eslint": "^9.29.0",
     "floating-vue": "^5.2.2",
-    "nuxt": "^4.0.3",
+    "nuxt": "^4.2.0",
     "nuxt-svgo-loader": "0.6.3",
     "pinia": "^3.0.3",
     "vue": "^3.5.18"
