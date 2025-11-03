@@ -13,7 +13,7 @@
     "test": "nuxi typecheck"
   },
   "dependencies": {
-    "@nuxt/eslint": "1.9.0",
+    "@nuxt/eslint": "1.10.0",
     "@nuxtjs/i18n": "10.0.5",
     "@pinia/nuxt": "^0.11.2",
     "@repo/configs": "workspace:*",
