@@ -1,9 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { ref } from "vue";
+import { readonly, ref } from "vue";
 
 export type LayoutType = "none" | "default";
 
-export const layout = ref<LayoutType>("default");
+const _layout = ref<LayoutType>("default");
+
+export const layout = readonly(_layout);
 
 const router = createRouter({
   history: createWebHistory(),
@@ -11,7 +13,7 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, _from, next) => {
-  layout.value = <LayoutType | undefined>to.meta.layout ?? "default";
+  _layout.value = <LayoutType | undefined>to.meta.layout ?? "default";
 
   next();
 });

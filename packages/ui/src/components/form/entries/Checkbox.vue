@@ -66,7 +66,7 @@ if (formField) {
     :disabled="disabled"
     :style="{
       '--mcsl-checkbox__color': getColorVar(color),
-      '--mcsl-checkbox__color-dark': getColorVar(new ColorData(color, 'dark')),
+      '--mcsl-checkbox__color-dark': new ColorData(color, 'dark').getCss(),
     }"
     class="mcsl-checkbox"
     type="checkbox"

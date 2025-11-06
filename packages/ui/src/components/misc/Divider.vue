@@ -38,6 +38,7 @@ withDefaults(
   display: flex;
   justify-content: center;
   position: relative;
+  width: 100%;
 }
 
 .mcsl-divider__type-horizontal {
@@ -94,7 +95,7 @@ withDefaults(
 }
 
 .mcsl-divider__text-start {
-  align-items: start;
+  align-items: flex-start;
 }
 
 .mcsl-divider__text-center {
@@ -102,6 +103,6 @@ withDefaults(
 }
 
 .mcsl-divider__text-end {
-  align-items: end;
+  align-items: flex-end;
 }
 </style>

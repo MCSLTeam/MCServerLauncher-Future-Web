@@ -6,6 +6,7 @@ import {
   ColorData,
   type ColorType,
   getColorVar,
+  getShadow,
   getStatusIcon,
 } from "../../utils/css.ts";
 import Button from "../form/button/Button.vue";
@@ -78,10 +79,10 @@ defineExpose({
       '--mcsl-message__bg-color': getColorVar(color),
       '--mcsl-message__border-color': isSurface
         ? 'var(--mcsl-border-color-base)'
-        : getColorVar(new ColorData(color, 'light')),
+        : new ColorData(color, 'light').getCss(),
       '--mcsl-message__box-shadow': isSurface
         ? 'var(--mcsl-box-shadow-base)'
-        : new ColorData(color).getShadow('base'),
+        : getShadow(color, 'base'),
       '--mcsl-message__anim-in': inAnim,
       '--mcsl-message__anim-out': outAnim,
       '--mcsl-message__spacing': variant == 'text' ? '0' : undefined,
@@ -193,7 +194,7 @@ defineExpose({
 
   & .mcsl-message__buttons {
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
   }
 }
 

@@ -13,8 +13,8 @@ export type MenuInfo = {
     iconPos?: "left" | "right";
     onClick?: (event: MouseEvent) => void | Promise<void>;
     disabled?: boolean;
-    variant?: "default" | "primary";
-    type?: ColorType;
+    type?: "default" | "primary" | "dashed" | "text";
+    color?: ColorType;
     buttonType?: "submit" | "reset" | "button";
   }[];
 }[];
@@ -35,11 +35,6 @@ withDefaults(
     shadow: false,
   },
 );
-
-function getButtonVarient(varient: "default" | "primary" = "default") {
-  if (varient === "default") return "text";
-  else return varient;
-}
 </script>
 
 <template>
@@ -74,11 +69,12 @@ function getButtonVarient(varient: "default" | "primary" = "default") {
           v-for="button in item.items"
           :key="button.label"
           :btn-type="button.buttonType"
-          :color="button.type"
+          :color="button.color"
           :disabled="button.disabled"
           :icon="button.icon"
           :icon-pos="button.iconPos"
-          :type="getButtonVarient(button.variant)"
+          :type="button.type ?? 'text'"
+          shadow="never"
           @click="button.onClick"
         >
           {{ button.label }}
@@ -91,7 +87,6 @@ function getButtonVarient(varient: "default" | "primary" = "default") {
 <style lang="scss" scoped>
 @use "../../assets/css/utils";
 @use "Panel" as *;
-@use "../PanelContent";
 
 $vars: (
   "spacing": (
@@ -142,7 +137,7 @@ $vars: (
 
   & > button {
     width: 100%;
-    justify-content: start;
+    justify-content: flex-start;
   }
 }
 </style>

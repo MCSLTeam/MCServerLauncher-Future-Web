@@ -1,8 +1,8 @@
 import {
-  computed,
   type ComputedRef,
   inject,
   provide,
+  readonly,
   type Ref,
   ref,
   type VueElement,
@@ -77,7 +77,7 @@ export function animatedVisibilityExists(
       }, duration.out);
     }
   });
-  return { exist, status: computed(() => status.value) };
+  return { exist, status: readonly(status) };
 }
 
 export function getSize(sizeProp: Size | undefined) {

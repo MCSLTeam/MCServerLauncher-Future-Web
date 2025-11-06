@@ -31,21 +31,7 @@ $sizes: ("small", "middle", "large");
   @return "large";
 }
 
-@function generate-shadow($color-var) {
-  @return (
-    "light": "0 1px 2px 0 #{transparent($color-var, 20%)}",
-    "lighter":
-      "0 1px 3px 0 #{transparent($color-var, 20%)}, 0 1px 2px -1px #{transparent($color-var, 20%)}",
-    "base":
-      "0 4px 6px -1px #{transparent($color-var, 20%)}, 0 2px 4px -2px #{transparent($color-var, 20%)}",
-    "dark":
-      "0 10px 15px -3px #{transparent($color-var, 20%)}, 0 4px 6px -4px #{transparent($color-var, 25%)}",
-    "darker":
-      "0 20px 25px -5px #{transparent($color-var, 20%)}, 0 8px 10px -6px #{transparent($color-var, 30%)}"
-  );
-}
-
-@function generate-shadow-surface($color-var) {
+@function box-shadow-surface($color-var) {
   @return (
     "light": "0 1px 2px 0 #{transparent($color-var, 10%)}",
     "lighter":

@@ -67,11 +67,10 @@ const hasHeader = computed(
 @use "../../assets/css/utils";
 
 .mcsl-panel {
-  margin: 5px;
   overflow: auto;
   background: var(--mcsl-bg-color-overlay);
   border: 1px solid var(--mcsl-border-color-base);
-  transition: 0.2s ease-in-out;
+  transition: box-shadow 0.2s ease-in-out;
 }
 
 @each $size in utils.$sizes {
@@ -80,6 +79,7 @@ const hasHeader = computed(
 
     border-radius: utils.get-size-var("border-radius", $size, $vars);
     padding: $spacing;
+    margin: calc($spacing / 2);
 
     &.mcsl-panel__shadow-always,
     .mcsl-panel__shadow-hover:hover {

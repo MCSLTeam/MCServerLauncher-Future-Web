@@ -14,7 +14,7 @@ import FloatingContent from "./FloatingContent.vue";
 const props = withDefaults(
   defineProps<{
     followWidth?: boolean;
-    defaultPos?: "top" | "bottom";
+    defaultPos?: "top" | "bottom" | "left" | "right";
   }>(),
   {
     followWidth: false,
@@ -26,19 +26,26 @@ const wrapperEl = ref();
 const triggererEl = ref();
 const floatingContentEl = ref();
 const opened = computed(() => floatingContentEl.value?.opened.value);
-const animType = ref<"top" | "bottom" | "fade">("fade");
+const isVertical = computed(
+  () => props.defaultPos == "top" || props.defaultPos == "bottom",
+);
+const animType = ref<"top" | "bottom" | "left" | "right" | "fade">("fade");
 const inAnim = computed(() => {
   switch (animType.value) {
     case "top":
       return "stretchInUp";
     case "bottom":
       return "stretchInDown";
+    case "left":
+      return "stretchInLeft";
+    case "right":
+      return "stretchInRight";
     default:
       return "fadeIn";
   }
 });
 
-function locateX(
+function locateXVertical(
   openX: number,
   elemX: Ref<number>,
   elemRect: ComputedRef<DOMRect>,
@@ -50,7 +57,7 @@ function locateX(
   );
 }
 
-function locateY(
+function locateYVertical(
   openY: number,
   elemY: Ref<number>,
   elemRect: ComputedRef<DOMRect>,
@@ -69,6 +76,37 @@ function locateY(
   }
 }
 
+function locateXHorizontal(
+  openX: number,
+  elemX: Ref<number>,
+  elemRect: ComputedRef<DOMRect>,
+  triggererRect: DOMRect,
+) {
+  for (const p of [
+    props.defaultPos,
+    props.defaultPos == "top" ? "bottom" : "top",
+  ]) {
+    elemX.value =
+      p == "top"
+        ? openX - triggererRect.width / 2 - elemRect.value.width
+        : openX + triggererRect.width / 2;
+    animType.value = p as "top" | "bottom";
+    if (floatingContentEl.value.canFullyShow("y")) return;
+  }
+}
+
+function locateYHorizontal(
+  openY: number,
+  elemY: Ref<number>,
+  elemRect: ComputedRef<DOMRect>,
+) {
+  elemY.value = clamp(
+    openY - elemRect.value.height / 2,
+    0,
+    window.innerHeight - elemRect.value.height,
+  );
+}
+
 function locator(
   openX: number,
   openY: number,
@@ -78,9 +116,12 @@ function locator(
 ) {
   const triggererRect = triggererEl.value.getBoundingClientRect();
   if (elemRect.value.width > innerWidth) elemX.value = 0;
-  else locateX(openX, elemX, elemRect);
+  else if (isVertical.value) locateXVertical(openX, elemX, elemRect);
+  else locateXHorizontal(openX, elemX, elemRect, triggererRect);
   if (elemRect.value.height > innerHeight) elemY.value = 0;
-  else locateY(openY, elemY, elemRect, triggererRect);
+  else if (isVertical.value)
+    locateYVertical(openY, elemY, elemRect, triggererRect);
+  else locateYHorizontal(openY, elemY, elemRect);
 }
 
 function getOpenPos() {

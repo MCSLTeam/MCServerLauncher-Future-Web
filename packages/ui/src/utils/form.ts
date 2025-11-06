@@ -1,5 +1,11 @@
 import * as yup from "yup";
-import { computed, type ComputedRef, ref, type WritableComputedRef } from "vue";
+import {
+  computed,
+  type ComputedRef,
+  readonly,
+  ref,
+  type WritableComputedRef,
+} from "vue";
 
 export type ValidationTrigger = "input" | "blur" | "submit";
 
@@ -90,7 +96,7 @@ export function createForm<T extends Record<string, any>>(
         reset: () => {
           this.resetField(name);
         },
-        error: computed(() => error.value),
+        error: readonly(error),
         __setError__(value: string | null) {
           error.value = value;
         },

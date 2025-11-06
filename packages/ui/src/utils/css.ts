@@ -21,13 +21,12 @@ const COLOR_TYPES: string[] = [
   "fuchsia",
   "pink",
   "rose",
+  "red",
   "slate",
   "gray",
   "zinc",
   "neutral",
   "stone",
-  "soho",
-  "viva",
   "ocean",
 ];
 
@@ -54,13 +53,12 @@ export type ColorType =
   | "fuchsia"
   | "pink"
   | "rose"
+  | "red"
   | "slate"
   | "gray"
   | "zinc"
   | "neutral"
   | "stone"
-  | "soho"
-  | "viva"
   | "ocean";
 
 export type ColorStep =
@@ -119,10 +117,6 @@ export class ColorData {
     if (this.opacity == 1) return cssVar;
     return `color-mix(in srgb, transparent, ${cssVar} ${this.opacity * 100}%)`;
   }
-
-  getShadow(type: "lighter" | "light" | "base" | "dark" | "darker") {
-    return `var(--mcsl-color-${this.type}-shadow-${type})`;
-  }
 }
 
 export type Color = ColorData | ColorType | ColorVar;
@@ -132,8 +126,38 @@ export function getColorVar(color: Color, darkerSurface = true) {
   else if (color == "surface" && darkerSurface)
     return getColorVar("bg-color-overlay-opposite");
   else if (COLOR_TYPES.includes(color))
-    return getColorVar(new ColorData(color as ColorType));
+    return new ColorData(color as ColorType).getCss();
   return `var(--mcsl-${color})`;
+}
+
+export function getShadow(
+  color: ColorType,
+  type: "lighter" | "light" | "base" | "dark" | "darker",
+) {
+  switch (type) {
+    case "light":
+      return `0 1px 2px 0 ${new ColorData(color, "default", 0.2).getCss()}`;
+    case "lighter":
+      return (
+        `0 1px 3px 0 ${new ColorData(color, "default", 0.2).getCss()}, ` +
+        `0 1px 2px -1px ${new ColorData(color, "default", 0.2).getCss()}`
+      );
+    case "base":
+      return (
+        `0 4px 6px -1px ${new ColorData(color, "default", 0.2).getCss()}, ` +
+        `0 2px 4px -2px ${new ColorData(color, "default", 0.2).getCss()}`
+      );
+    case "dark":
+      return (
+        `0 10px 15px -3px ${new ColorData(color, "default", 0.2).getCss()}, ` +
+        `0 4px 6px -4px ${new ColorData(color, "default", 0.25).getCss()}`
+      );
+    case "darker":
+      return (
+        `0 20px 25px -5px ${new ColorData(color, "default", 0.2).getCss()}, ` +
+        `0 8px 10px -6px ${new ColorData(color, "default", 0.3).getCss()}`
+      );
+  }
 }
 
 export function getStatusIcon(

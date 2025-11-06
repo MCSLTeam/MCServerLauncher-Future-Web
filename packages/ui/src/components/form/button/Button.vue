@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import { useRouter } from "vue-router";
-import { ColorData, type ColorType } from "../../../utils/css.ts";
+import { ColorData, type ColorType, getShadow } from "../../../utils/css.ts";
 import type { Size } from "../../../utils/types.ts";
 import { getSize } from "../../../utils/internal.ts";
 
@@ -13,6 +13,7 @@ const props = withDefaults(
     loading?: boolean;
     loadingIcon?: string;
     loadingIconPos?: "left" | "right" | "same";
+    align?: "left" | "right" | "center";
     link?: string;
     linkTarget?: string;
     routerLink?: boolean;
@@ -28,10 +29,11 @@ const props = withDefaults(
   {
     disabled: false,
     icon: "",
-    iconPos: "right",
+    iconPos: "left",
     loading: false,
     loadingIcon: "fas fa-circle-notch fa-spin",
     loadingIconPos: "same",
+    align: "center",
     link: "",
     linkTarget: "_blank",
     routerLink: true,
@@ -51,9 +53,9 @@ const size = getSize(props.size);
 
 const icon = computed(() => (props.loading ? props.loadingIcon : props.icon));
 const iconPos = computed(() =>
-  props.loading && props.loadingIconPos == "same"
-    ? props.iconPos
-    : props.loadingIconPos,
+  props.loading && props.loadingIconPos != "same"
+    ? props.loadingIconPos
+    : props.iconPos,
 );
 const isSurface = computed(() => props.color == "surface");
 
@@ -79,9 +81,9 @@ const onClick = computed(() =>
   <button
     :class="{
       [`mcsl-size-${size}`]: true,
-      [`mcsl-button__icon-${iconPos}`]: true,
       [`mcsl-button__shadow-${shadow}`]: true,
       [`mcsl-button__type-${type}`]: true,
+      [`mcsl-button__align-${align}`]: true,
       'mcsl-button__rounded': rounded,
       'mcsl-button__squared': squared,
       'mcsl-button__block': block,
@@ -91,7 +93,7 @@ const onClick = computed(() =>
       // Shadow
       '--mcsl-button__box-shadow': isSurface
         ? 'var(--mcsl-box-shadow-base)'
-        : new ColorData(props.color).getShadow('base'),
+        : getShadow(props.color, 'base'),
       // Text
       '--mcsl-button__text-color': isSurface
         ? 'var(--mcsl-text-color-regular)'
@@ -140,10 +142,10 @@ const onClick = computed(() =>
         : `var(--mcsl-color-${color})`,
       '--mcsl-button__primary-bg-hover': isSurface
         ? 'var(--mcsl-text-color-regular)'
-        : `var(--mcsl-color-${color}-dark)`,
+        : `var(--mcsl-color-${color}-600)`,
       '--mcsl-button__primary-bg-active': isSurface
         ? 'var(--mcsl-text-color-primary)'
-        : `var(--mcsl-color-${color}-darker)`,
+        : `var(--mcsl-color-${color}-700)`,
       '--mcsl-button__primary-bg-disabled': 'var(--mcsl-bg-color-darker)',
     }"
     class="mcsl-button"
@@ -151,7 +153,11 @@ const onClick = computed(() =>
     @click="onClick"
   >
     <slot name="contextmenu" />
-    <i v-if="icon != ''" :class="icon.split(' ')" class="mcsl-button__icon" />
+    <i
+      v-if="icon != ''"
+      :class="[...icon.split(' '), `mcsl-button__icon-${iconPos}`]"
+      class="mcsl-button__icon"
+    />
     <span v-if="$slots.default" class="mcsl-button__label"><slot /></span>
   </button>
 </template>
@@ -210,11 +216,27 @@ const onClick = computed(() =>
     width: 100%;
   }
 
+  &.mcsl-button__align-left {
+    justify-content: flex-start;
+  }
+
+  &.mcsl-button__align-center {
+    justify-content: center;
+  }
+
+  &.mcsl-button__align-right {
+    justify-content: flex-end;
+  }
+
   &.mcsl-button__rounded {
     border-radius: var(--mcsl-border-radius-full);
   }
 
-  &.mcsl-button__shadow-always,
+  &.mcsl-button__shadow-always {
+    box-shadow: var(--mcsl-box-shadow-base);
+  }
+
+  &.mcsl-button__shadow-always:hover,
   &.mcsl-button__shadow-hover:hover {
     box-shadow: var(--mcsl-button__box-shadow);
   }

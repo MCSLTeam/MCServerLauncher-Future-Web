@@ -13,9 +13,7 @@
   --font-mono:
     ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono,
     monospace;
-}
 
-html {
   &.light {
     color-scheme: light;
   }
@@ -30,6 +28,7 @@ html,
 body,
 #app,
 #__nuxt {
+  @extend .mcsl-font-middle;
   width: 100%;
   height: 100%;
   margin: 0;
@@ -210,7 +209,7 @@ $font-size-vars: (
 );
 
 @each $size, $vars in $font-size-vars {
-  .mcsl-size-#{$size} {
+  .mcsl-font-#{$size} {
     @each $name, $value in $vars {
       --mcsl-font-size-#{$name}: #{$value};
     }
@@ -244,6 +243,32 @@ $font-size-vars: (
   }
 }
 
+@keyframes stretchInLeft {
+  from {
+    scale: 1 0.5;
+    opacity: 0;
+    transform-origin: left;
+  }
+  to {
+    scale: 1;
+    opacity: 1;
+    transform-origin: left;
+  }
+}
+
+@keyframes stretchInRight {
+  from {
+    scale: 1 0.5;
+    opacity: 0;
+    transform-origin: right;
+  }
+  to {
+    scale: 1;
+    opacity: 1;
+    transform-origin: right;
+  }
+}
+
 @keyframes stretchOutUp {
   from {
     scale: 1;
@@ -267,6 +292,32 @@ $font-size-vars: (
     scale: 1 0.5;
     opacity: 0;
     transform-origin: bottom;
+  }
+}
+
+@keyframes stretchOutInLeft {
+  from {
+    scale: 1;
+    opacity: 1;
+    transform-origin: left;
+  }
+  to {
+    scale: 1 0.5;
+    opacity: 0;
+    transform-origin: left;
+  }
+}
+
+@keyframes stretchOutInRight {
+  from {
+    scale: 1;
+    opacity: 1;
+    transform-origin: right;
+  }
+  to {
+    scale: 1 0.5;
+    opacity: 0;
+    transform-origin: right;
   }
 }
 

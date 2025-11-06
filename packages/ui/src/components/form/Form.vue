@@ -4,6 +4,7 @@ import { inject, onMounted, onUpdated, provide, ref } from "vue";
 
 const props = defineProps<{
   form: FormInstance<any>;
+  title?: string;
   labelWidth?: string;
 }>();
 
@@ -75,6 +76,11 @@ onUpdated(() => {
       '--mcsl-form__label-width': actualLabelWidth,
     }"
   >
+    <div class="mcsl-form__title">
+      <slot name="title">
+        <h2 class="mcsl-form__title-default">{{ title }}</h2>
+      </slot>
+    </div>
     <slot />
   </form>
 </template>
@@ -90,5 +96,18 @@ onUpdated(() => {
 <style lang="scss">
 .mcsl-form > .mcsl-button[type="submit"] {
   margin-top: var(--mcsl-spacing-2xs);
+}
+
+.mcsl-form__title {
+  width: 100%;
+  margin-bottom: var(--mcsl-spacing-sm);
+}
+
+.mcsl-form__title-default {
+  width: 100%;
+  text-align: center;
+  color: var(--mcsl-text-color-secondary);
+  font-size: var(--mcsl-font-size-xl);
+  font-weight: var(--mcsl-font-weight-base);
 }
 </style>

@@ -74,7 +74,7 @@ if (formField) {
         new ColorData(color, 'light'),
       ),
       '--mcsl-textarea__color': getColorVar(color),
-      '--mcsl-textarea__color-dark': getColorVar(new ColorData(color, 'dark')),
+      '--mcsl-textarea__color-dark': new ColorData(color, 'dark').getCss(),
     }"
     :placeholder="placeholder"
     class="mcsl-textarea"

@@ -22,7 +22,7 @@ const props = withDefaults(
   }>(),
   {
     width: 100,
-    labelPos: "top",
+    labelPos: "left",
   },
 );
 

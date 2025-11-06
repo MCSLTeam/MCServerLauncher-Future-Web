@@ -36,11 +36,12 @@ const t = useI18n().t;
   margin-bottom: var(--mcsl-spacing-2xl);
 
   & > img {
-    width: 7.5rem;
+    width: 7rem;
   }
 
   & > h1 {
     color: transparent;
+    margin-top: var(--mcsl-spacing-2xs);
     background: linear-gradient(
       45deg,
       var(--mcsl-color-green),
@@ -66,15 +67,7 @@ const t = useI18n().t;
 </style>
 
 <style lang="scss">
-.auth-body {
-  & > h2 {
-    width: 100%;
-    text-align: center;
-    margin-bottom: var(--mcsl-spacing-sm);
-
-    color: var(--mcsl-text-color-secondary);
-    font-size: var(--mcsl-font-size-xl);
-    font-weight: var(--mcsl-font-weight-base);
-  }
+.auth-body > h2 {
+  margin-top: var(--mcsl-spacing-xs);
 }
 </style>
