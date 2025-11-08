@@ -137,7 +137,7 @@ $dark-color: color-mix(
       background: $dark-color;
     }
 
-    &:nth-last-child(1) {
+    &:last-child {
       border-radius: 0 var(--mcsl-border-radius-full)
         var(--mcsl-border-radius-full) 0;
     }

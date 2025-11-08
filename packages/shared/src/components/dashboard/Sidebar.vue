@@ -5,20 +5,21 @@ import Divider from "@repo/ui/src/components/misc/Divider.vue";
 import { getPlatform } from "../../index.ts";
 
 const t = useI18n().t;
+const platform = getPlatform();
 </script>
 
 <template>
   <div class="sidebar">
-    <div class="logo">
+    <div class="logo" :class="[`logo-${platform}`]">
       <img src="../../assets/MCSL.png" alt="" />
       <div>
-        <h3>
-          {{ t("shared.app.name.name") }}
-        </h3>
         <h2>
-          {{ t("shared.app.name.future") }}
-          {{ t(`${getPlatform()}.app.name.suffix`) }}
+          {{ t("shared.app.name.name") }}
         </h2>
+        <h3>
+          {{ t("shared.app.name.future") }}
+          {{ t(`${platform}.app.name.suffix`) }}
+        </h3>
       </div>
     </div>
     <Divider spacing="md" />
@@ -31,7 +32,7 @@ const t = useI18n().t;
           align="left"
           shadow="never"
         >
-          仪表盘
+          {{ t("shared.dashboard.title") }}
         </Button>
         <Button
           icon="fa fa-server"
@@ -40,7 +41,7 @@ const t = useI18n().t;
           align="left"
           shadow="never"
         >
-          实例管理
+          {{ t("shared.instances.title") }}
         </Button>
         <Button
           icon="fa fa-puzzle-piece"
@@ -49,10 +50,10 @@ const t = useI18n().t;
           align="left"
           shadow="never"
         >
-          探索资源
+          {{ t("shared.resource-center.title") }}
         </Button>
         <Button icon="fa fa-user" block type="text" align="left" shadow="never">
-          用户管理
+          {{ t("shared.users.title") }}
         </Button>
         <Button
           icon="fa fa-circle-info"
@@ -61,7 +62,7 @@ const t = useI18n().t;
           align="left"
           shadow="never"
         >
-          帮助中心
+          {{ t("shared.help-center.title") }}
         </Button>
       </div>
       <div class="sidebar__content">
@@ -74,7 +75,7 @@ const t = useI18n().t;
             align="left"
             shadow="never"
           >
-            任务列表
+            {{ t("shared.tasks.title") }}
           </Button>
           <Button
             icon="fa fa-desktop"
@@ -83,7 +84,7 @@ const t = useI18n().t;
             align="left"
             shadow="never"
           >
-            远程节点
+            {{ t("shared.nodes.title") }}
           </Button>
           <Button
             icon="fa fa-cog"
@@ -92,7 +93,7 @@ const t = useI18n().t;
             align="left"
             shadow="never"
           >
-            设置
+            {{ t("shared.settings.title") }}
           </Button>
         </div>
       </div>
@@ -104,7 +105,7 @@ const t = useI18n().t;
 .sidebar {
   margin: var(--mcsl-spacing-xl);
   margin-right: 0;
-  width: 18rem;
+  width: 16rem;
   display: flex;
   flex-direction: column;
 }
@@ -116,7 +117,7 @@ const t = useI18n().t;
   gap: var(--mcsl-spacing-2xs);
 
   & > img {
-    width: 4rem;
+    width: 3rem;
   }
 
   & > div {
@@ -124,26 +125,27 @@ const t = useI18n().t;
     flex-direction: column;
     justify-content: center;
 
-    & > h3 {
+    & > h2 {
       color: transparent;
       background: linear-gradient(
         45deg,
         var(--mcsl-color-green),
         var(--mcsl-color-blue)
       );
+      font-size: var(--mcsl-font-size-lg);
+      font-weight: var(--mcsl-font-weight-bold);
       background-clip: text;
     }
 
-    & > h2 {
+    & > h3 {
       color: transparent;
       background: linear-gradient(
-        45deg,
-        var(--mcsl-color-blue-500),
-        var(--mcsl-color-blue-600)
+        135deg,
+        var(--suffix-color-1),
+        var(--suffix-color-2)
       );
       background-clip: text;
       font-size: var(--mcsl-font-size-xl);
-      font-weight: var(--mcsl-font-weight-base);
     }
   }
 }
@@ -159,6 +161,16 @@ const t = useI18n().t;
   & > div {
     width: 100%;
   }
+}
+
+.logo-web {
+  --suffix-color-1: var(--mcsl-color-sky-500);
+  --suffix-color-2: var(--mcsl-color-blue-600);
+}
+
+.logo-app {
+  --suffix-color-1: var(--mcsl-color-amber-400);
+  --suffix-color-2: var(--mcsl-color-red-500);
 }
 
 .sidebar__content-big {

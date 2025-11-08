@@ -25,3 +25,5 @@ onUnmounted(() => {
   removeTemplate(props.id);
 });
 </script>
+
+<template></template>

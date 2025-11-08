@@ -55,7 +55,7 @@ const actuallyIconSeperator = computed(() =>
       color: var(--mcsl-text-color-secondary);
     }
 
-    &:nth-last-child(1) {
+    &:last-child {
       font-weight: var(--mcsl-font-weight-bold);
 
       &,

@@ -4,7 +4,9 @@ import Sidebar from "../components/dashboard/Sidebar.vue";
 import Breadcrumbs from "@repo/ui/src/components/navigation/Breadcrumbs.vue";
 import Button from "@repo/ui/src/components/form/button/Button.vue";
 import { Notification } from "@repo/ui/src/utils/notifications.ts";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
+
+const sidebarCollapsable = ref(true);
 
 onMounted(() => {
   new Notification({
@@ -13,6 +15,14 @@ onMounted(() => {
     },
     duration: 114514,
   });
+
+  setTimeout(() => {
+    sidebarCollapsable.value = false;
+  }, 2000);
+
+  setTimeout(() => {
+    sidebarCollapsable.value = true;
+  }, 4000);
 });
 </script>
 

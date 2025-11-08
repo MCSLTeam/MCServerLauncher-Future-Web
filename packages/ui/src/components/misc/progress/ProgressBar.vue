@@ -226,7 +226,7 @@ $size: var(--mcsl-progress-bar__size);
       fill: none;
       stroke-width: $stroke-width;
 
-      &:nth-child(1) {
+      &:first-child {
         stroke: var(--mcsl-border-color-base);
       }
 

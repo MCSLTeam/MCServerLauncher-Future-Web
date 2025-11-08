@@ -1,5 +1,4 @@
 import {
-  type ComputedRef,
   inject,
   provide,
   readonly,
@@ -39,7 +38,7 @@ export function animatedVisibilityExists(
   },
 ): {
   exist: Ref<boolean>;
-  status: ComputedRef<"in" | "out" | "show" | "hide">;
+  status: Readonly<Ref<"in" | "out" | "show" | "hide">>;
 } {
   const exist = ref(visible.value);
   const status = ref<"in" | "out" | "show" | "hide">(visible ? "show" : "hide");

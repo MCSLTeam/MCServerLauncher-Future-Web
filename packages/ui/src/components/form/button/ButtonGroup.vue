@@ -22,16 +22,16 @@
     z-index: 1; // 避免outline被遮挡
   }
 
-  &:not(:nth-child(1)):not(:nth-last-child(1)) {
+  &:not(:first-child):not(:last-child) {
     border-radius: 0;
   }
 
-  &:nth-child(1) {
+  &:first-child {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
 
-  &:nth-last-child(1) {
+  &:last-child {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }

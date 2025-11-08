@@ -330,12 +330,30 @@ $font-size-vars: (
   }
 }
 
+@keyframes collapseInHorizontal {
+  from {
+    max-width: 0;
+  }
+  to {
+    max-width: 1000px;
+  }
+}
+
 @keyframes collapseOutVertical {
   from {
     max-height: 1000px;
   }
   to {
     max-height: 0;
+  }
+}
+
+@keyframes collapseOutHorizontal {
+  from {
+    max-width: 1000px;
+  }
+  to {
+    max-width: 0;
   }
 }
 
