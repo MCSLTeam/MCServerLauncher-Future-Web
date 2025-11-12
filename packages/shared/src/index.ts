@@ -1,5 +1,5 @@
 import { loadUi } from "@repo/ui/src";
-import { createApp } from "vue";
+import { computed, createApp, type Ref, ref } from "vue";
 import { createPinia } from "pinia";
 import FloatingVue from "floating-vue";
 import { createI18n } from "vue-i18n";
@@ -10,6 +10,16 @@ import router from "./router.ts";
 type Platform = "web" | "app";
 
 let platform: Platform = "web";
+
+export const windowButtons = ref<{
+  close: () => Promise<void>;
+  minimize: () => Promise<void>;
+  fullscreen: Ref<boolean>;
+}>();
+export const windowButtonsExists = ref(false);
+export const windowButtonTransition = computed(
+  () => `0.3s ${windowButtonsExists.value ? "" : "0.5s"} ease-in-out`,
+);
 
 export function getPlatform(): Platform {
   return platform;

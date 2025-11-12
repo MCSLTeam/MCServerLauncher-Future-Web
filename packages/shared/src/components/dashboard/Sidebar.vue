@@ -2,12 +2,16 @@
 import { useI18n } from "vue-i18n";
 import Button from "@repo/ui/src/components/form/button/Button.vue";
 import Divider from "@repo/ui/src/components/misc/Divider.vue";
-import { getPlatform } from "../../index.ts";
+import {
+  windowButtonTransition,
+  getPlatform,
+  windowButtonsExists,
+} from "../../index.ts";
 import { useRouter } from "vue-router";
 
 defineProps<{
   collapsed: boolean;
-}>()
+}>();
 
 const t = useI18n().t;
 const platform = getPlatform();
@@ -15,8 +19,17 @@ const router = useRouter();
 </script>
 
 <template>
-  <div class="sidebar" :class="{'sidebar__collapsed': collapsed}">
-    <div class="logo" :class="[`logo-${platform}`]">
+  <div class="sidebar" :class="{ sidebar__collapsed: collapsed }">
+    <div
+      class="logo"
+      :class="[`logo-${platform}`]"
+      :style="{
+        marginTop: windowButtonsExists
+          ? `calc(var(--mcsl-spacing-xs) + 2 * var(--mcsl-spacing-md) + 1rem)`
+          : `var(--mcsl-spacing-xl)`,
+        transition: `margin-top ${windowButtonTransition}`,
+      }"
+    >
       <img src="../../assets/MCSL.png" alt="" />
       <div>
         <h2>
@@ -61,7 +74,14 @@ const router = useRouter();
         >
           {{ t("shared.resource-center.title") }}
         </Button>
-        <Button icon="fa fa-user" block type="text" align="left" shadow="never" @click="router.push('/users')">
+        <Button
+          icon="fa fa-user"
+          block
+          type="text"
+          align="left"
+          shadow="never"
+          @click="router.push('/users')"
+        >
           {{ t("shared.users.title") }}
         </Button>
         <Button
@@ -116,6 +136,7 @@ const router = useRouter();
 <style scoped lang="scss">
 .sidebar {
   margin: var(--mcsl-spacing-xl);
+  margin-top: 0;
   margin-right: 0;
   width: 16rem;
   display: flex;

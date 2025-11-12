@@ -13,6 +13,7 @@
     "@repo/configs": "workspace:*",
     "@repo/locales": "workspace:*",
     "@repo/ui": "workspace:*",
+    "@rsbuild/core": "^1.6.3",
     "@rsbuild/plugin-sass": "^1.4.0",
     "@rsbuild/plugin-vue": "^1.2.0",
     "eslint-config-prettier": "^10.1.8",
@@ -24,6 +25,7 @@
   },
   "dependencies": {
     "@vueuse/core": "^13.7.0",
+    "axios": "^1.13.2",
     "floating-vue": "^5.2.2",
     "pinia": "^3.0.3",
     "vue": "^3.5.18",

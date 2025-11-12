@@ -12,8 +12,6 @@
   "app": {
     "windows": [
       {
-        "titleBarStyle": "Overlay",
-        "hiddenTitle": true,
         "fullscreen": false,
         "height": 700,
         "width": 1100,

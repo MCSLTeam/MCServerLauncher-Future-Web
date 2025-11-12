@@ -1,8 +1,9 @@
 import { pluginVue } from "@rsbuild/plugin-vue";
 import { pluginSass } from "@rsbuild/plugin-sass";
 import { pluginSvg } from "rsbuild-plugin-svg";
+import { defineConfig } from "@rsbuild/core";
 
-export default {
+export const config = {
   plugins: [
     pluginVue(),
     pluginSass(),
@@ -21,4 +22,10 @@ export default {
       },
     }),
   ],
+  html: {
+    title: "MCSL Future Web-like",
+    mountId: "app",
+  },
 };
+
+export default defineConfig(config)
