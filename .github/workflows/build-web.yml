@@ -25,6 +25,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
@@ -58,10 +59,11 @@ jobs:
           cd apps/web
           pnpm frontend:build
 
+      - name: Install Rust
+        run: rustup target add ${{ matrix.target }}
+
       - name: Build backend
-        run: |
-          rustup target add ${{ matrix.target }}
-          cargo build --release --target ${{ matrix.target }}
+        run: cargo build --release --target ${{ matrix.target }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
