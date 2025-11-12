@@ -1,0 +1,28 @@
+{
+  "name": "web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "pnpm frontend:build && cargo build --release",
+    "backend:dev": "cargo run",
+    "frontend:dev": "rsbuild dev",
+    "frontend:build": "vue-tsc --noEmit && rsbuild build",
+    "frontend:preview": "rsbuild preview",
+    "lint": "eslint; prettier --check .; cargo lint",
+    "fix": "eslint --fix;prettier --write --list-different .; cargo fix",
+    "test": "tsc --noEmit && cargo test"
+  },
+  "dependencies": {
+    "@repo/configs": "workspace:*",
+    "@repo/shared": "workspace:*",
+    "@repo/ui": "workspace:*",
+    "eslint": "^9.33.0",
+    "vue": "^3.5.18"
+  },
+  "devDependencies": {
+    "@rsbuild/core": "^1.6.3",
+    "typescript": "^5.9.2",
+    "vue-tsc": "^2.2.12"
+  }
+}
