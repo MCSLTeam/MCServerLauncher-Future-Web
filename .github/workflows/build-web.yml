@@ -24,6 +24,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: macos-latest
+            target: aarch64-apple-darwin
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -42,10 +54,17 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Build website
-        run: pnpm web:build
+        run: |
+          cd apps/web
+          pnpm frontend:build
+
+      - name: Build backend
+        run: |
+          rustup target add ${{ matrix.target }}
+          cargo build --release --target ${{ matrix.target }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MCSL-Future-Web
-          path: ./apps/web/.output
+          name: mcsl-web-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/mcsl_future_web${{ matrix.os == 'windows-latest' && '.exe' || '' }}
