@@ -9,21 +9,19 @@ const t = useI18n().t;
 </script>
 
 <template>
-  <MainLayout>
-    <FancyBackground>
-      <div class="logo">
-        <img src="../assets/MCSL.png" alt="" />
-        <h1>
-          {{ t("shared.app.name.abbr") }} {{ t("shared.app.name.future") }}
-          {{ t(`${getPlatform()}.app.name.suffix`) }}
-        </h1>
-        <h2>{{ t("shared.app.desc") }}</h2>
-      </div>
-      <Panel class="auth-panel" body-class="auth-body">
-        <slot />
-      </Panel>
-    </FancyBackground>
-  </MainLayout>
+  <FancyBackground>
+    <div class="logo">
+      <img src="../assets/MCSL.png" alt="" />
+      <h1>
+        {{ t("shared.app.name.abbr") }} {{ t("shared.app.name.future") }}
+        {{ t(`${getPlatform()}.app.name.suffix`) }}
+      </h1>
+      <h2>{{ t("shared.app.desc") }}</h2>
+    </div>
+    <Panel class="auth-panel" body-class="auth-body">
+      <slot />
+    </Panel>
+  </FancyBackground>
 </template>
 
 <style scoped lang="scss">

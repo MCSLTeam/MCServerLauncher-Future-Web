@@ -16,7 +16,7 @@ import Message from "../../panel/Message.vue";
 
         ...item.template.props(item.data),
       }"
-      :visible="item.opened"
+      :visible="item.opened as any"
     >
       <component :is="item.element" />
     </Message>

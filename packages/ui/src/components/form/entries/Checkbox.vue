@@ -39,7 +39,7 @@ const formField = inject("mcsl-form-field", undefined) as
   | undefined;
 
 if (formField) {
-  if (typeof formField.field.value.value != "boolean") {
+  if (typeof formField.field.data.value != "boolean") {
     console.error(
       "[MCSL-UI] The type of the value for a <Checkbox> component is not boolean.",
     );
@@ -48,9 +48,9 @@ if (formField) {
     );
   }
 
-  model.value = formField.field.value.value;
+  model.value = formField.field.data.value;
   watch(model, (value) => {
-    formField.field.value.value = value;
+    formField.field.data.value = value;
   });
 }
 </script>
@@ -78,7 +78,7 @@ if (formField) {
       (e) => {
         $emit('input', e);
         if (formField) {
-          formField.field.value.value = model = (
+          formField.field.data.value = model = (
             e.currentTarget as HTMLInputElement
           ).checked;
           formField.onInput(e);

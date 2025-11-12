@@ -3,13 +3,19 @@ import { useI18n } from "vue-i18n";
 import Button from "@repo/ui/src/components/form/button/Button.vue";
 import Divider from "@repo/ui/src/components/misc/Divider.vue";
 import { getPlatform } from "../../index.ts";
+import { useRouter } from "vue-router";
+
+defineProps<{
+  collapsed: boolean;
+}>()
 
 const t = useI18n().t;
 const platform = getPlatform();
+const router = useRouter();
 </script>
 
 <template>
-  <div class="sidebar">
+  <div class="sidebar" :class="{'sidebar__collapsed': collapsed}">
     <div class="logo" :class="[`logo-${platform}`]">
       <img src="../../assets/MCSL.png" alt="" />
       <div>
@@ -31,6 +37,7 @@ const platform = getPlatform();
           type="text"
           align="left"
           shadow="never"
+          @click="router.push('/dashboard')"
         >
           {{ t("shared.dashboard.title") }}
         </Button>
@@ -40,6 +47,7 @@ const platform = getPlatform();
           type="text"
           align="left"
           shadow="never"
+          @click="router.push('/instances')"
         >
           {{ t("shared.instances.title") }}
         </Button>
@@ -49,10 +57,11 @@ const platform = getPlatform();
           type="text"
           align="left"
           shadow="never"
+          @click="router.push('/resource-center')"
         >
           {{ t("shared.resource-center.title") }}
         </Button>
-        <Button icon="fa fa-user" block type="text" align="left" shadow="never">
+        <Button icon="fa fa-user" block type="text" align="left" shadow="never" @click="router.push('/users')">
           {{ t("shared.users.title") }}
         </Button>
         <Button
@@ -61,6 +70,7 @@ const platform = getPlatform();
           type="text"
           align="left"
           shadow="never"
+          @click="router.push('/help-center')"
         >
           {{ t("shared.help-center.title") }}
         </Button>
@@ -83,6 +93,7 @@ const platform = getPlatform();
             type="text"
             align="left"
             shadow="never"
+            @click="router.push('/nodes')"
           >
             {{ t("shared.nodes.title") }}
           </Button>
@@ -92,6 +103,7 @@ const platform = getPlatform();
             type="text"
             align="left"
             shadow="never"
+            @click="router.push('/settings')"
           >
             {{ t("shared.settings.title") }}
           </Button>
@@ -164,17 +176,21 @@ const platform = getPlatform();
 }
 
 .logo-web {
-  --suffix-color-1: var(--mcsl-color-sky-500);
+  --suffix-color-1: var(--mcsl-color-sky);
   --suffix-color-2: var(--mcsl-color-blue-600);
 }
 
 .logo-app {
   --suffix-color-1: var(--mcsl-color-amber-400);
-  --suffix-color-2: var(--mcsl-color-red-500);
+  --suffix-color-2: var(--mcsl-color-red);
 }
 
 .sidebar__content-big {
   @extend .sidebar__content;
   flex-grow: 1;
+}
+
+.sidebar__collapsed {
+  width: 4rem;
 }
 </style>

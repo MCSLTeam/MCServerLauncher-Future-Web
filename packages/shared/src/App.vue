@@ -6,9 +6,11 @@ import NotificationOverlay from "@repo/ui/src/components/overlay/notification/No
 <template>
   <NotificationTemplate id="default">
     <template v-slot="data">
-      <p>{{ data.message }}</p>
+      <p>{{ (data as any).message }}</p>
     </template>
   </NotificationTemplate>
   <NotificationOverlay />
-  <slot />
+  <RouterView />
 </template>
+
+<style scoped></style>

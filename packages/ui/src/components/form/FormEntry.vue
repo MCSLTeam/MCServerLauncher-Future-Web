@@ -77,7 +77,7 @@ watch(field.error, (err) => {
   }
   const old = errMsg.value;
   clearTimeout(timeout);
-  timeout = setTimeout(() => {
+  timeout = window.setTimeout(() => {
     if (errMsg.value == old) errMsg.value = null;
   }, 200);
 });

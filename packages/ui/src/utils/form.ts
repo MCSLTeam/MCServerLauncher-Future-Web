@@ -1,8 +1,8 @@
 import * as yup from "yup";
 import {
   computed,
-  type ComputedRef,
   readonly,
+  type Ref,
   ref,
   type WritableComputedRef,
 } from "vue";
@@ -10,16 +10,16 @@ import {
 export type ValidationTrigger = "input" | "blur" | "submit";
 
 export type FormFieldInstance = {
-  value: WritableComputedRef<any>;
+  data: WritableComputedRef<any>;
   label?: string;
   validate: () => Promise<boolean>;
   reset: () => void;
-  error: ComputedRef<string | null>;
+  error: Readonly<Ref<string | null>>;
   __setError__: (error: string | null) => void;
 };
 
 export type FormInstance<T extends Record<string, any>> = {
-  value: WritableComputedRef<T>;
+  data: WritableComputedRef<T>;
   validate: () => Promise<boolean>;
   validateField: (field: string) => Promise<boolean>;
   validationTrigger: ValidationTrigger;
@@ -44,7 +44,7 @@ export function createForm<T extends Record<string, any>>(
     return valid;
   };
   return {
-    value: computed({
+    data: computed({
       get() {
         return formRef.value;
       },
@@ -81,7 +81,7 @@ export function createForm<T extends Record<string, any>>(
       if (fieldMap.has(name)) return fieldMap.get(name)!;
       const error = ref<string | null>(null);
       const instance = {
-        value: computed({
+        data: computed({
           get() {
             return formRef.value[name];
           },

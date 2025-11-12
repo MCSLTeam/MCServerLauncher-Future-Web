@@ -33,7 +33,7 @@ const model = defineModel<any>({
 
 const form = createForm(
   {
-    value: model.value,
+    data: model.value,
   },
   yup.object({
     value: props.schema ?? yup.mixed(),
@@ -43,16 +43,16 @@ const form = createForm(
 
 const field = form.__getField__("value");
 
-watch(field.value, (value) => {
+watch(field.data, (value) => {
   if (value != model.value) model.value = value;
 });
 
 watch(model, (value) => {
-  if (value != field.value.value) field.value.value = value;
+  if (value != field.data.value) field.data.value = value;
 });
 
 const data = computed(() => ({
-  value: field.value.value,
+  value: field.data.value,
   reset: form.reset,
   validate: form.validate,
   error: field.error,

@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import {
   useLocalStorage,
+  useMediaQuery,
   usePreferredColorScheme,
   usePreferredLanguages,
 } from "@vueuse/core";
@@ -213,5 +214,33 @@ export const useLocale = defineStore("locale", () => {
     getMessages,
     getLocale,
     setLocale,
+  };
+});
+
+/* ========== [ 屏幕宽度 ]========== */
+
+/**
+ * 屏幕宽度类型
+ *
+ * lg - 大屏（屏幕宽度 >= 1024px）
+ *
+ * md - 中等屏（768px < 屏幕宽度 < 1024px）
+ *
+ * sm - 小屏（屏幕宽度 <= 768px）
+ */
+export type ScreenWidth = "lg" | "md" | "sm";
+
+export const useScreenWidth = defineStore("screenWidth", () => {
+  const isSm = useMediaQuery("(max-width: 768px)");
+  const isMd = useMediaQuery("(max-width: 1024px)");
+
+  const width = computed(() => {
+    if (isSm.value) return "sm";
+    if (isMd.value) return "md";
+    return "lg";
+  });
+
+  return {
+    width,
   };
 });

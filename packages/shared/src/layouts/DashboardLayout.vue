@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import MainLayout from "./MainLayout.vue";
 import Sidebar from "../components/dashboard/Sidebar.vue";
 import Breadcrumbs from "@repo/ui/src/components/navigation/Breadcrumbs.vue";
 import Button from "@repo/ui/src/components/form/button/Button.vue";
+import { usePageData } from "../utils/stores.ts";
+import { useLocalStorage } from "@vueuse/core";
+import { onMounted } from "vue";
 import { Notification } from "@repo/ui/src/utils/notifications.ts";
-import { onMounted, ref } from "vue";
 
-const sidebarCollapsable = ref(true);
+const pageData = usePageData().data;
+const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
 
 onMounted(() => {
   new Notification({
@@ -15,81 +17,73 @@ onMounted(() => {
     },
     duration: 114514,
   });
-
-  setTimeout(() => {
-    sidebarCollapsable.value = false;
-  }, 2000);
-
-  setTimeout(() => {
-    sidebarCollapsable.value = true;
-  }, 4000);
 });
 </script>
 
 <template>
-  <MainLayout>
-    <div class="dashboard">
-      <Sidebar />
-      <div class="dashboard__main">
-        <div class="dashboard__nav">
-          <div>
-            <Button
-              type="text"
-              icon="fa fa-angles-left"
-              rounded
-              size="small"
-              shadow="never"
-              v-tooltip="'折叠侧边栏'"
-            />
-            <Button
-              type="text"
-              icon="fa fa-angle-left"
-              rounded
-              size="small"
-              shadow="never"
-              v-tooltip="'上一页'"
-            />
-            <Button
-              type="text"
-              icon="fa fa-angle-right"
-              rounded
-              size="small"
-              shadow="never"
-              v-tooltip="'下一页'"
-            />
-            <Breadcrumbs :items="[{ label: '仪表盘', path: '/dashboard' }]" />
-          </div>
-          <div>
-            <Button
-              type="text"
-              icon="fa fa-bell"
-              rounded
-              size="small"
-              shadow="never"
-              v-tooltip="'通知'"
-            />
-            <Button
-              type="text"
-              icon="fa fa-brush"
-              rounded
-              size="small"
-              shadow="never"
-              v-tooltip="'自定义界面'"
-            />
-            <Button
-              type="text"
-              icon="fa fa-user"
-              rounded
-              size="small"
-              shadow="never"
-              v-tooltip="'用户中心'"
-            />
-          </div>
+  <div class="dashboard">
+    <Sidebar :collapsed="sidebarCollapsed" />
+    <div class="dashboard__main">
+      <div class="dashboard__nav">
+        <div>
+          <Button
+            type="text"
+            icon="fa fa-angles-left"
+            rounded
+            size="small"
+            shadow="never"
+            v-tooltip="'折叠侧边栏'"
+          />
+          <Button
+            type="text"
+            icon="fa fa-angle-left"
+            rounded
+            size="small"
+            shadow="never"
+            v-tooltip="'上一页'"
+          />
+          <Button
+            type="text"
+            icon="fa fa-angle-right"
+            rounded
+            size="small"
+            shadow="never"
+            v-tooltip="'下一页'"
+          />
+          <Breadcrumbs :items="pageData.breadcrumbs" />
         </div>
-        <div class="dashboard__content"></div>
+        <div>
+          <Button
+            type="text"
+            icon="fa fa-bell"
+            rounded
+            size="small"
+            shadow="never"
+            v-tooltip="'通知'"
+          />
+          <Button
+            type="text"
+            icon="fa fa-brush"
+            rounded
+            size="small"
+            shadow="never"
+            v-tooltip="'自定义界面'"
+          />
+          <Button
+            type="text"
+            icon="fa fa-user"
+            rounded
+            size="small"
+            shadow="never"
+            v-tooltip="'用户中心'"
+          />
+        </div>
+      </div>
+      <div class="dashboard__content">
+        <slot />
       </div>
     </div>
-  </MainLayout>
+  </div>
 </template>
 
 <style scoped lang="scss">

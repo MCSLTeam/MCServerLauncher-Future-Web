@@ -23,7 +23,7 @@ async function submit() {
 }
 
 onMounted(() => {
-  if (Object.keys(props.form.value.value).length > props.form.__fieldMap__.size)
+  if (Object.keys(props.form.data.value).length > props.form.__fieldMap__.size)
     console.warn(
       "[MCSL-UI] Form fields aren't completely being read by form components. This might cause unexpected issues.",
     );

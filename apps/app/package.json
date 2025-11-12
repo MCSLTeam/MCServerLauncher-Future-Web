@@ -7,9 +7,9 @@
     "dev": "tauri dev",
     "build": "tauri build",
     "tauri": "tauri",
-    "frontend:dev": "vite",
-    "frontend:build": "vue-tsc --noEmit && vite build",
-    "frontend:preview": "vite preview",
+    "frontend:dev": "rsbuild dev",
+    "frontend:build": "vue-tsc --noEmit && rsbuild build",
+    "frontend:preview": "rsbuild preview",
     "lint": "eslint; prettier --check .",
     "fix": "eslint --fix;prettier --write --list-different .",
     "test": "tsc --noEmit"
@@ -21,19 +21,12 @@
     "@tauri-apps/api": "^2.8.0",
     "@tauri-apps/plugin-opener": "^2.4.0",
     "eslint": "^9.33.0",
-    "floating-vue": "^5.2.2",
-    "pinia": "^3.0.3",
-    "vite-svg-loader": "^5.1.0",
-    "vue": "^3.5.18",
-    "vue-i18n": "^11.1.11",
-    "vue-router": "^4.5.1"
+    "vue": "^3.5.18"
   },
   "devDependencies": {
+    "@rsbuild/core": "^1.6.3",
     "@tauri-apps/cli": "^2.8.1",
-    "@vitejs/plugin-vue": "^5.2.4",
     "typescript": "^5.9.2",
-    "vite": "^6.3.5",
-    "vite-plugin-dynamic-import": "^1.6.0",
     "vue-tsc": "^2.2.12"
   }
 }

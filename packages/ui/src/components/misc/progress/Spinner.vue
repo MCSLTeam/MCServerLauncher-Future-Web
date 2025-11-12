@@ -1,13 +1,16 @@
 <script lang="ts" setup>
 import { McLoadingIcon, RippleIcon, SpinnerIcon } from "../../../utils/icons";
 import { type Color, getColorVar } from "../../../utils/css.ts";
+import { getSize } from "../../../utils/internal.ts";
+import type { Size } from "../../../utils/types.ts";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     label?: string;
     labelPos?: "left" | "right" | "top" | "bottom";
     type?: "mc" | "ripples" | "spinner";
     color?: Color;
+    size?: Size;
   }>(),
   {
     label: "",
@@ -16,11 +19,13 @@ withDefaults(
     color: "text-color-regular",
   },
 );
+
+const size = getSize(props.size);
 </script>
 
 <template>
   <div
-    :class="[`mcsl-spinner__label-${labelPos}`]"
+    :class="[`mcsl-size-${size}`, `mcsl-spinner__label-${labelPos}`]"
     :style="{
       '--mcsl-spinner__color': getColorVar(color),
     }"
@@ -34,11 +39,31 @@ withDefaults(
 </template>
 
 <style lang="scss" scoped>
+@use "sass:map";
+@use "../../../assets/css/utils";
+
+$vars: (
+  "spinner-size": (
+    "small": 1rem,
+    "middle": 3rem,
+    "large": 5rem,
+  ),
+);
+
+@each $size in utils.$sizes {
+  .mcsl-size-#{$size}.mcsl-spinner {
+    $spinner-size: #{map.get(map.get($vars, "spinner-size"), $size)};
+
+    width: $spinner-size;
+    height: $spinner-size;
+  }
+}
+
 .mcsl-spinner {
   overflow: hidden;
   display: flex;
   justify-content: center;
-  align-content: center;
+  align-items: center;
 
   &.mcsl-spinner__label.top {
     flex-direction: column-reverse;

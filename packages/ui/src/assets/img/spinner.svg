@@ -3,7 +3,7 @@
             cx="400"
             cy="400"
             r="200"
-            fill="#fff"
+            fill="transparent"
             stroke-width="50"
             stroke-linecap="round"
             stroke-dasharray="700, 1400"

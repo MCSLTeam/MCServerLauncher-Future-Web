@@ -9,7 +9,13 @@ export const layout = readonly(_layout);
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: [],
+  routes: [
+    {
+      path: "/",
+      name: "Dashboard",
+      component: async () => await import("./views/Dashboard.vue"),
+    },
+  ],
 });
 
 router.beforeEach(async (to, _from, next) => {

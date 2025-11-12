@@ -26,10 +26,10 @@ const actuallyIconSeperator = computed(() =>
         <i v-if="actuallyIconSeperator" :class="actualSeperator" />
         <template v-else>{{ actualSeperator }} </template>
       </span>
-      <router-link :to="item.path">
+      <RouterLink :to="item.path">
         <i v-if="item.icon" :class="item.icon" />
         {{ item.label }}
-      </router-link>
+      </RouterLink>
     </template>
   </nav>
 </template>

@@ -60,7 +60,7 @@ export function animatedVisibilityExists(
       status.value = "in";
       hooks?.beforeShow?.();
       if (hooks?.afterShow) {
-        timeout = setTimeout(() => {
+        timeout = window.setTimeout(() => {
           status.value = "show";
           hooks?.afterShow?.();
         }, duration.in);
@@ -69,7 +69,7 @@ export function animatedVisibilityExists(
       // close
       status.value = "out";
       hooks?.beforeHide?.();
-      timeout = setTimeout(() => {
+      timeout = window.setTimeout(() => {
         exist.value = false;
         status.value = "hide";
         hooks?.afterHide?.();
