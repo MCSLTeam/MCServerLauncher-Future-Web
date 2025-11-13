@@ -30,23 +30,43 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
 
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: lts/*
+          cache: "pnpm"
+          cache-dependency-path: pnpm-lock.yaml
 
-      - name: Install PNPM
-        run: npm i -g pnpm
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ matrix.platform == 'windows-latest' && '~\\AppData\\Local\\pnpm-store' || '~/.pnpm-store' }}
+          key: ${{ matrix.platform }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ matrix.platform }}-pnpm-
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ matrix.platform == 'windows-latest' && '~\\AppData\\Local\\Cargo\\bin' || '~/.cargo/bin/' }}
+            ${{ matrix.platform == 'windows-latest' && '~\\AppData\\Local\\Cargo\\registry\\index' || '~/.cargo/registry/index/' }}
+            ${{ matrix.platform == 'windows-latest' && '~\\AppData\\Local\\Cargo\\registry\\cache' || '~/.cargo/registry/cache/' }}
+            ${{ matrix.platform == 'windows-latest' && '~\\AppData\\Local\\Cargo\\git\\db' || '~/.cargo/git/db/' }}
+            target
+          key: ${{ matrix.platform }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ matrix.platform }}-cargo-
 
       - name: Install NPM dependencies
         run: pnpm install --no-frozen-lockfile
 
       - name: Install dependencies (ubuntu only)
-        if: startsWith(matrix.platform, 'ubuntu')
+        if: matrix.platform == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
@@ -55,7 +75,7 @@ jobs:
         run: pnpm app:build
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: MCSL-Future-Tauri-${{ matrix.platform }}
           path: |
