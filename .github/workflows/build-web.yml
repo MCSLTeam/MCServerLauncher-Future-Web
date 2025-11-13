@@ -22,20 +22,31 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
+          - platform: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-          - os: macos-latest
+            targetName: linux-x86_64-gnu
+
+          - platform: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            targetName: linux-x86_64-musl
+
+          - platform: macos-latest
             target: x86_64-apple-darwin
-          - os: macos-latest
+            targetName: macOS-x86_64
+
+          - platform: macos-latest
             target: aarch64-apple-darwin
-          - os: windows-latest
+            targetName: macOS-aarch64
+
+          - platform: windows-latest
             target: x86_64-pc-windows-msvc
+            targetName: windows-x86_64
+
+    runs-on: ${{ matrix.platform }}
 
     steps:
       - name: Checkout repository
@@ -51,22 +62,19 @@ jobs:
       - name: Install PNPM
         run: npm i -g pnpm
 
-      - name: Install dependencies
+      - name: Install NPM dependencies
         run: pnpm install --no-frozen-lockfile
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
 
       - name: Build website
         run: |
           cd apps/web
           pnpm frontend:build
-
-      - name: Install Rust
-        run: rustup target add ${{ matrix.target }}
-
-      - name: Install dependencies (ubuntu only)
-        if: startsWith(matrix.os, 'ubuntu')
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libglib2.0-dev
 
       - name: Build backend
         run: cargo build --release --target ${{ matrix.target }}
@@ -74,5 +82,5 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mcsl-web-${{ matrix.target }}
+          name: MCSL-Future-Web-${{ matrix.targetName }}
           path: target/${{ matrix.target }}/release/mcsl_future_web${{ matrix.os == 'windows-latest' && '.exe' || '' }}
