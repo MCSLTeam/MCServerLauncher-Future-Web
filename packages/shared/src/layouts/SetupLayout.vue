@@ -3,7 +3,6 @@ import FancyBackground from "@repo/ui/src/components/misc/FancyBackground.vue";
 import Panel from "@repo/ui/src/components/panel/Panel.vue";
 import { useI18n } from "vue-i18n";
 import { getPlatform } from "../index.ts";
-import MainLayout from "./MainLayout.vue";
 
 const t = useI18n().t;
 </script>

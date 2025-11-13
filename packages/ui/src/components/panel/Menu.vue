@@ -94,11 +94,6 @@ $vars: (
     "middle": var(--mcsl-spacing-2xs),
     "large": var(--mcsl-spacing-xs),
   ),
-  "border-radius": (
-    "small": var(--mcsl-border-radius-sm),
-    "middle": var(--mcsl-border-radius-lg),
-    "large": var(--mcsl-border-radius-2xl),
-  ),
   "width": (
     "small": 8rem,
     "middle": 10rem,

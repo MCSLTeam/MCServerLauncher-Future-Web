@@ -116,7 +116,7 @@ defineExpose({
 
 <style lang="scss" scoped>
 @use "../../assets/css/utils";
-@use "../PanelContent" as *;
+@use "../Content" as *;
 
 @each $size in utils.$sizes {
   .mcsl-size-#{$size}.mcsl-message {

@@ -140,7 +140,7 @@ defineExpose({
 .mcsl-modal__card {
   width: 600px;
   max-height: calc(100% - 2 * var(--mcsl-spacing-lg));
-  border-radius: var(--mcsl-border-radius-4xl);
+  border-radius: var(--mcsl-border-radius-2xl);
   z-index: 1002;
   animation: 0.2s ease-in-out both fadeOutDown;
 

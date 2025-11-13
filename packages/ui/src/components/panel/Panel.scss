@@ -1,17 +1,23 @@
-$vars: (
-  "box-shadow": (
-    "small": var(--mcsl-box-shadow-light),
-    "middle": var(--mcsl-box-shadow-base),
-    "large": var(--mcsl-box-shadow-dark),
-  ),
-  "spacing": (
-    "small": var(--mcsl-spacing-md),
-    "middle": var(--mcsl-spacing-lg),
-    "large": var(--mcsl-spacing-xl),
-  ),
-  "border-radius": (
-    "small": var(--mcsl-border-radius-lg),
-    "middle": var(--mcsl-border-radius-xl),
-    "large": var(--mcsl-border-radius-2xl),
-  ),
+@use "sass:map";
+@use "../Content";
+
+$vars: map.merge(
+  Content.$vars,
+  (
+    "box-shadow": (
+      "small": var(--mcsl-box-shadow-light),
+      "middle": var(--mcsl-box-shadow-base),
+      "large": var(--mcsl-box-shadow-dark),
+    ),
+    "border-radius": (
+      "small": var(--mcsl-border-radius-sm),
+      "middle": var(--mcsl-border-radius-md),
+      "large": var(--mcsl-border-radius-lg),
+    ),
+    "spacing": (
+      "small": var(--mcsl-spacing-md),
+      "middle": var(--mcsl-spacing-lg),
+      "large": var(--mcsl-spacing-xl),
+    ),
+  )
 );

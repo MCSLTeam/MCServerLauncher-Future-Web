@@ -8,6 +8,7 @@ import {
   windowButtonsExists,
 } from "../../index.ts";
 import { useRouter } from "vue-router";
+import { computed } from "vue";
 
 defineProps<{
   collapsed: boolean;
@@ -16,6 +17,7 @@ defineProps<{
 const t = useI18n().t;
 const platform = getPlatform();
 const router = useRouter();
+const currentPath = computed(() => router.currentRoute.value.fullPath);
 </script>
 
 <template>
@@ -45,51 +47,63 @@ const router = useRouter();
     <div class="sidebar__content-big">
       <div>
         <Button
+          :class="{ 'sidebar__btn-selected': currentPath == '/dashboard' }"
           icon="fa fa-dashboard"
           block
           type="text"
           align="left"
           shadow="never"
+          :color="currentPath == '/dashboard' ? 'primary' : undefined"
           @click="router.push('/dashboard')"
         >
           {{ t("shared.dashboard.title") }}
         </Button>
         <Button
+          :class="{ 'sidebar__btn-selected': currentPath == '/instances' }"
           icon="fa fa-server"
           block
           type="text"
           align="left"
           shadow="never"
+          :color="currentPath == '/instances' ? 'primary' : undefined"
           @click="router.push('/instances')"
         >
           {{ t("shared.instances.title") }}
         </Button>
         <Button
+          :class="{
+            'sidebar__btn-selected': currentPath == '/resource-center',
+          }"
           icon="fa fa-puzzle-piece"
           block
           type="text"
           align="left"
           shadow="never"
+          :color="currentPath == '/resource-center' ? 'primary' : undefined"
           @click="router.push('/resource-center')"
         >
           {{ t("shared.resource-center.title") }}
         </Button>
+        <!--        <Button-->
+        <!--          :class="{ 'sidebar__btn-selected': currentPath == '/users' }"-->
+        <!--          icon="fa fa-user"-->
+        <!--          block-->
+        <!--          type="text"-->
+        <!--          align="left"-->
+        <!--          shadow="never"-->
+        <!--          :color="currentPath == '/users' ? 'primary' : undefined"-->
+        <!--          @click="router.push('/users')"-->
+        <!--        >-->
+        <!--          {{ t("web.users.title") }}-->
+        <!--        </Button>-->
         <Button
-          icon="fa fa-user"
-          block
-          type="text"
-          align="left"
-          shadow="never"
-          @click="router.push('/users')"
-        >
-          {{ t("shared.users.title") }}
-        </Button>
-        <Button
+          :class="{ 'sidebar__btn-selected': currentPath == '/help-center' }"
           icon="fa fa-circle-info"
           block
           type="text"
           align="left"
           shadow="never"
+          :color="currentPath == '/help-center' ? 'primary' : undefined"
           @click="router.push('/help-center')"
         >
           {{ t("shared.help-center.title") }}
@@ -108,21 +122,25 @@ const router = useRouter();
             {{ t("shared.tasks.title") }}
           </Button>
           <Button
+            :class="{ 'sidebar__btn-selected': currentPath == '/nodes' }"
             icon="fa fa-desktop"
             block
             type="text"
             align="left"
             shadow="never"
+            :color="currentPath == '/nodes' ? 'primary' : undefined"
             @click="router.push('/nodes')"
           >
             {{ t("shared.nodes.title") }}
           </Button>
           <Button
+            :class="{ 'sidebar__btn-selected': currentPath == '/settings' }"
             icon="fa fa-cog"
             block
             type="text"
             align="left"
             shadow="never"
+            :color="currentPath == '/settings' ? 'primary' : undefined"
             @click="router.push('/settings')"
           >
             {{ t("shared.settings.title") }}
@@ -134,6 +152,8 @@ const router = useRouter();
 </template>
 
 <style scoped lang="scss">
+@use "@repo/ui/src/assets/css/utils";
+
 .sidebar {
   margin: var(--mcsl-spacing-xl);
   margin-top: 0;
@@ -213,5 +233,9 @@ const router = useRouter();
 
 .sidebar__collapsed {
   width: 4rem;
+}
+
+.sidebar__btn-selected {
+  background: utils.transparent(var(--mcsl-color-primary), 10%);
 }
 </style>

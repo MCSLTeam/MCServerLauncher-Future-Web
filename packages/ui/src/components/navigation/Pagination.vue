@@ -93,7 +93,7 @@ function go(p: number) {
 </template>
 
 <style lang="scss" scoped>
-@use "../PanelContent" as *;
+@use "../Content" as *;
 @use "../../assets/css/utils";
 
 @each $size in utils.$sizes {

@@ -17,7 +17,7 @@ const size = getSize(props.size);
 
 <style lang="scss" scoped>
 @use "../../../assets/css/utils";
-@use "../../SmallerPanelContent" as *;
+@use "../../SmallerContent" as *;
 
 @each $size in utils.$sizes {
   .mcsl-size-#{$size}.mcsl-tags {

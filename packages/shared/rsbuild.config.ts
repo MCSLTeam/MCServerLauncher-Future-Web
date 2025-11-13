@@ -28,4 +28,4 @@ export const config = {
   },
 };
 
-export default defineConfig(config)
+export default defineConfig(config);

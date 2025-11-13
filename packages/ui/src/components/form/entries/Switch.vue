@@ -93,10 +93,10 @@ if (formField) {
 <style lang="scss" scoped>
 @use "sass:map";
 @use "../../../assets/css/utils";
-@use "../../SmallerPanelContent";
+@use "../../SmallerContent";
 
 $vars: map.merge(
-  SmallerPanelContent.$vars,
+  SmallerContent.$vars,
   (
     "height": (
       "small": 1rem,

@@ -19,7 +19,12 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src-frontend/**/*.ts", "src-frontend/**/*.d.ts", "src-frontend/**/*.tsx", "src-frontend/**/*.vue"],
+  "include": [
+    "src-frontend/**/*.ts",
+    "src-frontend/**/*.d.ts",
+    "src-frontend/**/*.tsx",
+    "src-frontend/**/*.vue"
+  ],
   "references": [
     {
       "path": "./tsconfig.node.json"

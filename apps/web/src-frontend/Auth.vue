@@ -7,7 +7,7 @@ import * as yup from "yup";
 import Form from "@repo/ui/src/components/form/Form.vue";
 import FormEntry from "@repo/ui/src/components/form/FormEntry.vue";
 import InputText from "@repo/ui/src/components/form/entries/InputText.vue";
-import SetupLayout from "@repo/shared/src/layouts/SetupLayout.vue";
+import Setup from "packages/shared/src/layouts/Setup.vue";
 
 const theme = useTheme();
 const nextTheme = computed(() => {
@@ -49,7 +49,7 @@ const form = createForm(
 </script>
 
 <template>
-  <SetupLayout>
+  <Setup>
     <Button
       shadow="always"
       icon="fa fa-moon"
@@ -72,7 +72,7 @@ const form = createForm(
         >注册</Button
       >
     </Form>
-  </SetupLayout>
+  </Setup>
 </template>
 
 <style scoped lang="scss"></style>

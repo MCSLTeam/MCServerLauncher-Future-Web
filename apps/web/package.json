@@ -18,7 +18,8 @@
     "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",
     "eslint": "^9.33.0",
-    "vue": "^3.5.18"
+    "vue": "^3.5.18",
+    "yup": "^1.7.0"
   },
   "devDependencies": {
     "@rsbuild/core": "^1.6.3",

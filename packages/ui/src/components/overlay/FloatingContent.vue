@@ -4,7 +4,6 @@ import {
   type ComputedRef,
   nextTick,
   onUnmounted,
-  readonly,
   type Ref,
   ref,
 } from "vue";
@@ -115,7 +114,7 @@ defineExpose({
   locate,
   canFullyShow,
   clickedOutside,
-  opened: readonly(visible),
+  opened: computed(() => visible.value),
 });
 </script>
 

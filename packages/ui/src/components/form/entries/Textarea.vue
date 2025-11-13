@@ -103,7 +103,7 @@ if (formField) {
 <style lang="scss" scoped>
 @use "sass:map";
 @use "../../../assets/css/utils";
-@use "../../SmallerPanelContent" as *;
+@use "../../SmallerContent" as *;
 
 @each $size in utils.$sizes {
   .mcsl-size-#{$size}.mcsl-textarea {

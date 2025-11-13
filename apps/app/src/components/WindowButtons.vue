@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import { windowButtons } from "../../index.ts";
 import Button from "@repo/ui/src/components/form/button/Button.vue";
+import { platform } from "@tauri-apps/plugin-os";
+import { exit } from "@tauri-apps/plugin-process";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { fullscreen } from "../index.ts";
+
+const win = getCurrentWindow();
 </script>
 
 <template>
-  <div class="window-buttons" v-if="windowButtons">
+  <div class="window-buttons" v-if="platform() != 'macos'">
     <Button
       type="text"
       rounded
       size="small"
       shadow="never"
       icon="fa fa-xmark"
-      @click="windowButtons.close"
+      @click="exit()"
     />
     <Button
       type="text"
@@ -19,15 +24,15 @@ import Button from "@repo/ui/src/components/form/button/Button.vue";
       size="small"
       shadow="never"
       icon="fa fa-minus"
-      @click="windowButtons.minimize"
+      @click="win.minimize()"
     />
     <Button
       type="text"
       rounded
       size="small"
       shadow="never"
-      :icon="`fa fa-${windowButtons.fullscreen ? 'compress' : 'expand'}`"
-      @click="(windowButtons.fullscreen as any) = !windowButtons.fullscreen"
+      :icon="`fa fa-${fullscreen ? 'compress' : 'expand'}`"
+      @click="win.setFullscreen(!fullscreen)"
     />
   </div>
 </template>

@@ -132,7 +132,7 @@ export const useTheme = defineStore("theme", () => {
     load,
     change,
     actualTheme,
-    theme: readonly(themeStorage),
+    theme: computed(() => themeStorage.value),
   };
 });
 

@@ -1,5 +1,6 @@
 import { load } from "@repo/shared/src";
+import App from "@repo/shared/src/App.vue";
 
 (async () => {
-  load("web");
+  await load("web", App);
 })();

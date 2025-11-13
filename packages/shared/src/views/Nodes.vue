@@ -6,14 +6,13 @@ usePageData().set({
   layout: "dashboard",
   breadcrumbs: [
     {
-      label: useI18n().t("shared.dashboard.title"),
-      path: "/dashboard",
+      label: useI18n().t("shared.nodes.title"),
+      path: "/nodes",
     },
   ],
 });
 </script>
 
-<template>
-</template>
+<template></template>
 
 <style scoped lang="scss"></style>

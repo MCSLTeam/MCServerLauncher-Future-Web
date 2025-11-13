@@ -1,14 +1,15 @@
 import {
+  computed,
+  type ComputedRef,
   inject,
   provide,
-  readonly,
   type Ref,
   ref,
   type VueElement,
   watch,
 } from "vue";
 import type { ColorType } from "./css.ts";
-import type { Size } from "./types.ts";
+import type { Size } from "./types.ts"; // Context menu
 
 // Context menu
 export const currContextmenu = ref<VueElement>();
@@ -38,7 +39,7 @@ export function animatedVisibilityExists(
   },
 ): {
   exist: Ref<boolean>;
-  status: Readonly<Ref<"in" | "out" | "show" | "hide">>;
+  status: ComputedRef<"in" | "out" | "show" | "hide">;
 } {
   const exist = ref(visible.value);
   const status = ref<"in" | "out" | "show" | "hide">(visible ? "show" : "hide");
@@ -76,7 +77,7 @@ export function animatedVisibilityExists(
       }, duration.out);
     }
   });
-  return { exist, status: readonly(status) };
+  return { exist, status: computed(() => status.value) };
 }
 
 export function getSize(sizeProp: Size | undefined) {

@@ -78,6 +78,9 @@ importers:
       vue:
         specifier: ^3.5.18
         version: 3.5.18(typescript@5.9.2)
+      yup:
+        specifier: ^1.7.0
+        version: 1.7.0
     devDependencies:
       '@rsbuild/core':
         specifier: ^1.6.3
@@ -145,9 +148,6 @@ importers:
       '@repo/ui':
         specifier: workspace:*
         version: link:../ui
-      '@rsbuild/core':
-        specifier: ^1.6.3
-        version: 1.6.3
       '@rsbuild/plugin-sass':
         specifier: ^1.4.0
         version: 1.4.0(@rsbuild/core@1.6.3)

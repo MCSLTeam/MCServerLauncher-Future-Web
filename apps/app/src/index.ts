@@ -1,33 +1,32 @@
-import { load, windowButtons, windowButtonsExists } from "@repo/shared/src";
+import { load, windowButtonsExists } from "@repo/shared/src";
 import { platform } from "@tauri-apps/plugin-os";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { exit } from "@tauri-apps/plugin-process";
-import { ref, watch } from "vue";
+import { ref, watchEffect } from "vue";
+import App from "./App.vue";
+import router from "@repo/shared/src/router.ts";
+
+export const fullscreen = ref(false);
 
 (async () => {
   const win = getCurrentWindow();
+  const refresh = async () => {
+    fullscreen.value = await win.isFullscreen();
+  };
+  await win.onResized(refresh);
+  await refresh();
+
   if (platform() == "macos") {
-    const refresh = async () => {
-      windowButtonsExists.value = !(await win.isFullscreen());
-    };
-    await win.onResized(refresh);
-    await refresh();
-  } else {
-    const fullscreen = ref(await win.isFullscreen());
-    watch(fullscreen, (value) => {
-      win.setFullscreen(value);
+    watchEffect(() => {
+      windowButtonsExists.value = !fullscreen.value;
     });
-    windowButtons.value = {
-      close: async () => {
-        await exit();
-      },
-      minimize: async () => {
-        await win.minimize();
-      },
-      fullscreen: fullscreen,
-    };
+  } else {
     windowButtonsExists.value = true;
   }
 
-  load("app");
+  router.addRoute({
+    path: "/",
+    redirect: "/dashboard",
+  });
+
+  await load("app", App);
 })();

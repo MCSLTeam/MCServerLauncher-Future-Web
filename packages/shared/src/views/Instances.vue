@@ -6,8 +6,8 @@ usePageData().set({
   layout: "dashboard",
   breadcrumbs: [
     {
-      label: useI18n().t("shared.dashboard.title"),
-      path: "/dashboard",
+      label: useI18n().t("shared.instances.title"),
+      path: "/instances",
     },
   ],
 });

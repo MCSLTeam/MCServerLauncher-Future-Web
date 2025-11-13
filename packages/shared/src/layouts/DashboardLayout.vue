@@ -2,11 +2,10 @@
 import Sidebar from "../components/dashboard/Sidebar.vue";
 import Breadcrumbs from "@repo/ui/src/components/navigation/Breadcrumbs.vue";
 import Button from "@repo/ui/src/components/form/button/Button.vue";
-import { usePageData } from "../utils/stores.ts";
 import { useLocalStorage } from "@vueuse/core";
 import { windowButtonsExists, windowButtonTransition } from "../index.ts";
+import { usePageData } from "../utils/stores.ts";
 
-const pageData = usePageData().data;
 const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
 </script>
 
@@ -48,7 +47,7 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
             shadow="never"
             v-tooltip="'下一页'"
           />
-          <Breadcrumbs :items="pageData.breadcrumbs" />
+          <Breadcrumbs :items="usePageData().data.breadcrumbs" />
         </div>
         <div>
           <Button
@@ -78,7 +77,11 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
         </div>
       </div>
       <div class="dashboard__content">
-        <slot />
+        <RouterView v-slot="{ Component }">
+          <transition mode="out-in" name="fade" :duration="250">
+            <component :is="Component" />
+          </transition>
+        </RouterView>
       </div>
     </div>
   </div>
@@ -90,6 +93,7 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
   height: 100%;
   display: flex;
   background: var(--mcsl-bg-color-overlay);
+  overflow: hidden;
 }
 
 .dashboard__main {
@@ -98,8 +102,6 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
   display: flex;
   flex-direction: column;
 }
-
-$nav-gap: var(--mcsl-spacing-2xs);
 
 .dashboard__nav {
   margin: var(--mcsl-spacing-xl) var(--mcsl-spacing-md);
@@ -112,7 +114,7 @@ $nav-gap: var(--mcsl-spacing-2xs);
   & > div {
     display: flex;
     align-items: center;
-    gap: $nav-gap;
+    gap: var(--mcsl-spacing-2xs);
   }
 }
 
@@ -120,8 +122,9 @@ $nav-gap: var(--mcsl-spacing-2xs);
   margin: var(--mcsl-spacing-md);
   background: var(--mcsl-bg-color-main);
   border: 1px solid var(--mcsl-border-color-base);
-  border-radius: var(--mcsl-border-radius-md);
+  border-radius: var(--mcsl-border-radius-2xl);
   flex-grow: 1;
+  padding: var(--mcsl-spacing-md);
 }
 
 .dashboard__with-window-btn {
@@ -129,12 +132,15 @@ $nav-gap: var(--mcsl-spacing-2xs);
     $btn-width: calc(
       var(--mcsl-font-size-md) * 1.5 + var(--mcsl-spacing-4xs) * 2
     );
-    $left: calc(3 * $btn-width + 2 * $nav-gap + var(--mcsl-spacing-md));
+    $left: calc(3 * $btn-width + var(--mcsl-spacing-md));
     transform: translateX(calc(-1 * $left));
     width: calc(100% - 2 * var(--mcsl-spacing-md) + $left);
 
-    & > div > nav {
-      margin-left: calc(var(--mcsl-spacing-md) - $nav-gap);
+    & > div:first-child {
+      gap: 0;
+      & > nav {
+        margin-left: var(--mcsl-spacing-md);
+      }
     }
   }
 }

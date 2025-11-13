@@ -3,18 +3,22 @@ import type { BreadcrumbItem } from "@repo/ui/src/components/navigation/Breadcru
 import { computed, ref } from "vue";
 
 export type PageData = {
+  layout: "dashboard" | "setup" | "none";
   breadcrumbs: BreadcrumbItem[];
 };
 
 export const usePageData = defineStore("pagaData", () => {
-  const pageData = ref<PageData>();
+  const pageData = ref<PageData>({
+    layout: "none",
+    breadcrumbs: [],
+  });
 
   function set(data: PageData) {
     pageData.value = data;
   }
 
   return {
-    data: computed(() => pageData.value!),
+    data: computed(() => pageData.value),
     set,
   };
 });

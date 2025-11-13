@@ -74,6 +74,28 @@ html.dark::view-transition-new(root) {
   z-index: 1;
 }
 
+/* 过渡动画 */
+.blur-enter-active,
+.blur-leave-active {
+  transition: all 0.5s;
+}
+
+.blur-enter-from,
+.blur-leave-to {
+  opacity: 0;
+  filter: blur(1rem);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.5s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
 /* 排版 */
 * {
   color: var(--mcsl-text-color-regular);

@@ -79,7 +79,6 @@ const hasHeader = computed(
 
     border-radius: utils.get-size-var("border-radius", $size, $vars);
     padding: $spacing;
-    margin: calc($spacing / 2);
 
     &.mcsl-panel__shadow-always,
     .mcsl-panel__shadow-hover:hover {
