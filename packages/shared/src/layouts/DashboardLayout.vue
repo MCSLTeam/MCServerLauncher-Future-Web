@@ -5,17 +5,27 @@ import Button from "@repo/ui/src/components/form/button/Button.vue";
 import { useLocalStorage } from "@vueuse/core";
 import { windowButtonsExists, windowButtonTransition } from "../index.ts";
 import { usePageData } from "../utils/stores.ts";
+import router from "../router.ts";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
 </script>
 
 <template>
   <div
     class="dashboard"
-    :class="{ 'dashboard__with-window-btn': windowButtonsExists }"
+    :class="{
+      'dashboard__with-window-btn': windowButtonsExists,
+    }"
   >
     <Sidebar :collapsed="sidebarCollapsed" />
-    <div class="dashboard__main">
+    <div
+      class="dashboard__main"
+      :class="{
+        'dashboard__main-expanded': sidebarCollapsed,
+      }"
+    >
       <div
         class="dashboard__nav"
         :style="{
@@ -28,24 +38,23 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
             icon="fa fa-angles-left"
             rounded
             size="small"
-            shadow="never"
-            v-tooltip="'折叠侧边栏'"
+            v-tooltip="t('shared.navbar.collapse')"
           />
           <Button
             type="text"
             icon="fa fa-angle-left"
             rounded
             size="small"
-            shadow="never"
-            v-tooltip="'上一页'"
+            v-tooltip="t('shared.navbar.previous')"
+            @click="router.back"
           />
           <Button
             type="text"
             icon="fa fa-angle-right"
             rounded
             size="small"
-            shadow="never"
-            v-tooltip="'下一页'"
+            v-tooltip="t('shared.navbar.next')"
+            @click="router.forward"
           />
           <Breadcrumbs :items="usePageData().data.breadcrumbs" />
         </div>
@@ -55,24 +64,21 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
             icon="fa fa-bell"
             rounded
             size="small"
-            shadow="never"
-            v-tooltip="'通知'"
+            v-tooltip="t('shared.navbar.notifications')"
           />
           <Button
             type="text"
             icon="fa fa-brush"
             rounded
             size="small"
-            shadow="never"
-            v-tooltip="'自定义界面'"
+            v-tooltip="t('shared.navbar.customize')"
           />
           <Button
             type="text"
             icon="fa fa-user"
             rounded
             size="small"
-            shadow="never"
-            v-tooltip="'用户中心'"
+            v-tooltip="t('shared.navbar.userCenter')"
           />
         </div>
       </div>
@@ -97,10 +103,15 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
 }
 
 .dashboard__main {
+  width: calc(100% - 16rem - var(--mcsl-spacing-lg));
   height: 100%;
-  flex-grow: 1;
   display: flex;
   flex-direction: column;
+  transition: 0.5s ease-in-out;
+}
+
+.dashboard__main-expanded {
+  width: calc(100% - 4rem - var(--mcsl-spacing-lg));
 }
 
 .dashboard__nav {
@@ -125,6 +136,10 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
   border-radius: var(--mcsl-border-radius-2xl);
   flex-grow: 1;
   padding: var(--mcsl-spacing-md);
+  overflow: auto;
+  height: calc(
+    100% - var(--mcsl-spacing-xl) - 1rem - 4 * var(--mcsl-spacing-md)
+  );
 }
 
 .dashboard__with-window-btn {

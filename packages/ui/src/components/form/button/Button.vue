@@ -42,7 +42,7 @@ const props = withDefaults(
     rounded: false,
     squared: false,
     block: false,
-    shadow: "hover",
+    shadow: "never",
     btnType: "button",
   },
 );
@@ -171,7 +171,7 @@ const onClick = computed(() =>
     border-radius: utils.get-size-var("border-radius", $size, $vars);
 
     $spacing: utils.get-size-var("spacing", $size, $vars);
-    $size: calc(var(--mcsl-font-size-md) * 1.5 + $spacing * 2);
+    $size: utils.get-size-var("height", $size, $vars);
     padding: $spacing;
     min-width: $size;
     height: $size;

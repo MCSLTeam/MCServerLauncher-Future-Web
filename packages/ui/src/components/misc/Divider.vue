@@ -5,12 +5,14 @@ withDefaults(
     variant?: "solid" | "dotted" | "dashed";
     type?: "horizontal" | "vertical";
     textPos?: "start" | "center" | "end";
+    bgColor?: string;
   }>(),
   {
     spacing: "md",
     variant: "solid",
     type: "horizontal",
     textPos: "center",
+    bgColor: "var(--mcsl-bg-color-overlay)",
   },
 );
 </script>
@@ -24,6 +26,7 @@ withDefaults(
     ]"
     :style="{
       '--mcsl-divider__spacing': `var(--mcsl-spacing-${spacing})`,
+      '--mcsl-divider__bg-color': bgColor,
     }"
     class="mcsl-divider"
   >
@@ -36,7 +39,7 @@ withDefaults(
 <style lang="scss" scoped>
 .mcsl-divider {
   display: flex;
-  justify-content: center;
+  align-items: center;
   position: relative;
   width: 100%;
 }
@@ -56,6 +59,7 @@ withDefaults(
 }
 
 .mcsl-divider__type-vertical {
+  flex-direction: column;
   padding: 0 var(--mcsl-divider__spacing);
 
   &::before {
@@ -91,18 +95,18 @@ withDefaults(
 
 .mcsl-divider__text {
   z-index: 1;
-  background: var(--mcsl-bg-color-overlay);
+  background: var(--mcsl-divider__bg-color);
 }
 
 .mcsl-divider__text-start {
-  align-items: flex-start;
+  justify-content: flex-start;
 }
 
 .mcsl-divider__text-center {
-  align-items: center;
+  justify-content: center;
 }
 
 .mcsl-divider__text-end {
-  align-items: flex-end;
+  justify-content: flex-end;
 }
 </style>

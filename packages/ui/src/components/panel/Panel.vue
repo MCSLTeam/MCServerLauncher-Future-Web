@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, useSlots } from "vue";
+import { onMounted, ref } from "vue";
 import type { Size } from "../../utils/types.ts";
 import { getSize } from "../../utils/internal.ts";
 import Divider from "../misc/Divider.vue";
@@ -27,10 +27,12 @@ const props = withDefaults(
 
 const size = getSize(props.size);
 
-const hasHeader = computed(
-  () =>
-    props.header || (useSlots().header && useSlots().header!()[0]?.children),
-);
+const hasHeader = ref(true);
+const headerRef = ref();
+
+onMounted(() => {
+  hasHeader.value = headerRef.value.innerText.trim() !== "";
+});
 </script>
 
 <template>
@@ -38,12 +40,13 @@ const hasHeader = computed(
     :class="{
       [`mcsl-size-${size}`]: true,
       [`mcsl-panel__shadow-${shadow}`]: shadow !== 'never',
-      'mcsl-panel__no-divider': !headerDivider,
+      'mcsl-panel__need-divider': !headerDivider && hasHeader,
     }"
     class="mcsl-panel"
   >
     <slot name="contextmenu" />
     <div
+      ref="headerRef"
       v-if="hasHeader"
       :class="headerClass"
       :style="headerStyle"
@@ -81,7 +84,7 @@ const hasHeader = computed(
     padding: $spacing;
 
     &.mcsl-panel__shadow-always,
-    .mcsl-panel__shadow-hover:hover {
+    &.mcsl-panel__shadow-hover:hover {
       box-shadow: utils.get-size-var("box-shadow", $size, $vars);
     }
 
@@ -89,7 +92,7 @@ const hasHeader = computed(
       padding: calc($spacing / 2) 0;
     }
 
-    &.mcsl-panel__no-divider > .mcsl-panel__body-wrapper > .mcsl-panel__body {
+    &.mcsl-panel__need-divider > .mcsl-panel__body-wrapper > .mcsl-panel__body {
       padding-top: $spacing;
     }
   }

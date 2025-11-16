@@ -3,6 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "dev": "rsbuild dev",
     "lint": "eslint; prettier --check .",
     "fix": "eslint --fix; prettier --write --list-different .",
     "test": "tsc --noEmit"
@@ -12,6 +13,7 @@
     "@repo/configs": "workspace:*",
     "@repo/locales": "workspace:*",
     "@repo/ui": "workspace:*",
+    "@rsbuild/core": "^1.6.3",
     "@rsbuild/plugin-sass": "^1.4.0",
     "@rsbuild/plugin-vue": "^1.2.0",
     "eslint-config-prettier": "^10.1.8",
@@ -24,8 +26,10 @@
   "dependencies": {
     "@vueuse/core": "^13.7.0",
     "axios": "^1.13.2",
+    "dayjs": "^1.11.13",
     "floating-vue": "^5.2.2",
     "pinia": "^3.0.3",
+    "pinyin-pro": "^3.27.0",
     "vue": "^3.5.18",
     "vue-i18n": "^11.1.11",
     "vue-router": "^4.5.1"

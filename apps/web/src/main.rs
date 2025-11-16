@@ -1,5 +1,4 @@
 use actix_web::{App, HttpResponse, HttpServer, get, middleware::Logger, web};
-use include_dir::{Dir, include_dir};
 use log::info;
 
 #[cfg(not(debug_assertions))]

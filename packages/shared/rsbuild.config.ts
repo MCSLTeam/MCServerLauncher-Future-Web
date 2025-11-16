@@ -1,9 +1,9 @@
 import { pluginVue } from "@rsbuild/plugin-vue";
 import { pluginSass } from "@rsbuild/plugin-sass";
 import { pluginSvg } from "rsbuild-plugin-svg";
-import { defineConfig } from "@rsbuild/core";
+import { defineConfig, type RsbuildConfig } from "@rsbuild/core";
 
-export const config = {
+export const config: RsbuildConfig = {
   plugins: [
     pluginVue(),
     pluginSass(),
@@ -23,9 +23,17 @@ export const config = {
     }),
   ],
   html: {
+    favicon: "../../packages/shared/src/assets/MCSL.png",
     title: "MCSL Future Web-like",
     mountId: "app",
   },
 };
 
-export default defineConfig(config);
+export default defineConfig({
+  ...config,
+  source: {
+    entry: {
+      index: "./src/dev-entry.ts",
+    },
+  },
+});

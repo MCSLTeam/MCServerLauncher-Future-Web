@@ -14,7 +14,6 @@ const win = getCurrentWindow();
       type="text"
       rounded
       size="small"
-      shadow="never"
       icon="fa fa-xmark"
       @click="exit()"
     />
@@ -22,7 +21,6 @@ const win = getCurrentWindow();
       type="text"
       rounded
       size="small"
-      shadow="never"
       icon="fa fa-minus"
       @click="win.minimize()"
     />
@@ -30,7 +28,6 @@ const win = getCurrentWindow();
       type="text"
       rounded
       size="small"
-      shadow="never"
       :icon="`fa fa-${fullscreen ? 'compress' : 'expand'}`"
       @click="win.setFullscreen(!fullscreen)"
     />

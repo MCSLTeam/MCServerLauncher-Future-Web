@@ -13,11 +13,9 @@ import FloatingContent from "./FloatingContent.vue";
 
 const props = withDefaults(
   defineProps<{
-    followWidth?: boolean;
     defaultPos?: "top" | "bottom" | "left" | "right";
   }>(),
   {
-    followWidth: false,
     defaultPos: "bottom",
   },
 );
@@ -25,7 +23,7 @@ const props = withDefaults(
 const wrapperEl = ref();
 const triggererEl = ref();
 const floatingContentEl = ref();
-const opened = computed(() => floatingContentEl.value?.opened.value);
+const opened = computed(() => floatingContentEl.value?.opened);
 const isVertical = computed(
   () => props.defaultPos == "top" || props.defaultPos == "bottom",
 );
@@ -182,14 +180,9 @@ defineExpose({
     </div>
     <FloatingContent
       ref="floatingContentEl"
-      :in-anim="`0.2s ease-in-out both ${inAnim}`"
+      :in-anim="`0.1s ease-in-out both ${inAnim}`"
       :locator="locator"
-      :out-anim="`0.2s ease-in-out both reverse ${inAnim}`"
-      :style="{
-        '--mcsl-menu__width': followWidth
-          ? `${triggererEl.value.getBoundingClientRect().width}px`
-          : undefined,
-      }"
+      :out-anim="`0.1s ease-in-out both reverse ${inAnim}`"
       class="mcsl-dropdown-content__dropdown"
       position="absolute"
     >

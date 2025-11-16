@@ -5,7 +5,7 @@ import {
   usePreferredColorScheme,
   usePreferredLanguages,
 } from "@vueuse/core";
-import { computed, readonly, watch } from "vue";
+import { computed, watch } from "vue";
 import { type Composer, type I18nOptions } from "vue-i18n";
 import { type I18nMessages } from "./types.ts";
 

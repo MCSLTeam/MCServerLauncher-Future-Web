@@ -3,7 +3,6 @@ import { platform } from "@tauri-apps/plugin-os";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { ref, watchEffect } from "vue";
 import App from "./App.vue";
-import router from "@repo/shared/src/router.ts";
 
 export const fullscreen = ref(false);
 
@@ -22,11 +21,6 @@ export const fullscreen = ref(false);
   } else {
     windowButtonsExists.value = true;
   }
-
-  router.addRoute({
-    path: "/",
-    redirect: "/dashboard",
-  });
 
   await load("app", App);
 })();

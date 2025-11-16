@@ -4,6 +4,7 @@ import type { FormFieldData } from "../FormEntry.vue";
 import { ColorData, type ColorType, getColorVar } from "../../../utils/css.ts";
 import type { Size } from "../../../utils/types.ts";
 import { getSize } from "../../../utils/internal.ts";
+import Button from "../button/Button.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -13,6 +14,7 @@ const props = withDefaults(
     size?: Size;
     placeholder?: string;
     password?: boolean;
+    cleanBtn?: boolean;
   }>(),
   {
     color: "primary",
@@ -20,6 +22,7 @@ const props = withDefaults(
     disabled: false,
     placeholder: "",
     password: false,
+    cleanBtn: false,
   },
 );
 
@@ -58,46 +61,55 @@ if (formField) {
 </script>
 
 <template>
-  <input
-    v-model="model"
-    :aria-invalid="
-      invalid || formField?.field?.error?.value ? 'true' : undefined
-    "
-    :id="formField?.id"
-    :class="[`mcsl-size-${size}`]"
-    :disabled="disabled"
-    :style="{
-      '--mcsl-input-text__color-light': getColorVar(
-        new ColorData(color, 'light'),
-      ),
-      '--mcsl-input-text__color': getColorVar(color),
-      '--mcsl-input-text__color-dark': getColorVar(
-        new ColorData(color, 'dark'),
-      ),
-    }"
-    :placeholder="placeholder"
-    class="mcsl-input mcsl-input-text"
-    :type="password ? 'password' : 'text'"
-    @blur="
-      $emit('blur', $event);
-      formField?.onBlur($event);
-    "
-    @input="
-      (e) => {
-        $emit('input', e);
-        if (formField) {
-          formField.field.data.value = model = (
-            e.currentTarget as HTMLInputElement
-          ).value;
-          formField.onInput(e);
+  <div class="mcsl-input mcsl-input-text" :class="[`mcsl-size-${size}`]">
+    <input
+      v-model="model"
+      :aria-invalid="
+        invalid || formField?.field?.error?.value ? 'true' : undefined
+      "
+      :id="formField?.id"
+      :disabled="disabled"
+      :style="{
+        '--mcsl-input-text__color-light': getColorVar(
+          new ColorData(color, 'light'),
+        ),
+        '--mcsl-input-text__color': getColorVar(color),
+        '--mcsl-input-text__color-dark': getColorVar(
+          new ColorData(color, 'dark'),
+        ),
+      }"
+      :placeholder="placeholder"
+      :type="password ? 'password' : 'text'"
+      @blur="
+        $emit('blur', $event);
+        formField?.onBlur($event);
+      "
+      @input="
+        (e) => {
+          $emit('input', e);
+          if (formField) {
+            formField.field.data.value = model = (
+              e.currentTarget as HTMLInputElement
+            ).value;
+            formField.onInput(e);
+          }
         }
-      }
-    "
-    @focus="
-      $emit('focus', $event);
-      formField?.onFocus($event);
-    "
-  />
+      "
+      @focus="
+        $emit('focus', $event);
+        formField?.onFocus($event);
+      "
+    />
+    <div v-if="cleanBtn">
+      <Button
+        type="text"
+        rounded
+        size="small"
+        icon="fa fa-xmark"
+        @click="model = ''"
+      />
+    </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -108,52 +120,69 @@ if (formField) {
 @each $size in utils.$sizes {
   .mcsl-size-#{$size}.mcsl-input-text {
     $spacing: calc(utils.get-size-var("spacing", $size, $vars));
-    flex-grow: 1;
-    height: calc($spacing * 2 - 2px);
-    padding: calc($spacing);
-    border-radius: utils.get-size-var("border-radius", $size, $vars);
+    $height: utils.get-size-var("height", $size, $vars);
 
-    &::placeholder {
-      color: var(--mcsl-text-color-gray);
-      font-size: utils.get-size-var("font-size", $size, $vars);
+    & > input {
+      width: calc(100% - 2 * $spacing);
+      height: calc($height - 2 * $spacing);
+      padding: $spacing;
+      border-radius: utils.get-size-var("border-radius", $size, $vars);
+    }
+
+    & > div {
+      width: calc($height + 2px); // 加上border宽度
+      height: calc($height + 2px);
+
+      & > button {
+        width: calc($height - $spacing);
+        height: calc($height - $spacing);
+      }
     }
   }
 }
 
 .mcsl-input-text {
+  flex-grow: 1;
+  transform: translate(0);
+}
+
+.mcsl-input-text > input {
   margin: 0;
   border: 1px solid var(--mcsl-border-color-base);
   outline: 0 solid transparent;
   outline-offset: -2px; // 覆盖 border
-  transform: translate(0);
   transition: 0.2s ease-in-out;
+
+  &::placeholder {
+    color: var(--mcsl-text-color-gray);
+  }
 }
 
-.mcsl-input-text:hover {
+.mcsl-input-text > input:hover {
   box-shadow: var(--mcsl-box-shadow-light);
   border-color: var(--mcsl-border-color-dark);
 }
 
-.mcsl-input-text:focus {
+.mcsl-input-text > input:focus {
   box-shadow: var(--mcsl-box-shadow-light);
   outline-color: var(--mcsl-input-text__color-light);
   outline-width: 2px;
   outline-offset: -1px;
 }
 
-.mcsl-input-text:hover:focus {
+.mcsl-input-text > input:hover:focus {
   box-shadow: var(--mcsl-box-shadow-base);
   outline-color: var(--mcsl-input-text__color);
 }
 
-.mcsl-input-text:disabled {
+.mcsl-input-text > input:disabled {
   cursor: not-allowed;
   border-color: var(--mcsl-border-color-dark);
   background: var(--mcsl-border-color-base);
   box-shadow: none;
 }
 
-.mcsl-input-text[aria-invalid="true"] {
+.mcsl-input-text > input[aria-invalid="true"] {
   &,
   &:hover,
   &:disabled {
@@ -164,5 +193,14 @@ if (formField) {
       color: var(--mcsl-color-danger);
     }
   }
+}
+
+.mcsl-input-text > div {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
