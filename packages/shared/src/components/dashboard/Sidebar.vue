@@ -32,7 +32,7 @@ const currentPath = computed(() => router.currentRoute.value.fullPath);
         transition: `margin-top ${windowButtonTransition}`,
       }"
     >
-      <img src="../../assets/MCSL.png" alt="" />
+      <img src="../../assets/MCSL.png" alt="" width="42" />
       <div>
         <h2>
           {{ t("shared.app.name.name") }}
@@ -52,58 +52,50 @@ const currentPath = computed(() => router.currentRoute.value.fullPath);
           block
           type="text"
           align="left"
-          shadow="never"
           :color="currentPath == '/dashboard' ? 'primary' : undefined"
           @click="router.push('/dashboard')"
         >
           {{ t("shared.dashboard.title") }}
         </Button>
         <Button
-          :class="{ 'sidebar__btn-selected': currentPath == '/instances' }"
+          :class="{
+            'sidebar__btn-selected': currentPath.startsWith('/instances'),
+          }"
           icon="fa fa-server"
           block
           type="text"
           align="left"
-          shadow="never"
-          :color="currentPath == '/instances' ? 'primary' : undefined"
+          :color="currentPath.startsWith('/instances') ? 'primary' : undefined"
           @click="router.push('/instances')"
         >
           {{ t("shared.instances.title") }}
         </Button>
         <Button
           :class="{
-            'sidebar__btn-selected': currentPath == '/resource-center',
+            'sidebar__btn-selected': currentPath.startsWith('/resource-center'),
           }"
           icon="fa fa-puzzle-piece"
           block
           type="text"
           align="left"
-          shadow="never"
-          :color="currentPath == '/resource-center' ? 'primary' : undefined"
+          :color="
+            currentPath.startsWith('/resource-center') ? 'primary' : undefined
+          "
           @click="router.push('/resource-center')"
         >
           {{ t("shared.resource-center.title") }}
         </Button>
-        <!--        <Button-->
-        <!--          :class="{ 'sidebar__btn-selected': currentPath == '/users' }"-->
-        <!--          icon="fa fa-user"-->
-        <!--          block-->
-        <!--          type="text"-->
-        <!--          align="left"-->
-        <!--          shadow="never"-->
-        <!--          :color="currentPath == '/users' ? 'primary' : undefined"-->
-        <!--          @click="router.push('/users')"-->
-        <!--        >-->
-        <!--          {{ t("web.users.title") }}-->
-        <!--        </Button>-->
         <Button
-          :class="{ 'sidebar__btn-selected': currentPath == '/help-center' }"
+          :class="{
+            'sidebar__btn-selected': currentPath.startsWith('/help-center'),
+          }"
           icon="fa fa-circle-info"
           block
           type="text"
           align="left"
-          shadow="never"
-          :color="currentPath == '/help-center' ? 'primary' : undefined"
+          :color="
+            currentPath.startsWith('/help-center') ? 'primary' : undefined
+          "
           @click="router.push('/help-center')"
         >
           {{ t("shared.help-center.title") }}
@@ -112,13 +104,7 @@ const currentPath = computed(() => router.currentRoute.value.fullPath);
       <div class="sidebar__content">
         <div>
           <Divider spacing="md" />
-          <Button
-            icon="fa fa-list-check"
-            block
-            type="text"
-            align="left"
-            shadow="never"
-          >
+          <Button icon="fa fa-list-check" block type="text" align="left">
             {{ t("shared.tasks.title") }}
           </Button>
           <Button
@@ -127,7 +113,6 @@ const currentPath = computed(() => router.currentRoute.value.fullPath);
             block
             type="text"
             align="left"
-            shadow="never"
             :color="currentPath == '/nodes' ? 'primary' : undefined"
             @click="router.push('/nodes')"
           >
@@ -139,7 +124,6 @@ const currentPath = computed(() => router.currentRoute.value.fullPath);
             block
             type="text"
             align="left"
-            shadow="never"
             :color="currentPath == '/settings' ? 'primary' : undefined"
             @click="router.push('/settings')"
           >
@@ -166,7 +150,6 @@ const currentPath = computed(() => router.currentRoute.value.fullPath);
 .logo {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   gap: var(--mcsl-spacing-2xs);
 
   & > img {

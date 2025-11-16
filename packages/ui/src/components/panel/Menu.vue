@@ -4,22 +4,27 @@ import Button from "../form/button/Button.vue";
 import type { ColorType } from "../../utils/css.ts";
 import type { Size } from "../../utils/types.ts";
 import Divider from "../misc/Divider.vue";
+import { computed } from "vue";
 
-export type MenuInfo = {
-  group?: string;
-  items: {
-    label: "default" | string;
-    icon?: string;
-    iconPos?: "left" | "right";
-    onClick?: (event: MouseEvent) => void | Promise<void>;
-    disabled?: boolean;
-    type?: "default" | "primary" | "dashed" | "text";
-    color?: ColorType;
-    buttonType?: "submit" | "reset" | "button";
-  }[];
-}[];
+export type MenuItem = {
+  label: "default" | string;
+  icon?: string;
+  iconPos?: "left" | "right";
+  onClick?: (event: MouseEvent) => void | Promise<void>;
+  disabled?: boolean;
+  type?: "default" | "primary" | "dashed" | "text";
+  color?: ColorType;
+  buttonType?: "submit" | "reset" | "button";
+};
 
-withDefaults(
+export type MenuInfo =
+  | {
+      group: string;
+      items: MenuItem[];
+    }[]
+  | MenuItem[];
+
+const props = withDefaults(
   defineProps<{
     menu: MenuInfo;
     header?: string;
@@ -35,6 +40,22 @@ withDefaults(
     shadow: false,
   },
 );
+
+const menuInfo = computed(() => {
+  if (props.menu.length == 0) return [];
+
+  let info: { group?: string; items: MenuItem[] }[];
+  if ((props.menu as any)[0].group) {
+    info = props.menu as any;
+  } else {
+    info = [
+      {
+        items: props.menu as MenuItem[],
+      },
+    ];
+  }
+  return info;
+});
 </script>
 
 <template>
@@ -56,7 +77,7 @@ withDefaults(
       <slot name="contextmenu" />
     </template>
     <div
-      v-for="(item, index) in menu as MenuInfo"
+      v-for="(item, index) in menuInfo"
       :key="index"
       class="mcsl-menu__group"
     >
@@ -74,7 +95,6 @@ withDefaults(
           :icon="button.icon"
           :icon-pos="button.iconPos"
           :type="button.type ?? 'text'"
-          shadow="never"
           @click="button.onClick"
         >
           {{ button.label }}
@@ -86,19 +106,23 @@ withDefaults(
 
 <style lang="scss" scoped>
 @use "../../assets/css/utils";
-@use "Panel" as *;
+@use "sass:map";
+@use "Panel";
 
-$vars: (
-  "spacing": (
-    "small": var(--mcsl-spacing-4xs),
-    "middle": var(--mcsl-spacing-2xs),
-    "large": var(--mcsl-spacing-xs),
-  ),
-  "width": (
-    "small": 8rem,
-    "middle": 10rem,
-    "large": 12rem,
-  ),
+$vars: map.merge(
+  Panel.$vars,
+  (
+    "spacing": (
+      "small": var(--mcsl-spacing-4xs),
+      "middle": var(--mcsl-spacing-2xs),
+      "large": var(--mcsl-spacing-xs),
+    ),
+    "width": (
+      "small": 8rem,
+      "middle": 10rem,
+      "large": 12rem,
+    ),
+  )
 );
 
 @each $size in utils.$sizes {
@@ -133,6 +157,9 @@ $vars: (
   & > button {
     width: 100%;
     justify-content: flex-start;
+    &:focus-visible {
+      z-index: 10; // 避免outline被遮挡
+    }
   }
 }
 </style>

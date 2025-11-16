@@ -5,6 +5,7 @@ import Button from "@repo/ui/src/components/form/button/Button.vue";
 import { useLocalStorage } from "@vueuse/core";
 import { windowButtonsExists, windowButtonTransition } from "../index.ts";
 import { usePageData } from "../utils/stores.ts";
+import router from "../router.ts";
 
 const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
 </script>
@@ -28,7 +29,6 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
             icon="fa fa-angles-left"
             rounded
             size="small"
-            shadow="never"
             v-tooltip="'折叠侧边栏'"
           />
           <Button
@@ -36,16 +36,16 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
             icon="fa fa-angle-left"
             rounded
             size="small"
-            shadow="never"
             v-tooltip="'上一页'"
+            @click="router.back"
           />
           <Button
             type="text"
             icon="fa fa-angle-right"
             rounded
             size="small"
-            shadow="never"
             v-tooltip="'下一页'"
+            @click="router.forward"
           />
           <Breadcrumbs :items="usePageData().data.breadcrumbs" />
         </div>
@@ -55,7 +55,6 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
             icon="fa fa-bell"
             rounded
             size="small"
-            shadow="never"
             v-tooltip="'通知'"
           />
           <Button
@@ -63,7 +62,6 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
             icon="fa fa-brush"
             rounded
             size="small"
-            shadow="never"
             v-tooltip="'自定义界面'"
           />
           <Button
@@ -71,7 +69,6 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
             icon="fa fa-user"
             rounded
             size="small"
-            shadow="never"
             v-tooltip="'用户中心'"
           />
         </div>
@@ -125,6 +122,10 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
   border-radius: var(--mcsl-border-radius-2xl);
   flex-grow: 1;
   padding: var(--mcsl-spacing-md);
+  overflow: auto;
+  height: calc(
+    100% - var(--mcsl-spacing-xl) - 1rem - 4 * var(--mcsl-spacing-md)
+  );
 }
 
 .dashboard__with-window-btn {

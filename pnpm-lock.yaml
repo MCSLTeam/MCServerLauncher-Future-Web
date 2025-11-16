@@ -148,6 +148,9 @@ importers:
       '@repo/ui':
         specifier: workspace:*
         version: link:../ui
+      '@rsbuild/core':
+        specifier: ^1.6.3
+        version: 1.6.3
       '@rsbuild/plugin-sass':
         specifier: ^1.4.0
         version: 1.4.0(@rsbuild/core@1.6.3)

@@ -25,7 +25,7 @@ const props = withDefaults(
 const wrapperEl = ref();
 const triggererEl = ref();
 const floatingContentEl = ref();
-const opened = computed(() => floatingContentEl.value?.opened.value);
+const opened = computed(() => floatingContentEl.value?.opened);
 const isVertical = computed(
   () => props.defaultPos == "top" || props.defaultPos == "bottom",
 );
@@ -182,12 +182,12 @@ defineExpose({
     </div>
     <FloatingContent
       ref="floatingContentEl"
-      :in-anim="`0.2s ease-in-out both ${inAnim}`"
+      :in-anim="`0.1s ease-in-out both ${inAnim}`"
       :locator="locator"
-      :out-anim="`0.2s ease-in-out both reverse ${inAnim}`"
+      :out-anim="`0.1s ease-in-out both reverse ${inAnim}`"
       :style="{
         '--mcsl-menu__width': followWidth
-          ? `${triggererEl.value.getBoundingClientRect().width}px`
+          ? `${triggererEl?.value?.getBoundingClientRect()?.width ?? 100}px`
           : undefined,
       }"
       class="mcsl-dropdown-content__dropdown"

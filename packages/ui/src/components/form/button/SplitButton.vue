@@ -83,7 +83,7 @@ defineEmits<(e: "click", event: MouseEvent) => void>();
       <slot />
     </Button>
     <DropdownMenu :default-pos="dropdownDefaultPos" :menu="dropdownMenu">
-      <template #default="{ toggle }">
+      <template #triggerer="{ toggle }">
         <Button
           :color="color"
           :disabled="disabled"

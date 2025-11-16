@@ -2,6 +2,7 @@
 import Menu, { type MenuInfo } from "../panel/Menu.vue";
 import type { Size } from "../../utils/types.ts";
 import DropdownContent from "./DropdownContent.vue";
+import { ref } from "vue";
 
 defineOptions({
   inheritAttrs: false,
@@ -29,16 +30,28 @@ withDefaults(
     bodyStyle: "",
   },
 );
+
+const dropdownContentRef = ref();
+
+defineExpose({
+  open: () => dropdownContentRef.value?.open(),
+  close: () => dropdownContentRef.value?.close(),
+  toggle: () => dropdownContentRef.value?.toggle(),
+  opened: () => dropdownContentRef.value?.opened,
+  relocate: () => dropdownContentRef.value?.relocate(),
+});
 </script>
 
 <template>
   <DropdownContent
+    ref="dropdownContentRef"
     :default-pos="defaultPos"
     :follow-width="followWidth"
     class="mcsl-dropdown-menu__menu"
   >
     <template #triggerer="{ open, close, toggle, opened, relocate }">
       <slot
+        name="triggerer"
         :close="close"
         :open="open"
         :opened="opened"
@@ -56,6 +69,7 @@ withDefaults(
       :menu="menu"
       :size="size"
       v-bind="$attrs"
+      class="mcsl-dropdown-menu__menu"
     >
       <template #header>
         <slot name="header" />
@@ -65,6 +79,10 @@ withDefaults(
 </template>
 
 <style lang="scss">
+.mcsl-dropdown-menu__menu {
+  margin-top: 2px;
+}
+
 @keyframes mcsl-dropdown-menu__anim-top {
   from {
     scale: 1 0.5;

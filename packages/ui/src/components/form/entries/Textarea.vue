@@ -108,10 +108,11 @@ if (formField) {
 @each $size in utils.$sizes {
   .mcsl-size-#{$size}.mcsl-textarea {
     $spacing: calc(utils.get-size-var("spacing", $size, $vars));
+    $height: utils.get-size-var("height", $size, $vars);
     flex-grow: 1;
-    height: calc($spacing * 10 - 2px);
-    min-height: calc($spacing * 2 - 2px);
-    padding: calc($spacing);
+    height: calc(2 * $height);
+    min-height: $height;
+    padding: $spacing;
     border-radius: utils.get-size-var("border-radius", $size, $vars);
 
     &::placeholder {
@@ -127,7 +128,6 @@ if (formField) {
   outline: 0 solid transparent;
   outline-offset: -2px; // 覆盖 border
   resize: none;
-  transform: translate(0);
   transition: 0.2s ease-in-out;
 }
 
