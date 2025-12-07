@@ -3,7 +3,6 @@ import { computed, inject, ref, watch } from "vue";
 import type { FormFieldData } from "../FormEntry.vue";
 import { ColorData, type ColorType, getColorVar } from "../../../utils/css.ts";
 import type { Size } from "../../../utils/types.ts";
-import { getSize } from "../../../utils/internal.ts";
 import DropdownMenu from "../../overlay/DropdownMenu.vue";
 
 export type SelectionItem = {
@@ -31,6 +30,7 @@ const props = withDefaults(
     size?: Size;
   }>(),
   {
+    size: "middle",
     color: "primary",
     invalid: false,
     disabled: false,
@@ -47,8 +47,6 @@ const model = defineModel<any>({
   required: false,
   default: undefined,
 });
-
-const size = getSize(props.size);
 
 const dropdownMenuRef = ref();
 

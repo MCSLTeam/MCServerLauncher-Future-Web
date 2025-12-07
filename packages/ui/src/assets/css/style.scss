@@ -26,9 +26,7 @@
 /* 基本样式 */
 html,
 body,
-#app,
-#__nuxt {
-  @extend .mcsl-font-middle;
+#app {
   width: 100%;
   height: 100%;
   margin: 0;
@@ -36,7 +34,15 @@ body,
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background: var(--mcsl-bg-color-main) !important;
+}
+
+body,
+#app {
+  background: var(--mcsl-bg-color-main);
+}
+
+#app {
+  border-radius: var(--mcsl-border-radius-lg);
 }
 
 body {
@@ -101,7 +107,7 @@ html.dark::view-transition-new(root) {
   color: var(--mcsl-text-color-regular);
   font-family: var(--font-sans);
   font-weight: var(--mcsl-font-weight-base);
-  font-size: var(--mcsl-font-size-all, var(--mcsl-font-size-md));
+  font-size: var(--mcsl-font-size-md);
   line-height: 1.2;
   flex-shrink: 0;
 
@@ -127,10 +133,16 @@ a {
 a,
 a * {
   color: var(--mcsl-text-color-primary);
+  border-radius: var(--mcsl-border-radius-2xs);
+  outline: 0 solid transparent;
   transition: 0.2s ease-in-out;
 
   &:hover {
     color: var(--mcsl-color-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mcsl-color-help);
   }
 }
 
@@ -139,27 +151,27 @@ label {
 }
 
 h1 {
-  font-size: var(--mcsl-font-size-h1, var(--mcsl-font-size-4xl));
+  font-size: var(--mcsl-font-size-4xl);
 }
 
 h2 {
-  font-size: var(--mcsl-font-size-h2, var(--mcsl-font-size-2xl));
+  font-size: var(--mcsl-font-size-2xl);
 }
 
 h3 {
-  font-size: var(--mcsl-font-size-h3, var(--mcsl-font-size-xl));
+  font-size: var(--mcsl-font-size-xl);
 }
 
 h4 {
-  font-size: var(--mcsl-font-size-h4, var(--mcsl-font-size-lg));
+  font-size: var(--mcsl-font-size-lg);
 }
 
 h5 {
-  font-size: var(--mcsl-font-size-h5, var(--mcsl-font-size-lg));
+  font-size: var(--mcsl-font-size-lg);
 }
 
 h6 {
-  font-size: var(--mcsl-font-size-h6, var(--mcsl-font-size-md));
+  font-size: var(--mcsl-font-size-md);
 }
 
 h1,
@@ -196,45 +208,6 @@ h6 {
   h5,
   h6 {
     margin: var(--mcsl-spacing-xs) 0;
-  }
-}
-
-/* 大小 */
-$font-size-vars: (
-  "small": (
-    "h1": var(--mcsl-font-size-2xl),
-    "h2": var(--mcsl-font-size-xl),
-    "h3": var(--mcsl-font-size-lg),
-    "h4": var(--mcsl-font-size-md),
-    "h5": var(--mcsl-font-size-md),
-    "h6": var(--mcsl-font-size-sm),
-    "all": var(--mcsl-font-size-sm),
-  ),
-  "middle": (
-    "h1": var(--mcsl-font-size-4xl),
-    "h2": var(--mcsl-font-size-2xl),
-    "h3": var(--mcsl-font-size-xl),
-    "h4": var(--mcsl-font-size-lg),
-    "h5": var(--mcsl-font-size-lg),
-    "h6": var(--mcsl-font-size-md),
-    "all": var(--mcsl-font-size-md),
-  ),
-  "large": (
-    "h1": var(--mcsl-font-size-4xl),
-    "h2": var(--mcsl-font-size-4xl),
-    "h3": var(--mcsl-font-size-2xl),
-    "h4": var(--mcsl-font-size-xl),
-    "h5": var(--mcsl-font-size-xl),
-    "h6": var(--mcsl-font-size-lg),
-    "all": var(--mcsl-font-size-lg),
-  ),
-);
-
-@each $size, $vars in $font-size-vars {
-  .mcsl-font-#{$size} {
-    @each $name, $value in $vars {
-      --mcsl-font-size-#{$name}: #{$value};
-    }
   }
 }
 

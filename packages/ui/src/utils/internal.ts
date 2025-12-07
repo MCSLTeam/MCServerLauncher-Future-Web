@@ -1,15 +1,12 @@
 import {
   computed,
   type ComputedRef,
-  inject,
-  provide,
   type Ref,
   ref,
   type VueElement,
   watch,
 } from "vue";
 import type { ColorType } from "./css.ts";
-import type { Size } from "./types.ts"; // Context menu
 
 // Context menu
 export const currContextmenu = ref<VueElement>();
@@ -78,36 +75,4 @@ export function animatedVisibilityExists(
     }
   });
   return { exist, status: computed(() => status.value) };
-}
-
-export function getSize(sizeProp: Size | undefined) {
-  let size = inject("mcsl-size", "middle") as Size;
-  if (sizeProp) {
-    switch (sizeProp) {
-      case "smaller":
-        switch (size) {
-          case "large":
-            size = "middle";
-            break;
-          case "middle":
-            size = "small";
-            break;
-        }
-        break;
-      case "larger":
-        switch (size) {
-          case "small":
-            size = "middle";
-            break;
-          case "middle":
-            size = "large";
-            break;
-        }
-        break;
-      default:
-        size = sizeProp;
-    }
-  }
-  provide("mcsl-size", size);
-  return size;
 }

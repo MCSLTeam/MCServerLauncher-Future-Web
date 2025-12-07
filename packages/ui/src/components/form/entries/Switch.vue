@@ -3,9 +3,8 @@ import { inject, watch } from "vue";
 import type { FormFieldData } from "../FormEntry.vue";
 import { ColorData, type ColorType, getColorVar } from "../../../utils/css.ts";
 import type { Size } from "../../../utils/types.ts";
-import { getSize } from "../../../utils/internal.ts";
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     color?: ColorType;
     invalid?: boolean;
@@ -13,6 +12,7 @@ const props = withDefaults(
     size?: Size;
   }>(),
   {
+    size: "middle",
     color: "primary",
     invalid: false,
     disabled: false,
@@ -29,8 +29,6 @@ const model = defineModel<boolean>({
   required: false,
   default: false,
 });
-
-const size = getSize(props.size);
 
 const formField = inject("mcsl-form-field", undefined) as
   | FormFieldData

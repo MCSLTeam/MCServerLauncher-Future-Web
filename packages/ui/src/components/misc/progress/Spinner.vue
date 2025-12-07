@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import { McLoadingIcon, RippleIcon, SpinnerIcon } from "../../../utils/icons";
 import { type Color, getColorVar } from "../../../utils/css.ts";
-import { getSize } from "../../../utils/internal.ts";
 import type { Size } from "../../../utils/types.ts";
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     label?: string;
     labelPos?: "left" | "right" | "top" | "bottom";
@@ -13,14 +12,13 @@ const props = withDefaults(
     size?: Size;
   }>(),
   {
+    size: "middle",
     label: "",
     labelPos: "bottom",
     type: "spinner",
     color: "text-color-regular",
   },
 );
-
-const size = getSize(props.size);
 </script>
 
 <template>

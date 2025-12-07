@@ -10,6 +10,13 @@ type Platform = "web" | "app";
 
 let platform: Platform = "web";
 
+export const versionCodename = import.meta.env.APP_VERSION_NAME;
+export const version =
+  import.meta.env.APP_VERSION +
+  (platform == "web"
+    ? import.meta.env.APP_VERSION_WEB
+    : import.meta.env.APP_VERSION_APP);
+
 export const windowButtonsExists = ref(false);
 export const windowButtonTransition = computed(
   () => `0.3s ${windowButtonsExists.value ? "" : "0.5s"} ease-in-out`,

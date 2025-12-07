@@ -2,11 +2,16 @@
 import type { Size } from "../../utils/types.ts";
 import Pagination from "./Pagination.vue";
 
-const props = defineProps<{
-  itemPerPage: number;
-  total: number;
-  size?: Size;
-}>();
+const props = withDefaults(
+  defineProps<{
+    itemPerPage: number;
+    total: number;
+    size?: Size;
+  }>(),
+  {
+    size: "middle",
+  },
+);
 
 const emit = defineEmits<(e: "change", newPage: number) => void>();
 

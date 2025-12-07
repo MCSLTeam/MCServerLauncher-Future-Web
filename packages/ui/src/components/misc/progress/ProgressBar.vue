@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import type { LoadingStatus, Size } from "../../../utils/types.ts";
-import { getSize } from "../../../utils/internal.ts";
 import { getStatusIcon } from "../../../utils/css.ts";
 
 const props = withDefaults(
@@ -16,14 +15,13 @@ const props = withDefaults(
     size?: Size;
   }>(),
   {
+    size: "middle",
     variant: "line",
     progress: 0,
     status: "loading",
     formatLabel: undefined,
   },
 );
-
-const size = getSize(props.size);
 
 const format =
   props.formatLabel ??

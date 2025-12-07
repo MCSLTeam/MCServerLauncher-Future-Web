@@ -31,6 +31,7 @@ const props = withDefaults(
     bodyStyle?: string;
   }>(),
   {
+    size: "middle",
     inAnim: "fadeIn",
     outAnim: "fadeOut",
     headerClass: "",

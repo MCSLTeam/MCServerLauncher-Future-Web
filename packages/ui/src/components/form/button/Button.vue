@@ -3,7 +3,6 @@ import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { ColorData, type ColorType, getShadow } from "../../../utils/css.ts";
 import type { Size } from "../../../utils/types.ts";
-import { getSize } from "../../../utils/internal.ts";
 
 const props = withDefaults(
   defineProps<{
@@ -27,6 +26,7 @@ const props = withDefaults(
     btnType?: "submit" | "reset" | "button";
   }>(),
   {
+    size: "middle",
     disabled: false,
     icon: "",
     iconPos: "left",
@@ -48,8 +48,6 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<(e: "click", event: MouseEvent) => void>();
-
-const size = getSize(props.size);
 
 const icon = computed(() => (props.loading ? props.loadingIcon : props.icon));
 const iconPos = computed(() =>

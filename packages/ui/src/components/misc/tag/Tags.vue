@@ -1,12 +1,14 @@
 <script lang="ts" setup>
 import type { Size } from "../../../utils/types.ts";
-import { getSize } from "../../../utils/internal.ts";
 
-const props = defineProps<{
-  size?: Size;
-}>();
-
-const size = getSize(props.size);
+withDefaults(
+  defineProps<{
+    size?: Size;
+  }>(),
+  {
+    size: "middle",
+  },
+);
 </script>
 
 <template>

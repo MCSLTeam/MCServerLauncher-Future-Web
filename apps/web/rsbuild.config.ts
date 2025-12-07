@@ -8,6 +8,7 @@ export default defineConfig({
     title: "MCSL Future Web",
   },
   source: {
+    ...config.source,
     entry: {
       index: "./src-frontend/index.ts",
     },

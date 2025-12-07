@@ -222,19 +222,23 @@ export const useLocale = defineStore("locale", () => {
 /**
  * 屏幕宽度类型
  *
- * lg - 大屏（屏幕宽度 >= 1024px）
+ * lg - 大型电脑（屏幕宽度 >= 1024px）
  *
- * md - 中等屏（768px < 屏幕宽度 < 1024px）
+ * md - 笔记本电脑（768px < 屏幕宽度 < 1024px）
  *
- * sm - 小屏（屏幕宽度 <= 768px）
+ * sm - 平板电脑（425px < 屏幕宽度 <= 768px）
+ *
+ * xs - 手机（屏幕宽度 <= 425px）
  */
 export type ScreenWidth = "lg" | "md" | "sm";
 
 export const useScreenWidth = defineStore("screenWidth", () => {
+  const isXs = useMediaQuery("(max-width: 425px)");
   const isSm = useMediaQuery("(max-width: 768px)");
   const isMd = useMediaQuery("(max-width: 1024px)");
 
   const width = computed(() => {
+    if (isXs.value) return "xs";
     if (isSm.value) return "sm";
     if (isMd.value) return "md";
     return "lg";
@@ -242,5 +246,6 @@ export const useScreenWidth = defineStore("screenWidth", () => {
 
   return {
     width,
+    isXsOrSm: computed(() => isXs.value || isSm.value),
   };
 });

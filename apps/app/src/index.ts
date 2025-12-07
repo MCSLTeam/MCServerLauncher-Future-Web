@@ -17,9 +17,11 @@ export const fullscreen = ref(false);
   if (platform() == "macos") {
     watchEffect(() => {
       windowButtonsExists.value = !fullscreen.value;
+      console.log(windowButtonsExists);
     });
   } else {
     windowButtonsExists.value = true;
+    document.body.style.background = "transparent";
   }
 
   await load("app", App);

@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
 import type { Size } from "../../utils/types.ts";
-import { getSize } from "../../utils/internal.ts";
 import Divider from "../misc/Divider.vue";
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     header?: string;
     headerDivider?: boolean;
@@ -16,6 +15,7 @@ const props = withDefaults(
     bodyStyle?: string;
   }>(),
   {
+    size: "middle",
     headerDivider: true,
     shadow: "never",
     headerClass: "",
@@ -24,8 +24,6 @@ const props = withDefaults(
     bodyStyle: "",
   },
 );
-
-const size = getSize(props.size);
 
 const hasHeader = ref(true);
 const headerRef = ref();

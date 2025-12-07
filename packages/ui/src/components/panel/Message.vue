@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import type { Size } from "../../utils/types.ts";
-import { animatedVisibilityExists, getSize } from "../../utils/internal.ts";
+import { animatedVisibilityExists } from "../../utils/internal.ts";
 import {
   ColorData,
   type ColorType,
@@ -10,7 +10,6 @@ import {
   getStatusIcon,
 } from "../../utils/css.ts";
 import Button from "../form/button/Button.vue";
-import ChangeSize from "../misc/ChangeSize.ts";
 
 export type MessageProps = {
   color?: ColorType;
@@ -25,6 +24,7 @@ export type MessageProps = {
 };
 
 const props = withDefaults(defineProps<MessageProps>(), {
+  size: "middle",
   color: "primary",
   variant: "default",
   inAnim: "stretchInDown",
@@ -32,8 +32,6 @@ const props = withDefaults(defineProps<MessageProps>(), {
   shadow: false,
   closeable: false,
 });
-
-const size = getSize(props.size);
 
 const actualIcon = computed(() => props.icon ?? getStatusIcon(props.color));
 
@@ -96,9 +94,7 @@ defineExpose({
         <h4 v-if="title" class="mcsl-message__title">{{ title }}</h4>
         <slot :close="close" :open="open" />
         <div v-if="$slots.buttons" class="mcsl-message__buttons">
-          <ChangeSize size="smaller">
-            <slot :close="close" :open="open" name="buttons" />
-          </ChangeSize>
+          <slot :close="close" :open="open" name="buttons" />
         </div>
       </div>
       <Button

@@ -380,7 +380,9 @@ function getTypeTooltip(instance: any) {
             shadow="hover"
             v-for="instance in instances"
             :key="instance.id"
+            tabindex="0"
             @click="router.push(`/instance/${instance.id}`)"
+            @keydown.enter="router.push(`/instance/${instance.id}`)"
           >
             <div class="instances__instance-info">
               <!-- TODO: 图标 -->
@@ -479,6 +481,13 @@ function getTypeTooltip(instance: any) {
 
 .instances__instance {
   transform: translate(0);
+  outline: 0 solid transparent;
+  outline-offset: -2px; // 覆盖 border
+  transition: 0.2s ease-in-out;
+
+  &:focus-visible {
+    outline: 3px solid var(--mcsl-color-help);
+  }
 }
 
 .instances__instance-info {

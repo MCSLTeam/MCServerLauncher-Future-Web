@@ -7,9 +7,18 @@ import { windowButtonsExists, windowButtonTransition } from "../index.ts";
 import { usePageData } from "../utils/stores.ts";
 import router from "../router.ts";
 import { useI18n } from "vue-i18n";
+import { computed, ref } from "vue";
+import { useScreenWidth } from "@repo/ui/src/utils/stores.ts";
+import { animatedVisibilityExists } from "@repo/ui/src/utils/internal.ts";
 
 const { t } = useI18n();
-const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
+const sidebarCollapsedStorage = useLocalStorage("sidebarCollapsed", false);
+const screenWidth = useScreenWidth();
+const sidebarCollapsed = computed(
+  () => sidebarCollapsedStorage.value || screenWidth.isXsOrSm,
+);
+const sidebarExpanded = ref(false);
+const { exist: sidebarBg } = animatedVisibilityExists(sidebarExpanded, 300);
 </script>
 
 <template>
@@ -17,16 +26,24 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
     class="dashboard"
     :class="{
       'dashboard__with-window-btn': windowButtonsExists,
+      'dashboard__sidebar-collapsed': sidebarCollapsed,
     }"
   >
-    <Sidebar :collapsed="sidebarCollapsed" />
+    <Sidebar
+      :collapsed="sidebarCollapsed"
+      :expanded="sidebarExpanded"
+      :has-bg="sidebarBg"
+    />
     <div
-      class="dashboard__main"
       :class="{
-        'dashboard__main-expanded': sidebarCollapsed,
+        'dashboard__sidebar-blocker-visible': sidebarExpanded,
       }"
-    >
+      class="dashboard__sidebar-blocker"
+      @click="() => (sidebarExpanded = false)"
+    />
+    <div class="dashboard__main">
       <div
+        data-tauri-drag-region
         class="dashboard__nav"
         :style="{
           transition: `${windowButtonTransition}`,
@@ -34,18 +51,31 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
       >
         <div>
           <Button
+            v-if="screenWidth.isXsOrSm"
             type="text"
-            icon="fa fa-angles-left"
+            icon="fa fa-bars"
             rounded
             size="small"
-            v-tooltip="t('shared.navbar.collapse')"
+            v-tooltip="t('shared.navbar.expand-sidebar')"
+            @click="sidebarExpanded = !sidebarExpanded"
+          />
+          <Button
+            v-else
+            type="text"
+            :icon="`fa fa-angles-${sidebarCollapsed ? 'right' : 'left'}`"
+            class="dashboard__collapse-btn"
+            :class="{ 'dashboard__collapse-btn-collapsed': sidebarCollapsed }"
+            rounded
+            size="small"
+            v-tooltip="t('shared.navbar.collapse-sidebar')"
+            @click="sidebarCollapsedStorage = !sidebarCollapsedStorage"
           />
           <Button
             type="text"
             icon="fa fa-angle-left"
             rounded
             size="small"
-            v-tooltip="t('shared.navbar.previous')"
+            v-tooltip="t('shared.navbar.back')"
             @click="router.back"
           />
           <Button
@@ -53,7 +83,7 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
             icon="fa fa-angle-right"
             rounded
             size="small"
-            v-tooltip="t('shared.navbar.next')"
+            v-tooltip="t('shared.navbar.forward')"
             @click="router.forward"
           />
           <Breadcrumbs :items="usePageData().data.breadcrumbs" />
@@ -78,7 +108,7 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
             icon="fa fa-user"
             rounded
             size="small"
-            v-tooltip="t('shared.navbar.userCenter')"
+            v-tooltip="t('shared.navbar.user-center')"
           />
         </div>
       </div>
@@ -94,29 +124,42 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
 </template>
 
 <style scoped lang="scss">
+@use "@repo/ui/src/assets/css/utils";
+@use "@repo/ui/src/components/SmallerContent";
+
 .dashboard {
   width: 100%;
   height: 100%;
-  display: flex;
   background: var(--mcsl-bg-color-overlay);
   overflow: hidden;
 }
 
 .dashboard__main {
+  position: absolute;
+  top: 0;
+  right: 0;
   width: calc(100% - 16rem - var(--mcsl-spacing-lg));
   height: 100%;
   display: flex;
   flex-direction: column;
-  transition: 0.5s ease-in-out;
-}
+  transition: 0.3s ease-in-out;
 
-.dashboard__main-expanded {
-  width: calc(100% - 4rem - var(--mcsl-spacing-lg));
+  .dashboard__sidebar-collapsed > & {
+    width: calc(
+      100% - utils.get-size-var("height", "large", SmallerContent.$vars) - var(
+          --mcsl-spacing-lg
+        )
+    );
+  }
+
+  @media (max-width: 425px) {
+    width: 100% !important;
+  }
 }
 
 .dashboard__nav {
-  margin: var(--mcsl-spacing-xl) var(--mcsl-spacing-md);
-  margin-bottom: 0;
+  padding: var(--mcsl-spacing-xl) var(--mcsl-spacing-md) 0
+    var(--mcsl-spacing-md);
   height: 1rem;
   display: flex;
   justify-content: space-between;
@@ -126,6 +169,32 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
     display: flex;
     align-items: center;
     gap: var(--mcsl-spacing-2xs);
+  }
+
+  $btn-width: calc(
+    var(--mcsl-font-size-md) * 1.5 + var(--mcsl-spacing-4xs) * 2
+  );
+
+  .dashboard__with-window-btn.dashboard__sidebar-collapsed & {
+    // 右移
+    transform: translateX($btn-width);
+    width: calc(100% - 2 * var(--mcsl-spacing-md) - $btn-width);
+  }
+
+  @media (max-width: 425px) {
+    // 右移
+    $offset: calc(3 * $btn-width);
+    transform: translateX($offset) !important;
+    width: calc(100% - 2 * var(--mcsl-spacing-md) - $offset) !important;
+  }
+
+  @media (max-width: 768px) {
+    .dashboard__with-window-btn & > div:first-child {
+      gap: 0;
+      & > nav {
+        margin-left: var(--mcsl-spacing-md);
+      }
+    }
   }
 }
 
@@ -142,21 +211,19 @@ const sidebarCollapsed = useLocalStorage("sidebarCollapsed", false);
   );
 }
 
-.dashboard__with-window-btn {
-  .dashboard__nav {
-    $btn-width: calc(
-      var(--mcsl-font-size-md) * 1.5 + var(--mcsl-spacing-4xs) * 2
-    );
-    $left: calc(3 * $btn-width + var(--mcsl-spacing-md));
-    transform: translateX(calc(-1 * $left));
-    width: calc(100% - 2 * var(--mcsl-spacing-md) + $left);
+.dashboard__sidebar-blocker {
+  z-index: 5;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transition: 0.3s ease-in-out;
+}
 
-    & > div:first-child {
-      gap: 0;
-      & > nav {
-        margin-left: var(--mcsl-spacing-md);
-      }
-    }
-  }
+.dashboard__sidebar-blocker-visible {
+  pointer-events: all;
+  background: utils.transparent(var(--mcsl-color-surface-darker), 50%);
 }
 </style>

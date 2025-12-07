@@ -1,31 +1,37 @@
 {
-    "name": "mcsl-future-web",
-    "private": true,
-    "license": "GPL-3.0-only",
-    "scripts": {
-        "app:build": "turbo run app#build",
-        "app:dev": "turbo run app#dev",
-        "app:fix": "turbo run fix --filter=mcsl-future-tauri",
-        "app:lint": "turbo run app#lint",
-        "web:build": "turbo run web#build",
-        "web:build:nuxt": "turbo run web#build:nuxt",
-        "web:build:docker": "turbo run web#build:docker",
-        "web:dev": "turbo run web#dev",
-        "web:fix": "turbo run fix --filter=mcsl-future-web",
-        "web:lint": "turbo run web#lint",
-        "ui:lint": "turbo run ui#lint",
-        "shared:lint": "turbo run shared#lint",
-        "build": "turbo run build",
-        "lint": "turbo run lint",
-        "fix": "turbo run fix"
-    },
-    "devDependencies": {
-        "prettier": "^3.6.2",
-        "turbo": "^2.5.6",
-        "typescript": "^5.9.2"
-    },
-    "packageManager": "pnpm@10.22.0",
-    "engines": {
-        "node": ">=18"
-    }
+  "name": "mcsl-future-web",
+  "private": true,
+  "license": "GPL-3.0-only",
+  "versions": {
+    "codename": "CherryWoods",
+    "version": "0.1.0",
+    "app": "a",
+    "web": "a"
+  },
+  "scripts": {
+    "app:build": "turbo run app#build",
+    "app:dev": "turbo run app#dev",
+    "app:fix": "turbo run fix --filter=mcsl-future-tauri",
+    "app:lint": "turbo run app#lint",
+    "web:build": "turbo run web#build",
+    "web:build:nuxt": "turbo run web#build:nuxt",
+    "web:build:docker": "turbo run web#build:docker",
+    "web:dev": "turbo run web#dev",
+    "web:fix": "turbo run fix --filter=mcsl-future-web",
+    "web:lint": "turbo run web#lint",
+    "ui:lint": "turbo run ui#lint",
+    "shared:lint": "turbo run shared#lint",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "fix": "turbo run fix"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2",
+    "turbo": "^2.5.6",
+    "typescript": "^5.9.2"
+  },
+  "packageManager": "pnpm@10.22.0",
+  "engines": {
+    "node": ">=18"
+  }
 }

@@ -4,3 +4,4 @@ members = [
     "apps/app/src-tauri",
     "apps/web"
 ]
+

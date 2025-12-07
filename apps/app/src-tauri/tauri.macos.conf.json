@@ -2,16 +2,16 @@
   "app": {
     "windows": [
       {
-        "titleBarStyle": "Overlay",
-        "hiddenTitle": true,
         "fullscreen": false,
-        "height": 800,
+        "height": 700,
+        "width": 1100,
+        "minHeight": 500,
+        "minWidth": 400,
         "resizable": true,
         "title": "MCSL Future Tauri",
-        "width": 1280,
-        "minHeight": 700,
-        "minWidth": 1100,
-        "decorations": true,
+        "visible": true,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
         "trafficLightPosition": {
           "x": 25,
           "y": 34

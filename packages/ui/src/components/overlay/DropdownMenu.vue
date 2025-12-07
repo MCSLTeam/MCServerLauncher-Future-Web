@@ -22,6 +22,7 @@ withDefaults(
     bodyStyle?: string;
   }>(),
   {
+    size: "middle",
     followWidth: false,
     defaultPos: "bottom",
     headerClass: "",

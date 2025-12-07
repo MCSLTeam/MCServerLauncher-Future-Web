@@ -4,36 +4,60 @@ import Button from "@repo/ui/src/components/form/button/Button.vue";
 import Divider from "@repo/ui/src/components/misc/Divider.vue";
 import {
   getPlatform,
+  version,
+  versionCodename,
   windowButtonsExists,
   windowButtonTransition,
 } from "../../index.ts";
 import { useRouter } from "vue-router";
 import { computed } from "vue";
+import { useScreenWidth } from "@repo/ui/src/utils/stores.ts";
 
-defineProps<{
+const props = defineProps<{
   collapsed: boolean;
+  expanded: boolean;
 }>();
 
 const t = useI18n().t;
 const platform = getPlatform();
 const router = useRouter();
 const currentPath = computed(() => router.currentRoute.value.fullPath);
+const screenWidth = useScreenWidth();
+const sidebarCollapsed = computed(
+  () => props.collapsed && !props.expanded && screenWidth.width != "xs",
+);
 </script>
 
 <template>
-  <div class="sidebar" :class="{ sidebar__collapsed: collapsed }">
+  <div
+    class="sidebar"
+    :class="{
+      sidebar__collapsed: sidebarCollapsed,
+      sidebar__expanded: expanded,
+    }"
+  >
     <div
+      data-tauri-drag-region
       class="logo"
       :class="[`logo-${platform}`]"
       :style="{
-        marginTop: windowButtonsExists
+        paddingTop: windowButtonsExists
           ? `calc(var(--mcsl-spacing-xs) + 2 * var(--mcsl-spacing-md) + 1rem)`
           : `var(--mcsl-spacing-xl)`,
-        transition: `margin-top ${windowButtonTransition}`,
+        transition: `padding-top ${windowButtonTransition}`,
       }"
     >
-      <img src="../../assets/MCSL.png" alt="" width="35" />
-      <div>
+      <img
+        src="../../assets/MCSL.png"
+        alt=""
+        width="35"
+        v-tooltip.right="
+          collapsed
+            ? `$${t('shared.app.name.abbr')} ${t('shared.app.name.future')} ${t(`${platform}.app.name.suffix`)} (${versionCodename} v${version})`
+            : undefined
+        "
+      />
+      <div v-if="!sidebarCollapsed">
         <h2>
           <span>
             {{ t("shared.app.name.abbr") }}
@@ -41,7 +65,7 @@ const currentPath = computed(() => router.currentRoute.value.fullPath);
           </span>
           <span>&nbsp;{{ t(`${platform}.app.name.suffix`) }}</span>
         </h2>
-        <p>v1.0.0</p>
+        <p v-tooltip.bottom="`v${version}`">{{ versionCodename }}</p>
       </div>
     </div>
     <Divider spacing="md" />
@@ -54,9 +78,15 @@ const currentPath = computed(() => router.currentRoute.value.fullPath);
           type="text"
           align="left"
           :color="currentPath == '/dashboard' ? 'primary' : undefined"
+          :size="sidebarCollapsed ? 'large' : 'middle'"
+          v-tooltip.right="
+            sidebarCollapsed ? t('shared.dashboard.title') : undefined
+          "
           @click="router.push('/dashboard')"
         >
-          {{ t("shared.dashboard.title") }}
+          <template v-if="!sidebarCollapsed">{{
+            t("shared.dashboard.title")
+          }}</template>
         </Button>
         <Button
           :class="{
@@ -67,9 +97,15 @@ const currentPath = computed(() => router.currentRoute.value.fullPath);
           type="text"
           align="left"
           :color="currentPath.startsWith('/instances') ? 'primary' : undefined"
+          :size="sidebarCollapsed ? 'large' : 'middle'"
+          v-tooltip.right="
+            sidebarCollapsed ? t('shared.instances.title') : undefined
+          "
           @click="router.push('/instances')"
         >
-          {{ t("shared.instances.title") }}
+          <template v-if="!sidebarCollapsed">{{
+            t("shared.instances.title")
+          }}</template>
         </Button>
         <Button
           :class="{
@@ -79,12 +115,18 @@ const currentPath = computed(() => router.currentRoute.value.fullPath);
           block
           type="text"
           align="left"
+          :size="sidebarCollapsed ? 'large' : 'middle'"
           :color="
             currentPath.startsWith('/resource-center') ? 'primary' : undefined
           "
+          v-tooltip.right="
+            sidebarCollapsed ? t('shared.resource-center.title') : undefined
+          "
           @click="router.push('/resource-center')"
         >
-          {{ t("shared.resource-center.title") }}
+          <template v-if="!sidebarCollapsed">{{
+            t("shared.resource-center.title")
+          }}</template>
         </Button>
         <Button
           :class="{
@@ -97,16 +139,33 @@ const currentPath = computed(() => router.currentRoute.value.fullPath);
           :color="
             currentPath.startsWith('/help-center') ? 'primary' : undefined
           "
+          :size="sidebarCollapsed ? 'large' : 'middle'"
+          v-tooltip.right="
+            sidebarCollapsed ? t('shared.help-center.title') : undefined
+          "
           @click="router.push('/help-center')"
         >
-          {{ t("shared.help-center.title") }}
+          <template v-if="!sidebarCollapsed">{{
+            t("shared.help-center.title")
+          }}</template>
         </Button>
       </div>
       <div class="sidebar__content">
         <div>
           <Divider spacing="md" />
-          <Button icon="fa fa-list-check" block type="text" align="left">
-            {{ t("shared.tasks.title") }}
+          <Button
+            icon="fa fa-list-check"
+            block
+            type="text"
+            align="left"
+            :size="sidebarCollapsed ? 'large' : 'middle'"
+            v-tooltip.right="
+              sidebarCollapsed ? t('shared.tasks.title') : undefined
+            "
+          >
+            <template v-if="!sidebarCollapsed">{{
+              t("shared.tasks.title")
+            }}</template>
           </Button>
           <Button
             :class="{ 'sidebar__btn-selected': currentPath == '/nodes' }"
@@ -114,10 +173,16 @@ const currentPath = computed(() => router.currentRoute.value.fullPath);
             block
             type="text"
             align="left"
+            :size="sidebarCollapsed ? 'large' : 'middle'"
+            v-tooltip.right="
+              sidebarCollapsed ? t('shared.nodes.title') : undefined
+            "
             :color="currentPath == '/nodes' ? 'primary' : undefined"
             @click="router.push('/nodes')"
           >
-            {{ t("shared.nodes.title") }}
+            <template v-if="!sidebarCollapsed">{{
+              t("shared.nodes.title")
+            }}</template>
           </Button>
           <Button
             :class="{ 'sidebar__btn-selected': currentPath == '/settings' }"
@@ -125,10 +190,16 @@ const currentPath = computed(() => router.currentRoute.value.fullPath);
             block
             type="text"
             align="left"
+            :size="sidebarCollapsed ? 'large' : 'middle'"
+            v-tooltip.right="
+              sidebarCollapsed ? t('shared.settings.title') : undefined
+            "
             :color="currentPath == '/settings' ? 'primary' : undefined"
             @click="router.push('/settings')"
           >
-            {{ t("shared.settings.title") }}
+            <template v-if="!sidebarCollapsed">{{
+              t("shared.settings.title")
+            }}</template>
           </Button>
         </div>
       </div>
@@ -138,14 +209,31 @@ const currentPath = computed(() => router.currentRoute.value.fullPath);
 
 <style scoped lang="scss">
 @use "@repo/ui/src/assets/css/utils";
+@use "@repo/ui/src/components/SmallerContent";
+
+$collapsed-width: utils.get-size-var("height", "large", SmallerContent.$vars);
 
 .sidebar {
-  margin: var(--mcsl-spacing-xl);
-  margin-top: 0;
-  margin-right: 0;
-  width: 16rem;
+  $width: 16rem;
+  $padding: var(--mcsl-spacing-md);
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: var(--mcsl-spacing-md);
+  padding-top: 0;
+  width: $width;
+  height: calc(100% - $padding);
+  border-radius: 0 var(--mcsl-border-radius-xl) var(--mcsl-border-radius-xl) 0;
+  background: var(--mcsl-bg-color-overlay);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  z-index: 10;
+  transition: 0.3s ease-in-out;
+
+  @media (max-width: 425px) {
+    left: calc(0px - $width - 2 * $padding);
+  }
 }
 
 .logo {
@@ -154,7 +242,11 @@ const currentPath = computed(() => router.currentRoute.value.fullPath);
   gap: var(--mcsl-spacing-2xs);
 
   & > img {
-    width: 2.5rem;
+    width: $collapsed-width;
+
+    .sidebar__collapsed & {
+      cursor: help;
+    }
   }
 
   & > div {
@@ -188,6 +280,10 @@ const currentPath = computed(() => router.currentRoute.value.fullPath);
     }
 
     & > p {
+      width: fit-content;
+      color: var(--mcsl-text-color-gray);
+      font-size: var(--mcsl-font-size-sm);
+      cursor: help;
     }
   }
 }
@@ -221,10 +317,21 @@ const currentPath = computed(() => router.currentRoute.value.fullPath);
 }
 
 .sidebar__collapsed {
-  width: 4rem;
+  width: $collapsed-width;
+}
+
+.sidebar__expanded {
+  box-shadow: var(--mcsl-box-shadow-darker);
+  left: 0;
 }
 
 .sidebar__btn-selected {
   background: utils.transparent(var(--mcsl-color-primary), 10%);
+}
+</style>
+
+<style lang="scss">
+.sidebar__collapsed button > i {
+  font-size: var(--mcsl-font-size-lg);
 }
 </style>

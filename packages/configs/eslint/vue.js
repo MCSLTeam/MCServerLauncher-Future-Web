@@ -32,7 +32,7 @@ export const customVueConfig = [
     },
   },
   {
-    ignores: ["node_modules/**/*", "dist/**/*", ".nuxt/**/*", ".output/**/*"],
+    ignores: ["node_modules/**/*", "dist/**/*"],
   },
 ];
 

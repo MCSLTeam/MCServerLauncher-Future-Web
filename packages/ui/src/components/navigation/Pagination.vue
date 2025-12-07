@@ -1,17 +1,19 @@
 <script lang="ts" setup>
 import { computed } from "vue";
-import { getSize } from "../../utils/internal.ts";
 import type { Size } from "../../utils/types.ts";
 import Button from "../form/button/Button.vue";
 
-const props = defineProps<{
-  length: number;
-  size?: Size;
-}>();
+const props = withDefaults(
+  defineProps<{
+    length: number;
+    size?: Size;
+  }>(),
+  {
+    size: "middle",
+  },
+);
 
 const emit = defineEmits<(e: "change", newPage: number) => void>();
-
-const size = getSize(props.size);
 
 const page = defineModel<number>("page", {
   default: 1,

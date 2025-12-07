@@ -3,7 +3,6 @@ import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { type Color, ColorData, getColorVar } from "../../utils/css.ts";
 import type { Size } from "../../utils/types.ts";
-import { getSize } from "../../utils/internal.ts";
 
 export type MeterItem = {
   label: string;
@@ -19,12 +18,15 @@ export type MeterInfo = {
   unallocated?: MeterItem;
 };
 
-const props = defineProps<{
-  meter: MeterInfo;
-  size?: Size;
-}>();
-
-const size = getSize(props.size);
+const props = withDefaults(
+  defineProps<{
+    meter: MeterInfo;
+    size?: Size;
+  }>(),
+  {
+    size: "middle",
+  },
+);
 
 const i18n = useI18n();
 

@@ -3,7 +3,6 @@ import { inject, provide, ref, watch } from "vue";
 import type { FormFieldInstance, FormInstance } from "../../utils/form.ts";
 import Message from "../panel/Message.vue";
 import type { Size } from "../../utils/types.ts";
-import { getSize } from "../../utils/internal.ts";
 
 export type FormFieldData = {
   id: string;
@@ -21,6 +20,7 @@ const props = withDefaults(
     size?: Size;
   }>(),
   {
+    size: "middle",
     width: 100,
     labelPos: "left",
   },
@@ -32,8 +32,6 @@ const emit = defineEmits<{
   (e: "focus", event: Event): void;
   (e: "validated", event: Event): void;
 }>();
-
-const size = getSize(props.size);
 
 const id = Math.random().toString(36).slice(-8);
 

@@ -79,7 +79,6 @@ defineExpose({
         '--mcsl-modal__overlay-bg': getColorVar(color),
       }"
       class="mcsl-modal__overlay"
-      data-tauri-drag-region
       @click="() => (closeOnClickOutside && closable ? close() : {})"
     />
     <Panel

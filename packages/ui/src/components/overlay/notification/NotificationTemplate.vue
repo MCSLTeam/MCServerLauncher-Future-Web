@@ -7,9 +7,13 @@ const props = withDefaults(
   defineProps<{
     id: string;
     props?: (data: any) => MessageProps;
+    systemNotif?: (
+      data: any,
+    ) => { title: string; body: string; image: string } | undefined;
   }>(),
   {
     props: (data: any) => data,
+    systemNotif: () => undefined,
   },
 );
 
@@ -18,7 +22,7 @@ const slots = defineSlots<{
 }>();
 
 onMounted(() => {
-  addTemplate(props.id, props.props, slots.default);
+  addTemplate(props.id, props.props, props.systemNotif, slots.default);
 });
 
 onUnmounted(() => {

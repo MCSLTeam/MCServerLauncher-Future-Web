@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import type { Size } from "../../../utils/types.ts";
 import { type Color, getColorVar } from "../../../utils/css.ts";
-import { getSize } from "../../../utils/internal.ts";
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     color?: Color | "default";
     rounded?: boolean;
@@ -11,12 +10,11 @@ const props = withDefaults(
     size?: Size;
   }>(),
   {
+    size: "middle",
     color: "default",
     rounded: false,
   },
 );
-
-const size = getSize(props.size);
 </script>
 
 <template>
