@@ -2401,6 +2401,8 @@ dependencies = [
  "include_dir",
  "log",
  "mime_guess",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

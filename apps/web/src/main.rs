@@ -1,6 +1,7 @@
 use actix_web::{App, HttpResponse, HttpServer, get, middleware::Logger, web};
 use log::info;
 
+pub mod user;
 #[cfg(not(debug_assertions))]
 static STATIC_DIR: Dir = include_dir!("apps/web/dist");
 
