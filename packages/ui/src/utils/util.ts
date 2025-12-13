@@ -1,3 +1,10 @@
+export type PosInfo = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export function throttle(callback: (...args: any[]) => void, interval: number) {
   let doThrottle = false;
   return function (...args: any[]) {

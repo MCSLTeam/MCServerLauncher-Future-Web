@@ -7,7 +7,7 @@ import {
   type Ref,
   ref,
 } from "vue";
-import { throttle } from "../../utils/util.ts";
+import { type PosInfo, throttle } from "../../utils/util.ts";
 import { clamp } from "@vueuse/core";
 import FloatingContent from "./FloatingContent.vue";
 
@@ -46,7 +46,7 @@ const inAnim = computed(() => {
 function locateXVertical(
   openX: number,
   elemX: Ref<number>,
-  elemRect: ComputedRef<DOMRect>,
+  elemRect: ComputedRef<PosInfo>,
 ) {
   elemX.value = clamp(
     openX - elemRect.value.width / 2,
@@ -58,8 +58,8 @@ function locateXVertical(
 function locateYVertical(
   openY: number,
   elemY: Ref<number>,
-  elemRect: ComputedRef<DOMRect>,
-  triggererRect: DOMRect,
+  elemRect: ComputedRef<PosInfo>,
+  triggererHeight: number,
 ) {
   for (const p of [
     props.defaultPos,
@@ -67,8 +67,8 @@ function locateYVertical(
   ]) {
     elemY.value =
       p == "top"
-        ? openY - triggererRect.height / 2 - elemRect.value.height
-        : openY + triggererRect.height / 2;
+        ? openY - triggererHeight / 2 - elemRect.value.height
+        : openY + triggererHeight / 2;
     animType.value = p as "top" | "bottom";
     if (floatingContentEl.value.canFullyShow("y")) return;
   }
@@ -77,18 +77,18 @@ function locateYVertical(
 function locateXHorizontal(
   openX: number,
   elemX: Ref<number>,
-  elemRect: ComputedRef<DOMRect>,
-  triggererRect: DOMRect,
+  elemRect: ComputedRef<PosInfo>,
+  triggererWidth: number,
 ) {
   for (const p of [
     props.defaultPos,
-    props.defaultPos == "top" ? "bottom" : "top",
+    props.defaultPos == "left" ? "right" : "left",
   ]) {
     elemX.value =
-      p == "top"
-        ? openX - triggererRect.width / 2 - elemRect.value.width
-        : openX + triggererRect.width / 2;
-    animType.value = p as "top" | "bottom";
+      p == "left"
+        ? openX - triggererWidth / 2 - elemRect.value.width
+        : openX + triggererWidth / 2;
+    animType.value = p as "left" | "right";
     if (floatingContentEl.value.canFullyShow("y")) return;
   }
 }
@@ -96,7 +96,7 @@ function locateXHorizontal(
 function locateYHorizontal(
   openY: number,
   elemY: Ref<number>,
-  elemRect: ComputedRef<DOMRect>,
+  elemRect: ComputedRef<PosInfo>,
 ) {
   elemY.value = clamp(
     openY - elemRect.value.height / 2,
@@ -110,22 +110,20 @@ function locator(
   openY: number,
   elemX: Ref<number>,
   elemY: Ref<number>,
-  elemRect: ComputedRef<DOMRect>,
+  elemRect: ComputedRef<PosInfo>,
 ) {
-  const triggererRect = triggererEl.value.getBoundingClientRect();
   if (elemRect.value.width > innerWidth) elemX.value = 0;
   else if (isVertical.value) locateXVertical(openX, elemX, elemRect);
-  else locateXHorizontal(openX, elemX, elemRect, triggererRect);
+  else locateXHorizontal(openX, elemX, elemRect, triggererEl.value.offsetWidth);
   if (elemRect.value.height > innerHeight) elemY.value = 0;
   else if (isVertical.value)
-    locateYVertical(openY, elemY, elemRect, triggererRect);
+    locateYVertical(openY, elemY, elemRect, triggererEl.value.offsetHeight);
   else locateYHorizontal(openY, elemY, elemRect);
 }
 
 function getOpenPos() {
-  const rect = triggererEl.value.getBoundingClientRect();
-  const x = rect.x + rect.width / 2;
-  const y = rect.y + rect.height / 2;
+  const x = triggererEl.value.offsetLeft + triggererEl.value.offsetWidth / 2;
+  const y = triggererEl.value.offsetTop + triggererEl.value.offsetHeight / 2;
   return { x, y };
 }
 

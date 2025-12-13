@@ -8,6 +8,7 @@ import {
   ref,
 } from "vue";
 import { animatedVisibilityExists } from "../../utils/internal.ts";
+import type { PosInfo } from "../../utils/util.ts";
 
 defineOptions({
   inheritAttrs: false,
@@ -20,7 +21,7 @@ const props = withDefaults(
       openY: number,
       elemX: Ref<number>,
       elemY: Ref<number>,
-      elemRect: ComputedRef<DOMRect>,
+      elemPos: ComputedRef<PosInfo>,
     ) => void;
     transition?: boolean;
     inAnim?: string;
@@ -47,20 +48,20 @@ const { exist, status } = animatedVisibilityExists(visible, 200, {
   },
 });
 const wrapperEl = ref();
-const rect = computed(() => {
+const posInfo = computed(() => {
   return {
     x: left.value,
     y: top.value,
     width: wrapperEl.value?.offsetWidth ?? 0,
     height: wrapperEl.value?.offsetHeight ?? 0,
-  } as DOMRect;
+  }
 });
 const top = ref<number>(0);
 const left = ref<number>(0);
 
 function canFullyShow(axis: "x" | "y") {
-  const elemPos = rect.value[axis];
-  const elemLength = rect.value[axis == "x" ? "width" : "height"];
+  const elemPos = posInfo.value[axis];
+  const elemLength = posInfo.value[axis == "x" ? "width" : "height"];
   const windowLength = axis == "x" ? innerWidth : innerHeight;
   return elemPos >= 0 && elemPos + elemLength <= windowLength;
 }
@@ -73,7 +74,7 @@ async function open(x: number, y: number) {
 }
 
 function locate(x: number, y: number) {
-  props.locator(x, y, left, top, rect);
+  props.locator(x, y, left, top, posInfo);
   if (props.position == "absolute") {
     left.value += scrollX;
     top.value += scrollY;
@@ -86,10 +87,10 @@ function close() {
 
 function clickedOutside(event: MouseEvent) {
   return (
-    event.clientX < rect.value.x ||
-    event.clientX > rect.value.x + rect.value.width ||
-    event.clientY < rect.value.y ||
-    event.clientY > rect.value.y + rect.value.height
+    event.clientX < posInfo.value.x ||
+    event.clientX > posInfo.value.x + posInfo.value.width ||
+    event.clientY < posInfo.value.y ||
+    event.clientY > posInfo.value.y + posInfo.value.height
   );
 }
 
