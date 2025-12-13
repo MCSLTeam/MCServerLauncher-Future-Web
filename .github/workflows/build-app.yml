@@ -1,4 +1,4 @@
-name: Auto Build App Artifacts
+name: Build App Artifacts
 on:
   push:
     branches:

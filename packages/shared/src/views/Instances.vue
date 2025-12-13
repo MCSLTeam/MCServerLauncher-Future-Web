@@ -247,26 +247,6 @@ const sortedInstances = computed(() => {
   return grouped;
 });
 
-function highlight(text: string) {
-  if (search.value == "") return text;
-
-  const searchText = search.value.replaceAll(/\s+/g, "");
-  const targetText = text.replaceAll(/\s+/g, "");
-
-  if (!targetText.toLowerCase().includes(searchText.toLowerCase())) {
-    return text;
-  }
-
-  const regex = new RegExp(
-    `(${search.value.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
-    "gi",
-  );
-  return text.replaceAll(
-    regex,
-    "<span class='instances__search-highlight'>$1</span>",
-  );
-}
-
 function getTypeInfo(instance: any) {
   const game = getGameType(instance.type);
   if (
@@ -282,6 +262,47 @@ function getTypeTooltip(instance: any) {
   if (instance.gameVersion != instance.loaderVersion)
     return `${t(`shared.instances.types.${game}`)} ${instance.gameVersion} - ${snakeToPascal(instance.type).replaceAll("+", " +")} ${instance.loaderVersion}`;
   return undefined;
+}
+
+// 高亮搜索文本的函数
+function highlightText(text: string, searchText: string): string {
+  if (!searchText || !text) return text;
+
+  const searchLower = searchText.toLowerCase().replaceAll(/\s+/g, "");
+  const textLower = text.toLowerCase().replaceAll(/\s+/g, "");
+
+  if (textLower.includes(searchLower)) {
+    const regex = new RegExp(
+      `(${searchText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+      "gi",
+    );
+    return text.replace(
+      regex,
+      '<span class="instances__search-highlight">$1</span>',
+    );
+  }
+
+  // 拼音的话全部高亮得了
+  const fullPinyin = pinyin(text, {
+    toneType: "none",
+    type: "array",
+  }).join("");
+
+  if (fullPinyin.toLowerCase().includes(searchLower)) {
+    return `<span class="instances__search-highlight">${text}</span>`;
+  }
+
+  const initialsPinyin = pinyin(text, {
+    toneType: "none",
+    pattern: "first",
+    type: "array",
+  }).join("");
+
+  if (initialsPinyin.toLowerCase().includes(searchLower)) {
+    return `<span class="instances__search-highlight">${text}</span>`;
+  }
+
+  return text;
 }
 </script>
 
@@ -372,7 +393,7 @@ function getTypeTooltip(instance: any) {
           text-pos="start"
           bg-color="var(--mcsl-bg-color-main)"
         >
-          {{ group }}
+          <span v-html="highlightText(group, search)" />
         </Divider>
         <div class="instances__instances">
           <Panel
@@ -388,10 +409,10 @@ function getTypeTooltip(instance: any) {
               <!-- TODO: 图标 -->
               <img src="../assets/MCSL.png" alt="" />
               <div>
-                <h3 v-html="highlight(instance.name)" />
+                <h3 v-html="highlightText(instance.name, search)" />
                 <p>
                   <i class="fa fa-server" />
-                  <span v-html="highlight(getTypeInfo(instance))" />
+                  <span v-html="highlightText(getTypeInfo(instance), search)" />
                   <i
                     class="far fa-question-circle"
                     v-if="getTypeTooltip(instance) != undefined"
@@ -400,7 +421,7 @@ function getTypeTooltip(instance: any) {
                 </p>
                 <p>
                   <i class="fa fa-desktop" />
-                  <span v-html="highlight(instance.daemon)" />
+                  <span v-html="highlightText(instance.daemon, search)" />
                 </p>
               </div>
             </div>

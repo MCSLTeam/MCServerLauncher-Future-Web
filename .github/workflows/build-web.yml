@@ -1,4 +1,4 @@
-name: Auto Build Web Artifacts
+name: Build Web Artifacts
 on:
   push:
     branches:
