@@ -7,12 +7,12 @@ import InputText from "@repo/ui/src/components/form/entries/InputText.vue";
 import { computed, ref } from "vue";
 import Panel from "@repo/ui/src/components/panel/Panel.vue";
 import router from "../router.ts";
-import { getGameType } from "../utils/node/cores.ts";
 import { snakeToPascal } from "../utils/utils.ts";
 import { pinyin } from "pinyin-pro";
-import { type InstanceInfo, type InstanceStatus } from "../utils/node/instance.ts";
 import Divider from "@repo/ui/src/components/misc/Divider.vue";
 import Button from "@repo/ui/src/components/form/button/Button.vue";
+import type { InstanceStatus } from "../utils/node/types/instance.ts";
+import { getGame } from "../utils/node/types/cores.ts";
 
 usePageData().set({
   layout: "dashboard",
@@ -45,7 +45,7 @@ const statusPriority: Record<InstanceStatus, number> = {
   stopping: 5,
   stopped: 6,
 };
-const instances = ref<Record<string, InstanceInfo[]>>({
+const instances = ref<Record<string, any[]>>({
   "My Daemon 1": [
     {
       id: "test",
@@ -200,8 +200,8 @@ const sortedInstances = computed(() => {
           bValue = b.name.toLowerCase();
           break;
         case "status":
-          aValue = statusPriority[a.status];
-          bValue = statusPriority[b.status];
+          aValue = statusPriority[a.status as InstanceStatus];
+          bValue = statusPriority[b.status as InstanceStatus];
           break;
         case "type":
           aValue = getTypeInfo(a).toLowerCase();
@@ -248,7 +248,7 @@ const sortedInstances = computed(() => {
 });
 
 function getTypeInfo(instance: any) {
-  const game = getGameType(instance.type);
+  const game = getGame(instance.type);
   if (
     (game == "mc" && instance.type != "vanilla") ||
     (game == "terraria" && instance.type != "terraria")
@@ -258,7 +258,7 @@ function getTypeInfo(instance: any) {
 }
 
 function getTypeTooltip(instance: any) {
-  const game = getGameType(instance.type);
+  const game = getGame(instance.type);
   if (instance.gameVersion != instance.loaderVersion)
     return `${t(`shared.instances.types.${game}`)} ${instance.gameVersion} - ${snakeToPascal(instance.type).replaceAll("+", " +")} ${instance.loaderVersion}`;
   return undefined;

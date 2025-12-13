@@ -54,7 +54,7 @@ const posInfo = computed(() => {
     y: top.value,
     width: wrapperEl.value?.offsetWidth ?? 0,
     height: wrapperEl.value?.offsetHeight ?? 0,
-  }
+  };
 });
 const top = ref<number>(0);
 const left = ref<number>(0);

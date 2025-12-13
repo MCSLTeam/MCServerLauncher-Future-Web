@@ -93,11 +93,7 @@ export const MCJE_CORES: MCJECore[] = [
   ...MCJE_PROXY_CORES,
 ];
 
-export type MCBECore =
-  | "bedrock"
-  | "cloudburst"
-  | "nukkit"
-  | "pocketmine";
+export type MCBECore = "bedrock" | "cloudburst" | "nukkit" | "pocketmine";
 export const MCBE_CORES: MCBECore[] = [
   "bedrock",
   "cloudburst",
@@ -106,26 +102,14 @@ export const MCBE_CORES: MCBECore[] = [
 ];
 
 export type MCCore = MCJECore | MCBECore;
-export const MC_CORES: MCCore[] = [
-  ...MCJE_CORES,
-  ...MCBE_CORES,
-];
+export const MC_CORES: MCCore[] = [...MCJE_CORES, ...MCBE_CORES];
 
 /* ========== [ Terraria ]========== */
 export type TerrariaCore = "terraria" | "tshock" | "tdsm";
-export const TERRARIA_CORES: TerrariaCore[] = [
-  "terraria",
-  "tshock",
-  "tdsm",
-];
+export const TERRARIA_CORES: TerrariaCore[] = ["terraria", "tshock", "tdsm"];
 
 /* ========== [ Frp ]========== */
-export type FrpCore =
-  | "mefrp"
-  | "openfrp"
-  | "locyanfrp"
-  | "mossfrp"
-  | "frpc";
+export type FrpCore = "mefrp" | "openfrp" | "locyanfrp" | "mossfrp" | "frpc";
 export const FRP_CORES: FrpCore[] = [
   "mefrp",
   "openfrp",
@@ -135,12 +119,7 @@ export const FRP_CORES: FrpCore[] = [
 ];
 
 /* ========== [ 所有核心 ]========== */
-export type Core =
-  | MCCore
-  | TerrariaCore
-  | "cs2"
-  | "palworld"
-  | "unknown";
+export type Core = MCCore | TerrariaCore | "cs2" | "palworld" | "unknown";
 export const CORES: Core[] = [
   ...MC_CORES,
   ...TERRARIA_CORES,
@@ -163,10 +142,8 @@ export function getMCLoaderType(core: MCCore): MCLoaderType {
   if (core == "vanilla") return "mcje_vanilla";
   if (core == "bedrock") return "mcbe_vanilla";
   if (MCJE_MOD_CORES.includes(core as any)) return "mcje_mod";
-  if (MCJE_PLUGIN_CORES.includes(core as any))
-    return "mcje_plugin";
-  if (MCJE_HYBRID_CORES.includes(core as any))
-    return "mcje_hybrid";
+  if (MCJE_PLUGIN_CORES.includes(core as any)) return "mcje_plugin";
+  if (MCJE_HYBRID_CORES.includes(core as any)) return "mcje_hybrid";
   if (MCJE_PROXY_CORES.includes(core as any)) return "mcje_proxy";
   if (MCBE_CORES.includes(core as any)) return "mcbe_plugin";
   throw new Error("Unknown mc instance type");
@@ -175,12 +152,7 @@ export function getMCLoaderType(core: MCCore): MCLoaderType {
 export type GameType = "mc" | "terraria" | "cs2" | "palworld" | "unknown";
 
 export function getGame(core: Core): GameType {
-  if (
-    core == "cs2" ||
-    core == "palworld" ||
-    core == "unknown"
-  )
-    return core;
+  if (core == "cs2" || core == "palworld" || core == "unknown") return core;
 
   if (MC_CORES.includes(core as any)) return "mc";
   if (TERRARIA_CORES.includes(core as any)) return "terraria";

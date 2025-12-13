@@ -31,7 +31,7 @@ export abstract class AbstractAdapter {
     this.instanceIcons.set(id, icon);
     return icon;
   }
-  abstract absGetInstanceIcon(id: string): Uint8Array;
+  abstract absGetInstanceIcon(id: string): Promise<Uint8Array>;
 
   async setInstanceIcon(id: string, icon?: Uint8Array) {
     await this.absSetInstanceIcon(id, icon);
@@ -40,7 +40,9 @@ export abstract class AbstractAdapter {
   }
   abstract absSetInstanceIcon(id: string, icon?: Uint8Array): Promise<void>;
 
-  abstract getInstanceTypeInfo(id: string): Promise<InstanceTypeInfo | undefined>;
+  abstract getInstanceTypeInfo(
+    id: string,
+  ): Promise<InstanceTypeInfo | undefined>;
 
   abstract changeInstanceType(
     id: string,
