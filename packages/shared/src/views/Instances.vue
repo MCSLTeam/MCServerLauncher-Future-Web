@@ -7,10 +7,10 @@ import InputText from "@repo/ui/src/components/form/entries/InputText.vue";
 import { computed, ref } from "vue";
 import Panel from "@repo/ui/src/components/panel/Panel.vue";
 import router from "../router.ts";
-import { getGameType } from "../utils/node/instanceTypes.ts";
+import { getGameType } from "../utils/node/cores.ts";
 import { snakeToPascal } from "../utils/utils.ts";
 import { pinyin } from "pinyin-pro";
-import { type InstanceInfo, type InstanceStatus } from "../utils/node/types.ts";
+import { type InstanceInfo, type InstanceStatus } from "../utils/node/instance.ts";
 import Divider from "@repo/ui/src/components/misc/Divider.vue";
 import Button from "@repo/ui/src/components/form/button/Button.vue";
 
