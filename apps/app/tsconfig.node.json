@@ -1,4 +1,7 @@
 {
   "extends": "@repo/configs/ts/base.json",
-  "include": ["vite.config.ts"]
+  "include": ["vite.config.ts"],
+  "compilerOptions": {
+    "composite": true
+  }
 }

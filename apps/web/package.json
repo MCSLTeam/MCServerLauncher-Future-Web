@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "pnpm frontend:build && cargo build --release",
+    "build:docker": "cd ../../; docker build -f apps/web/Dockerfile --progress=plain -t mcsl-future-web .; cd -",
     "backend:dev": "cargo run",
     "frontend:dev": "rsbuild dev",
     "frontend:build": "vue-tsc --noEmit && rsbuild build",

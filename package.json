@@ -3,7 +3,7 @@
   "private": true,
   "license": "GPL-3.0-only",
   "versions": {
-    "codename": "CherryWoods",
+    "codename": "CherryGrove",
     "version": "0.1.0",
     "app": "a",
     "web": "a"
@@ -14,9 +14,9 @@
     "app:fix": "turbo run fix --filter=mcsl-future-tauri",
     "app:lint": "turbo run app#lint",
     "web:build": "turbo run web#build",
-    "web:build:nuxt": "turbo run web#build:nuxt",
-    "web:build:docker": "turbo run web#build:docker",
-    "web:dev": "turbo run web#dev",
+    "web:build:docker": "cd apps/web; pnpm build:docker; cd -",
+    "web:dev:frontend": "turbo run web#frontend:dev",
+    "web:dev:backend": "turbo run web#backend:dev",
     "web:fix": "turbo run fix --filter=mcsl-future-web",
     "web:lint": "turbo run web#lint",
     "ui:lint": "turbo run ui#lint",

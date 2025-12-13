@@ -1,4 +1,6 @@
-use actix_web::{App, HttpResponse, HttpServer, get, middleware::Logger, web};
+use actix_web::{get, middleware::Logger, web, App, HttpResponse, HttpServer};
+#[cfg(not(debug_assertions))]
+use include_dir::{include_dir, Dir};
 use log::info;
 
 pub mod user;
@@ -30,7 +32,7 @@ async fn main() -> std::io::Result<()> {
 
         app
     })
-    .bind("0.0.0.0:11452")?
+    .bind("0.0.0.0:11451")?
     .run()
     .await
 }
