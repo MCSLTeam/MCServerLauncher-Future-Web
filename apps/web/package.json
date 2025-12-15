@@ -23,7 +23,7 @@
     "yup": "^1.7.0"
   },
   "devDependencies": {
-    "@rsbuild/core": "^1.6.3",
+    "@rsbuild/core": "^1.6.14",
     "typescript": "^5.9.2",
     "vue-tsc": "^2.2.12"
   }
