@@ -70,7 +70,7 @@ withDefaults(
     left: -5%;
     width: 55%;
     height: 60%;
-    background: utils.transparent(var(--mcsl-bg__primary-color), 50%);
+    background: utils.transparent(var(--mcsl-bg__primary-color), 20%);
   }
 
   .mcsl-bg__circle-2 {
@@ -78,7 +78,7 @@ withDefaults(
     right: -5%;
     width: 60%;
     height: 60%;
-    background: utils.transparent(var(--mcsl-bg__secondary-color), 50%);
+    background: utils.transparent(var(--mcsl-bg__secondary-color), 20%);
   }
 
   .mcsl-bg__circle-3 {
@@ -86,7 +86,7 @@ withDefaults(
     right: -5%;
     width: 50%;
     height: 45%;
-    background: utils.transparent(var(--mcsl-bg__base-color), 25%);
+    background: utils.transparent(var(--mcsl-bg__base-color), 10%);
   }
 
   .mcsl-bg__circle-4 {
@@ -94,7 +94,7 @@ withDefaults(
     left: -5%;
     width: 45%;
     height: 45%;
-    background: utils.transparent(var(--mcsl-bg__base-color), 25%);
+    background: utils.transparent(var(--mcsl-bg__base-color), 10%);
   }
 }
 </style>

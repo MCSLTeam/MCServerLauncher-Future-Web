@@ -1,8 +1,19 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { useLocalStorage } from "@vueuse/core";
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
+    {
+      path: "/welcome",
+      name: "Welcome",
+      component: async () => await import("./views/welcome/Welcome.vue"),
+    },
+    {
+      path: "/welcome/setup",
+      name: "Welcome - Setup",
+      component: async () => await import("./views/welcome/Setup.vue"),
+    },
     {
       path: "/",
       redirect: "/dashboard",
@@ -38,6 +49,18 @@ const router = createRouter({
       component: async () => await import("./views/Settings.vue"),
     },
   ],
+});
+
+export const firstLoad = useLocalStorage("firstLoad", true);
+
+router.beforeEach((to, _from, next) => {
+  if (firstLoad.value) {
+    if (!to.path.startsWith("/welcome")) next("/welcome");
+  } else {
+    if (to.path.startsWith("/welcome")) next("/");
+  }
+
+  next();
 });
 
 export default router;

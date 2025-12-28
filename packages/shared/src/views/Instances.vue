@@ -480,7 +480,7 @@ function highlightText(text: string, searchText: string): string {
     }
   }
 
-  @media (max-width: 425px) {
+  @media (max-width: 450px) {
     & > div {
       flex-direction: column;
       & > div {

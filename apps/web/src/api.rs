@@ -131,10 +131,21 @@ pub async fn api_user_refresh(
     }
 }
 
+#[get("/user/should-register")]
+pub async fn api_user_should_register() -> impl Responder {
+    HttpResponse::Ok().json(SuccessResponse {
+        status: "success",
+        data: get_users().is_empty(),
+    })
+}
+
 #[post("/user/register")]
 pub async fn api_user_register(data: web::Json<LoginRequest>) -> impl Responder {
     if !get_users().is_empty() {
-        return HttpResponse::NotFound().body("");
+        return HttpResponse::Forbidden().json(FailedResponse {
+            status: "failed",
+            err: "admin-exists",
+        });
     }
 
     match user::add_user(UserInput {

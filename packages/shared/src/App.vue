@@ -18,10 +18,12 @@ const layout = computed(() => {
 </script>
 
 <template>
-  <component v-if="layout" :is="layout">
-    <RouterView />
-  </component>
-  <RouterView v-else />
+  <component v-if="layout" :is="layout" />
+  <RouterView v-else v-slot="{ Component }">
+    <transition name="fade" mode="in-out">
+      <component :is="Component" />
+    </transition>
+  </RouterView>
   <NotificationTemplate id="default">
     <template v-slot="data">
       <p>{{ (data as any).message }}</p>

@@ -231,7 +231,7 @@ $collapsed-width: utils.get-size-var("height", "large", SmallerContent.$vars);
   z-index: 10;
   transition: 0.3s ease-in-out;
 
-  @media (max-width: 425px) {
+  @media (max-width: 450px) {
     left: calc(0px - $width - 2 * $padding);
   }
 }

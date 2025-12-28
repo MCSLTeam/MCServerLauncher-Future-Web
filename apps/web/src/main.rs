@@ -57,7 +57,8 @@ async fn main() -> std::io::Result<()> {
                 .service(api::api_user_update)
                 .service(api::api_user_update_password)
                 .service(api::api_user_delete)
-                .service(api::api_user_get_self),
+                .service(api::api_user_get_self)
+                .service(api::api_user_should_register),
         );
 
         #[cfg(not(debug_assertions))]

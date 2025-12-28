@@ -11,7 +11,7 @@ import { computed, ref } from "vue";
 import { useScreenWidth } from "@repo/ui/src/utils/stores.ts";
 import { animatedVisibilityExists } from "@repo/ui/src/utils/internal.ts";
 
-const { t } = useI18n();
+const t = useI18n().t;
 const sidebarCollapsedStorage = useLocalStorage("sidebarCollapsed", false);
 const screenWidth = useScreenWidth();
 const sidebarCollapsed = computed(
@@ -152,7 +152,7 @@ const { exist: sidebarBg } = animatedVisibilityExists(sidebarExpanded, 300);
     );
   }
 
-  @media (max-width: 425px) {
+  @media (max-width: 450px) {
     width: 100% !important;
   }
 }
@@ -181,11 +181,13 @@ const { exist: sidebarBg } = animatedVisibilityExists(sidebarExpanded, 300);
     width: calc(100% - 2 * var(--mcsl-spacing-md) - $btn-width);
   }
 
-  @media (max-width: 425px) {
-    // 右移
-    $offset: calc(3 * $btn-width);
-    transform: translateX($offset) !important;
-    width: calc(100% - 2 * var(--mcsl-spacing-md) - $offset) !important;
+  @media (max-width: 450px) {
+    .dashboard__with-window-btn & {
+      // 右移
+      $offset: calc(3 * $btn-width);
+      transform: translateX($offset) !important;
+      width: calc(100% - 2 * var(--mcsl-spacing-md) - $offset) !important;
+    }
   }
 
   @media (max-width: 768px) {

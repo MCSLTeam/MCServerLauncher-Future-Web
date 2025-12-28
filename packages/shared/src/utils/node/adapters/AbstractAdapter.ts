@@ -1,16 +1,21 @@
 import type { ConnectionInfo } from "../types/node.ts";
 import type {
   InstanceBasicInfo,
-  InstanceSettings,
+  InstanceConfig,
   InstanceStatus,
   InstanceTypeInfo,
 } from "../types/instance.ts";
 import type { ComputedRef } from "vue";
-import type { DirectoryInfo, FileInfo, FilePath } from "../types/files.ts";
+import type { DirectoryData, FileData, FilePath } from "../types/files.ts";
+import type { JavaRuntimeInfo, SystemInfo } from "../types/system.ts";
 
 export abstract class AbstractAdapter {
   // 基本操作
   abstract get info(): ConnectionInfo;
+
+  abstract getSystemInfo(): Promise<SystemInfo>;
+
+  abstract getJavaInfo(deep: boolean): Promise<JavaRuntimeInfo[]>;
 
   // 实例操作
   private readonly instanceIcons: Map<string, Uint8Array> = new Map();
@@ -49,11 +54,11 @@ export abstract class AbstractAdapter {
     typeInfo: InstanceTypeInfo,
   ): Promise<void>;
 
-  abstract getInstanceSettings(id: string): Promise<Partial<InstanceSettings>>;
+  abstract getInstanceSettings(id: string): Promise<Partial<InstanceConfig>>;
 
   abstract changeInstanceSettings(
     id: string,
-    settings: Partial<InstanceSettings>,
+    settings: Partial<InstanceConfig>,
   ): Promise<void>;
 
   abstract getInstanceStatus(id: string): Promise<InstanceStatus>;
@@ -73,12 +78,25 @@ export abstract class AbstractAdapter {
   abstract createInstance(
     info: InstanceBasicInfo,
     type: InstanceTypeInfo | undefined,
-    settings: Partial<InstanceSettings>,
+    settings: Partial<InstanceConfig>,
     icon: Uint8Array | undefined,
   ): Promise<void>;
 
+  abstract createInstance(
+    info: InstanceBasicInfo,
+    settings: Partial<InstanceConfig>,
+    icon: Uint8Array | undefined,
+    fileArchive: File,
+  ): Promise<void>;
+
+  abstract createInstance(
+    info: InstanceBasicInfo,
+    icon: Uint8Array | undefined,
+    serverPack: File,
+  ): Promise<void>;
+
   // 文件操作
-  abstract listFiles(path: FilePath): Promise<(FileInfo | DirectoryInfo)[]>;
+  abstract listFiles(path: FilePath): Promise<(FileData | DirectoryData)[]>;
 
   abstract readFile(path: FilePath): Promise<Uint8Array>;
 

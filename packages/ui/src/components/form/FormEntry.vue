@@ -133,7 +133,7 @@ provide("mcsl-form-field", {
 
   & > div {
     display: flex;
-    gap: var(--mcsl-spacing-4xs);
+    gap: var(--mcsl-spacing-xs);
   }
 }
 

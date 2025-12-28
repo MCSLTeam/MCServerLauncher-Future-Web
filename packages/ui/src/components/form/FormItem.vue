@@ -33,7 +33,7 @@ const model = defineModel<any>({
 
 const form = createForm(
   {
-    data: model.value,
+    value: model.value,
   },
   yup.object({
     value: props.schema ?? yup.mixed(),

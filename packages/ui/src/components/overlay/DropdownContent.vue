@@ -161,6 +161,7 @@ defineExpose({
   toggle,
   opened,
   relocate,
+  triggererWidth: computed(() => triggererEl.value.offsetWidth),
 });
 </script>
 

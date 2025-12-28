@@ -66,6 +66,11 @@ defineExpose({
       :size="size"
       v-bind="$attrs"
       class="mcsl-dropdown-menu__menu"
+      :style="{
+        width: followWidth
+          ? `calc(${dropdownContentRef.triggererWidth}px - var(--mcsl-spacing-xs))`
+          : undefined,
+      }"
     >
       <template #header>
         <slot name="header" />

@@ -24,8 +24,6 @@ export type MCJEPluginCore =
   | "leaf"
   | "folia"
   | "pufferfish"
-  | "pufferfish+"
-  | "pufferfish_purpur"
   | "purpur";
 export const MCJE_PLUGIN_CORES: MCJEPluginCore[] = [
   "sponge_vanilla",
@@ -36,8 +34,6 @@ export const MCJE_PLUGIN_CORES: MCJEPluginCore[] = [
   "leaf",
   "folia",
   "pufferfish",
-  "pufferfish+",
-  "pufferfish_purpur",
   "purpur",
 ];
 

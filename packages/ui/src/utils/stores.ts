@@ -5,7 +5,7 @@ import {
   usePreferredColorScheme,
   usePreferredLanguages,
 } from "@vueuse/core";
-import { computed, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { type Composer, type I18nOptions } from "vue-i18n";
 import { type I18nMessages } from "./types.ts";
 
@@ -31,7 +31,6 @@ export const useTheme = defineStore("theme", () => {
   function change(
     theme: Theme,
     transition: ThemeTransition = "viewTransition",
-    event?: MouseEvent,
   ): void {
     themeStorage.value = theme;
     const currClassName = getClassName(theme);
@@ -70,7 +69,7 @@ export const useTheme = defineStore("theme", () => {
         // 扩散动画
         if (!document.startViewTransition) {
           // 浏览器不支持 ViewTransition 就使用渐变
-          change(theme, "fade", event);
+          change(theme, "fade");
           return;
         }
         (() => {
@@ -83,18 +82,17 @@ export const useTheme = defineStore("theme", () => {
           // 加载过渡动画
           const viewTransition = document.startViewTransition(set);
 
-          // 从点击处（否则屏幕中心）开始扩散
-          const x = event?.clientX ?? window.innerWidth / 2;
-          const y = event?.clientY ?? window.innerHeight / 2;
+          // 从鼠标处开始扩散
+          const mousePos = useMousePosition();
 
           const endRadius = Math.hypot(
-            Math.max(x, innerWidth - x),
-            Math.max(y, innerHeight - y),
+            Math.max(mousePos.x, innerWidth - mousePos.x),
+            Math.max(mousePos.y, innerHeight - mousePos.y),
           );
           viewTransition.ready.then(() => {
             const clipPath = [
-              `circle(0px at ${x}px ${y}px)`,
-              `circle(${endRadius}px at ${x}px ${y}px)`,
+              `circle(0px at ${mousePos.x}px ${mousePos.y}px)`,
+              `circle(${endRadius}px at ${mousePos.x}px ${mousePos.y}px)`,
             ];
             document.documentElement.animate(
               {
@@ -139,11 +137,11 @@ export const useTheme = defineStore("theme", () => {
 /* ========== [ 语言 ]========== */
 export const LOCALES = [
   "en-US",
-  // "ja-JP",
-  // "ru-RU",
+  "ja-JP",
+  "ru-RU",
   "zh-CN",
   "zh-TW",
-  // "zh-HK",
+  "zh-HK",
   "zh-MEME",
 ] as const;
 
@@ -163,7 +161,7 @@ const i18nOptions: I18nOptions = {
 };
 
 export const useLocale = defineStore("locale", () => {
-  const localeStorage = useLocalStorage<Locale>("locale", "system");
+  const locale = useLocalStorage<Locale>("locale", "system");
   let messagesCache: I18nMessages | undefined = undefined;
   let i18n: Composer | undefined = undefined;
 
@@ -179,7 +177,7 @@ export const useLocale = defineStore("locale", () => {
     await importMessages();
     return {
       ...i18nOptions,
-      locale: getLocale(localeStorage.value),
+      locale: getLocale(locale.value),
       messages: getMessages(),
     };
   }
@@ -188,7 +186,11 @@ export const useLocale = defineStore("locale", () => {
     const messages: any = {};
     for (const locale of LOCALES) {
       const message = await import(`@repo/locales/locales/${locale}.json`);
-      messages[locale] = message.default;
+      const eula = await import(`@repo/locales/eula/${locale}.json`);
+      messages[locale] = {
+        ...message.default,
+        eula: eula.default,
+      };
     }
     messagesCache = messages;
   }
@@ -203,11 +205,12 @@ export const useLocale = defineStore("locale", () => {
       : locale;
   }
 
-  function setLocale(locale: Locale) {
-    getI18n().locale.value = localeStorage.value = getLocale(locale);
+  function setLocale(l: Locale) {
+    getI18n().locale.value = locale.value = getLocale(l);
   }
 
   return {
+    locale,
     injectI18n,
     getI18n,
     generateConfig,
@@ -226,14 +229,14 @@ export const useLocale = defineStore("locale", () => {
  *
  * md - 笔记本电脑（768px < 屏幕宽度 < 1024px）
  *
- * sm - 平板电脑（425px < 屏幕宽度 <= 768px）
+ * sm - 平板电脑（450px < 屏幕宽度 <= 768px）
  *
- * xs - 手机（屏幕宽度 <= 425px）
+ * xs - 手机（屏幕宽度 <= 450px） 为什么不用425px呢，因为我iPhone 12 Pro Max大于425px就很神奇
  */
 export type ScreenWidth = "lg" | "md" | "sm";
 
 export const useScreenWidth = defineStore("screenWidth", () => {
-  const isXs = useMediaQuery("(max-width: 425px)");
+  const isXs = useMediaQuery("(max-width: 450px)");
   const isSm = useMediaQuery("(max-width: 768px)");
   const isMd = useMediaQuery("(max-width: 1024px)");
 
@@ -247,5 +250,19 @@ export const useScreenWidth = defineStore("screenWidth", () => {
   return {
     width,
     isXsOrSm: computed(() => isXs.value || isSm.value),
+  };
+});
+
+/* ========== [ 鼠标位置 ]========== */
+export const useMousePosition = defineStore("mousePosition", () => {
+  const mousePosition = ref({ x: 0, y: 0 });
+
+  document.addEventListener("mousemove", (e) => {
+    mousePosition.value = { x: e.clientX, y: e.clientY };
+  });
+
+  return {
+    x: computed(() => mousePosition.value.x),
+    y: computed(() => mousePosition.value.y),
   };
 });

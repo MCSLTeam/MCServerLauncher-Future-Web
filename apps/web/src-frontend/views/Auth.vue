@@ -1,31 +1,11 @@
 <script setup lang="ts">
 import Button from "@repo/ui/src/components/form/button/Button.vue";
-import { useTheme } from "@repo/ui/src/utils/stores.ts";
-import { computed } from "vue";
 import { createForm } from "@repo/ui/src/utils/form.ts";
 import * as yup from "yup";
 import Form from "@repo/ui/src/components/form/Form.vue";
 import FormEntry from "@repo/ui/src/components/form/FormEntry.vue";
 import InputText from "@repo/ui/src/components/form/entries/InputText.vue";
-import Setup from "packages/shared/src/layouts/Setup.vue";
-
-const theme = useTheme();
-const nextTheme = computed(() => {
-  switch (theme.theme) {
-    case "system":
-      return "light";
-    case "light":
-      return "dark";
-    case "dark":
-      return "system";
-    default:
-      return "light";
-  }
-});
-
-function changeTheme(event: MouseEvent) {
-  theme.change(nextTheme.value, "viewTransition", event);
-}
+import SetupLayout from "packages/shared/src/layouts/SetupLayout.vue";
 
 const form = createForm(
   {
@@ -49,14 +29,7 @@ const form = createForm(
 </script>
 
 <template>
-  <Setup>
-    <Button
-      shadow="always"
-      icon="fa fa-moon"
-      :rounded="true"
-      @click="changeTheme"
-      style="position: absolute; top: 2rem; left: 2rem"
-    />
+  <SetupLayout>
     <h2>注册管理员账户</h2>
     <Form :form="form" @submit="console.log('submit', form.data.value)">
       <FormEntry name="name">
@@ -72,7 +45,7 @@ const form = createForm(
         >注册</Button
       >
     </Form>
-  </Setup>
+  </SetupLayout>
 </template>
 
 <style scoped lang="scss"></style>
