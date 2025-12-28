@@ -3,6 +3,8 @@ mod config;
 mod user;
 mod utils;
 
+#[cfg(not(debug_assertions))]
+use actix_web::HttpResponse;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 #[cfg(not(debug_assertions))]
 use include_dir::{include_dir, Dir};
