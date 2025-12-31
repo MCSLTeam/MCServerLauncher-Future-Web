@@ -9,7 +9,7 @@ updates:
   - package-ecosystem: 'npm'
     directory: '/apps/app'
     schedule:
-    interval: 'weekly'
+      interval: 'weekly'
 
   # Web
   - package-ecosystem: 'npm'
@@ -17,7 +17,7 @@ updates:
     schedule:
       interval: 'weekly'
 
-  # Common
+  # Shared
   - package-ecosystem: 'npm'
     directory: '/package/shared'
     schedule:

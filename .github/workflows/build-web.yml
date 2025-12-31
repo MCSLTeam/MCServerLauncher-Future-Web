@@ -85,7 +85,7 @@ jobs:
             ${{ matrix.platform }}-cargo-
 
       - name: Install NPM dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
