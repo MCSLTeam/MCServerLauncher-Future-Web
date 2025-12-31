@@ -1,4 +1,4 @@
-import MarkdownIt from "markdown-it";
+import MarkdownIt, { type Options } from "markdown-it";
 import * as xss from "xss";
 import hljs from "highlight.js";
 
@@ -148,7 +148,7 @@ export const configuredXss = new xss.FilterXSS({
   },
 });
 
-export const md = (options = {}) => {
+export const md = (options: Options = {}) => {
   const md = new MarkdownIt("default", {
     html: true,
     linkify: true,
@@ -196,9 +196,10 @@ hljs.registerAliases(["html", "htm", "xhtml", "mcui", "fxml"], {
 
 export const renderHtml = (string: string) => configuredXss.process(string);
 
-export const renderMd = (string: string) => renderHtml(md().render(string));
+export const renderMd = (string: string, options: Options = {}) =>
+  renderHtml(md(options).render(string));
 
-export const renderHighlightedMd = (string: string) =>
+export const renderHighlightedMd = (string: string, options: Options = {}) =>
   renderHtml(
     md({
       highlight(str: string, lang: string) {
@@ -212,5 +213,6 @@ export const renderHighlightedMd = (string: string) =>
 
         return "";
       },
+      ...options,
     }).render(string),
   );

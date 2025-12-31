@@ -3,6 +3,7 @@ import { platform } from "@tauri-apps/plugin-os";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { ref, watchEffect } from "vue";
 import App from "./App.vue";
+import { exit } from "@tauri-apps/plugin-process";
 
 export const fullscreen = ref(false);
 
@@ -23,5 +24,11 @@ export const fullscreen = ref(false);
     document.body.style.background = "transparent";
   }
 
-  await load("app", App);
+  await load(
+    "app",
+    () => {
+      exit();
+    },
+    App,
+  );
 })();

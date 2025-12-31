@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue";
-import type { LoadingStatus, Size } from "../../../utils/types.ts";
-import { getStatusIcon } from "../../../utils/css.ts";
+import type { LoadingStatus, Size } from "../../utils/types.ts";
+import { getStatusIcon } from "../../utils/css.ts";
 
 const props = withDefaults(
   defineProps<{
@@ -76,7 +76,7 @@ const icon = computed(() =>
 <style lang="scss" scoped>
 @use "sass:map";
 @use "sass:math";
-@use "../../../assets/css/utils";
+@use "../../assets/css/utils";
 
 $vars: (
   "stroke-width": (

@@ -1,11 +1,6 @@
 {
   "extends": "@repo/configs/ts/vue.json",
-  "include": [
-    "src-frontend/**/*.ts",
-    "src-frontend/**/*.d.ts",
-    "src-frontend/**/*.tsx",
-    "src-frontend/**/*.vue"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
   "references": [
     {
       "path": "./tsconfig.node.json"

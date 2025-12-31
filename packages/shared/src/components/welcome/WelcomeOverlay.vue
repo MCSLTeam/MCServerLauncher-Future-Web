@@ -1,37 +1,41 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import FancyBackground from "@repo/ui/src/components/misc/FancyBackground.vue";
-import { onMounted } from "vue";
 import { getPlatform } from "../../index.ts";
-import router from "../../router.ts";
-import { usePageData } from "../../utils/stores.ts";
 
 const t = useI18n().t;
-
-onMounted(() => {
-  setTimeout(() => {
-    router.push("/welcome/setup");
-  }, 3400);
-});
 </script>
 
 <template>
-  <FancyBackground>
-    <div class="logo">
-      <img src="../../assets/MCSL.png" alt="" />
-      <div>
-        <h1>
-          {{ t("shared.app.name.abbr") }} {{ t("shared.app.name.future") }}
-          {{ t(`${getPlatform()}.app.name.suffix`) }}
-        </h1>
-        <h2>{{ t("shared.app.desc") }}</h2>
+  <div class="welcome-overlay">
+    <FancyBackground>
+      <div class="welcome-overlay__logo">
+        <img src="../../assets/MCSL.png" alt="" width="98" />
+        <div>
+          <h1>
+            {{ t("shared.app.name.abbr") }} {{ t("shared.app.name.future") }}
+            {{ t(`${getPlatform()}.app.name.suffix`) }}
+          </h1>
+          <h2>{{ t("shared.app.desc") }}</h2>
+        </div>
       </div>
-    </div>
-  </FancyBackground>
+    </FancyBackground>
+  </div>
 </template>
 
 <style scoped lang="scss">
-.logo {
+.welcome-overlay {
+  z-index: 1000;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: var(--mcsl-bg-color-main);
+  animation: 0.5s ease-in-out 3s both welcome-overlay__out-anim;
+}
+
+.welcome-overlay__logo {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,9 +43,7 @@ onMounted(() => {
 
   & > img {
     width: 7rem;
-    animation:
-      0.5s ease-in-out 0.5s both zoomIn,
-      0.5s ease-in-out 3s fadeOut;
+    animation: 0.5s ease-in-out 0.5s both zoomIn;
   }
 
   & > div {
@@ -72,9 +74,7 @@ onMounted(() => {
       overflow: hidden;
       height: 100%;
       max-width: 0;
-      animation:
-        1s ease-in-out 1s both collapseInHorizontal,
-        0.5s ease-in-out 3s fadeOut;
+      animation: 1s ease-in-out 1s both collapseInHorizontal;
     }
   }
 
@@ -84,17 +84,23 @@ onMounted(() => {
       align-items: center;
 
       & > h1 {
-        animation:
-          0.5s ease-in-out 1s both fadeInUp,
-          0.5s ease-in-out 3s fadeOut;
+        animation: 0.5s ease-in-out 1s both fadeInUp;
       }
 
       & > h2 {
-        animation:
-          0.5s ease-in-out 1.25s both fadeInUp,
-          0.5s ease-in-out 3s fadeOut;
+        animation: 0.5s ease-in-out 1.25s both fadeInUp;
       }
     }
+  }
+}
+
+@keyframes welcome-overlay__out-anim {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    pointer-events: none;
   }
 }
 </style>

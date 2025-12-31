@@ -1,100 +1,143 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import { usePageData } from "../../utils/stores.ts";
-import router from "../../router.ts";
+import { renderMd } from "@repo/ui/src/utils/render.ts";
+import { onMounted, onUnmounted, ref, watch } from "vue";
+import axios from "axios";
+import Spinner from "@repo/ui/src/components/progress/Spinner.vue";
+import router, { firstLoad } from "../../router.ts";
+import { close } from "../../index.ts";
 import Button from "@repo/ui/src/components/form/button/Button.vue";
-import Select from "@repo/ui/src/components/form/entries/Select.vue";
-import FormItem from "@repo/ui/src/components/form/FormItem.vue";
-import {
-  type Locale,
-  type Theme,
-  useLocale,
-  useTheme,
-} from "@repo/ui/src/utils/stores.ts";
-import { computed, type Ref, ref } from "vue";
-import * as yup from "yup";
 
 usePageData().set({
   breadcrumbs: [],
   layout: "setup",
 });
 
-const i18n = useI18n();
-const messages = useLocale().getMessages();
-const theme = computed({
-  get() {
-    return useTheme().theme;
-  },
-  set(theme: string) {
-    useTheme().change(theme as Theme, "viewTransition");
-  },
-});
-const themes: Ref<{ label: string; value: string }[]> = ref([
-  { label: i18n.t("shared.settings.general.theme.system"), value: "system" },
-  { label: i18n.t("shared.settings.general.theme.light"), value: "light" },
-  { label: i18n.t("shared.settings.general.theme.dark"), value: "dark" },
-]);
+const t = useI18n().t;
+const eula = ref<string>();
 
-const locale = computed({
-  get() {
-    return useLocale().locale;
-  },
-  set(locale: Locale) {
-    useLocale().setLocale(locale);
-  },
+(async () => {
+  try {
+    eula.value = (
+      await axios.get(t("shared.eula.url"), { timeout: 5000 })
+    ).data;
+  } catch {
+    console.warn("Failed to fetch EULA content from GitHub, using mirror");
+    try {
+      eula.value = (
+        await axios.get(t("shared.eula.mirror"), { timeout: 5000 })
+      ).data;
+    } catch {
+      console.warn("Failed to fetch EULA content from mirror, using default");
+      eula.value = t("shared.eula.content");
+    }
+  }
+  eula.value = eula.value?.replace(/^---[\s\S]*?---\s*/, "");
+})();
+
+function acceptEula() {
+  firstLoad.value = false;
+  router.push("/");
+}
+
+const countdown = ref(10);
+let interval: any;
+function startCountdown() {
+  interval = setInterval(() => {
+    countdown.value--;
+    if (countdown.value <= 0) {
+      clearInterval(interval);
+    }
+  }, 1000);
+}
+
+onMounted(() => {
+  if (eula.value == undefined) {
+    watch(eula, (value) => {
+      if (value) {
+        startCountdown();
+      }
+    });
+  } else startCountdown();
 });
-const locales: Ref<{ label: string; value: string }[]> = ref([
-  { label: i18n.t("shared.settings.general.locale.system"), value: "system" },
-  ...Object.keys(messages).map((key) => ({
-    label:
-      messages[key as Locale]["language"]["name"] +
-      " (" +
-      messages[key as Locale]["language"]["country"] +
-      ")",
-    value: key,
-  })),
-]);
+
+onUnmounted(() => {
+  clearInterval(interval);
+});
 </script>
 
 <template>
   <div class="welcome-setup">
-    <h2>{{ i18n.t("shared.welcome.settings") }}</h2>
-    <FormItem
-      v-model="theme"
-      :schema="
-        yup
-          .string()
-          .oneOf(themes.map((item) => item.value))
-          .label(i18n.t('shared.settings.general.theme.label'))
-      "
-    >
-      <Select :options="themes" />
-    </FormItem>
-    <FormItem
-      v-model="locale"
-      :schema="
-        yup
-          .string()
-          .oneOf(locales.map((item) => item.value))
-          .label(i18n.t('shared.settings.general.locale.label'))
-      "
-    >
-      <Select :options="locales" />
-    </FormItem>
-    <Button type="primary" color="primary" @click="router.push('/welcome/eula')"
-      >{{ i18n.t("ui.common.next-step") }}
-    </Button>
+    <h2>{{ t("shared.eula.title") }}</h2>
+    <div class="eula-content">
+      <div
+        v-if="eula"
+        class="mcsl-typography"
+        v-html="renderMd(eula, { html: false })"
+      />
+      <div v-else class="spinner">
+        <Spinner />
+      </div>
+    </div>
+    <div class="eula-actions">
+      <Button @click="close">{{ t("shared.eula.reject") }}</Button>
+      <Button
+        type="primary"
+        color="primary"
+        :disabled="countdown > 0"
+        @click="acceptEula"
+        >{{
+          countdown > 0
+            ? t("shared.eula.accept.countdown", { time: countdown })
+            : t("shared.eula.accept.normal")
+        }}</Button
+      >
+    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
 .welcome-setup {
+  min-width: 30rem;
+  max-height: 30rem;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  overflow: hidden;
   gap: var(--mcsl-spacing-xs);
 
   & > Button {
     align-self: flex-end;
   }
+
+  @media (max-width: 768px) {
+    min-width: 100%;
+  }
+}
+
+.eula-content {
+  flex-shrink: 2;
+  overflow: auto;
+  padding: var(--mcsl-spacing-xs);
+  background: var(--mcsl-bg-color-main);
+  border-radius: var(--mcsl-border-radius-md);
+  & > .spinner {
+    height: 6rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  @media (max-width: 768px) {
+    height: 100%;
+  }
+}
+
+.eula-actions {
+  display: flex;
+  gap: var(--mcsl-spacing-xs);
+  justify-content: flex-end;
 }
 </style>

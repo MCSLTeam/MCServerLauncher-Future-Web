@@ -3,15 +3,16 @@ import Panel from "./Panel.vue";
 import type { Size } from "../../utils/types.ts";
 
 defineProps<{
+  disabled?: boolean;
   header?: string;
   headerDivider?: boolean;
-  disabled?: boolean;
   shadow?: "always" | "hover" | "never";
   size?: Size;
   headerClass?: string;
   headerStyle?: string;
   bodyClass?: string;
   bodyStyle?: string;
+  scrollable?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -59,7 +60,8 @@ defineExpose({
     :header="header"
     :header-class="headerClass"
     :header-style="headerStyle"
-    :headerDivider="headerDivider"
+    :header-divider="headerDivider"
+    :scrollable="scrollable"
     :shadow="shadow"
     :size="size"
     class="mcsl-collapsable-panel"
@@ -141,7 +143,7 @@ defineExpose({
   }
 
   & > .mcsl-panel__body-wrapper {
-    animation: 0.5s cubic-bezier(0, 1, 0, 1) both collapseOutVertical;
+    animation: 0.3s cubic-bezier(0, 1, 0, 1) both collapseOutVertical;
   }
 }
 

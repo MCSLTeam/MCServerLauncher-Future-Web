@@ -8,5 +8,13 @@ import router from "./router.ts";
     redirect: "/dashboard",
   });
 
-  load("web", App);
+  load(
+    "web",
+    () => {
+      window.close();
+      location.replace("about:blank");
+      document.body.innerHTML = "";
+    },
+    App,
+  );
 })();

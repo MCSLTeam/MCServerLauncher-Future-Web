@@ -23,7 +23,8 @@
     "shared:lint": "turbo run shared#lint",
     "build": "turbo run build",
     "lint": "turbo run lint",
-    "fix": "turbo run fix"
+    "fix": "turbo run fix",
+    "test": "turbo run test"
   },
   "devDependencies": {
     "prettier": "^3.6.2",

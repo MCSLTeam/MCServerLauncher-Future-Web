@@ -10,7 +10,7 @@ const t = useI18n().t;
 <template>
   <FancyBackground>
     <div class="logo">
-      <img src="../assets/MCSL.png" alt="" />
+      <img src="../assets/MCSL.png" alt="" width="98" />
       <h1>
         {{ t("shared.app.name.abbr") }} {{ t("shared.app.name.future") }}
         {{ t(`${getPlatform()}.app.name.suffix`) }}
@@ -19,7 +19,7 @@ const t = useI18n().t;
     </div>
     <Panel class="auth-panel" body-class="auth-body">
       <RouterView v-slot="{ Component }">
-        <transition mode="out-in" name="fade" :duration="250">
+        <transition mode="out-in" name="stretch" :duration="500">
           <component :is="Component" />
         </transition>
       </RouterView>
@@ -35,8 +35,6 @@ const t = useI18n().t;
   justify-content: center;
   gap: var(--mcsl-spacing-2xs);
   margin-bottom: var(--mcsl-spacing-2xl);
-  opacity: 0;
-  animation: 0.5s ease-in-out both 0.25s fadeInUp;
 
   & > img {
     width: 7rem;
@@ -61,13 +59,42 @@ const t = useI18n().t;
 }
 
 .auth-panel {
-  width: min(30rem);
-  opacity: 0;
-  animation: 0.5s ease-in-out both 0.5s fadeIn;
+  max-height: calc(
+    100% - 2 * var(--mcsl-spacing-lg) - 174px - var(--mcsl-spacing-2xl) - 2 *
+      var(--mcsl-spacing-md)
+  );
+
+  @media (min-width: 769px) {
+    max-width: 70vw;
+  }
 
   @media (max-width: 768px) {
     width: calc(100% - 2 * var(--mcsl-spacing-lg) - 2 * var(--mcsl-spacing-md));
   }
+}
+
+.stretch-enter-active {
+  transition: 0.5s cubic-bezier(0, 1, 0, 1);
+  overflow: hidden;
+}
+
+.stretch-leave-active {
+  transition: 0.5s ease-in-out;
+  overflow: hidden;
+}
+
+.stretch-enter-from,
+.stretch-leave-to {
+  max-width: 0;
+  max-height: 0;
+  opacity: 0;
+}
+
+.stretch-enter-to,
+.stretch-leave-from {
+  max-width: 999px;
+  max-height: 999px;
+  opacity: 1;
 }
 </style>
 

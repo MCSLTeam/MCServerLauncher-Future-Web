@@ -185,12 +185,14 @@ export const useLocale = defineStore("locale", () => {
   async function importMessages() {
     const messages: any = {};
     for (const locale of LOCALES) {
-      const message = await import(`@repo/locales/locales/${locale}.json`);
-      const eula = await import(`@repo/locales/eula/${locale}.json`);
-      messages[locale] = {
-        ...message.default,
-        eula: eula.default,
+      const message = (await import(`@repo/locales/locales/${locale}.json`))
+        .default;
+      const eula = (await import(`@repo/locales/eula/${locale}.json`)).default;
+      message.shared.eula = {
+        ...message.shared.eula,
+        ...eula,
       };
+      messages[locale] = message;
     }
     messagesCache = messages;
   }
@@ -257,11 +259,13 @@ export const useScreenWidth = defineStore("screenWidth", () => {
 export const useMousePosition = defineStore("mousePosition", () => {
   const mousePosition = ref({ x: 0, y: 0 });
 
-  document.addEventListener("mousemove", (e) => {
-    mousePosition.value = { x: e.clientX, y: e.clientY };
-  });
+  function onMouseMove(e: MouseEvent) {
+    mousePosition.value.x = e.clientX;
+    mousePosition.value.y = e.clientY;
+  }
 
   return {
+    onMouseMove,
     x: computed(() => mousePosition.value.x),
     y: computed(() => mousePosition.value.y),
   };

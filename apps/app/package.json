@@ -11,8 +11,8 @@
     "frontend:build": "vue-tsc --noEmit && rsbuild build",
     "frontend:preview": "rsbuild preview",
     "lint": "eslint; prettier --check .",
-    "fix": "eslint --fix;prettier --write --list-different .",
-    "test": "tsc --noEmit"
+    "fix": "eslint --fix; prettier --write --list-different .",
+    "test": "vue-tsc --noEmit"
   },
   "dependencies": {
     "@repo/configs": "workspace:*",

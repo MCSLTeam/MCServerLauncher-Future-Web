@@ -4,4 +4,4 @@ export type I18nMessages = Record<Locale, any>;
 
 export type LoadingStatus = "loading" | "success" | "error" | "warning";
 
-export type Size = "small" | "middle" | "large" | "smaller" | "larger";
+export type Size = "small" | "middle" | "large";

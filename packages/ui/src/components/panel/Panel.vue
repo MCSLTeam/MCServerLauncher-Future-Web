@@ -13,6 +13,7 @@ withDefaults(
     headerStyle?: string;
     bodyClass?: string;
     bodyStyle?: string;
+    scrollable?: boolean;
   }>(),
   {
     size: "middle",
@@ -22,6 +23,7 @@ withDefaults(
     headerStyle: "",
     bodyClass: "",
     bodyStyle: "",
+    scrollable: false,
   },
 );
 
@@ -39,6 +41,7 @@ onMounted(() => {
       [`mcsl-size-${size}`]: true,
       [`mcsl-panel__shadow-${shadow}`]: shadow !== 'never',
       'mcsl-panel__need-divider': !headerDivider && hasHeader,
+      'mcsl-panel__not-scrollable': !scrollable,
     }"
     class="mcsl-panel"
   >
@@ -99,6 +102,14 @@ onMounted(() => {
 .mcsl-panel__header {
   & * {
     color: var(--mcsl-text-color-primary);
+  }
+}
+
+.mcsl-panel__not-scrollable {
+  & > .mcsl-panel__body-wrapper,
+  & .mcsl-panel__body {
+    overflow: hidden;
+    height: 100%;
   }
 }
 </style>

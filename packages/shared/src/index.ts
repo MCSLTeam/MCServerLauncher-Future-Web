@@ -9,6 +9,7 @@ import router from "./router.ts";
 type Platform = "web" | "app";
 
 let platform: Platform = "web";
+export let close: () => any = () => {};
 
 export const versionCodename = import.meta.env.APP_VERSION_NAME;
 export const version =
@@ -26,8 +27,13 @@ export function getPlatform(): Platform {
   return platform;
 }
 
-export async function load(p: Platform, appComponent: Component) {
+export async function load(
+  p: Platform,
+  closeWindow: () => any,
+  appComponent: Component,
+) {
   platform = p;
+  close = closeWindow;
 
   const app = createApp(appComponent);
   app.use(createPinia());

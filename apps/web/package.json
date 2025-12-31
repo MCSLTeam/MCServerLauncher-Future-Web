@@ -12,7 +12,7 @@
     "frontend:preview": "rsbuild preview",
     "lint": "eslint; prettier --check .; cargo lint",
     "fix": "eslint --fix;prettier --write --list-different .; cargo fix",
-    "test": "tsc --noEmit && cargo test"
+    "test": "vue-tsc --noEmit && cargo test"
   },
   "dependencies": {
     "@repo/configs": "workspace:*",

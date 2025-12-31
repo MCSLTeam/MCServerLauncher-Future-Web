@@ -35,6 +35,7 @@ const props = withDefaults(
     headerStyle?: string;
     bodyClass?: string;
     bodyStyle?: string;
+    scrollable?: boolean;
   }>(),
   {
     shadow: false,
@@ -66,6 +67,7 @@ const menuInfo = computed(() => {
     :header-class="headerClass"
     :header-divider="headerDivider"
     :header-style="headerStyle"
+    :scrollable="scrollable"
     :shadow="shadow ? 'always' : 'never'"
     :size="size"
     class="mcsl-menu"

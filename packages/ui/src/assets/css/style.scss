@@ -83,7 +83,7 @@ html.dark::view-transition-new(root) {
 /* 过渡动画 */
 .blur-enter-active,
 .blur-leave-active {
-  transition: all 0.5s;
+  transition: all 0.25s;
 }
 
 .blur-enter-from,
@@ -94,7 +94,7 @@ html.dark::view-transition-new(root) {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: all 0.5s;
+  transition: all 0.25s;
 }
 
 .fade-enter-from,
@@ -198,6 +198,16 @@ h6 {
     font-size: unset;
     font-weight: unset;
   }
+}
+
+ul,
+ol,
+dl {
+  padding-inline-start: var(--mcsl-spacing-md);
+}
+
+blockquote {
+  margin-inline: var(--mcsl-spacing-md);
 }
 
 .mcsl-typography {

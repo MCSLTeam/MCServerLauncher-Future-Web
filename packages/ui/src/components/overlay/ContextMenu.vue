@@ -29,6 +29,7 @@ const props = withDefaults(
     headerStyle?: string;
     bodyClass?: string;
     bodyStyle?: string;
+    scrollable?: boolean;
   }>(),
   {
     size: "middle",
@@ -120,9 +121,10 @@ onUnmounted(() => {
         :bodyClass="bodyClass"
         :bodyStyle="bodyStyle"
         :header="header"
-        :headerClass="headerClass"
-        :headerDivider="headerDivider"
-        :headerStyle="headerStyle"
+        :header-class="headerClass"
+        :header-divider="headerDivider"
+        :header-style="headerStyle"
+        :scrollable="scrollable"
         :menu="menu"
         :size="size"
         shadow

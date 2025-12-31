@@ -11,8 +11,9 @@ import {
   useLocale,
   useTheme,
 } from "@repo/ui/src/utils/stores.ts";
-import { computed, type Ref, ref } from "vue";
+import { computed } from "vue";
 import * as yup from "yup";
+import WelcomeOverlay from "../../components/welcome/WelcomeOverlay.vue";
 
 usePageData().set({
   breadcrumbs: [],
@@ -29,7 +30,7 @@ const theme = computed({
     useTheme().change(theme as Theme, "viewTransition");
   },
 });
-const themes: Ref<{ label: string; value: string }[]> = ref([
+const themes = computed(() => [
   { label: i18n.t("shared.settings.general.theme.system"), value: "system" },
   { label: i18n.t("shared.settings.general.theme.light"), value: "light" },
   { label: i18n.t("shared.settings.general.theme.dark"), value: "dark" },
@@ -43,7 +44,7 @@ const locale = computed({
     useLocale().setLocale(locale);
   },
 });
-const locales: Ref<{ label: string; value: string }[]> = ref([
+const locales = computed(() => [
   { label: i18n.t("shared.settings.general.locale.system"), value: "system" },
   ...Object.keys(messages).map((key) => ({
     label:
@@ -58,6 +59,7 @@ const locales: Ref<{ label: string; value: string }[]> = ref([
 
 <template>
   <div class="welcome-setup">
+    <WelcomeOverlay />
     <h2>{{ i18n.t("shared.welcome.settings") }}</h2>
     <FormItem
       v-model="theme"
@@ -89,12 +91,17 @@ const locales: Ref<{ label: string; value: string }[]> = ref([
 
 <style scoped lang="scss">
 .welcome-setup {
+  width: 30rem;
   display: flex;
   flex-direction: column;
   gap: var(--mcsl-spacing-xs);
 
   & > Button {
     align-self: flex-end;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
   }
 }
 </style>

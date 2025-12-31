@@ -4,7 +4,15 @@ import router from "@repo/shared/src/router.ts";
 import { useAccount } from "./utils/store.ts";
 
 (async () => {
-  await load("web", App);
+  await load(
+    "web",
+    () => {
+      window.close();
+      location.replace("about:blank");
+      document.body.innerHTML = "";
+    },
+    App,
+  );
 
   router.beforeEach((to, _from, next) => {
     if (useAccount().loggedIn) {

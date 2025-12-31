@@ -7,12 +7,17 @@ const router = createRouter({
     {
       path: "/welcome",
       name: "Welcome",
-      component: async () => await import("./views/welcome/Welcome.vue"),
+      redirect: "/welcome/setup",
     },
     {
       path: "/welcome/setup",
       name: "Welcome - Setup",
       component: async () => await import("./views/welcome/Setup.vue"),
+    },
+    {
+      path: "/welcome/eula",
+      name: "Welcome - EULA",
+      component: async () => await import("./views/welcome/Eula.vue"),
     },
     {
       path: "/",

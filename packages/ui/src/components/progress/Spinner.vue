@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { McLoadingIcon, RippleIcon, SpinnerIcon } from "../../../utils/icons";
-import { type Color, getColorVar } from "../../../utils/css.ts";
-import type { Size } from "../../../utils/types.ts";
+import { McLoadingIcon, RippleIcon, SpinnerIcon } from "../../utils/icons";
+import { type Color, getColorVar } from "../../utils/css.ts";
+import type { Size } from "../../utils/types.ts";
 
 withDefaults(
   defineProps<{
@@ -38,7 +38,7 @@ withDefaults(
 
 <style lang="scss" scoped>
 @use "sass:map";
-@use "../../../assets/css/utils";
+@use "../../assets/css/utils";
 
 $vars: (
   "spinner-size": (
