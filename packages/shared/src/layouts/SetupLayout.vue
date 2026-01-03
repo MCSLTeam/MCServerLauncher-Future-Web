@@ -64,11 +64,11 @@ const t = useI18n().t;
       var(--mcsl-spacing-md)
   );
 
-  @media (min-width: 769px) {
+  @media (min-width: 451px) {
     max-width: 70vw;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 450px) {
     width: calc(100% - 2 * var(--mcsl-spacing-lg) - 2 * var(--mcsl-spacing-md));
   }
 }
@@ -85,8 +85,8 @@ const t = useI18n().t;
 
 .stretch-enter-from,
 .stretch-leave-to {
-  max-width: 0;
-  max-height: 0;
+  max-width: 0 !important;
+  max-height: 0 !important;
   opacity: 0;
 }
 

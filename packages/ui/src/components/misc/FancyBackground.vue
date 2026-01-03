@@ -24,11 +24,8 @@ withDefaults(
     }"
     class="mcsl-bg__container"
   >
-    <div
-      v-for="i in 4"
-      :key="i"
-      :class="['mcsl-bg__circle', `mcsl-bg__circle-${i}`]"
-    />
+    <div class="mcsl-bg__circle mcsl-bg__circle-1" />
+    <div class="mcsl-bg__circle mcsl-bg__circle-2" />
     <div class="mcsl-bg__content">
       <slot />
     </div>
@@ -66,34 +63,18 @@ withDefaults(
   }
 
   .mcsl-bg__circle-1 {
-    top: -5%;
-    left: -5%;
-    width: 55%;
+    bottom: -5%;
+    right: -10%;
+    width: 60%;
     height: 60%;
-    background: utils.transparent(var(--mcsl-bg__primary-color), 20%);
+    background: utils.transparent(var(--mcsl-bg__secondary-color), 10%);
   }
 
   .mcsl-bg__circle-2 {
     bottom: -5%;
-    right: -5%;
+    left: -10%;
     width: 60%;
     height: 60%;
-    background: utils.transparent(var(--mcsl-bg__secondary-color), 20%);
-  }
-
-  .mcsl-bg__circle-3 {
-    top: -5%;
-    right: -5%;
-    width: 50%;
-    height: 45%;
-    background: utils.transparent(var(--mcsl-bg__base-color), 10%);
-  }
-
-  .mcsl-bg__circle-4 {
-    bottom: -5%;
-    left: -5%;
-    width: 45%;
-    height: 45%;
     background: utils.transparent(var(--mcsl-bg__base-color), 10%);
   }
 }

@@ -99,7 +99,7 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .welcome-setup {
-  min-width: 30rem;
+  width: 70vw;
   max-height: 30rem;
   height: 100%;
   display: flex;
@@ -112,8 +112,8 @@ onUnmounted(() => {
     align-self: flex-end;
   }
 
-  @media (max-width: 768px) {
-    min-width: 100%;
+  @media (max-width: 450px) {
+    width: 100%;
   }
 }
 
@@ -130,7 +130,7 @@ onUnmounted(() => {
     align-items: center;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 450px) {
     height: 100%;
   }
 }

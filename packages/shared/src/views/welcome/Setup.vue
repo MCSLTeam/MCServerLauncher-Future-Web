@@ -91,7 +91,7 @@ const locales = computed(() => [
 
 <style scoped lang="scss">
 .welcome-setup {
-  width: 30rem;
+  width: min(30rem, 70vw);
   display: flex;
   flex-direction: column;
   gap: var(--mcsl-spacing-xs);
@@ -100,7 +100,7 @@ const locales = computed(() => [
     align-self: flex-end;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 450px) {
     width: 100%;
   }
 }

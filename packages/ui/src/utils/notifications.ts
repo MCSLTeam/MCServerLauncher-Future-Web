@@ -10,12 +10,14 @@ type TemplateInfo = {
   template: (props: any) => VueElement[];
 };
 
+export type NotificationType = "mcsl" | "system" | "both";
+
 export class MCSLNotif {
   readonly id: string;
   readonly template: TemplateInfo;
   readonly duration: number;
   readonly data: any;
-  readonly type: "mcsl" | "system" | "both";
+  readonly type: NotificationType;
   readonly opened = ref(false);
   private systemNotif: Notification | undefined;
   private _closed: boolean = false;
@@ -23,7 +25,6 @@ export class MCSLNotif {
   constructor(settings: {
     template?: string;
     duration?: number;
-    open?: boolean;
     type?: "mcsl" | "system" | "both";
     data: any;
   }) {
@@ -38,7 +39,6 @@ export class MCSLNotif {
     this.data = settings.data;
     this.type = settings.type ?? "mcsl";
     addNotification(this);
-    if (settings.open != false) this.open();
   }
 
   get element(): VueElement {
@@ -65,8 +65,8 @@ export class MCSLNotif {
     }, this.duration);
   }
 
-  get mcslOpened() {
-    return this.type == "mcsl" || (this.type == "both" && this.opened.value);
+  get isMcsl() {
+    return this.type == "mcsl" || this.type == "both";
   }
 
   close() {
@@ -76,7 +76,7 @@ export class MCSLNotif {
     this.systemNotif?.close();
     setTimeout(() => {
       removeNotification(this.id);
-    }, 200); // 等待动画
+    }, 500); // 等待动画
   }
 }
 

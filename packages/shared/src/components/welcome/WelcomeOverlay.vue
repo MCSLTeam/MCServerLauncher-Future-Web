@@ -32,7 +32,7 @@ const t = useI18n().t;
   top: 0;
   left: 0;
   background: var(--mcsl-bg-color-main);
-  animation: 0.5s ease-in-out 3s both welcome-overlay__out-anim;
+  animation: 0.5s ease-in-out 2s both welcome-overlay__out-anim;
 }
 
 .welcome-overlay__logo {
@@ -74,7 +74,7 @@ const t = useI18n().t;
       overflow: hidden;
       height: 100%;
       max-width: 0;
-      animation: 1s ease-in-out 1s both collapseInHorizontal;
+      animation: 0.75s ease-in-out 0.8s both collapseInHorizontal;
     }
   }
 
@@ -84,11 +84,11 @@ const t = useI18n().t;
       align-items: center;
 
       & > h1 {
-        animation: 0.5s ease-in-out 1s both fadeInUp;
+        animation: 0.5s ease-in-out 0.8s both fadeInUp;
       }
 
       & > h2 {
-        animation: 0.5s ease-in-out 1.25s both fadeInUp;
+        animation: 0.5s ease-in-out 1s both fadeInUp;
       }
     }
   }

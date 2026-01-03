@@ -158,10 +158,10 @@ defineExpose({
   display: flex;
 
   .mcsl-message__with-title & {
-    --mcsl-message__icon-font-size: var(--mcsl-font-size-h4);
+    --mcsl-message__icon-font-size: var(--mcsl-font-size-lg);
   }
 
-  --mcsl-message__icon-font-size: var(--mcsl-font-size-all);
+  --mcsl-message__icon-font-size: var(--mcsl-font-size-md);
   $size: calc(var(--mcsl-message__icon-font-size) * 1.2);
 
   & > i {
