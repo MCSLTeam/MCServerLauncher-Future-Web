@@ -4,6 +4,7 @@ import { usePageData } from "../../utils/stores.ts";
 import router from "../../router.ts";
 import Button from "@repo/ui/src/components/form/button/Button.vue";
 import Select from "@repo/ui/src/components/form/entries/Select.vue";
+import SelectButton from "@repo/ui/src/components/form/entries/SelectButton.vue";
 import FormItem from "@repo/ui/src/components/form/FormItem.vue";
 import {
   type Locale,
@@ -70,7 +71,7 @@ const locales = computed(() => [
           .label(i18n.t('shared.settings.general.theme.label'))
       "
     >
-      <Select :options="themes" />
+      <SelectButton :options="themes" size="large" />
     </FormItem>
     <FormItem
       v-model="locale"

@@ -100,3 +100,11 @@ export function createForm<T extends Record<string, any>>(
     },
   };
 }
+
+// types
+export type SelectionItem = {
+  value: any;
+  label?: string;
+  icon?: string;
+  disabled?: boolean;
+};

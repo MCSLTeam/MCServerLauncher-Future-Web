@@ -2,7 +2,7 @@
 import { inject, provide, ref, watch } from "vue";
 import type { FormFieldInstance, FormInstance } from "../../utils/form.ts";
 import Message from "../panel/Message.vue";
-import type { Size } from "../../utils/types.ts";
+import type { Size } from "../../utils/util.ts";
 
 export type FormFieldData = {
   id: string;
@@ -17,12 +17,14 @@ const props = withDefaults(
     name: string;
     width?: number | "fit";
     labelPos?: "left" | "right" | "top";
+    entryPos?: "left" | "right" | "center" | "full";
     size?: Size;
   }>(),
   {
     size: "middle",
     width: 100,
     labelPos: "left",
+    entryPos: "right",
   },
 );
 
@@ -108,6 +110,7 @@ provide("mcsl-form-field", {
     :class="[
       `mcsl-size-${size}`,
       `mcsl-form-entry__label-${labelPos}`,
+      `mcsl-form-entry__entry-${entryPos}`,
       ...(width == 'fit' ? ['mcsl-form-entry__width-fit'] : []),
     ]"
     :style="{
@@ -117,7 +120,9 @@ provide("mcsl-form-field", {
   >
     <div>
       <label v-if="field.label" :for="id">{{ field.label }}</label>
-      <slot />
+      <div>
+        <slot />
+      </div>
     </div>
     <Message :visible="field.error.value != null" color="danger" variant="text">
       {{ errMsg }}
@@ -145,6 +150,11 @@ provide("mcsl-form-field", {
   flex-direction: column;
 }
 
+.mcsl-form-entry > div > div {
+  flex-grow: 1;
+  display: flex;
+}
+
 .mcsl-form-entry__label-top,
 .mcsl-form-entry__label-left {
   & > div > label {
@@ -154,6 +164,22 @@ provide("mcsl-form-field", {
 
 .mcsl-form-entry__label-right > div > label {
   order: 2;
+}
+
+.mcsl-form-entry__entry-center > div > div {
+  justify-content: center;
+}
+
+.mcsl-form-entry__entry-full > div > div {
+  justify-content: stretch;
+}
+
+.mcsl-form-entry__entry-left > div > div {
+  justify-content: flex-start;
+}
+
+.mcsl-form-entry__entry-right > div > div {
+  justify-content: flex-end;
 }
 
 .mcsl-form-entry__label-left,

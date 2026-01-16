@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { ColorData, type ColorType, getShadow } from "../../../utils/css.ts";
-import type { Size } from "../../../utils/types.ts";
+import type { Size } from "../../../utils/util.ts";
 
 const props = withDefaults(
   defineProps<{

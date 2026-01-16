@@ -1,6 +1,6 @@
 import { computed, type Ref, ref, watch } from "vue";
-import type { LoadingStatus } from "@repo/ui/src/utils/types.ts";
 import { sleep } from "@repo/ui/src/utils/util.ts";
+import type { LoadingStatus } from "@repo/ui/src/components/progress/ProgressBar.vue";
 
 export class SimpleTask {
   static lastId = -1;

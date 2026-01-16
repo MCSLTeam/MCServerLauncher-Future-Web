@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Size } from "../../utils/types.ts";
+import type { Size } from "../../utils/util.ts";
 import FormEntry from "./FormEntry.vue";
 import { createForm } from "../../utils/form.ts";
 import * as yup from "yup";
@@ -10,6 +10,7 @@ const props = defineProps<{
   validationTrigger?: "input" | "blur";
   width?: number | "fit";
   labelPos?: "left" | "right" | "top";
+  entryPos?: "left" | "right" | "center" | "full";
   size?: Size;
 }>();
 
@@ -70,6 +71,7 @@ defineExpose({
 <template>
   <FormEntry
     :label-pos="labelPos"
+    :entry-pos="entryPos"
     :size="size"
     name="value"
     @blur="$emit('blur', data, $event)"

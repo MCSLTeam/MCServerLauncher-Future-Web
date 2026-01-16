@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Size } from "../../../utils/types.ts";
+import type { Size } from "../../../utils/util.ts";
 
 withDefaults(
   defineProps<{

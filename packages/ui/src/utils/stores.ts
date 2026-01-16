@@ -7,7 +7,6 @@ import {
 } from "@vueuse/core";
 import { computed, ref, watch } from "vue";
 import { type Composer, type I18nOptions } from "vue-i18n";
-import { type I18nMessages } from "./types.ts";
 
 /* ========== [ 主题 ]========== */
 export type Theme = "system" | "light" | "dark";
@@ -144,6 +143,8 @@ export const LOCALES = [
   "zh-HK",
   "zh-MEME",
 ] as const;
+
+export type I18nMessages = Record<Locale, any>;
 
 export type Locale = (typeof LOCALES)[number] | "system";
 

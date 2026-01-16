@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { McLoadingIcon, RippleIcon, SpinnerIcon } from "../../utils/icons";
 import { type Color, getColorVar } from "../../utils/css.ts";
-import type { Size } from "../../utils/types.ts";
+import type { Size } from "../../utils/util.ts";
 
 withDefaults(
   defineProps<{

@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { computed } from "vue";
-import type { LoadingStatus, Size } from "../../utils/types.ts";
 import { getStatusIcon } from "../../utils/css.ts";
+import type { Size } from "../../utils/util.ts";
+
+export type LoadingStatus = "loading" | "success" | "error" | "warning";
 
 const props = withDefaults(
   defineProps<{

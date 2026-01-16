@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import CollapsablePanel from "../CollapsablePanel.vue";
-import type { Size } from "../../../utils/types.ts";
+import type { Size } from "../../../utils/util.ts";
 import { inject } from "vue";
 
 withDefaults(

@@ -1,3 +1,5 @@
+export type Size = "small" | "middle" | "large";
+
 export type PosInfo = {
   x: number;
   y: number;
