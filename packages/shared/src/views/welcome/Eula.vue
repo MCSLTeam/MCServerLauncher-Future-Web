@@ -81,6 +81,9 @@ onUnmounted(() => {
       </div>
     </div>
     <div class="eula-actions">
+      <Button @click="router.push('/welcome/setup')">{{
+        t("ui.common.prev-step")
+      }}</Button>
       <Button @click="close">{{ t("shared.eula.reject") }}</Button>
       <Button
         type="primary"

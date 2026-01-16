@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import { getStatusIcon } from "../../utils/css.ts";
-import type { Size } from "../../utils/util.ts";
+import type { Size } from "../../utils/utils.ts";
 
 export type LoadingStatus = "loading" | "success" | "error" | "warning";
 

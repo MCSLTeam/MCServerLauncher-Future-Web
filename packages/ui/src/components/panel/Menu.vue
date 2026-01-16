@@ -2,7 +2,7 @@
 import Panel from "./Panel.vue";
 import Button from "../form/button/Button.vue";
 import type { ColorType } from "../../utils/css.ts";
-import type { Size } from "../../utils/util.ts";
+import type { Size } from "../../utils/utils.ts";
 import Divider from "../misc/Divider.vue";
 import { computed } from "vue";
 

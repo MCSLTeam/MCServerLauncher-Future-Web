@@ -33,6 +33,7 @@ import Message from "../../panel/Message.vue";
   flex-direction: column-reverse;
   gap: var(--mcsl-spacing-xs);
   transition: 0.2s ease-in-out;
+  z-index: 9999;
 
   @media (max-width: 20rem) {
     width: calc(100% - var(--mcsl-spacing-md) * 2);

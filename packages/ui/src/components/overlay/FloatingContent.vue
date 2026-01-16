@@ -8,7 +8,7 @@ import {
   ref,
 } from "vue";
 import { animatedVisibilityExists } from "../../utils/internal.ts";
-import type { PosInfo } from "../../utils/util.ts";
+import type { PosInfo } from "../../utils/utils.ts";
 
 defineOptions({
   inheritAttrs: false,

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue";
-import type { Size } from "../../utils/util.ts";
+import type { Size } from "../../utils/utils.ts";
 import { animatedVisibilityExists } from "../../utils/internal.ts";
 import {
   ColorData,
@@ -123,6 +123,7 @@ defineExpose({
       $spacing: var(--mcsl-message__spacing);
       gap: $spacing;
       padding: $spacing;
+      width: calc(100% - 2 * $spacing);
 
       & .mcsl-message__title {
         margin-bottom: calc($spacing / 2);
@@ -141,6 +142,7 @@ defineExpose({
 }
 
 .mcsl-message {
+  width: 100%;
   opacity: 0;
   transform: translate(0);
   animation:
@@ -173,7 +175,7 @@ defineExpose({
   }
 
   & > div {
-    flex-grow: 1;
+    width: calc(100% - $size);
   }
 
   & > .mcsl-message__close-btn {

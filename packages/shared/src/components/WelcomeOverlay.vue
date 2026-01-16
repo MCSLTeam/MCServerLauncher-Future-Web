@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import FancyBackground from "@repo/ui/src/components/misc/FancyBackground.vue";
-import { getPlatform } from "../../index.ts";
+import { getPlatform } from "../index.ts";
 
 const t = useI18n().t;
 </script>
@@ -10,7 +10,7 @@ const t = useI18n().t;
   <div class="welcome-overlay">
     <FancyBackground>
       <div class="welcome-overlay__logo">
-        <img src="../../assets/MCSL.png" alt="" width="98" />
+        <img src="../assets/MCSL.png" alt="" width="98" />
         <div>
           <h1>
             {{ t("shared.app.name.abbr") }} {{ t("shared.app.name.future") }}

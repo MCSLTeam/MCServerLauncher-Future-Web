@@ -2,7 +2,7 @@
 import { inject, provide, ref, watch } from "vue";
 import type { FormFieldInstance, FormInstance } from "../../utils/form.ts";
 import Message from "../panel/Message.vue";
-import type { Size } from "../../utils/util.ts";
+import type { Size } from "../../utils/utils.ts";
 
 export type FormFieldData = {
   id: string;

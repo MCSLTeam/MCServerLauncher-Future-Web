@@ -23,6 +23,9 @@ export const windowButtonTransition = computed(
   () => `0.3s ${windowButtonsExists.value ? "" : "0.5s"} ease-in-out`,
 );
 
+export const loading = ref(true);
+export const loadingStep = ref("");
+
 export function getPlatform(): Platform {
   return platform;
 }
@@ -31,6 +34,7 @@ export async function load(
   p: Platform,
   closeWindow: () => any,
   appComponent: Component,
+  load: () => void | Promise<void>,
 ) {
   platform = p;
   close = closeWindow;
@@ -47,4 +51,9 @@ export async function load(
   loadUi();
 
   app.mount("#app");
+
+  await load();
+
+  loading.value = false;
+  loadingStep.value = useLocale().getI18n().t("ui.loading.success");
 }

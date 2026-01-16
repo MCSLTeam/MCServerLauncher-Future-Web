@@ -14,7 +14,7 @@ import {
 } from "@repo/ui/src/utils/stores.ts";
 import { computed } from "vue";
 import * as yup from "yup";
-import WelcomeOverlay from "../../components/welcome/WelcomeOverlay.vue";
+import WelcomeOverlay from "../../components/WelcomeOverlay.vue";
 
 usePageData().set({
   breadcrumbs: [],

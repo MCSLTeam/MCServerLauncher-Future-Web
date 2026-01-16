@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { type Color, ColorData, getColorVar } from "../../utils/css.ts";
-import type { Size } from "../../utils/util.ts";
+import type { Size } from "../../utils/utils.ts";
 
 export type MeterItem = {
   label: string;

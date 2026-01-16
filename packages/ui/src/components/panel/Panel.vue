@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
-import type { Size } from "../../utils/util.ts";
+import type { Size } from "../../utils/utils.ts";
 import Divider from "../misc/Divider.vue";
 
 withDefaults(

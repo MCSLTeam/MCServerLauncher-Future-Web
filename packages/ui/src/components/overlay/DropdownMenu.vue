@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import Menu, { type MenuInfo } from "../panel/Menu.vue";
-import type { Size } from "../../utils/util.ts";
+import type { Size } from "../../utils/utils.ts";
 import DropdownContent from "./DropdownContent.vue";
 import { ref } from "vue";
 

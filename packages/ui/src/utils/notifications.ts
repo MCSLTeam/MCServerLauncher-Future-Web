@@ -1,6 +1,6 @@
 import type { MessageProps } from "../components/panel/Message.vue";
 import { reactive, ref, type VueElement } from "vue";
-import { randNum } from "./util.ts";
+import { randNum } from "./utils.ts";
 
 type TemplateInfo = {
   props: (data: any) => MessageProps;
@@ -60,9 +60,11 @@ export class MCSLNotif {
         });
       }
     }
-    setTimeout(() => {
-      this.close();
-    }, this.duration);
+    if (this.duration > 0) {
+      setTimeout(() => {
+        this.close();
+      }, this.duration);
+    }
   }
 
   get isMcsl() {

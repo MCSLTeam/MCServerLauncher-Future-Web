@@ -5,6 +5,7 @@ import DashboardLayout from "./layouts/DashboardLayout.vue";
 import SetupLayout from "./layouts/SetupLayout.vue";
 import { computed } from "vue";
 import { usePageData } from "./utils/stores.ts";
+import LoadingOverlay from "./components/LoadingOverlay.vue";
 
 const layout = computed(() => {
   switch (usePageData().data.layout) {
@@ -24,6 +25,7 @@ const layout = computed(() => {
       <component :is="Component" />
     </transition>
   </RouterView>
+  <LoadingOverlay />
   <NotificationTemplate id="default">
     <template v-slot="data">
       <p>{{ (data as any).message }}</p>

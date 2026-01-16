@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import Panel from "./Panel.vue";
-import type { Size } from "../../utils/util.ts";
+import type { Size } from "../../utils/utils.ts";
 
 defineProps<{
   disabled?: boolean;

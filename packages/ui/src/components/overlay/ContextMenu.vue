@@ -9,7 +9,7 @@ import {
 } from "vue";
 import Menu, { type MenuInfo } from "../panel/Menu.vue";
 import { currContextmenu } from "../../utils/internal.ts";
-import type { Size } from "../../utils/util.ts";
+import type { Size } from "../../utils/utils.ts";
 import FloatingContent from "./FloatingContent.vue";
 
 defineOptions({

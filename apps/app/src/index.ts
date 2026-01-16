@@ -30,5 +30,6 @@ export const fullscreen = ref(false);
       exit();
     },
     App,
+    async () => {},
   );
 })();

@@ -1,5 +1,5 @@
 import { computed, type Ref, ref, watch } from "vue";
-import { sleep } from "@repo/ui/src/utils/util.ts";
+import { sleep } from "@repo/ui/src/utils/utils.ts";
 import type { LoadingStatus } from "@repo/ui/src/components/progress/ProgressBar.vue";
 
 export class SimpleTask {

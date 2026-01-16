@@ -8,7 +8,7 @@ import router from "./router.ts";
     redirect: "/dashboard",
   });
 
-  load(
+  await load(
     "web",
     () => {
       window.close();
@@ -16,5 +16,6 @@ import router from "./router.ts";
       document.body.innerHTML = "";
     },
     App,
+    async () => {},
   );
 })();

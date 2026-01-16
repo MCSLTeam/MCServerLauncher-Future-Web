@@ -2,7 +2,7 @@
 import { inject, watch } from "vue";
 import type { FormFieldData } from "../FormEntry.vue";
 import { type ColorType } from "../../../utils/css.ts";
-import type { Size } from "../../../utils/util.ts";
+import type { Size } from "../../../utils/utils.ts";
 import type { SelectionItem } from "../../../utils/form.ts";
 
 const props = withDefaults(
@@ -53,27 +53,36 @@ if (formField) {
   });
 }
 
+function emitAll() {
+  emit("input", model.value);
+  emit("focus", model.value);
+  emit("blur", model.value);
+}
+
 function selectValue(value: any) {
   if (props.multiple) {
-    if (
-      (model.value as any[]).includes(value) &&
-      (props.nullable || (model.value as any[]).length > 1)
-    )
-      (model.value as any[]).splice((model.value as any[]).indexOf(value), 1);
-    else (model.value as any[]).push(value);
+    if ((model.value as any[]).includes(value)) {
+      if (props.nullable || (model.value as any[]).length > 1) {
+        (model.value as any[]).splice((model.value as any[]).indexOf(value), 1);
+        emitAll();
+      }
+    } else {
+      (model.value as any[]).push(value);
+      emitAll();
+    }
   } else {
-    if (props.nullable && value == model.value) model.value = null;
-    else model.value = value;
+    if (props.nullable && value == model.value) {
+      model.value = null;
+    } else if (model.value != value) {
+      model.value = value;
+    }
+    emitAll();
   }
 }
 
 function isChecked(value: any) {
   if (props.multiple) return (model.value as any[]).includes(value);
   return model.value == value;
-}
-
-function findLabel(value: any) {
-  return model.value.find((item: any) => item.value == value)?.label;
 }
 </script>
 

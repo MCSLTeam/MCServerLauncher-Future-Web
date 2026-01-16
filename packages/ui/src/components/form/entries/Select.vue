@@ -2,7 +2,7 @@
 import { computed, inject, ref, watch } from "vue";
 import type { FormFieldData } from "../FormEntry.vue";
 import { ColorData, type ColorType, getColorVar } from "../../../utils/css.ts";
-import type { Size } from "../../../utils/util.ts";
+import type { Size } from "../../../utils/utils.ts";
 import DropdownMenu from "../../overlay/DropdownMenu.vue";
 import type { SelectionItem } from "../../../utils/form.ts";
 

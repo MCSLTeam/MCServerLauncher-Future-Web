@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, watch } from "vue";
-import { throttle as throttleFunc } from "../../utils/util.ts";
+import { throttle as throttleFunc } from "../../utils/utils.ts";
 
 defineOptions({
   inheritAttrs: false,

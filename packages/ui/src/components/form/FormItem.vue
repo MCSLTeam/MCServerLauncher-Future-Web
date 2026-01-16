@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Size } from "../../utils/util.ts";
+import type { Size } from "../../utils/utils.ts";
 import FormEntry from "./FormEntry.vue";
 import { createForm } from "../../utils/form.ts";
 import * as yup from "yup";
