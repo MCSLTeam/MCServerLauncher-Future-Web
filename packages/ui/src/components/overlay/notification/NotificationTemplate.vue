@@ -9,11 +9,11 @@ const props = withDefaults(
     props?: (data: any) => MessageProps;
     systemNotif?: (
       data: any,
-    ) => { title: string; body: string; image: string } | undefined;
+    ) => { title: string; body: string };
   }>(),
   {
     props: (data: any) => data,
-    systemNotif: () => undefined,
+    systemNotif: (data: any) => ({ title: data.title, body: data.message }),
   },
 );
 

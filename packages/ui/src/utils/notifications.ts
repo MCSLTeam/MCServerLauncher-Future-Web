@@ -1,16 +1,39 @@
 import type { MessageProps } from "../components/panel/Message.vue";
 import { reactive, ref, type VueElement } from "vue";
 import { randNum } from "./utils.ts";
+import { useLocale } from "./stores.ts";
 
 type TemplateInfo = {
   props: (data: any) => MessageProps;
-  systemNotif: (
-    data: any,
-  ) => { title: string; body: string; image: string } | undefined;
+  systemNotif: (data: any) => { title: string; body: string };
   template: (props: any) => VueElement[];
 };
 
 export type NotificationType = "mcsl" | "system" | "both";
+
+export type SystemNotifSettings = {
+  supported: boolean;
+  requestPermission: () => Promise<void>;
+  isPermissionGranted: () => "default" | "granted" | "denied";
+  send: (title: string, body: string) => Notification | undefined;
+};
+
+let systemNotifSettings: SystemNotifSettings = {
+  supported: "Notification" in window,
+  async requestPermission() {
+    await Notification.requestPermission();
+  },
+  isPermissionGranted() {
+    return Notification.permission;
+  },
+  send(title: string, body: string) {
+    return new Notification(title, { body });
+  },
+};
+
+export function setSystemNotif(notif: SystemNotifSettings) {
+  systemNotifSettings = notif;
+}
 
 export class MCSLNotif {
   readonly id: string;
@@ -54,10 +77,10 @@ export class MCSLNotif {
     ) {
       const systemNotif = this.template.systemNotif(this.data);
       if (systemNotif) {
-        this.systemNotif = new Notification(systemNotif.title, {
-          body: systemNotif.body,
-          icon: systemNotif.image,
-        });
+        this.systemNotif = systemNotifSettings.send(
+          systemNotif.title,
+          systemNotif.body,
+        );
       }
     }
     if (this.duration > 0) {
@@ -82,14 +105,42 @@ export class MCSLNotif {
   }
 }
 
+export async function requestNotifPermission() {
+  const t = useLocale().getI18n().t;
+  if (!systemNotifSettings.supported) {
+    new MCSLNotif({
+      data: {
+        title: t("ui.notification.title.warning"),
+        message: t("ui.notification.message.not-supported"),
+        color: "warning",
+      },
+    }).open();
+  } else if (systemNotifSettings.isPermissionGranted() == "default") {
+    new MCSLNotif({
+      data: {
+        message: t("ui.notification.message.request"),
+        color: "primary",
+      },
+    }).open();
+    await systemNotifSettings.requestPermission();
+    await requestNotifPermission();
+  } else if (systemNotifSettings.isPermissionGranted() == "denied") {
+    new MCSLNotif({
+      data: {
+        title: t("ui.notification.title.warning"),
+        message: t("ui.notification.message.not-allowed"),
+        color: "warning",
+      },
+    }).open();
+  }
+}
+
 const templates: Record<string, TemplateInfo> = {};
 
 export function addTemplate(
   id: string,
   props: (data: any) => MessageProps,
-  systemNotif: (
-    data: any,
-  ) => { title: string; body: string; image: string } | undefined,
+  systemNotif: (data: any) => { title: string; body: string },
   template: (data: any) => VueElement[],
 ) {
   templates[id] = {
