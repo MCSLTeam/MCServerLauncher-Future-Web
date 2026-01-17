@@ -66,6 +66,7 @@ defineExpose({
       :scrollable="scrollable"
       :menu="menu"
       :size="size"
+      shadow
       v-bind="$attrs"
       class="mcsl-dropdown-menu__menu"
       :style="{

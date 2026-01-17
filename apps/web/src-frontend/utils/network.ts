@@ -7,7 +7,7 @@ import { useLocale } from "@repo/ui/src/utils/stores.ts";
 import { useAccount } from "./store.ts";
 import {
   MCSLNotif,
-  type NotificationType,
+  type MCSLNotifSettings,
 } from "@repo/ui/src/utils/notifications.ts";
 
 export type Method =
@@ -19,20 +19,23 @@ export type Method =
   | "PATCH"
   | "PURGE";
 
+export type ApiErrNotifProvider = (message: string) => MCSLNotifSettings;
+
 function notifyErr(
   path: string,
   method: Method,
   err: any,
-  type?: NotificationType | "none",
+  notification?: string | ApiErrNotifProvider,
 ) {
   console.warn(`Failed to request /api${path} with method ${method}`, err);
-  if (type !== "none") {
-    const message = err instanceof Error ? err.message : err;
+  const message = err instanceof Error ? err.message : err;
+  if (typeof notification == "function") {
+    new MCSLNotif(notification(message)).open();
+  } else if (notification) {
     new MCSLNotif({
-      type: type,
       data: {
         title: useLocale().getI18n().t("ui.notification.title.error"),
-        message: message,
+        message: useLocale().getI18n().t(notification, { reason: message }),
         color: "danger",
       },
     }).open();
@@ -45,7 +48,7 @@ export async function request(
   data: any = {},
   headers: object = {},
   requestConfig: AxiosRequestConfig = {},
-  errNotification: NotificationType | "none" = "mcsl",
+  errNotification?: string | ApiErrNotifProvider,
 ): Promise<AxiosResponse> {
   try {
     return await axios("/api" + path, {
@@ -66,7 +69,12 @@ export async function request(
   } catch (e) {
     const ex = <AxiosError>e;
     const res = ex.response as any;
-    const err = new ApiError(path, method, res?.err ?? "network-error", e);
+    const err = new ApiError(
+      path,
+      method,
+      res?.data?.err ?? (ex.status == 504 ? "network-error" : ex.message),
+      e,
+    );
     notifyErr(path, method, err, errNotification);
     throw err;
   }
@@ -78,11 +86,11 @@ export async function requestApi<T>(
   data?: any,
   headers?: object,
   requestConfig?: AxiosRequestConfig,
-  errNotification?: NotificationType | "none",
+  errNotification?: string | ApiErrNotifProvider,
 ): Promise<T> {
   return (
     await request(path, method, data, headers, requestConfig, errNotification)
-  ).data;
+  ).data.data;
 }
 
 export async function requestWithToken<T>(
@@ -91,7 +99,7 @@ export async function requestWithToken<T>(
   data?: any,
   headers?: object,
   requestConfig?: AxiosRequestConfig,
-  errNotification?: NotificationType | "none",
+  errNotification?: string | ApiErrNotifProvider,
   autoRefreshToken: boolean = true,
 ): Promise<T> {
   try {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Button from "@repo/ui/src/components/form/button/Button.vue";
+import Checkbox from "@repo/ui/src/components/form/entries/Checkbox.vue";
 import { createForm } from "@repo/ui/src/utils/form.ts";
 import * as yup from "yup";
 import Form from "@repo/ui/src/components/form/Form.vue";
@@ -10,7 +11,8 @@ import { useI18n } from "vue-i18n";
 import { requestApi } from "../utils/network.ts";
 import router from "@repo/shared/src/router.ts";
 import { MCSLNotif } from "@repo/ui/src/utils/notifications.ts";
-import { setShouldRegister } from "../index.ts";
+import { useRoute } from "vue-router";
+import { type TokenPair, useAccount } from "../utils/store.ts";
 
 usePageData().set({
   breadcrumbs: [],
@@ -21,9 +23,9 @@ const t = useI18n().t;
 
 const form = createForm(
   {
-    username: "",
-    password: "",
-    passwordConfirm: "",
+    username: (useRoute().query.username as string) ?? "",
+    password: (useRoute().query.password as string) ?? "",
+    remember: false,
   },
   yup.object({
     username: yup
@@ -41,11 +43,7 @@ const form = createForm(
         t("web.auth.password.invalid"),
       )
       .required(),
-    passwordConfirm: yup
-      .string()
-      .label(t("web.auth.password-confirm.label"))
-      .oneOf([yup.ref("password")], t("web.auth.password-confirm.invalid"))
-      .required(),
+    remember: yup.boolean().label(t("web.auth.remember")),
   }),
   "input",
 );
@@ -59,8 +57,8 @@ async function submit() {
   canSubmit = false;
 
   try {
-    await requestApi(
-      "/account/register",
+    const tokenPair = await requestApi<TokenPair>(
+      "/account/login",
       "POST",
       {
         username: form.data.value.username,
@@ -68,26 +66,20 @@ async function submit() {
       },
       undefined,
       undefined,
-      "web.auth.register.error",
+      "web.auth.login.error",
     );
 
-    setShouldRegister(false);
+    useAccount().setToken(tokenPair);
 
     new MCSLNotif({
       data: {
         color: "success",
         title: t("ui.notification.title.success"),
-        message: t("web.auth.register.success"),
+        message: t("web.auth.login.success"),
       },
     }).open();
 
-    await router.push({
-      path: "/auth/login",
-      query: {
-        username: form.data.value.username,
-        password: form.data.value.password,
-      },
-    });
+    await router.push("/");
   } catch {
     canSubmit = true;
   }
@@ -95,30 +87,27 @@ async function submit() {
 </script>
 
 <template>
-  <div class="register">
-    <h2>{{ t("web.auth.register.title") }}</h2>
+  <div class="login">
+    <h2>{{ t("web.auth.login.title") }}</h2>
     <Form :form="form" @submit="submit">
       <FormEntry name="username">
-        <InputText :placeholder="t('web.auth.username.format')" />
+        <InputText :placeholder="t('web.auth.username.placeholder')" />
       </FormEntry>
       <FormEntry name="password">
-        <InputText :placeholder="t('web.auth.password.format')" password />
+        <InputText :placeholder="t('web.auth.password.placeholder')" password />
       </FormEntry>
-      <FormEntry name="passwordConfirm">
-        <InputText
-          :placeholder="t('web.auth.password-confirm.placeholder')"
-          password
-        />
+      <FormEntry name="remember" entry-pos="left">
+        <Checkbox />
       </FormEntry>
       <Button block type="primary" color="primary" btn-type="submit">
-        {{ t("web.auth.register.submit") }}
+        {{ t("web.auth.login.submit") }}
       </Button>
     </Form>
   </div>
 </template>
 
 <style scoped lang="scss">
-.register {
+.login {
   width: min(30rem, 70vw);
 }
 </style>

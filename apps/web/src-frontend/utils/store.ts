@@ -3,6 +3,8 @@ import { computed } from "vue";
 import { useLocalStorage, useSessionStorage } from "@vueuse/core";
 import router from "@repo/shared/src/router.ts";
 import { requestApi } from "./network.ts";
+import { MCSLNotif } from "@repo/ui/src/utils/notifications.ts";
+import { useLocale } from "@repo/ui/src/utils/stores.ts";
 
 export type TokenPair = { access_token: string; refresh_token: string };
 
@@ -50,6 +52,14 @@ export const useAccount = defineStore("account", () => {
       setToken(res, true);
       return true;
     } catch {
+      const t = useLocale().getI18n().t;
+      new MCSLNotif({
+        data: {
+          title: t("ui.notification.title.warning"),
+          message: t("web.login.expired"),
+          color: "warning",
+        },
+      }).open();
       await logout();
       return false;
     }

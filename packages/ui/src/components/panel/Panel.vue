@@ -108,7 +108,6 @@ onMounted(() => {
 .mcsl-panel__not-scrollable {
   & > .mcsl-panel__body-wrapper,
   & .mcsl-panel__body {
-    overflow: hidden;
     height: 100%;
   }
 }

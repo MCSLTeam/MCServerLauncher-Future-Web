@@ -90,6 +90,12 @@ importers:
       vue:
         specifier: ^3.5.18
         version: 3.5.18(typescript@5.9.2)
+      vue-i18n:
+        specifier: ^11.1.11
+        version: 11.1.11(vue@3.5.18(typescript@5.9.2))
+      vue-router:
+        specifier: ^4.5.1
+        version: 4.5.1(vue@3.5.18(typescript@5.9.2))
       yup:
         specifier: ^1.7.0
         version: 1.7.0

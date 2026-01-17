@@ -7,9 +7,7 @@ const props = withDefaults(
   defineProps<{
     id: string;
     props?: (data: any) => MessageProps;
-    systemNotif?: (
-      data: any,
-    ) => { title: string; body: string };
+    systemNotif?: (data: any) => { title: string; body: string };
   }>(),
   {
     props: (data: any) => data,

@@ -15,14 +15,12 @@ export type FormFieldData = {
 const props = withDefaults(
   defineProps<{
     name: string;
-    width?: number | "fit";
     labelPos?: "left" | "right" | "top";
     entryPos?: "left" | "right" | "center" | "full";
     size?: Size;
   }>(),
   {
     size: "middle",
-    width: 100,
     labelPos: "left",
     entryPos: "right",
   },
@@ -111,11 +109,7 @@ provide("mcsl-form-field", {
       `mcsl-size-${size}`,
       `mcsl-form-entry__label-${labelPos}`,
       `mcsl-form-entry__entry-${entryPos}`,
-      ...(width == 'fit' ? ['mcsl-form-entry__width-fit'] : []),
     ]"
-    :style="{
-      width: width != 'fit' ? `${width}%` : undefined,
-    }"
     class="mcsl-form-entry"
   >
     <div>
@@ -132,6 +126,8 @@ provide("mcsl-form-field", {
 
 <style lang="scss" scoped>
 .mcsl-form-entry {
+  width: 100%;
+
   & > .mcsl-message {
     margin-top: var(--mcsl-spacing-2xs);
   }
@@ -139,6 +135,10 @@ provide("mcsl-form-field", {
   & > div {
     display: flex;
     gap: var(--mcsl-spacing-xs);
+
+    & > label {
+      text-wrap: nowrap;
+    }
   }
 }
 

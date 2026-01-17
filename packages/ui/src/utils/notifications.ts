@@ -18,6 +18,13 @@ export type SystemNotifSettings = {
   send: (title: string, body: string) => Notification | undefined;
 };
 
+export type MCSLNotifSettings = {
+  template?: string;
+  duration?: number;
+  type?: "mcsl" | "system" | "both";
+  data: any;
+};
+
 let systemNotifSettings: SystemNotifSettings = {
   supported: "Notification" in window,
   async requestPermission() {
@@ -45,12 +52,7 @@ export class MCSLNotif {
   private systemNotif: Notification | undefined;
   private _closed: boolean = false;
 
-  constructor(settings: {
-    template?: string;
-    duration?: number;
-    type?: "mcsl" | "system" | "both";
-    data: any;
-  }) {
+  constructor(settings: MCSLNotifSettings) {
     this.id = randNum().toString();
     const templateId = settings.template ?? "default";
     if (!templates[templateId]) {

@@ -110,6 +110,7 @@ if (formField) {
 }
 
 .mcsl-checkbox {
+  cursor: pointer;
   margin: 0;
   appearance: none;
   border: 1px solid var(--mcsl-border-color-base);

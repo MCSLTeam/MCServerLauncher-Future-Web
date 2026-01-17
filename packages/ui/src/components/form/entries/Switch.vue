@@ -123,6 +123,7 @@ $vars: map.merge(
 }
 
 .mcsl-switch {
+  cursor: pointer;
   margin: 0;
   appearance: none;
   border: 1px solid transparent;

@@ -4,8 +4,13 @@ import router from "@repo/shared/src/router.ts";
 import { useAccount } from "./utils/store.ts";
 import { requestApi } from "./utils/network.ts";
 import { useLocale } from "@repo/ui/src/utils/stores.ts";
-import { MCSLNotif } from "@repo/ui/src/utils/notifications.ts";
 import { sleep } from "@repo/ui/src/utils/utils.ts";
+
+let shouldRegister = false;
+
+export function setShouldRegister(value: boolean) {
+  shouldRegister = value;
+}
 
 (async () => {
   await load(
@@ -20,24 +25,27 @@ import { sleep } from "@repo/ui/src/utils/utils.ts";
       const t = useLocale().getI18n().t;
       loadingStep.value = t("web.loading.connect-backend");
 
-      let shouldRegister = false;
-
       try {
         shouldRegister = await requestApi<boolean>(
           "/account/should-register",
           "GET",
+          undefined,
+          undefined,
+          undefined,
+          (message) => ({
+            duration: 0,
+            data: {
+              color: "danger",
+              closeable: false,
+              title: t("ui.notification.title.error"),
+              message: t("web.loading.connect-backend-error", {
+                reason: message,
+              }),
+            },
+          }),
         );
       } catch {
-        new MCSLNotif({
-          duration: 0,
-          data: {
-            color: "danger",
-            closeable: false,
-            title: t("ui.notification.title.error"),
-            message: t("web.loading.connect-backend-error"),
-          },
-        }).open();
-
+        // 阻塞直到刷新页面重试
         while (true) {
           await sleep(1000);
         }
@@ -45,7 +53,20 @@ import { sleep } from "@repo/ui/src/utils/utils.ts";
 
       router.addRoute({
         path: "/auth",
-        redirect: shouldRegister ? "/auth/register" : "/auth/login",
+        name: "Auth",
+        redirect: () => (shouldRegister ? "/auth/register" : "/auth/login"),
+      });
+
+      router.addRoute({
+        path: "/auth/register",
+        name: "Auth - Register",
+        component: () => import("./views/Register.vue"),
+      });
+
+      router.addRoute({
+        path: "/auth/login",
+        name: "Auth - Login",
+        component: () => import("./views/Login.vue"),
       });
 
       router.beforeEach(async (to, _from, next) => {
@@ -64,6 +85,8 @@ import { sleep } from "@repo/ui/src/utils/utils.ts";
 
         next();
       });
+
+      if (!useAccount().accessToken) await router.push("/auth");
 
       loadingStep.value = "";
     },

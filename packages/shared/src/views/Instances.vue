@@ -311,7 +311,7 @@ function highlightText(text: string, searchText: string): string {
     <div class="instances__searchbar">
       <InputText
         v-model="search"
-        clean-btn
+        clear-btn
         :placeholder="t('shared.instances.sorting.search-placeholder')"
       />
       <div>
