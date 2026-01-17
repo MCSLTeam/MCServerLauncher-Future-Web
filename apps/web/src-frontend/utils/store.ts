@@ -1,6 +1,10 @@
 import { defineStore } from "pinia";
 import { computed } from "vue";
-import { useLocalStorage, useSessionStorage } from "@vueuse/core";
+import {
+  type Serializer,
+  useLocalStorage,
+  useSessionStorage,
+} from "@vueuse/core";
 import router from "@repo/shared/src/router.ts";
 import { requestApi } from "./network.ts";
 import { MCSLNotif } from "@repo/ui/src/utils/notifications.ts";
@@ -8,14 +12,23 @@ import { useLocale } from "@repo/ui/src/utils/stores.ts";
 
 export type TokenPair = { access_token: string; refresh_token: string };
 
+const jsonSerializer: Serializer<TokenPair | null> = {
+  write: (token: TokenPair | null) =>
+    token == null ? "" : JSON.stringify(token),
+  read: (token: string) =>
+    token == "" ? null : (JSON.parse(token) as TokenPair),
+};
+
 export const useAccount = defineStore("account", () => {
   const tokenPermanent = useLocalStorage<TokenPair | null>(
     "mcsl-web-token",
     null,
+    { serializer: jsonSerializer },
   );
   const tokenTemporary = useSessionStorage<TokenPair | null>(
     "mcsl-web-token",
     null,
+    { serializer: jsonSerializer },
   );
 
   const token = computed(() => {
