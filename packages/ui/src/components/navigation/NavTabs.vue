@@ -1,23 +1,16 @@
 <script lang="ts" setup>
 import { onMounted, ref, watchEffect } from "vue";
-import { type RouteLocationRaw, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import { type Color, getColorVar } from "../../utils/css.ts";
-
-type TabInfo = {
-  label: string;
-  link: RouteLocationRaw | string;
-  disabled?: boolean;
-  icon?: string;
-  subpages?: string[];
-};
+import { navigateTo, type PageNavigationInfo } from "../../utils/utils.ts";
 
 const props = withDefaults(
   defineProps<{
-    tabs: TabInfo[];
-    variant?: Color;
+    tabs: PageNavigationInfo[];
+    color?: Color;
   }>(),
   {
-    variant: "primary",
+    color: "primary",
   },
 );
 
@@ -39,8 +32,16 @@ function updateBg() {
 function switchTab(index: number) {
   activeTab.value = index;
   const info = props.tabs[index]!;
-  useRouter().push(info.link);
+  navigateTo(info);
 }
+
+watchEffect(() => {
+  const path = useRouter().currentRoute.value.path;
+
+  activeTab.value = props.tabs.findIndex(
+    (tab) => tab.link === path || tab.isSubpage?.(path),
+  );
+});
 
 onMounted(() => {
   updateBg();
@@ -54,7 +55,7 @@ defineExpose({
 <template>
   <div
     :style="{
-      '--mcsl-tab__hover-bg': getColorVar(variant),
+      '--mcsl-tab__hover-bg': getColorVar(color),
     }"
     class="mcsl-tab__container"
   >
@@ -64,7 +65,7 @@ defineExpose({
       :key="index"
       ref="tabRefs"
       :class="{ 'mcsl-tab__btn-active': activeTab === index }"
-      :disabled="info.disabled == true"
+      :disabled="info.disabled"
       @click="
         () => {
           switchTab(index);

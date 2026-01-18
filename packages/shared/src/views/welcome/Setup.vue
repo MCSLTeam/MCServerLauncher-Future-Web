@@ -14,7 +14,7 @@ import {
 } from "@repo/ui/src/utils/stores.ts";
 import { computed } from "vue";
 import * as yup from "yup";
-import WelcomeOverlay from "../../components/WelcomeOverlay.vue";
+import WelcomeOverlay from "../../components/overlay/WelcomeOverlay.vue";
 
 usePageData().set({
   breadcrumbs: [],
@@ -71,7 +71,7 @@ const locales = computed(() => [
           .label(i18n.t('shared.settings.general.theme.label'))
       "
     >
-      <SelectButton :options="themes" size="large" />
+      <SelectButton :options="themes" />
     </FormItem>
     <FormItem
       v-model="locale"

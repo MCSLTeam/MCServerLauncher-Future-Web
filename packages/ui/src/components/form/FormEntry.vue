@@ -23,7 +23,7 @@ const props = withDefaults(
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     width: "100%",
     labelPos: "left",
     entryPos: "right",
@@ -189,9 +189,18 @@ provide("mcsl-form-field", {
 .mcsl-form-entry__label-right {
   & > div {
     align-items: center;
-    & > label {
-      width: var(--mcsl-form__label-width, auto);
-    }
+  }
+}
+
+.mcsl-form-entry__label-left {
+  & > div > label {
+    width: var(--mcsl-form__label-width-left, auto);
+  }
+}
+
+.mcsl-form-entry__label-right {
+  & > div > label {
+    width: var(--mcsl-form__label-width-right, auto);
   }
 }
 </style>

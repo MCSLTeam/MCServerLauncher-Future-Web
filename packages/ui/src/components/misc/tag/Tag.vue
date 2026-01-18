@@ -10,7 +10,7 @@ withDefaults(
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     color: "default",
     rounded: false,
   },

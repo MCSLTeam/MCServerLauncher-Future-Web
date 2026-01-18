@@ -13,7 +13,7 @@ withDefaults(
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     icon: "fas fa-check",
     color: "primary",
     invalid: false,

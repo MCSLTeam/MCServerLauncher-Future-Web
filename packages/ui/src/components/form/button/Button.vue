@@ -26,7 +26,7 @@ const props = withDefaults(
     btnType?: "submit" | "reset" | "button";
   }>(),
   {
-    size: "middle",
+    size: "medium",
     disabled: false,
     icon: "",
     iconPos: "left",

@@ -13,6 +13,7 @@ import { sleep } from "@repo/ui/src/utils/utils.ts";
 import { ref, watchEffect } from "vue";
 import { tasks } from "@repo/shared/src/utils/tasks.ts";
 import { useLocalStorage } from "@vueuse/core";
+import { useNavigation } from "@repo/shared/src/utils/stores.ts";
 
 let shouldRegister = false;
 
@@ -53,6 +54,24 @@ export function setShouldRegister(value: boolean) {
         e.preventDefault();
       }
     });
+
+    useNavigation().addSidebarUpperItem(
+      {
+        label: t("web.users.title"),
+        icon: "fa fa-users",
+        link: "/users",
+      },
+      3,
+    );
+
+    useNavigation().addNavbarItem(
+      {
+        label: t("web.user-center.title"),
+        icon: "fa fa-user",
+        onClick() {},
+      },
+      1,
+    );
 
     loadingStep.value = t("web.loading.connect-backend");
 

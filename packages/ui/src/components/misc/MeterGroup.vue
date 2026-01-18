@@ -24,7 +24,7 @@ const props = withDefaults(
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
   },
 );
 
@@ -95,7 +95,7 @@ const actualValues = computed(() => {
 $vars: (
   "stroke-width": (
     "small": 0.4rem,
-    "middle": 0.6rem,
+    "medium": 0.6rem,
     "large": 0.75rem,
   ),
 );

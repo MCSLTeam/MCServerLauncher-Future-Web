@@ -23,7 +23,7 @@ withDefaults(
     scrollable?: boolean;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     followWidth: false,
     defaultPos: "bottom",
     headerClass: "",

@@ -25,7 +25,7 @@ const props = withDefaults(
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     color: "primary",
     invalid: false,
     disabled: false,

@@ -14,7 +14,7 @@ withDefaults(
     resizeable?: boolean;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     color: "primary",
     invalid: false,
     disabled: false,

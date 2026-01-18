@@ -12,7 +12,7 @@ withDefaults(
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     color: "primary",
     invalid: false,
     disabled: false,
@@ -98,7 +98,7 @@ $vars: map.merge(
   (
     "height": (
       "small": 1rem,
-      "middle": 1.25rem,
+      "medium": 1.25rem,
       "large": 1.5rem,
     ),
   )

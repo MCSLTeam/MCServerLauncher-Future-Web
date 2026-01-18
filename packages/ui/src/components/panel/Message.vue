@@ -24,7 +24,7 @@ export type MessageProps = {
 };
 
 const props = withDefaults(defineProps<MessageProps>(), {
-  size: "middle",
+  size: "medium",
   color: "primary",
   variant: "default",
   inAnim: "stretchInDown",

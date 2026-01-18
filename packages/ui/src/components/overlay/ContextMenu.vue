@@ -32,7 +32,7 @@ const props = withDefaults(
     scrollable?: boolean;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     inAnim: "fadeIn",
     outAnim: "fadeOut",
     headerClass: "",

@@ -69,7 +69,7 @@ async function submit() {
       "web.auth.login.error",
     );
 
-    useAccount().setToken(tokenPair);
+    useAccount().setToken(tokenPair, form.data.value.remember);
 
     new MCSLNotif({
       data: {
@@ -109,5 +109,9 @@ async function submit() {
 <style scoped lang="scss">
 .login {
   width: min(30rem, 70vw);
+
+  @media (max-width: 450px) {
+    width: 100%;
+  }
 }
 </style>

@@ -116,12 +116,12 @@ $vars: map.merge(
   (
     "spacing": (
       "small": var(--mcsl-spacing-4xs),
-      "middle": var(--mcsl-spacing-2xs),
+      "medium": var(--mcsl-spacing-2xs),
       "large": var(--mcsl-spacing-xs),
     ),
     "width": (
       "small": 10rem,
-      "middle": 12rem,
+      "medium": 12rem,
       "large": 14rem,
     ),
   )

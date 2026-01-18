@@ -15,7 +15,7 @@ const props = withDefaults(
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     color: "primary",
     invalid: false,
     nullable: false,
@@ -104,16 +104,16 @@ function isChecked(value: any) {
 @use "../../SmallerContent" as *;
 
 @each $size in utils.$sizes {
-  $padding: calc(utils.get-size-var("spacing", $size, $vars) / 2);
+  $padding: calc(utils.get-size-var("spacing", $size, $vars) / 1.5);
   $border-radius: utils.get-size-var("border-radius", $size, $vars);
   .mcsl-size-#{$size}.mcsl-select-button {
     padding: $padding;
     gap: $padding;
-    border-radius: $border-radius;
+    border-radius: calc($border-radius + $padding);
 
     & > button {
       padding: calc($padding);
-      border-radius: calc($border-radius - $padding);
+      border-radius: $border-radius;
     }
   }
 }

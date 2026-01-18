@@ -27,7 +27,7 @@
     "test": "turbo run test"
   },
   "devDependencies": {
-    "prettier": "^3.6.2",
+    "prettier": "^3.8.0",
     "turbo": "^2.7.5",
     "typescript": "^5.9.2"
   },

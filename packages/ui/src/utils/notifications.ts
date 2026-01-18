@@ -22,6 +22,7 @@ export type MCSLNotifSettings = {
   template?: string;
   duration?: number;
   type?: "mcsl" | "system" | "both";
+  addToHistory?: boolean;
   data: any;
 };
 
@@ -34,7 +35,7 @@ let systemNotifSettings: SystemNotifSettings = {
     return Notification.permission;
   },
   send(title: string, body: string) {
-    return new Notification(title, { body });
+    return new Notification(title ?? "", { body: body ?? "" });
   },
 };
 
@@ -44,40 +45,29 @@ export function setSystemNotif(notif: SystemNotifSettings) {
 
 export class MCSLNotif {
   readonly id: string;
-  readonly template: TemplateInfo;
-  readonly duration: number;
-  readonly data: any;
-  readonly type: NotificationType;
   readonly opened = ref(false);
   private systemNotif: Notification | undefined;
   private _closed: boolean = false;
 
-  constructor(settings: MCSLNotifSettings) {
+  constructor(readonly settings: MCSLNotifSettings) {
     this.id = randNum().toString();
     const templateId = settings.template ?? "default";
     if (!templates[templateId]) {
       console.warn(`[MCSL-UI] Notification template '${templateId}' not found`);
       throw new Error(`Notification template '${templateId}' not found`);
     }
-    this.template = templates[templateId];
-    this.duration = settings.duration ?? 3000;
-    this.data = settings.data;
-    this.type = settings.type ?? "mcsl";
     addNotification(this);
   }
 
   get element(): VueElement {
-    return this.template.template(this.data)[0]!;
+    return this.template.template(this.settings.data)[0]!;
   }
 
   open() {
     if (this._closed) return;
     this.opened.value = true;
-    if (
-      Notification.permission == "granted" &&
-      (this.type == "system" || this.type == "both")
-    ) {
-      const systemNotif = this.template.systemNotif(this.data);
+    if (Notification.permission == "granted" && this.isSystem) {
+      const systemNotif = this.template.systemNotif(this.settings.data);
       if (systemNotif) {
         this.systemNotif = systemNotifSettings.send(
           systemNotif.title,
@@ -85,15 +75,25 @@ export class MCSLNotif {
         );
       }
     }
-    if (this.duration > 0) {
+    if (this.settings.duration ?? 3000 > 0) {
       setTimeout(() => {
         this.close();
-      }, this.duration);
+      }, this.settings.duration ?? 3000);
     }
   }
 
   get isMcsl() {
-    return this.type == "mcsl" || this.type == "both";
+    return (
+      (this.settings.type ?? "mcsl") == "mcsl" || this.settings.type == "both"
+    );
+  }
+
+  get isSystem() {
+    return this.settings.type == "system" || this.settings.type == "both";
+  }
+
+  get template() {
+    return templates[this.settings.template ?? "default"]!;
   }
 
   close() {
@@ -121,7 +121,6 @@ export async function requestNotifPermission() {
     new MCSLNotif({
       data: {
         message: t("ui.notification.message.request"),
-        color: "primary",
       },
     }).open();
     await systemNotifSettings.requestPermission();

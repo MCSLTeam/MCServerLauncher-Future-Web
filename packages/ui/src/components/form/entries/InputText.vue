@@ -16,7 +16,7 @@ withDefaults(
     clearBtn?: boolean;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     color: "primary",
     invalid: false,
     disabled: false,

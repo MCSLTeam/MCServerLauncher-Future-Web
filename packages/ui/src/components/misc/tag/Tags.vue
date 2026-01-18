@@ -6,7 +6,7 @@ withDefaults(
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
   },
 );
 </script>

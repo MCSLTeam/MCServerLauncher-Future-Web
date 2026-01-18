@@ -9,7 +9,7 @@ const props = withDefaults(
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
   },
 );
 

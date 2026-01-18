@@ -44,7 +44,14 @@ export async function load(
 ) {
   const app = createApp(appComponent);
   app.use(createPinia());
-  app.use(FloatingVue);
+  app.use(FloatingVue, {
+    themes: {
+      tooltip: {
+        hideTriggers: (events: string[]) => events, // 点击后不隐藏tooltip
+        overflowPadding: 1,
+      },
+    },
+  });
   app.use(router);
 
   const i18n = createI18n(await useLocale().generateConfig());

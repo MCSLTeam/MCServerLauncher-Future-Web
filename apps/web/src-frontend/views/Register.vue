@@ -120,5 +120,9 @@ async function submit() {
 <style scoped lang="scss">
 .register {
   width: min(30rem, 70vw);
+
+  @media (max-width: 450px) {
+    width: 100%;
+  }
 }
 </style>

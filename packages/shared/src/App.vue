@@ -5,7 +5,7 @@ import DashboardLayout from "./layouts/DashboardLayout.vue";
 import SetupLayout from "./layouts/SetupLayout.vue";
 import { computed } from "vue";
 import { usePageData } from "./utils/stores.ts";
-import LoadingOverlay from "./components/LoadingOverlay.vue";
+import LoadingOverlay from "./components/overlay/LoadingOverlay.vue";
 
 const layout = computed(() => {
   switch (usePageData().data.layout) {

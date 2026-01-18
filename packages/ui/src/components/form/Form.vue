@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import type { FormInstance } from "../../utils/form.ts";
-import { inject, onMounted, onUpdated, provide, ref } from "vue";
+import { inject, onMounted, onUpdated, provide, reactive, ref } from "vue";
 
 const props = defineProps<{
   form: FormInstance<any>;
   title?: string;
-  labelWidth?: string;
+  labelWidthLeft?: string;
+  labelWidthRight?: string;
 }>();
 
 const emit = defineEmits<(e: "submit") => void>();
@@ -30,32 +31,46 @@ onMounted(() => {
 });
 
 const formRef = ref<HTMLFormElement>();
-const actualLabelWidth = ref("");
+const actualLabelWidth = reactive({
+  left: "",
+  right: "",
+});
 
 function refreshLabelWidth() {
-  if (props.labelWidth) {
-    actualLabelWidth.value = props.labelWidth;
-    return;
+  if (props.labelWidthLeft) {
+    actualLabelWidth.left = props.labelWidthLeft;
+  }
+  if (props.labelWidthRight) {
+    actualLabelWidth.right = props.labelWidthRight;
   }
   if (!formRef.value) {
-    actualLabelWidth.value = "auto";
+    actualLabelWidth.left = "auto";
+    actualLabelWidth.right = "auto";
     return;
   }
 
   // 自动对齐
   const children = formRef.value!.children;
-  let max = 0;
+  let leftMax = 0;
+  let rightMax = 0;
   for (const obj of children) {
+    const width =
+      obj.children[0]?.getElementsByTagName("label")?.[0]?.offsetWidth ?? 0;
     if (
-      obj.classList.contains("mcsl-form-entry__label-left") ||
-      obj.classList.contains("mcsl-form-entry__label-right")
-    ) {
-      const width =
-        obj.children[0]!.getElementsByTagName("label")[0]!.offsetWidth;
-      if (width > max) max = width;
-    }
+      !props.labelWidthLeft &&
+      obj.classList.contains("mcsl-form-entry__label-left") &&
+      width > leftMax
+    )
+      leftMax = width;
+    else if (
+      !props.labelWidthRight &&
+      obj.classList.contains("mcsl-form-entry__label-right") &&
+      width > rightMax
+    )
+      rightMax = width;
   }
-  actualLabelWidth.value = max + "px";
+  actualLabelWidth.left = leftMax + "px";
+  actualLabelWidth.right = rightMax + "px";
 }
 
 onMounted(() => {
@@ -73,7 +88,8 @@ onUpdated(() => {
     class="mcsl-form"
     @submit.prevent="submit"
     :style="{
-      '--mcsl-form__label-width': actualLabelWidth,
+      '--mcsl-form__label-width-left': actualLabelWidth.left,
+      '--mcsl-form__label-width-right': actualLabelWidth.right,
     }"
   >
     <div class="mcsl-form__title">

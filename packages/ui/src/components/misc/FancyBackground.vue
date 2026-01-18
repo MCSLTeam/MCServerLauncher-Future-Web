@@ -55,7 +55,7 @@ withDefaults(
   }
 
   .mcsl-bg__circle {
-    filter: blur(500px);
+    filter: blur(250px);
     position: fixed;
     border-radius: var(--mcsl-border-radius-full);
   }

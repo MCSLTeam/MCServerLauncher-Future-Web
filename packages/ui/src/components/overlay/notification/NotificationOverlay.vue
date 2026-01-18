@@ -14,7 +14,7 @@ import Message from "../../panel/Message.vue";
         inAnim: 'fadeInRight',
         outAnim: 'fadeOut',
 
-        ...item.template.props(item.data),
+        ...item.template.props(item.settings.data),
       }"
       :visible="item.isMcsl && (item.opened as any)"
     >

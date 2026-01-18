@@ -1,4 +1,6 @@
-export type Size = "small" | "middle" | "large";
+import { type RouteLocationRaw, useRouter } from "vue-router";
+
+export type Size = "small" | "medium" | "large";
 
 export type PosInfo = {
   x: number;
@@ -6,6 +8,21 @@ export type PosInfo = {
   width: number;
   height: number;
 };
+
+export type PageNavigationInfo = {
+  label: string;
+  link?: RouteLocationRaw | string;
+  onClick?: () => void;
+  disabled?: boolean;
+  icon?: string;
+  isSubpage?: (path: string) => boolean;
+};
+
+export function navigateTo(info: PageNavigationInfo) {
+  if (info.disabled) return;
+  if (info.link) useRouter().push(info.link);
+  if (info.onClick) info.onClick();
+}
 
 export function throttle(callback: (...args: any[]) => void, interval: number) {
   let doThrottle = false;

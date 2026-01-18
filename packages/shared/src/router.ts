@@ -56,7 +56,7 @@ const router = createRouter({
   ],
 });
 
-export const firstLoad = useLocalStorage("firstLoad", true);
+export const firstLoad = useLocalStorage("first-load", true);
 
 router.beforeEach((to, _from, next) => {
   if (firstLoad.value) {

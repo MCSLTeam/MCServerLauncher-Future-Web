@@ -16,7 +16,7 @@ withDefaults(
     scrollable?: boolean;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     headerDivider: true,
     shadow: "never",
     headerClass: "",
