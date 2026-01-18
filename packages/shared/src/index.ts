@@ -11,6 +11,14 @@ type Platform = "web" | "app";
 let platform: Platform = "web";
 export let close: () => any = () => {};
 
+export function setPlatform(p: Platform) {
+  platform = p;
+}
+
+export function setCloseWindow(c: () => any) {
+  close = c;
+}
+
 export const versionCodename = import.meta.env.APP_VERSION_NAME;
 export const version =
   import.meta.env.APP_VERSION +
@@ -31,14 +39,9 @@ export function getPlatform(): Platform {
 }
 
 export async function load(
-  p: Platform,
-  closeWindow: () => any,
   appComponent: Component,
   load: () => void | Promise<void>,
 ) {
-  platform = p;
-  close = closeWindow;
-
   const app = createApp(appComponent);
   app.use(createPinia());
   app.use(FloatingVue);

@@ -8,9 +8,8 @@ withDefaults(
     secondaryColor?: Color;
   }>(),
   {
-    baseColor: "green",
-    primaryColor: "blue",
-    secondaryColor: "cyan",
+    primaryColor: "green",
+    secondaryColor: "blue",
   },
 );
 </script>
@@ -18,7 +17,6 @@ withDefaults(
 <template>
   <div
     :style="{
-      '--mcsl-bg__base-color': getColorVar(baseColor),
       '--mcsl-bg__primary-color': getColorVar(primaryColor),
       '--mcsl-bg__secondary-color': getColorVar(secondaryColor),
     }"
@@ -75,7 +73,7 @@ withDefaults(
     left: -10%;
     width: 60%;
     height: 60%;
-    background: utils.transparent(var(--mcsl-bg__base-color), 10%);
+    background: utils.transparent(var(--mcsl-bg__primary-color), 10%);
   }
 }
 </style>

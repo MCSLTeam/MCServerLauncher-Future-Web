@@ -3,6 +3,7 @@ import { inject, provide, ref, watch } from "vue";
 import type { FormFieldInstance, FormInstance } from "../../utils/form.ts";
 import Message from "../panel/Message.vue";
 import type { Size } from "../../utils/utils.ts";
+import type { CSSSize } from "../../utils/css.ts";
 
 export type FormFieldData = {
   id: string;
@@ -15,14 +16,18 @@ export type FormFieldData = {
 const props = withDefaults(
   defineProps<{
     name: string;
+    width?: string;
     labelPos?: "left" | "right" | "top";
     entryPos?: "left" | "right" | "center" | "full";
+    gap?: CSSSize;
     size?: Size;
   }>(),
   {
     size: "middle",
+    width: "100%",
     labelPos: "left",
     entryPos: "right",
+    gap: "xs",
   },
 );
 
@@ -110,9 +115,10 @@ provide("mcsl-form-field", {
       `mcsl-form-entry__label-${labelPos}`,
       `mcsl-form-entry__entry-${entryPos}`,
     ]"
+    :style="{ width }"
     class="mcsl-form-entry"
   >
-    <div>
+    <div :style="{ gap: `var(--mcsl-spacing-${gap})` }">
       <label v-if="field.label" :for="id">{{ field.label }}</label>
       <div>
         <slot />
@@ -126,15 +132,12 @@ provide("mcsl-form-field", {
 
 <style lang="scss" scoped>
 .mcsl-form-entry {
-  width: 100%;
-
   & > .mcsl-message {
     margin-top: var(--mcsl-spacing-2xs);
   }
 
   & > div {
     display: flex;
-    gap: var(--mcsl-spacing-xs);
 
     & > label {
       text-wrap: nowrap;

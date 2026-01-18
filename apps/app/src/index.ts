@@ -1,19 +1,29 @@
-import { load, windowButtonsExists } from "@repo/shared/src";
+import {
+  load,
+  setCloseWindow,
+  setPlatform,
+  windowButtonsExists,
+} from "@repo/shared/src";
 import { platform } from "@tauri-apps/plugin-os";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { ref, watchEffect } from "vue";
 import App from "./App.vue";
-import { exit } from "@tauri-apps/plugin-process";
 import { setSystemNotif } from "@repo/ui/src/utils/notifications.ts";
 import {
   isPermissionGranted,
   requestPermission as requestNotificationPermission,
   sendNotification,
 } from "@tauri-apps/plugin-notification";
+import { exit } from "@tauri-apps/plugin-process";
 
 export const fullscreen = ref(false);
 
 (async () => {
+  setPlatform("app");
+  setCloseWindow(() => {
+    exit();
+  });
+
   const win = getCurrentWindow();
   const refresh = async () => {
     fullscreen.value = await win.isFullscreen();
@@ -49,12 +59,5 @@ export const fullscreen = ref(false);
     },
   });
 
-  await load(
-    "app",
-    () => {
-      exit();
-    },
-    App,
-    async () => {},
-  );
+  await load(App, async () => {});
 })();

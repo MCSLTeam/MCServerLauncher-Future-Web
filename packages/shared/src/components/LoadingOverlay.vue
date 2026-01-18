@@ -48,7 +48,7 @@ watch(loading, (newValue) => {
 
 <style scoped lang="scss">
 .loading-overlay {
-  z-index: 1000;
+  z-index: 999;
   width: 100vw;
   height: 100vh;
   position: fixed;

@@ -8,7 +8,7 @@ import { computed, type ComputedRef, provide, watch } from "vue";
 const props = defineProps<{
   schema?: yup.Schema;
   validationTrigger?: "input" | "blur";
-  width?: number | "fit";
+  width?: string;
   labelPos?: "left" | "right" | "top";
   entryPos?: "left" | "right" | "center" | "full";
   size?: Size;
@@ -70,6 +70,7 @@ defineExpose({
 
 <template>
   <FormEntry
+    :width="width"
     :label-pos="labelPos"
     :entry-pos="entryPos"
     :size="size"

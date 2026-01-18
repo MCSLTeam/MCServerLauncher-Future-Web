@@ -11,6 +11,7 @@ defineOptions({
 
 const props = withDefaults(
   defineProps<{
+    width?: string;
     header?: string;
     color?: Color;
     closable?: boolean;
@@ -18,6 +19,7 @@ const props = withDefaults(
     closeOnClickOutside?: boolean;
   }>(),
   {
+    width: "600px",
     color: "primary",
     closable: true,
     closeOnEsc: true,
@@ -83,6 +85,9 @@ defineExpose({
     />
     <Panel
       :class="{ 'mcsl-modal__container-visible': visible }"
+      :style="{
+        '--mcsl-modal__card-width': width,
+      }"
       class="mcsl-modal__card"
       size="large"
       v-bind="$attrs"
@@ -137,8 +142,11 @@ defineExpose({
 }
 
 .mcsl-modal__card {
-  width: 600px;
-  max-height: calc(100% - 2 * var(--mcsl-spacing-lg));
+  width: min(
+    var(--mcsl-modal__card-width),
+    calc(100% - 4 * var(--mcsl-spacing-xl))
+  );
+  max-height: calc(100% - 2 * var(--mcsl-spacing-xl));
   border-radius: var(--mcsl-border-radius-2xl);
   z-index: 1002;
   animation: 0.2s ease-in-out both fadeOutDown;
@@ -151,10 +159,6 @@ defineExpose({
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
-
-  @media (max-width: 768px) {
-    width: calc(100% - 2 * var(--mcsl-spacing-lg));
   }
 }
 

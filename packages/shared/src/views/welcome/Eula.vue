@@ -102,7 +102,7 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .welcome-setup {
-  width: 70vw;
+  width: min(60rem, 70vw);
   max-height: 30rem;
   height: 100%;
   display: flex;

@@ -143,7 +143,6 @@ defineExpose({
 
 .mcsl-message {
   width: 100%;
-  opacity: 0;
   transform: translate(0);
   animation:
     0.2s ease-in-out both var(--mcsl-message__anim-out),

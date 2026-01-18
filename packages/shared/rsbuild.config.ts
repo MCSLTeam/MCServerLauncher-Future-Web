@@ -1,7 +1,7 @@
 import { pluginVue } from "@rsbuild/plugin-vue";
 import { pluginSass } from "@rsbuild/plugin-sass";
 import { pluginSvg } from "rsbuild-plugin-svg";
-import { defineConfig, type RsbuildConfig } from "@rsbuild/core";
+import { type RsbuildConfig } from "@rsbuild/core";
 import pkg from "../../package.json";
 
 export const config: RsbuildConfig = {
@@ -37,13 +37,3 @@ export const config: RsbuildConfig = {
     mountId: "app",
   },
 };
-
-export default defineConfig({
-  ...config,
-  source: {
-    ...config.source,
-    entry: {
-      index: "./src/dev-entry.ts",
-    },
-  },
-});

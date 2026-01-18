@@ -1,4 +1,4 @@
-const COLOR_TYPES: string[] = [
+const COLOR_TYPES = [
   "primary",
   "success",
   "warning",
@@ -28,38 +28,9 @@ const COLOR_TYPES: string[] = [
   "neutral",
   "stone",
   "ocean",
-];
+] as const;
 
-export type ColorType =
-  | "primary"
-  | "success"
-  | "warning"
-  | "danger"
-  | "help"
-  | "surface"
-  | "emerald"
-  | "green"
-  | "lime"
-  | "orange"
-  | "amber"
-  | "yellow"
-  | "teal"
-  | "cyan"
-  | "sky"
-  | "blue"
-  | "indigo"
-  | "violet"
-  | "purple"
-  | "fuchsia"
-  | "pink"
-  | "rose"
-  | "red"
-  | "slate"
-  | "gray"
-  | "zinc"
-  | "neutral"
-  | "stone"
-  | "ocean";
+export type ColorType = (typeof COLOR_TYPES)[number];
 
 export type ColorStep =
   | 50
@@ -91,6 +62,17 @@ export type ColorVar =
   | "text-color-secondary"
   | "text-color-gray"
   | "text-color-opposite";
+
+export type CSSSize =
+  | "4xs"
+  | "2xs"
+  | "xs"
+  | "sm"
+  | "md"
+  | "lg"
+  | "xl"
+  | "2xl"
+  | "4xl";
 
 export class ColorData {
   readonly type: ColorType;
@@ -125,7 +107,7 @@ export function getColorVar(color: Color, darkerSurface = true) {
   if (color instanceof ColorData) return color.getCss(darkerSurface);
   else if (color == "surface" && darkerSurface)
     return getColorVar("bg-color-overlay-opposite");
-  else if (COLOR_TYPES.includes(color))
+  else if (COLOR_TYPES.includes(color as any))
     return new ColorData(color as ColorType).getCss();
   return `var(--mcsl-${color})`;
 }

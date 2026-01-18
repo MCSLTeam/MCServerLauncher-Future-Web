@@ -12,23 +12,23 @@ import { useLocale } from "@repo/ui/src/utils/stores.ts";
 
 export type TokenPair = { access_token: string; refresh_token: string };
 
-const jsonSerializer: Serializer<TokenPair | null> = {
-  write: (token: TokenPair | null) =>
-    token == null ? "" : JSON.stringify(token),
-  read: (token: string) =>
-    token == "" ? null : (JSON.parse(token) as TokenPair),
-};
-
 export const useAccount = defineStore("account", () => {
+  const serializer: Serializer<TokenPair | null> = {
+    write: (token: TokenPair | null) =>
+      token == null ? "" : JSON.stringify(token),
+    read: (token: string) =>
+      token == "" ? null : (JSON.parse(token) as TokenPair),
+  };
+
   const tokenPermanent = useLocalStorage<TokenPair | null>(
     "mcsl-web-token",
     null,
-    { serializer: jsonSerializer },
+    { serializer },
   );
   const tokenTemporary = useSessionStorage<TokenPair | null>(
     "mcsl-web-token",
     null,
-    { serializer: jsonSerializer },
+    { serializer },
   );
 
   const token = computed(() => {
