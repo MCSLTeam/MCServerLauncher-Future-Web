@@ -47,7 +47,7 @@ function isActive(info: PageNavigationInfo) {
       :color="isActive(info) ? 'primary' : undefined"
       :size="size"
       v-tooltip.right="collapsed ? info.label : undefined"
-      @click="navigateTo(info)"
+      @click="navigateTo(info, router)"
     >
       <template v-if="!collapsed">{{ info.label }}</template>
     </Button>

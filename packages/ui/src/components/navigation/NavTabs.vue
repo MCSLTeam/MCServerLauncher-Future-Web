@@ -32,7 +32,7 @@ function updateBg() {
 function switchTab(index: number) {
   activeTab.value = index;
   const info = props.tabs[index]!;
-  navigateTo(info);
+  navigateTo(info, useRouter());
 }
 
 watchEffect(() => {

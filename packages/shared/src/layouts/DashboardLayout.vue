@@ -103,7 +103,7 @@ router.afterEach(() => {
             rounded
             size="small"
             v-tooltip="info.label"
-            @click="navigateTo(info)"
+            @click="navigateTo(info, router)"
           />
         </div>
       </div>

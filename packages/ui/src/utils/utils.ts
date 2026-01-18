@@ -1,4 +1,4 @@
-import { type RouteLocationRaw, useRouter } from "vue-router";
+import { type RouteLocationRaw, type Router } from "vue-router";
 
 export type Size = "small" | "medium" | "large";
 
@@ -18,9 +18,9 @@ export type PageNavigationInfo = {
   isSubpage?: (path: string) => boolean;
 };
 
-export function navigateTo(info: PageNavigationInfo) {
+export function navigateTo(info: PageNavigationInfo, router: Router) {
   if (info.disabled) return;
-  if (info.link) useRouter().push(info.link);
+  if (info.link) router.push(info.link);
   if (info.onClick) info.onClick();
 }
 
