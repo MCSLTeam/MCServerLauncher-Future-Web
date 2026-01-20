@@ -1,12 +1,12 @@
 import type { MessageProps } from "../components/panel/Message.vue";
-import { reactive, ref, type VueElement } from "vue";
-import { randNum } from "./utils.ts";
+import { ref, shallowReactive, type VueElement } from "vue";
 import { useLocale } from "./stores.ts";
+import { useLocalStorage } from "@vueuse/core";
 
 type TemplateInfo = {
-  props: (data: any) => MessageProps;
-  systemNotif: (data: any) => { title: string; body: string };
-  template: (props: any) => VueElement[];
+  props: (notif: MCSLNotif) => MessageProps;
+  systemNotif: (notif: MCSLNotif) => { title: string; body: string };
+  template: (notif: MCSLNotif) => VueElement[];
 };
 
 export type NotificationType = "mcsl" | "system" | "both";
@@ -21,7 +21,7 @@ export type SystemNotifSettings = {
 export type MCSLNotifSettings = {
   template?: string;
   duration?: number;
-  type?: "mcsl" | "system" | "both";
+  type?: NotificationType;
   addToHistory?: boolean;
   data: any;
 };
@@ -44,30 +44,31 @@ export function setSystemNotif(notif: SystemNotifSettings) {
 }
 
 export class MCSLNotif {
-  readonly id: string;
+  private static idCounter = -1;
+
+  readonly id = ++MCSLNotif.idCounter;
   readonly opened = ref(false);
   private systemNotif: Notification | undefined;
   private _closed: boolean = false;
 
   constructor(readonly settings: MCSLNotifSettings) {
-    this.id = randNum().toString();
     const templateId = settings.template ?? "default";
     if (!templates[templateId]) {
       console.warn(`[MCSL-UI] Notification template '${templateId}' not found`);
       throw new Error(`Notification template '${templateId}' not found`);
     }
-    addNotification(this);
+    addNotif(this);
   }
 
   get element(): VueElement {
-    return this.template.template(this.settings.data)[0]!;
+    return this.template.template(this)[0]!;
   }
 
   open() {
     if (this._closed) return;
     this.opened.value = true;
     if (Notification.permission == "granted" && this.isSystem) {
-      const systemNotif = this.template.systemNotif(this.settings.data);
+      const systemNotif = this.template.systemNotif(this);
       if (systemNotif) {
         this.systemNotif = systemNotifSettings.send(
           systemNotif.title,
@@ -102,21 +103,28 @@ export class MCSLNotif {
     this.opened.value = false;
     this.systemNotif?.close();
     setTimeout(() => {
-      removeNotification(this.id);
+      removeNotif(this.id);
     }, 500); // 等待动画
   }
 }
 
+const sysNotifWarning = useLocalStorage("sys-notif-warning", true);
+
 export async function requestNotifPermission() {
   const t = useLocale().getI18n().t;
+  let shouldShowWarning = false;
   if (!systemNotifSettings.supported) {
-    new MCSLNotif({
-      data: {
-        title: t("ui.notification.title.warning"),
-        message: t("ui.notification.message.not-supported"),
-        color: "warning",
-      },
-    }).open();
+    shouldShowWarning = true;
+    if (sysNotifWarning.value)
+      new MCSLNotif({
+        template: "do-not-show-again",
+        data: {
+          title: t("ui.notification.title.warning"),
+          message: t("ui.notification.message.not-supported"),
+          color: "warning",
+          onClick: () => (sysNotifWarning.value = false),
+        },
+      }).open();
   } else if (systemNotifSettings.isPermissionGranted() == "default") {
     new MCSLNotif({
       data: {
@@ -126,23 +134,28 @@ export async function requestNotifPermission() {
     await systemNotifSettings.requestPermission();
     await requestNotifPermission();
   } else if (systemNotifSettings.isPermissionGranted() == "denied") {
-    new MCSLNotif({
-      data: {
-        title: t("ui.notification.title.warning"),
-        message: t("ui.notification.message.not-allowed"),
-        color: "warning",
-      },
-    }).open();
+    shouldShowWarning = true;
+    if (sysNotifWarning.value)
+      new MCSLNotif({
+        template: "do-not-show-again",
+        data: {
+          title: t("ui.notification.title.warning"),
+          message: t("ui.notification.message.not-allowed"),
+          color: "warning",
+          onClick: () => (sysNotifWarning.value = false),
+        },
+      }).open();
   }
+  if (!shouldShowWarning) sysNotifWarning.value = true;
 }
 
 const templates: Record<string, TemplateInfo> = {};
 
 export function addTemplate(
   id: string,
-  props: (data: any) => MessageProps,
-  systemNotif: (data: any) => { title: string; body: string },
-  template: (data: any) => VueElement[],
+  props: (notif: MCSLNotif) => MessageProps,
+  systemNotif: (notif: MCSLNotif) => { title: string; body: string },
+  template: (notif: MCSLNotif) => VueElement[],
 ) {
   templates[id] = {
     props,
@@ -159,12 +172,12 @@ export function getTemplate(id: string) {
   return templates[id];
 }
 
-export const notifications = reactive<Record<string, MCSLNotif>>({});
+export const notifications = shallowReactive<Record<number, MCSLNotif>>({});
 
-export function addNotification(notification: MCSLNotif) {
-  notifications[notification.id] = notification;
+export function addNotif(notif: MCSLNotif) {
+  notifications[notif.id] = notif;
 }
 
-export function removeNotification(id: string) {
+export function removeNotif(id: number) {
   delete notifications[id];
 }

@@ -35,5 +35,14 @@ export const config: RsbuildConfig = {
     favicon: "../../packages/shared/src/assets/MCSL.png",
     title: "MCSL Future Web-like",
     mountId: "app",
+    tags: [
+      {
+        tag: "link",
+        attrs: {
+          rel: "stylesheet",
+          href: "https://cdn-font.hyperos.mi.com/font/css?family=MiSans_VF:VF:Latin,Chinese_Simplify,Chinese_Traditional_TW&display=swap",
+        },
+      },
+    ],
   },
 };

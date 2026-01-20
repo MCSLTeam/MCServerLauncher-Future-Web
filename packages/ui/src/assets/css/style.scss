@@ -7,9 +7,10 @@
 
 :root {
   --font-sans:
-    "MiSans VF", Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen,
-    Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  --font-minecraft: "Minecraft", "GNU Unifont", sans-serif;
+    "MiSans VF", "PingFang SC", Inter, -apple-system, BlinkMacSystemFont,
+    Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans,
+    Helvetica Neue, sans-serif;
+  --font-minecraft: "Minecraft", "GNU Unifont", var(--font-sans);
   --font-mono:
     ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono,
     monospace;
@@ -364,18 +365,15 @@ blockquote {
 
 /* 字体 */
 @font-face {
-  font-family: "MiSans VF";
-  src: url("../font/MiSans VF.ttf") format("truetype");
-}
-
-@font-face {
   font-family: "Minecraft";
-  src: url("../font/Minecraft.woff") format("woff");
+  src: url("https://www.minecraft.net/etc.clientlibs/minecraftnet/clientlibs/clientlib-site/resources/fonts/Minecraft-Seven_v2.woff2")
+    format("woff");
 }
 
 @font-face {
   font-family: "GNU Unifont";
-  src: url("../font/unifont-16.0.04.otf") format("opentype");
+  src: url("https://www.unifoundry.com/pub/unifont/unifont-17.0.03/font-builds/unifont-17.0.03.otf")
+    format("opentype");
 }
 
 /* Floating Vue  */

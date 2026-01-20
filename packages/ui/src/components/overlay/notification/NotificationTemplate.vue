@@ -1,22 +1,29 @@
 <script setup lang="ts">
-import { addTemplate, removeTemplate } from "../../../utils/notifications.ts";
+import {
+  addTemplate,
+  MCSLNotif,
+  removeTemplate,
+} from "../../../utils/notifications.ts";
 import { onMounted, onUnmounted, type VueElement } from "vue";
 import type { MessageProps } from "../../panel/Message.vue";
 
 const props = withDefaults(
   defineProps<{
     id: string;
-    props?: (data: any) => MessageProps;
-    systemNotif?: (data: any) => { title: string; body: string };
+    props?: (notif: MCSLNotif) => MessageProps;
+    systemNotif?: (notif: MCSLNotif) => { title: string; body: string };
   }>(),
   {
-    props: (data: any) => data,
-    systemNotif: (data: any) => ({ title: data.title, body: data.message }),
+    props: (notif: MCSLNotif) => notif.settings.data,
+    systemNotif: (notif: MCSLNotif) => ({
+      title: notif.settings.data.title,
+      body: notif.settings.data.message,
+    }),
   },
 );
 
 const slots = defineSlots<{
-  default(props: any): VueElement[];
+  default(props: MCSLNotif): VueElement[];
 }>();
 
 onMounted(() => {

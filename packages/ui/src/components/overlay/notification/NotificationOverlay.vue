@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { notifications } from "../../../utils/notifications.ts";
+import { MCSLNotif, notifications } from "../../../utils/notifications.ts";
 import Message from "../../panel/Message.vue";
 </script>
 
 <template>
   <div class="mcsl-notifications">
     <Message
-      v-for="(item, id) in notifications"
+      v-for="(item, id) in notifications as Record<string, MCSLNotif>"
       :key="id"
       v-bind="{
         closeable: true,
@@ -14,9 +14,9 @@ import Message from "../../panel/Message.vue";
         inAnim: 'fadeInRight',
         outAnim: 'fadeOut',
 
-        ...item.template.props(item.settings.data),
+        ...item.template.props(item),
       }"
-      :visible="item.isMcsl && (item.opened as any)"
+      :visible="item.isMcsl && item.opened.value"
     >
       <component :is="item.element" />
     </Message>
