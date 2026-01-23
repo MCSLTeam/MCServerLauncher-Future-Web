@@ -107,7 +107,7 @@ $collapsed-width: utils.get-size-var("height", "large", SmallerContent.$vars);
   background: var(--mcsl-bg-color-overlay);
   display: flex;
   flex-direction: column;
-  overflow: auto;
+  overflow: hidden auto;
   z-index: 10;
   transition: 0.3s ease-in-out;
 
