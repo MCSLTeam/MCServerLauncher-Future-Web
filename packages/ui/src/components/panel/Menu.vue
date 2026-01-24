@@ -74,7 +74,6 @@ const menuInfo = computed(() => {
     :scrollable="scrollable"
     :shadow="shadow ? 'always' : 'never'"
     :size="size"
-    :border="border"
     class="mcsl-menu"
   >
     <template #header>
