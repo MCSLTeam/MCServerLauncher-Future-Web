@@ -25,11 +25,7 @@ const t = useI18n().t;
 
 <template>
   <component v-if="layout" :is="layout" />
-  <RouterView v-else v-slot="{ Component }">
-    <transition name="fade" mode="in-out" :duration="250">
-      <component :is="Component" />
-    </transition>
-  </RouterView>
+  <RouterView v-else />
   <LoadingOverlay />
   <NotificationTemplate id="default">
     <template v-slot="notif">

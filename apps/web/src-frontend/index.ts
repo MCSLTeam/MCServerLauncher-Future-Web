@@ -56,7 +56,8 @@ export function setShouldRegister(value: boolean) {
       }
     });
 
-    useNavigation().addSidebarUpperItem(
+    useNavigation().addItem(
+      "sidebarUpper",
       {
         label: t("web.users.title"),
         icon: "fa fa-users",
@@ -65,7 +66,8 @@ export function setShouldRegister(value: boolean) {
       3,
     );
 
-    useNavigation().addNavbarItem(
+    useNavigation().addItem(
+      "navbar",
       {
         label: t("web.user-center.title"),
         icon: "fa fa-user",

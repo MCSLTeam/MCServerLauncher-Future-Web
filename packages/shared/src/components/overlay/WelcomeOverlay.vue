@@ -49,7 +49,7 @@ onMounted(() => {
 
   & > img {
     width: 7rem;
-    animation: 0.5s cubic-bezier(0.3, 0, 0.5, 1.5) 0.5s both zoomIn;
+    animation: 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.5s both zoomIn;
   }
 
   & > div {

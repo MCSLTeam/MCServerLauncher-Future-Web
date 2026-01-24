@@ -31,7 +31,7 @@ $dynamic-vars: (
 
 $default-step: (
   "light": 500,
-  "dark": 400,
+  "dark": 500,
 );
 
 $named-steps: (
@@ -120,17 +120,23 @@ $color-vars: (
   ),
   "border-color-dark": (
     "light": [ "surface",
-    300],
+    200],
     "dark": [ "surface",
-    600],
+    200],
   ),
   // 字体
-  "text-color-primary": (
+  "text-color-light": (
       "light": [ "surface",
-      800],
-      "dark": [ "surface",
       0],
+      "dark": [ "surface",
+      200],
     ),
+  "text-color-primary": (
+    "light": [ "surface",
+    800],
+    "dark": [ "surface",
+    0],
+  ),
   "text-color-regular": (
     "light": [ "surface",
     700],

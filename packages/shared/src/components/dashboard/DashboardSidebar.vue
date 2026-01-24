@@ -71,14 +71,14 @@ const navigationInfo = useNavigation();
     <Divider spacing="md" />
     <div class="dashboard-sidebar__content-grow">
       <Sidebar
-        :pages="navigationInfo.sidebarUpperItems"
+        :pages="navigationInfo.getItems('sidebarUpper').value"
         :size="collapsed ? 'large' : 'medium'"
         :collapsed="collapsed"
       />
       <div class="dashboard-sidebar__content">
         <Divider spacing="md" />
         <Sidebar
-          :pages="navigationInfo.sidebarDownerItems"
+          :pages="navigationInfo.getItems('sidebarDowner').value"
           :size="collapsed ? 'large' : 'medium'"
           :collapsed="collapsed"
         />

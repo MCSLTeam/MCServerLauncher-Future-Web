@@ -21,8 +21,8 @@ usePageData().set({
   layout: "setup",
 });
 
-const i18n = useI18n();
-const messages = useLocale().getMessages();
+const t = useI18n().t;
+
 const theme = computed({
   get() {
     return useTheme().theme;
@@ -32,11 +32,12 @@ const theme = computed({
   },
 });
 const themes = computed(() => [
-  { label: i18n.t("shared.settings.general.theme.system"), value: "system" },
-  { label: i18n.t("shared.settings.general.theme.light"), value: "light" },
-  { label: i18n.t("shared.settings.general.theme.dark"), value: "dark" },
+  { label: t("shared.settings.appearance.theme.system"), value: "system" },
+  { label: t("shared.settings.appearance.theme.light"), value: "light" },
+  { label: t("shared.settings.appearance.theme.dark"), value: "dark" },
 ]);
 
+const messages = useLocale().getMessages();
 const locale = computed({
   get() {
     return useLocale().locale;
@@ -46,7 +47,7 @@ const locale = computed({
   },
 });
 const locales = computed(() => [
-  { label: i18n.t("shared.settings.general.locale.system"), value: "system" },
+  { label: t("shared.settings.general.locale.system"), value: "system" },
   ...Object.keys(messages).map((key) => ({
     label:
       messages[key as Locale]["language"]["name"] +
@@ -61,14 +62,14 @@ const locales = computed(() => [
 <template>
   <div class="welcome-setup">
     <WelcomeOverlay />
-    <h2>{{ i18n.t("shared.welcome.settings") }}</h2>
+    <h2>{{ t("shared.welcome.settings") }}</h2>
     <FormItem
       v-model="theme"
       :schema="
         yup
           .string()
           .oneOf(themes.map((item) => item.value))
-          .label(i18n.t('shared.settings.general.theme.label'))
+          .label(t('shared.settings.appearance.theme.label'))
       "
     >
       <SelectButton :options="themes" />
@@ -79,13 +80,13 @@ const locales = computed(() => [
         yup
           .string()
           .oneOf(locales.map((item) => item.value))
-          .label(i18n.t('shared.settings.general.locale.label'))
+          .label(t('shared.settings.general.locale.label'))
       "
     >
       <Select :options="locales" />
     </FormItem>
     <Button type="primary" color="primary" @click="router.push('/welcome/eula')"
-      >{{ i18n.t("ui.common.next-step") }}
+      >{{ t("ui.common.next-step") }}
     </Button>
   </div>
 </template>

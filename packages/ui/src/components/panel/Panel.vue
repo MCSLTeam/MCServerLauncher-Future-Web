@@ -14,7 +14,6 @@ withDefaults(
     bodyClass?: string;
     bodyStyle?: string;
     scrollable?: boolean;
-    border?: boolean;
   }>(),
   {
     size: "medium",
@@ -25,7 +24,6 @@ withDefaults(
     bodyClass: "",
     bodyStyle: "",
     scrollable: false,
-    border: false,
   },
 );
 
@@ -33,7 +31,7 @@ const hasHeader = ref(true);
 const headerRef = ref();
 
 onMounted(() => {
-  hasHeader.value = headerRef.value.innerText.trim() !== "";
+  hasHeader.value = headerRef.value.innerText.trim() != "";
 });
 </script>
 
@@ -44,7 +42,6 @@ onMounted(() => {
       [`mcsl-panel__shadow-${shadow}`]: shadow !== 'never',
       'mcsl-panel__need-divider': !headerDivider && hasHeader,
       'mcsl-panel__not-scrollable': !scrollable,
-      'mcsl-panel__border': border,
     }"
     class="mcsl-panel"
   >
@@ -75,6 +72,7 @@ onMounted(() => {
 
 .mcsl-panel {
   overflow: auto;
+  border: 1px solid var(--mcsl-border-color-base);
   background: var(--mcsl-bg-color-overlay);
   transition: box-shadow 0.2s ease-in-out;
 }
@@ -99,10 +97,6 @@ onMounted(() => {
       padding-top: $spacing;
     }
   }
-}
-
-.mcsl-panel__border {
-  border: 1px solid var(--mcsl-border-color-base);
 }
 
 .mcsl-panel__header {

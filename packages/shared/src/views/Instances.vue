@@ -16,17 +16,18 @@ import Button from "@repo/ui/src/components/form/button/Button.vue";
 import type { InstanceStatus } from "../utils/node/types/instance.ts";
 import { getGame } from "../utils/node/types/cores.ts";
 
+const t = useI18n().t;
+
 usePageData().set({
   layout: "dashboard",
   breadcrumbs: [
     {
-      label: useI18n().t("shared.instances.title"),
+      label: t("shared.instances.title"),
       path: "/instances",
     },
   ],
 });
 
-const t = useI18n().t;
 const search = ref("");
 const sorting = useLocalStorage("instance-sorting", {
   ascending: true,
@@ -349,7 +350,7 @@ function buildContextMenu(instance: any) {
 </script>
 
 <template>
-  <div>
+  <div class="instances">
     <div class="instances__searchbar">
       <InputText
         v-model="search"
@@ -427,7 +428,7 @@ function buildContextMenu(instance: any) {
         />
       </div>
     </div>
-    <div>
+    <div class="instances__content">
       <div v-for="(instances, group) in sortedInstances" :key="group">
         <Divider
           v-if="!noGrouping"
@@ -444,14 +445,13 @@ function buildContextMenu(instance: any) {
             v-for="instance in instances"
             :key="instance.id"
             tabindex="0"
-            border
             @click="router.push(`/instance/${instance.id}`)"
             @keydown.enter="router.push(`/instance/${instance.id}`)"
           >
             <template #contextmenu>
               <ContextMenu
                 v-if="buildContextMenu(instance)"
-                :menu="buildContextMenu(instance)"
+                :menu="buildContextMenu(instance)!"
               />
             </template>
             <div class="instances__instance-info">
@@ -501,8 +501,20 @@ function buildContextMenu(instance: any) {
 </template>
 
 <style scoped lang="scss">
+.instances {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--mcsl-spacing-md);
+}
+
+.instances__content {
+  flex-grow: 1;
+  overflow: hidden auto;
+}
+
 .instances__searchbar {
-  margin-bottom: var(--mcsl-spacing-md);
   &,
   & > div,
   & > div > div:first-child {

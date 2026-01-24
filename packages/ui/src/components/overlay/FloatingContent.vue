@@ -86,11 +86,12 @@ function close() {
 }
 
 function clickedOutside(event: MouseEvent) {
+  const rect = wrapperEl.value?.getBoundingClientRect();
   return (
-    event.clientX < posInfo.value.x ||
-    event.clientX > posInfo.value.x + posInfo.value.width ||
-    event.clientY < posInfo.value.y ||
-    event.clientY > posInfo.value.y + posInfo.value.height
+    event.clientX < rect.x ||
+    event.clientX > rect.x + rect.width ||
+    event.clientY < rect.y ||
+    event.clientY > rect.y + rect.height
   );
 }
 

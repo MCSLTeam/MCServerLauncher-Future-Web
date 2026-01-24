@@ -59,7 +59,7 @@ onUnmounted(() => {
   gap: var(--mcsl-spacing-4xs);
 
   & > h3 {
-    color: var(--mcsl-color-text-gray);
+    color: var(--mcsl-text-color-gray);
   }
 
   & > div {

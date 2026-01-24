@@ -209,7 +209,8 @@ export const useLocale = defineStore("locale", () => {
   }
 
   function setLocale(l: Locale) {
-    getI18n().locale.value = locale.value = getLocale(l);
+    locale.value = l;
+    getI18n().locale.value = getLocale(l);
   }
 
   return {

@@ -36,7 +36,6 @@ const props = withDefaults(
     bodyClass?: string;
     bodyStyle?: string;
     scrollable?: boolean;
-    border?: boolean;
   }>(),
   {
     shadow: false,
