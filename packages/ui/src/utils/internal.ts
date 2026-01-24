@@ -1,21 +1,14 @@
-import {
-  computed,
-  type ComputedRef,
-  type Ref,
-  ref,
-  type VueElement,
-  watch,
-} from "vue";
+import { computed, type ComputedRef, type Ref, ref, watch } from "vue";
 import type { ColorType } from "./css.ts";
 
 // Context menu
-export const currContextmenu = ref<VueElement>();
+export let openContextMenu: (event: MouseEvent, props: any) => void = () => {};
 
-window.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    currContextmenu.value = undefined;
-  }
-});
+export function setOpenContextMenu(
+  fn: (event: MouseEvent, props: any) => void,
+) {
+  openContextMenu = fn;
+}
 
 // Meter group
 export const colorMap = new Map<string, ColorType>();

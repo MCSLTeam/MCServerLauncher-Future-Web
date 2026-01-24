@@ -36,11 +36,16 @@ const props = withDefaults(
     bodyClass?: string;
     bodyStyle?: string;
     scrollable?: boolean;
+    border?: boolean;
   }>(),
   {
     shadow: false,
   },
 );
+
+defineEmits<{
+  (e: "click", event: MouseEvent): void;
+}>();
 
 const menuInfo = computed(() => {
   if (props.menu.length == 0) return [];
@@ -70,6 +75,7 @@ const menuInfo = computed(() => {
     :scrollable="scrollable"
     :shadow="shadow ? 'always' : 'never'"
     :size="size"
+    :border="border"
     class="mcsl-menu"
   >
     <template #header>
@@ -97,7 +103,12 @@ const menuInfo = computed(() => {
           :icon="button.icon"
           :icon-pos="button.iconPos"
           :type="button.type ?? 'text'"
-          @click="button.onClick"
+          @click="
+            (e) => {
+              button?.onClick?.(e);
+              $emit('click', e);
+            }
+          "
         >
           {{ button.label }}
         </Button>

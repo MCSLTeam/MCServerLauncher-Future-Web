@@ -60,6 +60,8 @@ export async function load(
 
   app.mount("#app");
 
+  document.body.oncontextmenu = () => false;
+
   await loadUi();
 
   await load();

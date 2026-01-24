@@ -109,13 +109,6 @@ export const useAccount = defineStore("account", () => {
     }
   }
 
-  setInterval(
-    async () => {
-      await updateSelfInfo();
-    },
-    1000 * 60 * 5,
-  );
-
   return {
     accessToken,
     setToken,

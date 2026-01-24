@@ -1,98 +1,37 @@
 <script lang="ts" setup>
-import {
-  type ComputedRef,
-  onMounted,
-  onUnmounted,
-  type Ref,
-  ref,
-  watch,
-} from "vue";
-import Menu, { type MenuInfo } from "../panel/Menu.vue";
-import { currContextmenu } from "../../utils/internal.ts";
+import { onMounted, onUnmounted, ref } from "vue";
+import { type MenuInfo } from "../panel/Menu.vue";
 import type { Size } from "../../utils/utils.ts";
-import FloatingContent from "./FloatingContent.vue";
+import { openContextMenu } from "../../utils/internal.ts";
 
 defineOptions({
   inheritAttrs: false,
 });
 
-const props = withDefaults(
-  defineProps<{
-    menu: MenuInfo;
-    parent?: HTMLElement | "global" | string;
-    inAnim?: string;
-    outAnim?: string;
-    header?: string;
-    headerDivider?: boolean;
-    size?: Size;
-    headerClass?: string;
-    headerStyle?: string;
-    bodyClass?: string;
-    bodyStyle?: string;
-    scrollable?: boolean;
-  }>(),
-  {
-    size: "medium",
-    inAnim: "fadeIn",
-    outAnim: "fadeOut",
-    headerClass: "",
-    headerStyle: "",
-    bodyClass: "",
-    bodyStyle: "",
-  },
-);
+const props = defineProps<{
+  menu: MenuInfo;
+  parent?: HTMLElement | "global" | string;
+  inAnim?: string;
+  outAnim?: string;
+  header?: string;
+  headerDivider?: boolean;
+  size?: Size;
+  headerClass?: string;
+  headerStyle?: string;
+  bodyClass?: string;
+  bodyStyle?: string;
+  scrollable?: boolean;
+}>();
 
-const floatingContentEl = ref();
 const wrapperEl = ref();
 
-watch(currContextmenu, (value) => {
-  if (value != floatingContentEl.value) floatingContentEl.value.close();
-});
+let listenedElement: HTMLElement;
 
 function handleContextMenu(event: MouseEvent) {
-  if (floatingContentEl.value.clickedOutside(event)) {
-    floatingContentEl.value.open(event.clientX, event.clientY);
-    event.preventDefault();
-    event.stopImmediatePropagation();
-  }
+  openContextMenu(event, props);
+  event.preventDefault();
+  event.stopImmediatePropagation();
 }
-
-function locateX(
-  openX: number,
-  elemX: Ref<number>,
-  elemRect: ComputedRef<DOMRect>,
-) {
-  for (const pos of ["left", "right"]) {
-    elemX.value = pos == "left" ? openX : openX - elemRect.value.width;
-    if (floatingContentEl.value.canFullyShow("x")) return;
-  }
-}
-
-function locateY(
-  openY: number,
-  elemY: Ref<number>,
-  elemRect: ComputedRef<DOMRect>,
-) {
-  for (const pos of ["top", "bottom"]) {
-    elemY.value = pos == "top" ? openY : openY - elemRect.value.height;
-    if (floatingContentEl.value.canFullyShow("y")) return;
-  }
-}
-
-function locator(
-  openX: number,
-  openY: number,
-  elemX: Ref<number>,
-  elemY: Ref<number>,
-  elemRect: ComputedRef<DOMRect>,
-) {
-  if (elemRect.value.width > innerWidth) elemX.value = 0;
-  else locateX(openX, elemX, elemRect);
-  if (elemRect.value.height > innerHeight) elemY.value = 0;
-  else locateY(openY, elemY, elemRect);
-}
-
-let listenedElement: HTMLElement;
 
 onMounted(() => {
   if (props.parent instanceof HTMLElement) {
@@ -115,31 +54,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="wrapperEl" class="mcsl-contextmenu">
-    <FloatingContent ref="floatingContentEl" :locator="locator" transition>
-      <Menu
-        :bodyClass="bodyClass"
-        :bodyStyle="bodyStyle"
-        :header="header"
-        :header-class="headerClass"
-        :header-divider="headerDivider"
-        :header-style="headerStyle"
-        :scrollable="scrollable"
-        :menu="menu"
-        :size="size"
-        shadow
-        v-bind="$attrs"
-      >
-        <template #header>
-          <slot name="header" />
-        </template>
-      </Menu>
-    </FloatingContent>
-  </div>
+  <div ref="wrapperEl" class="mcsl-contextmenu"></div>
 </template>
 
-<style lang="scss">
-.mcsl-contextmenu > .mcsl-floating-content {
-  z-index: 10000;
-}
-</style>
+<style lang="scss"></style>

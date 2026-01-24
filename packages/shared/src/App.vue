@@ -4,6 +4,7 @@ import NotificationOverlay from "@repo/ui/src/components/overlay/notification/No
 import DashboardLayout from "./layouts/DashboardLayout.vue";
 import SetupLayout from "./layouts/SetupLayout.vue";
 import Button from "@repo/ui/src/components/form/button/Button.vue";
+import ContextMenuOverlay from "@repo/ui/src/components/overlay/ContextMenuOverlay.vue";
 import { computed } from "vue";
 import { usePageData } from "./utils/stores.ts";
 import LoadingOverlay from "./components/overlay/LoadingOverlay.vue";
@@ -57,6 +58,7 @@ const t = useI18n().t;
     </template>
   </NotificationTemplate>
   <NotificationOverlay />
+  <ContextMenuOverlay />
 </template>
 
 <style scoped>

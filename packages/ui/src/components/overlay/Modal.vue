@@ -90,6 +90,7 @@ defineExpose({
       }"
       class="mcsl-modal__card"
       size="large"
+      border
       v-bind="$attrs"
     >
       <template #header>

@@ -14,6 +14,7 @@ withDefaults(
     bodyClass?: string;
     bodyStyle?: string;
     scrollable?: boolean;
+    border?: boolean;
   }>(),
   {
     size: "medium",
@@ -24,6 +25,7 @@ withDefaults(
     bodyClass: "",
     bodyStyle: "",
     scrollable: false,
+    border: false,
   },
 );
 
@@ -42,6 +44,7 @@ onMounted(() => {
       [`mcsl-panel__shadow-${shadow}`]: shadow !== 'never',
       'mcsl-panel__need-divider': !headerDivider && hasHeader,
       'mcsl-panel__not-scrollable': !scrollable,
+      'mcsl-panel__border': border,
     }"
     class="mcsl-panel"
   >
@@ -73,7 +76,6 @@ onMounted(() => {
 .mcsl-panel {
   overflow: auto;
   background: var(--mcsl-bg-color-overlay);
-  border: 1px solid var(--mcsl-border-color-base);
   transition: box-shadow 0.2s ease-in-out;
 }
 
@@ -97,6 +99,10 @@ onMounted(() => {
       padding-top: $spacing;
     }
   }
+}
+
+.mcsl-panel__border {
+  border: 1px solid var(--mcsl-border-color-base);
 }
 
 .mcsl-panel__header {

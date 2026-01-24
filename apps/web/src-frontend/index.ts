@@ -138,12 +138,14 @@ export function setShouldRegister(value: boolean) {
 
     loadingStep.value = t("web.loading.fetch-user");
 
-    try {
-      await useAccount().updateSelfInfo();
-    } catch {
-      // 阻塞直到刷新页面重试
-      while (true) await sleep(1000);
-    }
+    await useAccount().updateSelfInfo();
+    setInterval(
+      async () => {
+        // 刷新权限
+        await useAccount().updateSelfInfo();
+      },
+      1000 * 60 * 5,
+    );
 
     loadingStep.value = "";
   });

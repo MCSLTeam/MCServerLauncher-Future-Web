@@ -21,7 +21,7 @@ const props = withDefaults(
       openY: number,
       elemX: Ref<number>,
       elemY: Ref<number>,
-      elemPos: ComputedRef<PosInfo>,
+      elemRect: ComputedRef<PosInfo>,
     ) => void;
     transition?: boolean;
     inAnim?: string;
