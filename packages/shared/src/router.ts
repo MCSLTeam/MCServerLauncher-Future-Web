@@ -53,6 +53,11 @@ const router = createRouter({
       name: "Settings",
       component: async () => await import("./views/Settings.vue"),
     },
+    {
+      path: "/:pathMatch(.*)*",
+      name: "404",
+      component: async () => await import("./views/NotFound.vue"),
+    },
   ],
 });
 
