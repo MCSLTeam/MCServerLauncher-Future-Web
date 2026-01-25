@@ -97,7 +97,13 @@ defineExpose({
           <slot :close="close" :open="open" :visible="visible" name="header">
             <h2>{{ header }}</h2>
           </slot>
-          <Button v-if="closable" type="text" icon="fas fa-xmark" rounded @click="close" />
+          <Button
+            v-if="closable"
+            type="text"
+            icon="fas fa-xmark"
+            rounded
+            @click="close"
+          />
         </div>
       </template>
       <slot :close="close" :open="open" :visible="visible" />
