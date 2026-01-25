@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue";
-import type { Size } from "../../utils/types.ts";
+import type { Size } from "../../utils/utils.ts";
 import { animatedVisibilityExists } from "../../utils/internal.ts";
 import {
   ColorData,
@@ -24,11 +24,11 @@ export type MessageProps = {
 };
 
 const props = withDefaults(defineProps<MessageProps>(), {
-  size: "middle",
+  size: "medium",
   color: "primary",
   variant: "default",
-  inAnim: "stretchInDown",
-  outAnim: "stretchOutUp",
+  inAnim: "0.2s ease-in-out both stretchInDown",
+  outAnim: "0.2s ease-in-out both stretchOutUp",
   shadow: false,
   closeable: false,
 });
@@ -81,7 +81,7 @@ defineExpose({
       '--mcsl-message__box-shadow': isSurface
         ? 'var(--mcsl-box-shadow-base)'
         : getShadow(color, 'base'),
-      '--mcsl-message__anim-in': inAnim,
+      '--mcsl-message__anim-in': inAnim + ' 0.2s',
       '--mcsl-message__anim-out': outAnim,
       '--mcsl-message__spacing': variant == 'text' ? '0' : undefined,
     }"
@@ -123,6 +123,7 @@ defineExpose({
       $spacing: var(--mcsl-message__spacing);
       gap: $spacing;
       padding: $spacing;
+      width: calc(100% - 2 * $spacing);
 
       & .mcsl-message__title {
         margin-bottom: calc($spacing / 2);
@@ -141,16 +142,16 @@ defineExpose({
 }
 
 .mcsl-message {
-  opacity: 0;
+  width: 100%;
   transform: translate(0);
   animation:
-    0.2s ease-in-out both var(--mcsl-message__anim-out),
+    var(--mcsl-message__anim-out),
     0.5s 0.2s cubic-bezier(0, 1, 0, 1) collapseOutVertical;
 
   &.mcsl-message__visible {
     animation:
       0.8s ease-in-out collapseInVertical,
-      0.2s 0.2s ease-in-out both var(--mcsl-message__anim-in);
+      var(--mcsl-message__anim-in);
   }
 }
 
@@ -158,10 +159,10 @@ defineExpose({
   display: flex;
 
   .mcsl-message__with-title & {
-    --mcsl-message__icon-font-size: var(--mcsl-font-size-h4);
+    --mcsl-message__icon-font-size: var(--mcsl-font-size-lg);
   }
 
-  --mcsl-message__icon-font-size: var(--mcsl-font-size-all);
+  --mcsl-message__icon-font-size: var(--mcsl-font-size-md);
   $size: calc(var(--mcsl-message__icon-font-size) * 1.2);
 
   & > i {
@@ -173,7 +174,7 @@ defineExpose({
   }
 
   & > div {
-    flex-grow: 1;
+    width: calc(100% - $size);
   }
 
   & > .mcsl-message__close-btn {

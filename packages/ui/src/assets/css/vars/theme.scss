@@ -31,7 +31,7 @@ $dynamic-vars: (
 
 $default-step: (
   "light": 500,
-  "dark": 400,
+  "dark": 500,
 );
 
 $named-steps: (
@@ -120,17 +120,23 @@ $color-vars: (
   ),
   "border-color-dark": (
     "light": [ "surface",
-    300],
+    200],
     "dark": [ "surface",
-    600],
+    200],
   ),
   // 字体
-  "text-color-primary": (
+  "text-color-light": (
       "light": [ "surface",
-      800],
-      "dark": [ "surface",
       0],
+      "dark": [ "surface",
+      200],
     ),
+  "text-color-primary": (
+    "light": [ "surface",
+    800],
+    "dark": [ "surface",
+    0],
+  ),
   "text-color-regular": (
     "light": [ "surface",
     700],
@@ -181,7 +187,7 @@ $other-vars: (
     "2xs": 0.1rem,
   ),
   "font-weight": (
-    "bolder": 600,
+    "bolder": 550,
     "bold": 500,
     "base": 400,
     "light": 300,
@@ -190,6 +196,7 @@ $other-vars: (
   "font-size": (
     "8xl": 4rem,
     "4xl": 2rem,
+    "3xl": 1.75rem,
     "2xl": 1.5rem,
     "xl": 1.25rem,
     "lg": 1rem,

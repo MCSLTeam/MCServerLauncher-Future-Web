@@ -2,15 +2,9 @@
 import { computed, inject, ref, watch } from "vue";
 import type { FormFieldData } from "../FormEntry.vue";
 import { ColorData, type ColorType, getColorVar } from "../../../utils/css.ts";
-import type { Size } from "../../../utils/types.ts";
+import type { Size } from "../../../utils/utils.ts";
 import DropdownMenu from "../../overlay/DropdownMenu.vue";
-
-export type SelectionItem = {
-  value: any;
-  label?: string;
-  icon?: string;
-  disabled?: boolean;
-};
+import type { SelectionItem } from "../../../utils/form.ts";
 
 export type SelectionInfo =
   | {
@@ -26,11 +20,12 @@ const props = withDefaults(
     invalid?: boolean;
     disabled?: boolean;
     prefix?: string;
+    suffix?: string;
     placeholder?: string;
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     color: "primary",
     invalid: false,
     disabled: false,
@@ -133,11 +128,13 @@ function findLabel(value: any) {
               new ColorData(color, 'dark'),
             ),
           }"
+          :disabled="disabled"
         >
-          <span>
+          <span v-if="!model">{{ placeholder }}</span>
+          <span v-else>
             <span v-if="model && prefix">{{ prefix }}</span>
-            <span v-if="placeholder && !model">{{ placeholder }}</span
-            >{{ findLabel(model) }}
+            <span v-if="model">{{ findLabel(model) }}</span>
+            <span v-if="model && suffix">{{ suffix }}</span>
           </span>
           <i class="fa fa-angle-down" :class="{ 'fa-rotate-180': opened }" />
         </button>

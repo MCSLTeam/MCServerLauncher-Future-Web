@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { McLoadingIcon, RippleIcon, SpinnerIcon } from "../../utils/icons";
 import { type Color, getColorVar } from "../../utils/css.ts";
-import type { Size } from "../../utils/types.ts";
+import type { Size } from "../../utils/utils.ts";
 
 withDefaults(
   defineProps<{
@@ -12,7 +12,7 @@ withDefaults(
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     label: "",
     labelPos: "bottom",
     type: "spinner",
@@ -43,7 +43,7 @@ withDefaults(
 $vars: (
   "spinner-size": (
     "small": 1rem,
-    "middle": 3rem,
+    "medium": 3rem,
     "large": 5rem,
   ),
 );

@@ -2,7 +2,7 @@
 import { inject, watch } from "vue";
 import type { FormFieldData } from "../FormEntry.vue";
 import { ColorData, type ColorType, getColorVar } from "../../../utils/css.ts";
-import type { Size } from "../../../utils/types.ts";
+import type { Size } from "../../../utils/utils.ts";
 
 withDefaults(
   defineProps<{
@@ -12,7 +12,7 @@ withDefaults(
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     color: "primary",
     invalid: false,
     disabled: false,
@@ -98,7 +98,7 @@ $vars: map.merge(
   (
     "height": (
       "small": 1rem,
-      "middle": 1.25rem,
+      "medium": 1.25rem,
       "large": 1.5rem,
     ),
   )
@@ -123,6 +123,7 @@ $vars: map.merge(
 }
 
 .mcsl-switch {
+  cursor: pointer;
   margin: 0;
   appearance: none;
   border: 1px solid transparent;
@@ -141,7 +142,7 @@ $vars: map.merge(
     background: var(--mcsl-bg-color-overlay);
     border-radius: var(--mcsl-border-radius-full);
     box-shadow: var(--mcsl-box-shadow-light);
-    transition: 0.2s ease-in-out;
+    transition: 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.38);
   }
 
   &:focus-visible {

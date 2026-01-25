@@ -3,10 +3,9 @@ import { useI18n } from "vue-i18n";
 import { usePageData } from "../../utils/stores.ts";
 import { renderMd } from "@repo/ui/src/utils/render.ts";
 import { onMounted, onUnmounted, ref, watch } from "vue";
-import axios from "axios";
 import Spinner from "@repo/ui/src/components/progress/Spinner.vue";
 import router, { firstLoad } from "../../router.ts";
-import { close } from "../../index.ts";
+import { close, getEula } from "../../index.ts";
 import Button from "@repo/ui/src/components/form/button/Button.vue";
 
 usePageData().set({
@@ -18,22 +17,7 @@ const t = useI18n().t;
 const eula = ref<string>();
 
 (async () => {
-  try {
-    eula.value = (
-      await axios.get(t("shared.eula.url"), { timeout: 5000 })
-    ).data;
-  } catch {
-    console.warn("Failed to fetch EULA content from GitHub, using mirror");
-    try {
-      eula.value = (
-        await axios.get(t("shared.eula.mirror"), { timeout: 5000 })
-      ).data;
-    } catch {
-      console.warn("Failed to fetch EULA content from mirror, using default");
-      eula.value = t("shared.eula.content");
-    }
-  }
-  eula.value = eula.value?.replace(/^---[\s\S]*?---\s*/, "");
+  eula.value = await getEula();
 })();
 
 function acceptEula() {
@@ -42,9 +26,9 @@ function acceptEula() {
 }
 
 const countdown = ref(10);
-let interval: any;
+let interval = -1;
 function startCountdown() {
-  interval = setInterval(() => {
+  interval = window.setInterval(() => {
     countdown.value--;
     if (countdown.value <= 0) {
       clearInterval(interval);
@@ -81,6 +65,9 @@ onUnmounted(() => {
       </div>
     </div>
     <div class="eula-actions">
+      <Button @click="router.push('/welcome/setup')">{{
+        t("ui.common.prev-step")
+      }}</Button>
       <Button @click="close">{{ t("shared.eula.reject") }}</Button>
       <Button
         type="primary"
@@ -99,7 +86,7 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .welcome-setup {
-  min-width: 30rem;
+  width: min(60rem, 70vw);
   max-height: 30rem;
   height: 100%;
   display: flex;
@@ -112,8 +99,8 @@ onUnmounted(() => {
     align-self: flex-end;
   }
 
-  @media (max-width: 768px) {
-    min-width: 100%;
+  @media (max-width: 450px) {
+    width: 100%;
   }
 }
 
@@ -130,7 +117,7 @@ onUnmounted(() => {
     align-items: center;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 450px) {
     height: 100%;
   }
 }

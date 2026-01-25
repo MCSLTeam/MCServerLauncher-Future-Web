@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { inject, watch } from "vue";
+import { inject, ref, watch } from "vue";
 import type { FormFieldData } from "../FormEntry.vue";
 import { ColorData, type ColorType, getColorVar } from "../../../utils/css.ts";
-import type { Size } from "../../../utils/types.ts";
+import type { Size } from "../../../utils/utils.ts";
 import Button from "../button/Button.vue";
 
 withDefaults(
@@ -13,16 +13,16 @@ withDefaults(
     size?: Size;
     placeholder?: string;
     password?: boolean;
-    cleanBtn?: boolean;
+    clearBtn?: boolean;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     color: "primary",
     invalid: false,
     disabled: false,
     placeholder: "",
     password: false,
-    cleanBtn: false,
+    clearBtn: false,
   },
 );
 
@@ -36,6 +36,8 @@ const model = defineModel<string>({
   required: false,
   default: "",
 });
+
+const showPassword = ref(false);
 
 const formField = inject("mcsl-form-field", undefined) as
   | FormFieldData
@@ -77,7 +79,7 @@ if (formField) {
         ),
       }"
       :placeholder="placeholder"
-      :type="password ? 'password' : 'text'"
+      :type="password && !showPassword ? 'password' : 'text'"
       @blur="
         $emit('blur', $event);
         formField?.onBlur($event);
@@ -98,13 +100,22 @@ if (formField) {
         formField?.onFocus($event);
       "
     />
-    <div v-if="cleanBtn">
+    <div v-if="clearBtn">
       <Button
         type="text"
         rounded
         size="small"
         icon="fa fa-xmark"
         @click="model = ''"
+      />
+    </div>
+    <div v-else-if="password">
+      <Button
+        type="text"
+        rounded
+        size="small"
+        :icon="showPassword ? 'fa fa-eye-slash' : 'fa fa-eye'"
+        @click="showPassword = !showPassword"
       />
     </div>
   </div>
@@ -121,8 +132,8 @@ if (formField) {
     $height: utils.get-size-var("height", $size, $vars);
 
     & > input {
-      width: calc(100% - 2 * $spacing);
-      height: calc($height - 2 * $spacing);
+      width: calc(100% - 2 * $spacing - 2px); // 减去border宽度
+      height: calc($height - 2 * $spacing - 2px);
       padding: $spacing;
       border-radius: utils.get-size-var("border-radius", $size, $vars);
     }

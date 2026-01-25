@@ -82,6 +82,17 @@ pub fn verify_token(token: &str, secret: &str) -> Result<TokenClaims, jsonwebtok
         ));
     }
 
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_secs() as usize;
+
+    if claims.exp < now {
+        return Err(jsonwebtoken::errors::Error::from(
+            jsonwebtoken::errors::ErrorKind::ExpiredSignature,
+        ));
+    }
+
     Ok(claims)
 }
 
@@ -115,9 +126,15 @@ pub fn verify_token_pair(
     })?
     .claims;
 
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_secs() as usize;
+
     if access_claims.typ != "access"
         || refresh_claims.typ != "refresh"
         || access_claims.tid != refresh_claims.tid
+        || refresh_claims.exp < now
     {
         return Err(HttpResponse::Unauthorized().json(FailedResponse {
             status: "failed",

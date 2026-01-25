@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Size } from "../../utils/types.ts";
+import type { Size } from "../../utils/utils.ts";
 import Pagination from "./Pagination.vue";
 
 const props = withDefaults(
@@ -9,7 +9,7 @@ const props = withDefaults(
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
   },
 );
 

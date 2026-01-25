@@ -7,7 +7,7 @@ import {
   type Ref,
   ref,
 } from "vue";
-import { type PosInfo, throttle } from "../../utils/util.ts";
+import { type PosInfo, throttle } from "../../utils/utils.ts";
 import { clamp } from "@vueuse/core";
 import FloatingContent from "./FloatingContent.vue";
 
