@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import Menu, { type MenuInfo } from "../panel/Menu.vue";
-import type { Size } from "../../utils/types.ts";
+import type { Size } from "../../utils/utils.ts";
 import DropdownContent from "./DropdownContent.vue";
 import { ref } from "vue";
 
@@ -23,7 +23,7 @@ withDefaults(
     scrollable?: boolean;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     followWidth: false,
     defaultPos: "bottom",
     headerClass: "",
@@ -66,6 +66,7 @@ defineExpose({
       :scrollable="scrollable"
       :menu="menu"
       :size="size"
+      shadow
       v-bind="$attrs"
       class="mcsl-dropdown-menu__menu"
       :style="{

@@ -50,15 +50,15 @@ async fn main() -> std::io::Result<()> {
         app = app.service(
             web::scope("/api")
                 .service(api::api_index)
-                .service(api::api_user_login)
-                .service(api::api_user_refresh)
+                .service(api::api_account_login)
+                .service(api::api_account_refresh)
+                .service(api::api_account_register)
+                .service(api::api_account_should_register)
                 .service(api::api_user_create)
-                .service(api::api_user_register)
                 .service(api::api_user_update)
                 .service(api::api_user_update_password)
                 .service(api::api_user_delete)
-                .service(api::api_user_get_self)
-                .service(api::api_user_should_register),
+                .service(api::api_user_get_self),
         );
 
         #[cfg(not(debug_assertions))]

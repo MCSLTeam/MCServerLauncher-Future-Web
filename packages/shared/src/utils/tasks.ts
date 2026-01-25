@@ -1,9 +1,9 @@
 import { computed, type Ref, ref, watch } from "vue";
-import type { LoadingStatus } from "@repo/ui/src/utils/types.ts";
-import { sleep } from "@repo/ui/src/utils/util.ts";
+import { sleep } from "@repo/ui/src/utils/utils.ts";
+import type { LoadingStatus } from "@repo/ui/src/components/progress/ProgressBar.vue";
 
 export class SimpleTask {
-  static lastId = -1;
+  private static idCounter = -1;
 
   public readonly name: Ref<string>;
   public readonly desc: Ref<string>;
@@ -24,7 +24,7 @@ export class SimpleTask {
     this.desc = ref(desc);
     this.status = ref("loading");
     this.createTime = Date.now();
-    this.id = ++SimpleTask.lastId;
+    this.id = ++SimpleTask.idCounter;
     this._progress = progress;
     watch(progress, (newValue) => {
       if (newValue >= 100 && this.status.value == "loading" && autoSuccess) {

@@ -27,11 +27,11 @@
     "test": "turbo run test"
   },
   "devDependencies": {
-    "prettier": "^3.6.2",
-    "turbo": "^2.5.6",
+    "prettier": "^3.8.0",
+    "turbo": "^2.7.5",
     "typescript": "^5.9.2"
   },
-  "packageManager": "pnpm@10.25.0",
+  "packageManager": "pnpm@10.28.0",
   "engines": {
     "node": ">=18"
   }

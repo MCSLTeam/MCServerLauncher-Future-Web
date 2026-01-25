@@ -2,7 +2,7 @@
 import { inject, watch } from "vue";
 import type { FormFieldData } from "../FormEntry.vue";
 import { ColorData, type ColorType, getColorVar } from "../../../utils/css.ts";
-import type { Size } from "../../../utils/types.ts";
+import type { Size } from "../../../utils/utils.ts";
 
 withDefaults(
   defineProps<{
@@ -14,7 +14,7 @@ withDefaults(
     resizeable?: boolean;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     color: "primary",
     invalid: false,
     disabled: false,

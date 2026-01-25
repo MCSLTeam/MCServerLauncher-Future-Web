@@ -2,7 +2,7 @@
 import { inject, watch } from "vue";
 import type { FormFieldData } from "../FormEntry.vue";
 import { ColorData, type ColorType, getColorVar } from "../../../utils/css.ts";
-import type { Size } from "../../../utils/types.ts";
+import type { Size } from "../../../utils/utils.ts";
 
 withDefaults(
   defineProps<{
@@ -13,7 +13,7 @@ withDefaults(
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     icon: "fas fa-check",
     color: "primary",
     invalid: false,
@@ -110,6 +110,7 @@ if (formField) {
 }
 
 .mcsl-checkbox {
+  cursor: pointer;
   margin: 0;
   appearance: none;
   border: 1px solid var(--mcsl-border-color-base);

@@ -25,6 +25,13 @@ pub struct UserInput {
     pub permissions: Vec<String>,
 }
 
+#[derive(Serialize)]
+pub struct UserOutput {
+    pub id: u32,
+    pub name: String,
+    pub permissions: Vec<String>,
+}
+
 const USERS_FILE_NAME: &str = "users.json";
 
 lazy_static::lazy_static! {
@@ -232,10 +239,12 @@ impl User {
         let permission_regex = regex::Regex::new(
             r"^(([a-zA-Z-_]+|\*{1,2})\.)*([a-zA-Z-_]+|\*{1,2})$",
         )
-        .map_err(|_| HttpResponse::InternalServerError().json(FailedResponse {
-            status: "failed",
-            err: "internal-server-error",
-        }))?;
+        .map_err(|_| {
+            HttpResponse::InternalServerError().json(FailedResponse {
+                status: "failed",
+                err: "internal-server-error",
+            })
+        })?;
 
         if !permission_regex.is_match(permission) {
             return Ok(false);

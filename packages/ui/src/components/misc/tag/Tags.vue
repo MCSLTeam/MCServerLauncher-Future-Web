@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import type { Size } from "../../../utils/types.ts";
+import type { Size } from "../../../utils/utils.ts";
 
 withDefaults(
   defineProps<{
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
   },
 );
 </script>

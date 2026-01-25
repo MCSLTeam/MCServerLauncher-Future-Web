@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { computed } from "vue";
-import type { LoadingStatus, Size } from "../../utils/types.ts";
 import { getStatusIcon } from "../../utils/css.ts";
+import type { Size } from "../../utils/utils.ts";
+
+export type LoadingStatus = "loading" | "success" | "error" | "warning";
 
 const props = withDefaults(
   defineProps<{
@@ -15,7 +17,7 @@ const props = withDefaults(
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     variant: "line",
     progress: 0,
     status: "loading",
@@ -81,12 +83,12 @@ const icon = computed(() =>
 $vars: (
   "stroke-width": (
     "small": 0.25rem,
-    "middle": 0.5rem,
+    "medium": 0.5rem,
     "large": 0.75rem,
   ),
   "circle-size": (
     "small": 3rem,
-    "middle": 5rem,
+    "medium": 5rem,
     "large": 8rem,
   ),
 );
@@ -156,7 +158,8 @@ $size: var(--mcsl-progress-bar__size);
   gap: var(--mcsl-spacing-2xs);
 
   & > div {
-    width: 100%;
+    width: 0;
+    flex-grow: 1;
     height: $stroke-width;
     background: var(--mcsl-border-color-base);
     border-radius: var(--mcsl-border-radius-full);

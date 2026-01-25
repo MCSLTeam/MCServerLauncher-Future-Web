@@ -1,33 +1,17 @@
 /* ========== [ Minecraft ]========== */
-export type MCJEModCore =
-  | "fabric"
-  | "forge"
-  | "quilt"
-  | "neoforge"
-  | "legacy_fabric"
-  | "babric";
-export const MCJE_MOD_CORES: MCJEModCore[] = [
+export const MCJE_MOD_CORES = [
   "fabric",
   "forge",
   "quilt",
   "neoforge",
   "legacy_fabric",
-  "babric",
-];
+  "cleanroom",
+] as const;
+export type MCJEModCore = (typeof MCJE_MOD_CORES)[number];
 
-export type MCJEPluginCore =
-  | "sponge_vanilla"
-  | "craft_bukkit"
-  | "spigot"
-  | "paper"
-  | "leaves"
-  | "leaf"
-  | "folia"
-  | "pufferfish"
-  | "purpur";
-export const MCJE_PLUGIN_CORES: MCJEPluginCore[] = [
+export const MCJE_PLUGIN_CORES = [
   "sponge_vanilla",
-  "craft_bukkit",
+  "craftbukkit",
   "spigot",
   "paper",
   "leaves",
@@ -35,94 +19,63 @@ export const MCJE_PLUGIN_CORES: MCJEPluginCore[] = [
   "folia",
   "pufferfish",
   "purpur",
-];
+] as const;
+export type MCJEPluginCore = (typeof MCJE_PLUGIN_CORES)[number];
 
-export type MCJEHybridCore =
-  | "sponge_forge"
-  | "sponge_neoforge"
-  | "mohist"
-  | "youer"
-  | "thermos"
-  | "crucible"
-  | "taiyitist"
-  | "cat_server"
-  | "arclight"
-  | "banner";
-export const MCJE_HYBRID_CORES: MCJEHybridCore[] = [
+export const MCJE_HYBRID_CORES = [
   "sponge_forge",
-  "sponge_neoforge",
-  "mohist",
+  "sponge_neo",
+  "mohist", // TODO: 判断tenet
   "youer",
-  "thermos",
   "crucible",
   "taiyitist",
   "cat_server",
   "arclight",
-  "banner",
-];
+] as const;
+export type MCJEHybridCore = (typeof MCJE_HYBRID_CORES)[number];
 
-export type MCJEProxyCore =
-  | "bungeecord"
-  | "velocity"
-  | "waterfall"
-  | "viaversion"
-  | "geyser";
-export const MCJE_PROXY_CORES: MCJEProxyCore[] = [
+export const MCJE_PROXY_CORES = [
   "bungeecord",
   "velocity",
   "waterfall",
-  "viaversion",
+  "viaproxy",
   "geyser",
-];
+] as const;
+export type MCJEProxyCore = (typeof MCJE_PROXY_CORES)[number];
 
-export type MCJECore =
-  | "vanilla"
-  | MCJEModCore
-  | MCJEPluginCore
-  | MCJEHybridCore
-  | MCJEProxyCore;
-export const MCJE_CORES: MCJECore[] = [
+export const MCJE_CORES = [
   "vanilla",
   ...MCJE_MOD_CORES,
   ...MCJE_PLUGIN_CORES,
   ...MCJE_HYBRID_CORES,
   ...MCJE_PROXY_CORES,
-];
+] as const;
+export type MCJECore = (typeof MCJE_CORES)[number];
 
-export type MCBECore = "bedrock" | "cloudburst" | "nukkit" | "pocketmine";
-export const MCBE_CORES: MCBECore[] = [
+export const MCBE_CORES = [
   "bedrock",
   "cloudburst",
   "nukkit",
   "pocketmine",
-];
+] as const;
+export type MCBECore = (typeof MCBE_CORES)[number];
 
-export type MCCore = MCJECore | MCBECore;
-export const MC_CORES: MCCore[] = [...MCJE_CORES, ...MCBE_CORES];
+export const MC_CORES = [...MCJE_CORES, ...MCBE_CORES] as const;
+export type MCCore = (typeof MC_CORES)[number];
 
 /* ========== [ Terraria ]========== */
-export type TerrariaCore = "terraria" | "tshock" | "tdsm";
-export const TERRARIA_CORES: TerrariaCore[] = ["terraria", "tshock", "tdsm"];
-
-/* ========== [ Frp ]========== */
-export type FrpCore = "mefrp" | "openfrp" | "locyanfrp" | "mossfrp" | "frpc";
-export const FRP_CORES: FrpCore[] = [
-  "mefrp",
-  "openfrp",
-  "locyanfrp",
-  "mossfrp",
-  "frpc",
-];
+export const TERRARIA_CORES = ["terraria", "tshock"] as const;
+export type TerrariaCore = (typeof TERRARIA_CORES)[number];
 
 /* ========== [ 所有核心 ]========== */
-export type Core = MCCore | TerrariaCore | "cs2" | "palworld" | "unknown";
-export const CORES: Core[] = [
+export const CORES = [
   ...MC_CORES,
   ...TERRARIA_CORES,
-  "cs2",
-  "palworld",
-  "unknown",
-];
+  "frpc",
+  "jar",
+  "universal",
+] as const;
+export type Core = (typeof CORES)[number];
 
 /* ========== [ 一些函数 ]========== */
 export type MCLoaderType =
@@ -145,10 +98,11 @@ export function getMCLoaderType(core: MCCore): MCLoaderType {
   throw new Error("Unknown mc instance type");
 }
 
-export type GameType = "mc" | "terraria" | "cs2" | "palworld" | "unknown";
+export type GameType = "mc" | "terraria" | "frpc" | "unknown";
 
 export function getGame(core: Core): GameType {
-  if (core == "cs2" || core == "palworld" || core == "unknown") return core;
+  if (core == "frpc") return core;
+  if (core == "universal" || core == "jar") return "unknown";
 
   if (MC_CORES.includes(core as any)) return "mc";
   if (TERRARIA_CORES.includes(core as any)) return "terraria";

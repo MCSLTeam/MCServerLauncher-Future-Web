@@ -20,7 +20,7 @@ withDefaults(
 <template>
   <div
     :class="[
-      'mcsl-divider__varient-' + variant,
+      'mcsl-divider__variant-' + variant,
       'mcsl-divider__type-' + type,
       'mcsl-divider__text-' + textPos,
     ]"
@@ -81,15 +81,15 @@ withDefaults(
   border-radius: var(--mcsl-border-radius-full);
 }
 
-.mcsl-divider.mcsl-divider__varient-solid::before {
+.mcsl-divider.mcsl-divider__variant-solid::before {
   border-style: solid;
 }
 
-.mcsl-divider.mcsl-divider__varient-dashed::before {
+.mcsl-divider.mcsl-divider__variant-dashed::before {
   border-style: dashed;
 }
 
-.mcsl-divider.mcsl-divider__varient-dotted::before {
+.mcsl-divider.mcsl-divider__variant-dotted::before {
   border-style: dotted;
 }
 

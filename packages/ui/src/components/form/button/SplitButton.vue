@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { ColorType } from "../../../utils/css.ts";
-import type { Size } from "../../../utils/types.ts";
+import type { Size } from "../../../utils/utils.ts";
 import Button from "./Button.vue";
 import DropdownMenu from "../../overlay/DropdownMenu.vue";
 import type { MenuInfo } from "../../panel/Menu.vue";

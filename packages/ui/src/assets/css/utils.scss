@@ -1,7 +1,7 @@
 @use "sass:map";
 @use "sass:list";
 
-$sizes: ("small", "middle", "large");
+$sizes: ("small", "medium", "large");
 
 @function get-color-var($list) {
   @return var(--mcsl-color-#{list.nth($list, 1)}-#{list.nth($list, 2)});

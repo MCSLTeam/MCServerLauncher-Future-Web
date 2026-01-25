@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ProgressBar from "@repo/ui/src/components/progress/ProgressBar.vue";
 import { SimpleTask } from "../../utils/tasks.ts";
-import type { Size } from "@repo/ui/src/utils/types.ts";
+import type { Size } from "@repo/ui/src/utils/utils.ts";
 
 withDefaults(
   defineProps<{
