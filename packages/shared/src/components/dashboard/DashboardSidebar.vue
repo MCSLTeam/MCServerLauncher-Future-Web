@@ -3,7 +3,7 @@ import { useI18n } from "vue-i18n";
 import Divider from "@repo/ui/src/components/misc/Divider.vue";
 import Sidebar from "@repo/ui/src/components/navigation/Sidebar.vue";
 import {
-  getPlatform,
+  platform,
   version,
   versionCodename,
   windowButtonsExists,
@@ -19,7 +19,6 @@ const props = defineProps<{
 }>();
 
 const t = useI18n().t;
-const platform = getPlatform();
 const screenWidth = useScreenWidth();
 const sidebarCollapsed = computed(
   () => props.collapsed && !props.expanded && screenWidth.width != "xs",
@@ -48,11 +47,11 @@ const navigationInfo = useNavigation();
       }"
     >
       <img
-        src="../../assets/MCSL.png"
+        src="../../assets/img/MCSL.png"
         alt=""
         width="35"
         v-tooltip.right="
-          collapsed
+          sidebarCollapsed
             ? `$${t('shared.app.name.abbr')} ${t('shared.app.name.future')} ${t(`${platform}.app.name.suffix`)} (${versionCodename} v${version})`
             : undefined
         "
@@ -72,15 +71,15 @@ const navigationInfo = useNavigation();
     <div class="dashboard-sidebar__content-grow">
       <Sidebar
         :pages="navigationInfo.getItems('sidebarUpper').value"
-        :size="collapsed ? 'large' : 'medium'"
-        :collapsed="collapsed"
+        :size="sidebarCollapsed ? 'large' : 'medium'"
+        :collapsed="sidebarCollapsed"
       />
       <div class="dashboard-sidebar__content">
         <Divider spacing="md" />
         <Sidebar
           :pages="navigationInfo.getItems('sidebarDowner').value"
-          :size="collapsed ? 'large' : 'medium'"
-          :collapsed="collapsed"
+          :size="sidebarCollapsed ? 'large' : 'medium'"
+          :collapsed="sidebarCollapsed"
         />
       </div>
     </div>
@@ -175,16 +174,6 @@ $collapsed-width: utils.get-size-var("height", "large", SmallerContent.$vars);
   align-items: center;
   justify-content: space-between;
   gap: var(--mcsl-spacing-4xs);
-}
-
-.logo-web {
-  --suffix-color-1: var(--mcsl-color-sky);
-  --suffix-color-2: var(--mcsl-color-blue-600);
-}
-
-.logo-app {
-  --suffix-color-1: var(--mcsl-color-amber-400);
-  --suffix-color-2: var(--mcsl-color-red);
 }
 
 .dashboard-sidebar__content-grow {

@@ -42,7 +42,7 @@ export function animatedVisibilityExists(
         }
       : animationDuration;
 
-  let timeout: number = -1;
+  let timeout = -1;
   watch(visible, (value) => {
     clearTimeout(timeout);
     if (value) {

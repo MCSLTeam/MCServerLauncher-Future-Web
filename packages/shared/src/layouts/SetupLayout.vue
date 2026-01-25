@@ -2,7 +2,7 @@
 import FancyBackground from "@repo/ui/src/components/misc/FancyBackground.vue";
 import Panel from "@repo/ui/src/components/panel/Panel.vue";
 import { useI18n } from "vue-i18n";
-import { getPlatform } from "../index.ts";
+import { platform } from "../index.ts";
 
 const t = useI18n().t;
 </script>
@@ -10,10 +10,10 @@ const t = useI18n().t;
 <template>
   <FancyBackground>
     <div class="logo">
-      <img src="../assets/MCSL.png" alt="" width="98" />
+      <img src="../assets/img/MCSL.png" alt="" width="98" />
       <h1>
         {{ t("shared.app.name.abbr") }} {{ t("shared.app.name.future") }}
-        {{ t(`${getPlatform()}.app.name.suffix`) }}
+        {{ t(`${platform}.app.name.suffix`) }}
       </h1>
       <h2>{{ t("shared.app.desc") }}</h2>
     </div>

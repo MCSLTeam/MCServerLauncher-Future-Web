@@ -112,14 +112,8 @@ defineExpose({
 .mcsl-collapsable-panel.mcsl-collapsable-panel__collapsed {
   border-color: var(--mcsl-border-color-base);
 
-  & .mcsl-collapsable-panel__header {
-    & * {
-      color: var(--mcsl-text-color-secondary);
-    }
-
-    & > i {
-      transform: rotate(90deg);
-    }
+  & .mcsl-collapsable-panel__header > i {
+    transform: rotate(90deg);
   }
 }
 </style>

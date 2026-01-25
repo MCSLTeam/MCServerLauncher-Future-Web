@@ -47,7 +47,7 @@ function switchTab(index: number) {
 }
 
 watchEffect(() => {
-  const path = useRouter().currentRoute.value.path;
+  const path = router.currentRoute.value.path;
 
   activeTab.value = props.tabs.findIndex(
     (tab) => tab.link === path || tab.isSubpage?.(path),
@@ -58,7 +58,7 @@ let interval = -1;
 
 onMounted(() => {
   // 多刷新几遍（（（
-  interval = setInterval(updateBg, 50);
+  interval = window.setInterval(updateBg, 50);
   setTimeout(() => {
     clearInterval(interval);
   }, 1000);
@@ -161,7 +161,7 @@ defineExpose({
 }
 
 .mcsl-nav-tabs__btns > button {
-  z-index: 7;
+  z-index: 1;
   border: none;
   outline: 0 solid transparent;
   outline-offset: 1px;
@@ -200,7 +200,6 @@ defineExpose({
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 6;
   overflow: hidden;
 
   & > div {

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Panel from "@repo/ui/src/components/panel/Panel.vue";
 import { useI18n } from "vue-i18n";
-import { useScreenWidth } from "@repo/ui/src/utils/stores.ts";
 
 defineProps<{
   label: string;
@@ -14,7 +13,7 @@ const t = useI18n().t;
 <template>
   <Panel border>
     <div class="settings-item">
-      <div v-tooltip="useScreenWidth().isXsOrSm ? t(desc) : undefined">
+      <div>
         <h4>{{ t(label) }}</h4>
         <p>
           {{ t(desc) }}
@@ -32,13 +31,24 @@ const t = useI18n().t;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--mcsl-spacing-2xs);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 
   & > div:first-child {
-    width: calc(100% - 15rem);
+    width: 0;
+    flex-grow: 1;
+
     & > p {
+      margin-top: var(--mcsl-spacing-4xs);
       color: var(--mcsl-text-color-gray);
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: var(--mcsl-font-size-sm);
+    }
+
+    @media (max-width: 768px) {
+      width: 100%;
     }
   }
 
@@ -46,6 +56,9 @@ const t = useI18n().t;
     display: flex;
     justify-content: flex-end;
     width: 15rem;
+    @media (max-width: 768px) {
+      width: 100%;
+    }
   }
 }
 </style>

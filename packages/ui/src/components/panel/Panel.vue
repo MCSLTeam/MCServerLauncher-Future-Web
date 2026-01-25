@@ -90,7 +90,7 @@ onMounted(() => {
     }
 
     & > .mcsl-panel__body-wrapper > .mcsl-divider {
-      padding: calc($spacing / 2) 0;
+      padding: calc($spacing / 1.5) 0;
     }
 
     &.mcsl-panel__need-divider > .mcsl-panel__body-wrapper > .mcsl-panel__body {

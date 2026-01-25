@@ -456,7 +456,7 @@ function buildContextMenu(instance: any) {
             </template>
             <div class="instances__instance-info">
               <!-- TODO: 图标 -->
-              <img src="../assets/MCSL.png" alt="" />
+              <img src="../assets/img/MCSL.png" alt="" />
               <div>
                 <h3 v-html="highlightText(instance.name, search)" />
                 <p>
@@ -510,6 +510,7 @@ function buildContextMenu(instance: any) {
 }
 
 .instances__content {
+  height: 0;
   flex-grow: 1;
   overflow: hidden auto;
 }

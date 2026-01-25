@@ -47,6 +47,16 @@ body,
   border-radius: var(--mcsl-border-radius-lg);
 }
 
+.web {
+  --suffix-color-1: var(--mcsl-color-sky);
+  --suffix-color-2: var(--mcsl-color-blue-600);
+}
+
+.app {
+  --suffix-color-1: var(--mcsl-color-amber-400);
+  --suffix-color-2: var(--mcsl-color-red);
+}
+
 .font-mono {
   font-family: var(--font-mono);
 }

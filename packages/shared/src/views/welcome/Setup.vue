@@ -10,7 +10,7 @@ import {
   type Locale,
   type Theme,
   useLocale,
-  useTheme,
+  useAppearance,
 } from "@repo/ui/src/utils/stores.ts";
 import { computed } from "vue";
 import * as yup from "yup";
@@ -25,10 +25,10 @@ const t = useI18n().t;
 
 const theme = computed({
   get() {
-    return useTheme().theme;
+    return useAppearance().theme;
   },
   set(theme: string) {
-    useTheme().change(theme as Theme, "viewTransition");
+    useAppearance().changeTheme(theme as Theme, "viewTransition");
   },
 });
 const themes = computed(() => [

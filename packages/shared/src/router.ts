@@ -65,6 +65,16 @@ const router = createRouter({
           component: async () =>
             await import("./views/settings/Appearance.vue"),
         },
+        {
+          path: "/settings/instance",
+          name: "Settings - Instance",
+          component: async () => await import("./views/settings/Instance.vue"),
+        },
+        {
+          path: "/settings/about",
+          name: "Settings - About",
+          component: async () => await import("./views/settings/About.vue"),
+        },
       ],
     },
     {

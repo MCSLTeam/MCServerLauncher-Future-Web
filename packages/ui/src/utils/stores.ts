@@ -8,14 +8,20 @@ import {
 import { computed, ref, watch } from "vue";
 import { type Composer, type I18nOptions } from "vue-i18n";
 
-/* ========== [ 主题 ]========== */
+/* ========== [ 外观 ]========== */
 export type Theme = "system" | "light" | "dark";
 export type ThemeTransition = "viewTransition" | "fade" | "none";
+export type Rendering = "advanced" | "basic" | "fast";
 
-export const useTheme = defineStore("theme", () => {
+export const useAppearance = defineStore("appearance", () => {
   const themeStorage = useLocalStorage<Theme>("theme", "system");
+  const renderingStorage = useLocalStorage<Rendering>(
+    "rendering",
+    useMediaQuery("(prefers-reduced-motion: reduce)").value
+      ? "basic"
+      : "advanced",
+  );
   const actualTheme = computed(() => getActualTheme(themeStorage.value));
-  let prevClassName = "none";
 
   function getActualTheme(theme: Theme) {
     if (theme === "system")
@@ -23,27 +29,34 @@ export const useTheme = defineStore("theme", () => {
     else return theme;
   }
 
-  function getClassName(theme: Theme): string {
-    return getActualTheme(theme);
-  }
-
-  function change(
-    theme: Theme,
-    transition: ThemeTransition = "viewTransition",
-  ): void {
+  let prevActualTheme = "none";
+  function changeTheme(theme: Theme, transition?: ThemeTransition): void {
     themeStorage.value = theme;
-    const currClassName = getClassName(theme);
-    if (currClassName == prevClassName) return;
+    const currActualTheme = getActualTheme(theme);
+    if (currActualTheme == prevActualTheme) return;
 
     const set = () => {
-      document.documentElement.classList.remove(prevClassName);
-      document.documentElement.classList.add(currClassName);
-      prevClassName = currClassName;
+      document.documentElement.classList.remove(prevActualTheme);
+      document.documentElement.classList.add(currActualTheme);
+      prevActualTheme = currActualTheme;
     };
 
     // 添加过渡样式
     const style = document.createElement("style");
     document.head.appendChild(style);
+
+    if (!transition)
+      switch (renderingStorage.value) {
+        case "advanced":
+          transition = "viewTransition";
+          break;
+        case "basic":
+          transition = "fade";
+          break;
+        case "fast":
+          transition = "none";
+          break;
+      }
 
     switch (transition) {
       case "none":
@@ -68,7 +81,7 @@ export const useTheme = defineStore("theme", () => {
         // 扩散动画
         if (!document.startViewTransition) {
           // 浏览器不支持 ViewTransition 就使用渐变
-          change(theme, "fade");
+          changeTheme(theme, "fade");
           return;
         }
         (() => {
@@ -96,13 +109,15 @@ export const useTheme = defineStore("theme", () => {
             document.documentElement.animate(
               {
                 clipPath:
-                  currClassName == "dark" ? clipPath : [...clipPath].reverse(),
+                  currActualTheme == "dark"
+                    ? clipPath
+                    : [...clipPath].reverse(),
               },
               {
                 duration: 500,
                 easing: "ease-in-out",
                 pseudoElement:
-                  currClassName == "dark"
+                  currActualTheme == "dark"
                     ? "::view-transition-new(root)"
                     : "::view-transition-old(root)",
               },
@@ -117,18 +132,30 @@ export const useTheme = defineStore("theme", () => {
   }
 
   function load() {
-    change(themeStorage.value, "none");
+    changeTheme(themeStorage.value, "none");
+    setRendering(renderingStorage.value);
   }
 
   // 监听系统主题变更
   watch(usePreferredColorScheme(), () => {
-    change(themeStorage.value, "fade");
+    changeTheme(themeStorage.value, "fade");
   });
+
+  let prevRendering = "none";
+  function setRendering(rendering: Rendering) {
+    renderingStorage.value = rendering;
+    if (rendering == prevRendering) return;
+    document.documentElement.classList.remove(`rendering-${prevRendering}`);
+    document.documentElement.classList.add(`rendering-${rendering}`);
+    prevRendering = rendering;
+  }
 
   return {
     load,
-    change,
+    changeTheme,
+    setRendering,
     actualTheme,
+    rendering: computed(() => renderingStorage.value),
     theme: computed(() => themeStorage.value),
   };
 });

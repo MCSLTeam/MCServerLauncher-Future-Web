@@ -14,14 +14,14 @@ usePageData().set({
 const t = useI18n().t;
 
 const countdown = ref(5);
-let interval: any;
+let interval = -1;
 
 function goHome() {
   router.push("/");
 }
 
 onMounted(() => {
-  interval = setInterval(() => {
+  interval = window.setInterval(() => {
     countdown.value--;
     if (countdown.value <= 0) {
       clearInterval(interval);
