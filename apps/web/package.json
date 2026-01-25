@@ -20,7 +20,7 @@
     "@repo/ui": "workspace:*",
     "@vueuse/core": "^13.7.0",
     "axios": "^1.13.2",
-    "eslint": "^9.33.0",
+    "eslint": "^9.39.2",
     "pinia": "^3.0.3",
     "vue": "^3.5.27",
     "vue-i18n": "^11.1.11",
