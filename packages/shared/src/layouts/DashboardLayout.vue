@@ -20,7 +20,7 @@ const sidebarCollapsed = computed(
 );
 const sidebarExpanded = ref(false);
 const { exist: sidebarBg } = animatedVisibilityExists(sidebarExpanded, 300);
-const navbarItems = useNavigation().navbarItems;
+const navbarItems = useNavigation().getItems("navbar");
 
 router.afterEach(() => {
   sidebarExpanded.value = false;

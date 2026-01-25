@@ -53,7 +53,7 @@ export const configuredXss = new xss.FilterXSS({
           allowedParameters: [/id=\d{18,19}/],
         },
         {
-          url: /^https?:\/\/player.bilibili.com\/player.html/,
+          url: /^https?:\/\/player\.bilibili\.com\/player\.html/,
           allowedParameters: [/bvid=BV[a-zA-Z0-9]{10}/],
         },
       ];

@@ -27,8 +27,8 @@ const props = withDefaults(defineProps<MessageProps>(), {
   size: "medium",
   color: "primary",
   variant: "default",
-  inAnim: "stretchInDown",
-  outAnim: "stretchOutUp",
+  inAnim: "0.2s ease-in-out both stretchInDown",
+  outAnim: "0.2s ease-in-out both stretchOutUp",
   shadow: false,
   closeable: false,
 });
@@ -81,7 +81,7 @@ defineExpose({
       '--mcsl-message__box-shadow': isSurface
         ? 'var(--mcsl-box-shadow-base)'
         : getShadow(color, 'base'),
-      '--mcsl-message__anim-in': inAnim,
+      '--mcsl-message__anim-in': inAnim + ' 0.2s',
       '--mcsl-message__anim-out': outAnim,
       '--mcsl-message__spacing': variant == 'text' ? '0' : undefined,
     }"
@@ -145,13 +145,13 @@ defineExpose({
   width: 100%;
   transform: translate(0);
   animation:
-    0.2s ease-in-out both var(--mcsl-message__anim-out),
+    var(--mcsl-message__anim-out),
     0.5s 0.2s cubic-bezier(0, 1, 0, 1) collapseOutVertical;
 
   &.mcsl-message__visible {
     animation:
       0.8s ease-in-out collapseInVertical,
-      0.2s 0.2s ease-in-out both var(--mcsl-message__anim-in);
+      var(--mcsl-message__anim-in);
   }
 }
 

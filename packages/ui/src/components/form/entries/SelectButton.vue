@@ -10,6 +10,7 @@ const props = withDefaults(
     options: SelectionItem[];
     nullable?: boolean;
     multiple?: boolean;
+    disabled?: boolean;
     color?: ColorType;
     invalid?: boolean;
     size?: Size;
@@ -17,8 +18,10 @@ const props = withDefaults(
   {
     size: "medium",
     color: "primary",
-    invalid: false,
     nullable: false,
+    multiple: false,
+    disabled: false,
+    invalid: false,
   },
 );
 
@@ -87,10 +90,15 @@ function isChecked(value: any) {
 </script>
 
 <template>
-  <div class="mcsl-select-button" :class="[`mcsl-size-${size}`]">
+  <div
+    class="mcsl-select-button"
+    :class="[`mcsl-size-${size}`]"
+    :aria-invalid="invalid"
+  >
     <button
-      v-for="item in props.options"
+      v-for="item in options"
       :key="item.value"
+      :disabled="disabled"
       :class="{ 'mcsl-select-button__checked': isChecked(item.value) }"
       @click="selectValue(item.value)"
     >
@@ -120,52 +128,49 @@ function isChecked(value: any) {
 
 .mcsl-select-button {
   display: flex;
+  border: 1px solid transparent;
   background: var(--mcsl-bg-color-main);
-
-  & > button {
-    cursor: pointer;
-    border: none;
-    background: none;
-    outline: 0 solid transparent;
-    outline-offset: 2px;
-    transition: 0.2s ease-in-out;
-
-    &:focus-visible {
-      outline: 3px solid var(--mcsl-color-help);
-    }
-
-    &:hover {
-      background: var(--mcsl-bg-color-overlay);
-    }
-
-    .light & {
-      --mcsl-select-button__background: var(--mcsl-bg-color-overlay);
-    }
-
-    .dark & {
-      --mcsl-select-button__background: var(--mcsl-border-color-light);
-    }
-
-    &.mcsl-select-button__checked {
-      background: var(--mcsl-select-button__background);
-      box-shadow: var(--mcsl-box-shadow-light);
-    }
-
-    &.mcsl-select-button__checked:hover {
-      box-shadow: var(--mcsl-box-shadow-base);
-    }
-  }
 }
 
-.mcsl-select-button:disabled {
-  border-color: var(--mcsl-border-color-dark);
-  cursor: not-allowed;
-  background: var(--mcsl-border-color-base);
-  box-shadow: none;
+.mcsl-select-button > button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  outline: 0 solid transparent;
+  outline-offset: 2px;
+  transition: 0.2s ease-in-out;
 
-  &:checked {
-    border-color: var(--mcsl-border-color-dark);
-    background: var(--mcsl-border-color-dark);
+  &:focus-visible {
+    outline: 3px solid var(--mcsl-color-help);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--mcsl-bg-color-overlay);
+  }
+
+  .light & {
+    --mcsl-select-button__background: var(--mcsl-bg-color-overlay);
+  }
+
+  .dark & {
+    --mcsl-select-button__background: var(--mcsl-border-color-light);
+  }
+
+  &.mcsl-select-button__checked {
+    background: var(--mcsl-select-button__background);
+    box-shadow: var(--mcsl-box-shadow-light);
+  }
+
+  &.mcsl-select-button__checked:disabled {
+    background: var(--mcsl-border-color-base);
+  }
+
+  &.mcsl-select-button__checked:hover:not(:disabled) {
+    box-shadow: var(--mcsl-box-shadow-base);
   }
 }
 

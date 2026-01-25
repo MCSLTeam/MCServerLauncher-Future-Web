@@ -1,4 +1,4 @@
-use crate::user::{get_user_by_id, get_users, User, UserInput};
+use crate::user::{get_user_by_id, get_users, User, UserInput, UserOutput};
 use crate::utils::{verify_token, TokenPair};
 use crate::{config::WebConfig, user, utils};
 use actix_web::http::header::HeaderMap;
@@ -53,7 +53,10 @@ pub fn get_user_from_headers_nullable(config: &WebConfig, headers: &HeaderMap) -
     }
 }
 
-pub fn get_user_from_headers(config: &WebConfig, headers: &HeaderMap) -> Result<User, HttpResponse> {
+pub fn get_user_from_headers(
+    config: &WebConfig,
+    headers: &HeaderMap,
+) -> Result<User, HttpResponse> {
     match get_user_from_headers_nullable(config, headers) {
         Some(user) => Ok(user),
         None => Err(HttpResponse::Unauthorized().json(FailedResponse {
@@ -63,16 +66,13 @@ pub fn get_user_from_headers(config: &WebConfig, headers: &HeaderMap) -> Result<
     }
 }
 
-pub fn verify_user_permission<F>(
+pub fn verify_user_permission(
     config: &WebConfig,
     http_request: &HttpRequest,
-    permission: F,
-) -> Result<User, HttpResponse>
-where
-    F: Fn(&User) -> String,
-{
+    permission: String,
+) -> Result<User, HttpResponse> {
     let user = get_user_from_headers(&config, http_request.headers())?;
-    if user.verify_permission(&permission(&user)).unwrap_or(false) {
+    if user.verify_permission(&permission).unwrap_or(false) {
         return Err(HttpResponse::Forbidden().json(FailedResponse {
             status: "failed",
             err: "permission-denied",
@@ -167,9 +167,7 @@ pub async fn api_user_create(
     config: web::Data<WebConfig>,
     http_request: HttpRequest,
 ) -> impl Responder {
-    match verify_user_permission(&config, &http_request, |_| {
-        "mcsl.web.user.create".to_string()
-    }) {
+    match verify_user_permission(&config, &http_request, "mcsl.web.user.create".to_string()) {
         Ok(_) => match user::add_user(data.into_inner()) {
             Ok(_) => HttpResponse::Ok().json(SuccessResponse {
                 status: "success",
@@ -188,9 +186,11 @@ pub async fn api_user_update(
     config: web::Data<WebConfig>,
     http_request: HttpRequest,
 ) -> impl Responder {
-    match verify_user_permission(&config, &http_request, |user| {
-        format!("mcsl.web.user.{}.change", user.id)
-    }) {
+    match verify_user_permission(
+        &config,
+        &http_request,
+        format!("mcsl.web.user.{}.change", id),
+    ) {
         Ok(_) => match user::update_user(*id, data.into_inner()) {
             Ok(_) => HttpResponse::Ok().json(SuccessResponse {
                 status: "success",
@@ -208,9 +208,11 @@ pub async fn api_user_delete(
     config: web::Data<WebConfig>,
     http_request: HttpRequest,
 ) -> impl Responder {
-    match verify_user_permission(&config, &http_request, |user| {
-        format!("mcsl.web.user.{}.delete", user.id)
-    }) {
+    match verify_user_permission(
+        &config,
+        &http_request,
+        format!("mcsl.web.user.{}.delete", id),
+    ) {
         Ok(_) => match user::delete_user(*id) {
             Ok(_) => HttpResponse::Ok().json(SuccessResponse {
                 status: "success",
@@ -257,7 +259,11 @@ pub async fn api_user_get_self(
     match get_user_from_headers(&config, http_request.headers()) {
         Ok(user) => HttpResponse::Ok().json(SuccessResponse {
             status: "success",
-            data: user,
+            data: UserOutput {
+                id: user.id,
+                name: user.name.clone(),
+                permissions: user.permissions.clone(),
+            },
         }),
         Err(res) => res,
     }
