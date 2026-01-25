@@ -6,18 +6,18 @@ $vars: map.merge(
   (
     "box-shadow": (
       "small": var(--mcsl-box-shadow-light),
-      "middle": var(--mcsl-box-shadow-base),
+      "medium": var(--mcsl-box-shadow-base),
       "large": var(--mcsl-box-shadow-dark),
     ),
     "border-radius": (
       "small": var(--mcsl-border-radius-sm),
-      "middle": var(--mcsl-border-radius-md),
+      "medium": var(--mcsl-border-radius-md),
       "large": var(--mcsl-border-radius-lg),
     ),
     "spacing": (
-      "small": var(--mcsl-spacing-md),
-      "middle": var(--mcsl-spacing-lg),
-      "large": var(--mcsl-spacing-xl),
+      "small": var(--mcsl-spacing-sm),
+      "medium": var(--mcsl-spacing-md),
+      "large": var(--mcsl-spacing-lg),
     ),
   )
 );

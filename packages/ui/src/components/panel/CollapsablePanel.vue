@@ -1,17 +1,18 @@
 <script lang="ts" setup>
 import Panel from "./Panel.vue";
-import type { Size } from "../../utils/types.ts";
+import type { Size } from "../../utils/utils.ts";
 
 defineProps<{
+  disabled?: boolean;
   header?: string;
   headerDivider?: boolean;
-  disabled?: boolean;
   shadow?: "always" | "hover" | "never";
   size?: Size;
   headerClass?: string;
   headerStyle?: string;
   bodyClass?: string;
   bodyStyle?: string;
+  scrollable?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -20,7 +21,7 @@ const emit = defineEmits<{
 }>();
 
 const collapsed = defineModel<boolean>("collapsed", {
-  default: false,
+  default: true,
 });
 
 function collapse() {
@@ -59,7 +60,8 @@ defineExpose({
     :header="header"
     :header-class="headerClass"
     :header-style="headerStyle"
-    :headerDivider="headerDivider"
+    :header-divider="headerDivider"
+    :scrollable="scrollable"
     :shadow="shadow"
     :size="size"
     class="mcsl-collapsable-panel"
@@ -79,7 +81,7 @@ defineExpose({
             <h2>{{ header }}</h2>
           </slot>
         </div>
-        <i class="fa fa-angle-down" />
+        <i class="fa fa-angle-up" />
       </div>
     </template>
     <template #contextmenu>
@@ -110,14 +112,8 @@ defineExpose({
 .mcsl-collapsable-panel.mcsl-collapsable-panel__collapsed {
   border-color: var(--mcsl-border-color-base);
 
-  & .mcsl-collapsable-panel__header {
-    & * {
-      color: var(--mcsl-text-color-secondary);
-    }
-
-    & > i {
-      transform: rotate(90deg);
-    }
+  & .mcsl-collapsable-panel__header > i {
+    transform: rotate(-180deg);
   }
 }
 </style>
@@ -141,7 +137,7 @@ defineExpose({
   }
 
   & > .mcsl-panel__body-wrapper {
-    animation: 0.5s cubic-bezier(0, 1, 0, 1) both collapseOutVertical;
+    animation: 0.3s cubic-bezier(0, 1, 0, 1) both collapseOutVertical;
   }
 }
 

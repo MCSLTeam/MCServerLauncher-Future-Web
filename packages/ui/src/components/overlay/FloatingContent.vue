@@ -8,7 +8,7 @@ import {
   ref,
 } from "vue";
 import { animatedVisibilityExists } from "../../utils/internal.ts";
-import type { PosInfo } from "../../utils/util.ts";
+import type { PosInfo } from "../../utils/utils.ts";
 
 defineOptions({
   inheritAttrs: false,
@@ -21,7 +21,7 @@ const props = withDefaults(
       openY: number,
       elemX: Ref<number>,
       elemY: Ref<number>,
-      elemPos: ComputedRef<PosInfo>,
+      elemRect: ComputedRef<PosInfo>,
     ) => void;
     transition?: boolean;
     inAnim?: string;
@@ -86,11 +86,12 @@ function close() {
 }
 
 function clickedOutside(event: MouseEvent) {
+  const rect = wrapperEl.value?.getBoundingClientRect();
   return (
-    event.clientX < posInfo.value.x ||
-    event.clientX > posInfo.value.x + posInfo.value.width ||
-    event.clientY < posInfo.value.y ||
-    event.clientY > posInfo.value.y + posInfo.value.height
+    event.clientX < rect.x ||
+    event.clientX > rect.x + rect.width ||
+    event.clientY < rect.y ||
+    event.clientY > rect.y + rect.height
   );
 }
 

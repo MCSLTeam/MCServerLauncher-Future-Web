@@ -1,0 +1,102 @@
+<script setup lang="ts">
+import { useI18n } from "vue-i18n";
+import FancyBackground from "@repo/ui/src/components/misc/FancyBackground.vue";
+import { platform } from "../../index.ts";
+import { onMounted, ref } from "vue";
+
+const t = useI18n().t;
+const exists = ref(true);
+
+onMounted(() => {
+  setTimeout(() => (exists.value = false), 2600);
+});
+</script>
+
+<template>
+  <div class="welcome-overlay" v-if="exists">
+    <FancyBackground>
+      <div class="welcome-overlay__logo">
+        <img src="../../assets/img/MCSL.png" alt="" width="98" />
+        <div>
+          <h1>
+            {{ t("shared.app.name.abbr") }} {{ t("shared.app.name.future") }}
+            {{ t(`${platform}.app.name.suffix`) }}
+          </h1>
+          <h2>{{ t("shared.app.desc") }}</h2>
+        </div>
+      </div>
+    </FancyBackground>
+  </div>
+</template>
+
+<style scoped lang="scss">
+.welcome-overlay {
+  z-index: 1000;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: var(--mcsl-bg-color-main);
+  animation: 0.5s ease-in-out 2s both fadeOut;
+}
+
+.welcome-overlay__logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mcsl-spacing-xs);
+
+  & > img {
+    width: 7rem;
+    animation: 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.5s both zoomIn;
+  }
+
+  & > div {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: var(--mcsl-spacing-2xs);
+
+    & > h1 {
+      color: transparent;
+      background: linear-gradient(
+        45deg,
+        var(--mcsl-color-green),
+        var(--mcsl-color-blue)
+      );
+      background-clip: text;
+      text-wrap: nowrap;
+    }
+
+    & > h2 {
+      color: var(--mcsl-text-color-gray);
+      font-size: var(--mcsl-font-size-xl);
+      font-weight: var(--mcsl-font-weight-base);
+      text-wrap: nowrap;
+    }
+
+    @media (min-width: 769px) {
+      overflow: hidden;
+      height: 100%;
+      max-width: 0;
+      animation: 0.75s ease-in-out 0.95s both collapseInHorizontal;
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    & > div {
+      align-items: center;
+
+      & > h1 {
+        animation: 0.5s ease-in-out 0.8s both fadeInUp;
+      }
+
+      & > h2 {
+        animation: 0.5s ease-in-out 1s both fadeInUp;
+      }
+    }
+  }
+}
+</style>

@@ -12,14 +12,19 @@
     "frontend:preview": "rsbuild preview",
     "lint": "eslint; prettier --check .; cargo lint",
     "fix": "eslint --fix;prettier --write --list-different .; cargo fix",
-    "test": "tsc --noEmit && cargo test"
+    "test": "vue-tsc --noEmit && cargo test"
   },
   "dependencies": {
     "@repo/configs": "workspace:*",
     "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",
+    "@vueuse/core": "^13.7.0",
+    "axios": "^1.13.2",
     "eslint": "^9.33.0",
+    "pinia": "^3.0.3",
     "vue": "^3.5.18",
+    "vue-i18n": "^11.1.11",
+    "vue-router": "^4.5.1",
     "yup": "^1.7.0"
   },
   "devDependencies": {

@@ -25,3 +25,6 @@ dist-ssr
 
 # Cargo
 /target
+
+# MCSL
+mcsl-web

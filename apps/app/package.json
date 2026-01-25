@@ -11,14 +11,15 @@
     "frontend:build": "vue-tsc --noEmit && rsbuild build",
     "frontend:preview": "rsbuild preview",
     "lint": "eslint; prettier --check .",
-    "fix": "eslint --fix;prettier --write --list-different .",
-    "test": "tsc --noEmit"
+    "fix": "eslint --fix; prettier --write --list-different .",
+    "test": "vue-tsc --noEmit"
   },
   "dependencies": {
     "@repo/configs": "workspace:*",
     "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",
     "@tauri-apps/api": "^2.8.0",
+    "@tauri-apps/plugin-notification": "~2.3.3",
     "@tauri-apps/plugin-opener": "^2.4.0",
     "@tauri-apps/plugin-os": "~2.3.2",
     "@tauri-apps/plugin-process": "~2.3.1",

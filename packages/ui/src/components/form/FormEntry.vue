@@ -2,7 +2,8 @@
 import { inject, provide, ref, watch } from "vue";
 import type { FormFieldInstance, FormInstance } from "../../utils/form.ts";
 import Message from "../panel/Message.vue";
-import type { Size } from "../../utils/types.ts";
+import type { Size } from "../../utils/utils.ts";
+import type { CSSSize } from "../../utils/css.ts";
 
 export type FormFieldData = {
   id: string;
@@ -15,14 +16,18 @@ export type FormFieldData = {
 const props = withDefaults(
   defineProps<{
     name: string;
-    width?: number | "fit";
+    width?: string;
     labelPos?: "left" | "right" | "top";
+    entryPos?: "left" | "right" | "center" | "full";
+    gap?: CSSSize;
     size?: Size;
   }>(),
   {
-    size: "middle",
-    width: 100,
+    size: "medium",
+    width: "100%",
     labelPos: "left",
+    entryPos: "right",
+    gap: "xs",
   },
 );
 
@@ -108,16 +113,16 @@ provide("mcsl-form-field", {
     :class="[
       `mcsl-size-${size}`,
       `mcsl-form-entry__label-${labelPos}`,
-      ...(width == 'fit' ? ['mcsl-form-entry__width-fit'] : []),
+      `mcsl-form-entry__entry-${entryPos}`,
     ]"
-    :style="{
-      width: width != 'fit' ? `${width}%` : undefined,
-    }"
+    :style="{ width }"
     class="mcsl-form-entry"
   >
-    <div>
+    <div :style="{ gap: `var(--mcsl-spacing-${gap})` }">
       <label v-if="field.label" :for="id">{{ field.label }}</label>
-      <slot />
+      <div>
+        <slot />
+      </div>
     </div>
     <Message :visible="field.error.value != null" color="danger" variant="text">
       {{ errMsg }}
@@ -133,7 +138,10 @@ provide("mcsl-form-field", {
 
   & > div {
     display: flex;
-    gap: var(--mcsl-spacing-4xs);
+
+    & > label {
+      text-wrap: nowrap;
+    }
   }
 }
 
@@ -143,6 +151,11 @@ provide("mcsl-form-field", {
 
 .mcsl-form-entry__label-top > div {
   flex-direction: column;
+}
+
+.mcsl-form-entry > div > div {
+  flex-grow: 1;
+  display: flex;
 }
 
 .mcsl-form-entry__label-top,
@@ -156,13 +169,38 @@ provide("mcsl-form-field", {
   order: 2;
 }
 
+.mcsl-form-entry__entry-center > div > div {
+  justify-content: center;
+}
+
+.mcsl-form-entry__entry-full > div > div {
+  justify-content: stretch;
+}
+
+.mcsl-form-entry__entry-left > div > div {
+  justify-content: flex-start;
+}
+
+.mcsl-form-entry__entry-right > div > div {
+  justify-content: flex-end;
+}
+
 .mcsl-form-entry__label-left,
 .mcsl-form-entry__label-right {
   & > div {
     align-items: center;
-    & > label {
-      width: var(--mcsl-form__label-width, auto);
-    }
+  }
+}
+
+.mcsl-form-entry__label-left {
+  & > div > label {
+    width: var(--mcsl-form__label-width-left, auto);
+  }
+}
+
+.mcsl-form-entry__label-right {
+  & > div > label {
+    width: var(--mcsl-form__label-width-right, auto);
   }
 }
 </style>

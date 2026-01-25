@@ -1,4 +1,4 @@
-export type NodeType = "mcsl-daemon"; // | "mcsm" | "vanilla-ws" | "vanilla-rcon";
+export type NodeType = "mcsl-daemon"; // | "vanilla-ws" | "vanilla-rcon";
 
 export type NodeStatus = "online" | "offline" | "connecting" | "reconnecting";
 

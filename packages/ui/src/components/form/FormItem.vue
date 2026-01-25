@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Size } from "../../utils/types.ts";
+import type { Size } from "../../utils/utils.ts";
 import FormEntry from "./FormEntry.vue";
 import { createForm } from "../../utils/form.ts";
 import * as yup from "yup";
@@ -8,8 +8,9 @@ import { computed, type ComputedRef, provide, watch } from "vue";
 const props = defineProps<{
   schema?: yup.Schema;
   validationTrigger?: "input" | "blur";
-  width?: number | "fit";
+  width?: string;
   labelPos?: "left" | "right" | "top";
+  entryPos?: "left" | "right" | "center" | "full";
   size?: Size;
 }>();
 
@@ -33,7 +34,7 @@ const model = defineModel<any>({
 
 const form = createForm(
   {
-    data: model.value,
+    value: model.value,
   },
   yup.object({
     value: props.schema ?? yup.mixed(),
@@ -69,7 +70,9 @@ defineExpose({
 
 <template>
   <FormEntry
+    :width="width"
     :label-pos="labelPos"
+    :entry-pos="entryPos"
     :size="size"
     name="value"
     @blur="$emit('blur', data, $event)"

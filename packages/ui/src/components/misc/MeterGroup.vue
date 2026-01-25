@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { type Color, ColorData, getColorVar } from "../../utils/css.ts";
-import type { Size } from "../../utils/types.ts";
+import type { Size } from "../../utils/utils.ts";
 
 export type MeterItem = {
   label: string;
@@ -24,14 +24,14 @@ const props = withDefaults(
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
   },
 );
 
-const i18n = useI18n();
+const t = useI18n().t;
 
 function getLabel(item: MeterItem) {
-  return i18n.t("ui.meter-group.label", {
+  return t("ui.meter-group.label", {
     label: item.label,
     percentage: ((item.length / props.meter.length) * 100).toString(),
   });
@@ -50,7 +50,7 @@ const actualValues = computed(() => {
     ...(meter.total && meter.total > sum
       ? [
           meter.unallocated ?? {
-            label: i18n.t("ui.meter-group.unallocated"),
+            label: t("ui.meter-group.unallocated"),
             length: meter.total - sum,
             type: new ColorData("surface", "light"),
           },
@@ -95,7 +95,7 @@ const actualValues = computed(() => {
 $vars: (
   "stroke-width": (
     "small": 0.4rem,
-    "middle": 0.6rem,
+    "medium": 0.6rem,
     "large": 0.75rem,
   ),
 );

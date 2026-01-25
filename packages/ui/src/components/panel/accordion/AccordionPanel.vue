@@ -1,18 +1,20 @@
 <script lang="ts" setup>
 import CollapsablePanel from "../CollapsablePanel.vue";
-import type { Size } from "../../../utils/types.ts";
+import type { Size } from "../../../utils/utils.ts";
 import { inject } from "vue";
 
 withDefaults(
   defineProps<{
     name: string;
-    header?: string;
     disabled?: boolean;
+    header?: string;
+    headerDivider?: boolean;
     size?: Size;
     headerClass?: string;
     headerStyle?: string;
     bodyClass?: string;
     bodyStyle?: string;
+    scrollable?: boolean;
   }>(),
   {
     disabled: false,
@@ -36,7 +38,8 @@ defineEmits<{
     :header="header"
     :header-class="headerClass"
     :header-style="headerStyle"
-    :headerDivider="false"
+    :header-divider="false"
+    :scrollable="scrollable"
     class="mcsl-accordion-panel"
     shadow="never"
     @collapse="

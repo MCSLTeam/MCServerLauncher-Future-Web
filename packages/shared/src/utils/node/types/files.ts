@@ -11,16 +11,15 @@ interface BaseInfo {
   type: FileType;
   created: string; // 时间均为ISO-8601
   modified: string;
+  permission?: string; // 仅在 Unix-like 系统中存在，数字权限，如 755
 }
 
-export interface FileInfo extends BaseInfo {
+export interface FileData extends BaseInfo {
   type: "file";
   size: bigint;
-  permission: string;
-  readonly?: boolean;
 }
 
-export interface DirectoryInfo extends BaseInfo {
+export interface DirectoryData extends BaseInfo {
   type: "directory";
   hidden?: boolean;
   link?: string; // 符号链接目标路径

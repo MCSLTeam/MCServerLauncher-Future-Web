@@ -7,9 +7,10 @@
 
 :root {
   --font-sans:
-    "MiSans VF", Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen,
-    Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  --font-minecraft: "Minecraft", "GNU Unifont", sans-serif;
+    "MiSans VF", "PingFang SC", Inter, -apple-system, BlinkMacSystemFont,
+    Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans,
+    Helvetica Neue, sans-serif;
+  --font-minecraft: "Minecraft", "GNU Unifont", var(--font-sans);
   --font-mono:
     ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono,
     monospace;
@@ -34,6 +35,7 @@ body,
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  overflow: hidden;
 }
 
 body,
@@ -45,8 +47,14 @@ body,
   border-radius: var(--mcsl-border-radius-lg);
 }
 
-body {
-  overflow: auto;
+.web {
+  --suffix-color-1: var(--mcsl-color-sky);
+  --suffix-color-2: var(--mcsl-color-blue-600);
+}
+
+.app {
+  --suffix-color-1: var(--mcsl-color-amber-400);
+  --suffix-color-2: var(--mcsl-color-red);
 }
 
 .font-mono {
@@ -83,7 +91,7 @@ html.dark::view-transition-new(root) {
 /* 过渡动画 */
 .blur-enter-active,
 .blur-leave-active {
-  transition: all 0.5s;
+  transition: all 0.25s;
 }
 
 .blur-enter-from,
@@ -94,7 +102,7 @@ html.dark::view-transition-new(root) {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: all 0.5s;
+  transition: all 0.25s;
 }
 
 .fade-enter-from,
@@ -198,6 +206,16 @@ h6 {
     font-size: unset;
     font-weight: unset;
   }
+}
+
+ul,
+ol,
+dl {
+  padding-inline-start: var(--mcsl-spacing-md);
+}
+
+blockquote {
+  margin-inline: var(--mcsl-spacing-md);
 }
 
 .mcsl-typography {
@@ -354,18 +372,15 @@ h6 {
 
 /* 字体 */
 @font-face {
-  font-family: "MiSans VF";
-  src: url("../font/MiSans VF.ttf") format("truetype");
-}
-
-@font-face {
   font-family: "Minecraft";
-  src: url("../font/Minecraft.woff") format("woff");
+  src: url("https://www.minecraft.net/etc.clientlibs/minecraftnet/clientlibs/clientlib-site/resources/fonts/Minecraft-Seven_v2.woff2")
+    format("woff");
 }
 
 @font-face {
   font-family: "GNU Unifont";
-  src: url("../font/unifont-16.0.04.otf") format("opentype");
+  src: url("https://www.unifoundry.com/pub/unifont/unifont-17.0.03/font-builds/unifont-17.0.03.otf")
+    format("opentype");
 }
 
 /* Floating Vue  */

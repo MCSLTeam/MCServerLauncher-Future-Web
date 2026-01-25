@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
-import type { Size } from "../../utils/types.ts";
+import type { Size } from "../../utils/utils.ts";
 import Divider from "../misc/Divider.vue";
 
 withDefaults(
@@ -13,15 +13,17 @@ withDefaults(
     headerStyle?: string;
     bodyClass?: string;
     bodyStyle?: string;
+    scrollable?: boolean;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     headerDivider: true,
     shadow: "never",
     headerClass: "",
     headerStyle: "",
     bodyClass: "",
     bodyStyle: "",
+    scrollable: false,
   },
 );
 
@@ -29,7 +31,7 @@ const hasHeader = ref(true);
 const headerRef = ref();
 
 onMounted(() => {
-  hasHeader.value = headerRef.value.innerText.trim() !== "";
+  hasHeader.value = headerRef.value.innerText.trim() != "";
 });
 </script>
 
@@ -39,6 +41,7 @@ onMounted(() => {
       [`mcsl-size-${size}`]: true,
       [`mcsl-panel__shadow-${shadow}`]: shadow !== 'never',
       'mcsl-panel__need-divider': !headerDivider && hasHeader,
+      'mcsl-panel__not-scrollable': !scrollable,
     }"
     class="mcsl-panel"
   >
@@ -69,8 +72,8 @@ onMounted(() => {
 
 .mcsl-panel {
   overflow: auto;
-  background: var(--mcsl-bg-color-overlay);
   border: 1px solid var(--mcsl-border-color-base);
+  background: var(--mcsl-bg-color-overlay);
   transition: box-shadow 0.2s ease-in-out;
 }
 
@@ -87,7 +90,7 @@ onMounted(() => {
     }
 
     & > .mcsl-panel__body-wrapper > .mcsl-divider {
-      padding: calc($spacing / 2) 0;
+      padding: calc($spacing / 1.5) 0;
     }
 
     &.mcsl-panel__need-divider > .mcsl-panel__body-wrapper > .mcsl-panel__body {
@@ -99,6 +102,13 @@ onMounted(() => {
 .mcsl-panel__header {
   & * {
     color: var(--mcsl-text-color-primary);
+  }
+}
+
+.mcsl-panel__not-scrollable {
+  & > .mcsl-panel__body-wrapper,
+  & .mcsl-panel__body {
+    height: 100%;
   }
 }
 </style>

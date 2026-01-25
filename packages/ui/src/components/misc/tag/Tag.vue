@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Size } from "../../../utils/types.ts";
+import type { Size } from "../../../utils/utils.ts";
 import { type Color, getColorVar } from "../../../utils/css.ts";
 
 withDefaults(
@@ -10,7 +10,7 @@ withDefaults(
     size?: Size;
   }>(),
   {
-    size: "middle",
+    size: "medium",
     color: "default",
     rounded: false,
   },

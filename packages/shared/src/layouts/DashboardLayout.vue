@@ -1,24 +1,30 @@
 <script setup lang="ts">
-import Sidebar from "../components/dashboard/Sidebar.vue";
+import DashboardSidebar from "../components/dashboard/DashboardSidebar.vue";
 import Breadcrumbs from "@repo/ui/src/components/navigation/Breadcrumbs.vue";
 import Button from "@repo/ui/src/components/form/button/Button.vue";
 import { useLocalStorage } from "@vueuse/core";
 import { windowButtonsExists, windowButtonTransition } from "../index.ts";
-import { usePageData } from "../utils/stores.ts";
+import { useNavigation, usePageData } from "../utils/stores.ts";
 import router from "../router.ts";
 import { useI18n } from "vue-i18n";
 import { computed, ref } from "vue";
 import { useScreenWidth } from "@repo/ui/src/utils/stores.ts";
 import { animatedVisibilityExists } from "@repo/ui/src/utils/internal.ts";
+import { navigateTo } from "@repo/ui/src/utils/utils.ts";
 
-const { t } = useI18n();
-const sidebarCollapsedStorage = useLocalStorage("sidebarCollapsed", false);
+const t = useI18n().t;
+const sidebarCollapsedStorage = useLocalStorage("sidebar-collapsed", false);
 const screenWidth = useScreenWidth();
 const sidebarCollapsed = computed(
   () => sidebarCollapsedStorage.value || screenWidth.isXsOrSm,
 );
 const sidebarExpanded = ref(false);
 const { exist: sidebarBg } = animatedVisibilityExists(sidebarExpanded, 300);
+const navbarItems = useNavigation().getItems("navbar");
+
+router.afterEach(() => {
+  sidebarExpanded.value = false;
+});
 </script>
 
 <template>
@@ -29,7 +35,7 @@ const { exist: sidebarBg } = animatedVisibilityExists(sidebarExpanded, 300);
       'dashboard__sidebar-collapsed': sidebarCollapsed,
     }"
   >
-    <Sidebar
+    <DashboardSidebar
       :collapsed="sidebarCollapsed"
       :expanded="sidebarExpanded"
       :has-bg="sidebarBg"
@@ -39,7 +45,7 @@ const { exist: sidebarBg } = animatedVisibilityExists(sidebarExpanded, 300);
         'dashboard__sidebar-blocker-visible': sidebarExpanded,
       }"
       class="dashboard__sidebar-blocker"
-      @click="() => (sidebarExpanded = false)"
+      @click="sidebarExpanded = false"
     />
     <div class="dashboard__main">
       <div
@@ -90,25 +96,14 @@ const { exist: sidebarBg } = animatedVisibilityExists(sidebarExpanded, 300);
         </div>
         <div>
           <Button
+            v-for="(info, index) in navbarItems"
+            :key="index"
             type="text"
-            icon="fa fa-bell"
+            :icon="info.icon"
             rounded
             size="small"
-            v-tooltip="t('shared.navbar.notifications')"
-          />
-          <Button
-            type="text"
-            icon="fa fa-brush"
-            rounded
-            size="small"
-            v-tooltip="t('shared.navbar.customize')"
-          />
-          <Button
-            type="text"
-            icon="fa fa-user"
-            rounded
-            size="small"
-            v-tooltip="t('shared.navbar.user-center')"
+            v-tooltip="info.label"
+            @click="navigateTo(info, router)"
           />
         </div>
       </div>
@@ -152,18 +147,19 @@ const { exist: sidebarBg } = animatedVisibilityExists(sidebarExpanded, 300);
     );
   }
 
-  @media (max-width: 425px) {
+  @media (max-width: 450px) {
     width: 100% !important;
   }
 }
 
 .dashboard__nav {
-  padding: var(--mcsl-spacing-xl) var(--mcsl-spacing-md) 0
-    var(--mcsl-spacing-md);
+  padding: var(--mcsl-spacing-md);
+  padding-top: var(--mcsl-spacing-xl);
   height: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  overflow: auto hidden;
 
   & > div {
     display: flex;
@@ -181,11 +177,13 @@ const { exist: sidebarBg } = animatedVisibilityExists(sidebarExpanded, 300);
     width: calc(100% - 2 * var(--mcsl-spacing-md) - $btn-width);
   }
 
-  @media (max-width: 425px) {
-    // 右移
-    $offset: calc(3 * $btn-width);
-    transform: translateX($offset) !important;
-    width: calc(100% - 2 * var(--mcsl-spacing-md) - $offset) !important;
+  @media (max-width: 450px) {
+    .dashboard__with-window-btn & {
+      // 右移
+      $offset: calc(3 * $btn-width);
+      transform: translateX($offset) !important;
+      width: calc(100% - 2 * var(--mcsl-spacing-md) - $offset) !important;
+    }
   }
 
   @media (max-width: 768px) {
@@ -200,6 +198,7 @@ const { exist: sidebarBg } = animatedVisibilityExists(sidebarExpanded, 300);
 
 .dashboard__content {
   margin: var(--mcsl-spacing-md);
+  margin-top: 0;
   background: var(--mcsl-bg-color-main);
   border: 1px solid var(--mcsl-border-color-base);
   border-radius: var(--mcsl-border-radius-2xl);

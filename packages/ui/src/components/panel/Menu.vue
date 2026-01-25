@@ -2,7 +2,7 @@
 import Panel from "./Panel.vue";
 import Button from "../form/button/Button.vue";
 import type { ColorType } from "../../utils/css.ts";
-import type { Size } from "../../utils/types.ts";
+import type { Size } from "../../utils/utils.ts";
 import Divider from "../misc/Divider.vue";
 import { computed } from "vue";
 
@@ -35,11 +35,16 @@ const props = withDefaults(
     headerStyle?: string;
     bodyClass?: string;
     bodyStyle?: string;
+    scrollable?: boolean;
   }>(),
   {
     shadow: false,
   },
 );
+
+defineEmits<{
+  (e: "click", event: MouseEvent): void;
+}>();
 
 const menuInfo = computed(() => {
   if (props.menu.length == 0) return [];
@@ -66,6 +71,7 @@ const menuInfo = computed(() => {
     :header-class="headerClass"
     :header-divider="headerDivider"
     :header-style="headerStyle"
+    :scrollable="scrollable"
     :shadow="shadow ? 'always' : 'never'"
     :size="size"
     class="mcsl-menu"
@@ -95,7 +101,12 @@ const menuInfo = computed(() => {
           :icon="button.icon"
           :icon-pos="button.iconPos"
           :type="button.type ?? 'text'"
-          @click="button.onClick"
+          @click="
+            (e) => {
+              button?.onClick?.(e);
+              $emit('click', e);
+            }
+          "
         >
           {{ button.label }}
         </Button>
@@ -114,12 +125,12 @@ $vars: map.merge(
   (
     "spacing": (
       "small": var(--mcsl-spacing-4xs),
-      "middle": var(--mcsl-spacing-2xs),
+      "medium": var(--mcsl-spacing-2xs),
       "large": var(--mcsl-spacing-xs),
     ),
     "width": (
       "small": 10rem,
-      "middle": 12rem,
+      "medium": 12rem,
       "large": 14rem,
     ),
   )

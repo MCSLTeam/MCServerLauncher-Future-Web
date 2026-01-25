@@ -5,7 +5,7 @@
   "identifier": "cn.com.mcsl.future.tauri",
   "build": {
     "beforeDevCommand": "pnpm frontend:dev",
-    "devUrl": "http://localhost:3000/",
+    "devUrl": "http://localhost:3001/",
     "beforeBuildCommand": "pnpm frontend:build",
     "frontendDist": "../dist"
   },

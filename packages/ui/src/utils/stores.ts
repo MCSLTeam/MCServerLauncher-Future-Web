@@ -5,18 +5,23 @@ import {
   usePreferredColorScheme,
   usePreferredLanguages,
 } from "@vueuse/core";
-import { computed, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { type Composer, type I18nOptions } from "vue-i18n";
-import { type I18nMessages } from "./types.ts";
 
-/* ========== [ 主题 ]========== */
+/* ========== [ 外观 ]========== */
 export type Theme = "system" | "light" | "dark";
 export type ThemeTransition = "viewTransition" | "fade" | "none";
+export type Rendering = "advanced" | "basic" | "fast";
 
-export const useTheme = defineStore("theme", () => {
+export const useAppearance = defineStore("appearance", () => {
   const themeStorage = useLocalStorage<Theme>("theme", "system");
+  const renderingStorage = useLocalStorage<Rendering>(
+    "rendering",
+    useMediaQuery("(prefers-reduced-motion: reduce)").value
+      ? "basic"
+      : "advanced",
+  );
   const actualTheme = computed(() => getActualTheme(themeStorage.value));
-  let prevClassName = "none";
 
   function getActualTheme(theme: Theme) {
     if (theme === "system")
@@ -24,28 +29,34 @@ export const useTheme = defineStore("theme", () => {
     else return theme;
   }
 
-  function getClassName(theme: Theme): string {
-    return getActualTheme(theme);
-  }
-
-  function change(
-    theme: Theme,
-    transition: ThemeTransition = "viewTransition",
-    event?: MouseEvent,
-  ): void {
+  let prevActualTheme = "none";
+  function changeTheme(theme: Theme, transition?: ThemeTransition): void {
     themeStorage.value = theme;
-    const currClassName = getClassName(theme);
-    if (currClassName == prevClassName) return;
+    const currActualTheme = getActualTheme(theme);
+    if (currActualTheme == prevActualTheme) return;
 
     const set = () => {
-      document.documentElement.classList.remove(prevClassName);
-      document.documentElement.classList.add(currClassName);
-      prevClassName = currClassName;
+      document.documentElement.classList.remove(prevActualTheme);
+      document.documentElement.classList.add(currActualTheme);
+      prevActualTheme = currActualTheme;
     };
 
     // 添加过渡样式
     const style = document.createElement("style");
     document.head.appendChild(style);
+
+    if (!transition)
+      switch (renderingStorage.value) {
+        case "advanced":
+          transition = "viewTransition";
+          break;
+        case "basic":
+          transition = "fade";
+          break;
+        case "fast":
+          transition = "none";
+          break;
+      }
 
     switch (transition) {
       case "none":
@@ -70,7 +81,7 @@ export const useTheme = defineStore("theme", () => {
         // 扩散动画
         if (!document.startViewTransition) {
           // 浏览器不支持 ViewTransition 就使用渐变
-          change(theme, "fade", event);
+          changeTheme(theme, "fade");
           return;
         }
         (() => {
@@ -83,29 +94,30 @@ export const useTheme = defineStore("theme", () => {
           // 加载过渡动画
           const viewTransition = document.startViewTransition(set);
 
-          // 从点击处（否则屏幕中心）开始扩散
-          const x = event?.clientX ?? window.innerWidth / 2;
-          const y = event?.clientY ?? window.innerHeight / 2;
+          // 从鼠标处开始扩散
+          const mousePos = useMousePosition();
 
           const endRadius = Math.hypot(
-            Math.max(x, innerWidth - x),
-            Math.max(y, innerHeight - y),
+            Math.max(mousePos.x, innerWidth - mousePos.x),
+            Math.max(mousePos.y, innerHeight - mousePos.y),
           );
           viewTransition.ready.then(() => {
             const clipPath = [
-              `circle(0px at ${x}px ${y}px)`,
-              `circle(${endRadius}px at ${x}px ${y}px)`,
+              `circle(0px at ${mousePos.x}px ${mousePos.y}px)`,
+              `circle(${endRadius}px at ${mousePos.x}px ${mousePos.y}px)`,
             ];
             document.documentElement.animate(
               {
                 clipPath:
-                  currClassName == "dark" ? clipPath : [...clipPath].reverse(),
+                  currActualTheme == "dark"
+                    ? clipPath
+                    : [...clipPath].reverse(),
               },
               {
                 duration: 500,
                 easing: "ease-in-out",
                 pseudoElement:
-                  currClassName == "dark"
+                  currActualTheme == "dark"
                     ? "::view-transition-new(root)"
                     : "::view-transition-old(root)",
               },
@@ -120,18 +132,30 @@ export const useTheme = defineStore("theme", () => {
   }
 
   function load() {
-    change(themeStorage.value, "none");
+    changeTheme(themeStorage.value, "none");
+    setRendering(renderingStorage.value);
   }
 
   // 监听系统主题变更
   watch(usePreferredColorScheme(), () => {
-    change(themeStorage.value, "fade");
+    changeTheme(themeStorage.value, "fade");
   });
+
+  let prevRendering = "none";
+  function setRendering(rendering: Rendering) {
+    renderingStorage.value = rendering;
+    if (rendering == prevRendering) return;
+    document.documentElement.classList.remove(`rendering-${prevRendering}`);
+    document.documentElement.classList.add(`rendering-${rendering}`);
+    prevRendering = rendering;
+  }
 
   return {
     load,
-    change,
+    changeTheme,
+    setRendering,
     actualTheme,
+    rendering: computed(() => renderingStorage.value),
     theme: computed(() => themeStorage.value),
   };
 });
@@ -139,13 +163,15 @@ export const useTheme = defineStore("theme", () => {
 /* ========== [ 语言 ]========== */
 export const LOCALES = [
   "en-US",
-  // "ja-JP",
-  // "ru-RU",
+  "ja-JP",
+  "ru-RU",
   "zh-CN",
   "zh-TW",
-  // "zh-HK",
+  "zh-HK",
   "zh-MEME",
 ] as const;
+
+export type I18nMessages = Record<Locale, any>;
 
 export type Locale = (typeof LOCALES)[number] | "system";
 
@@ -163,7 +189,7 @@ const i18nOptions: I18nOptions = {
 };
 
 export const useLocale = defineStore("locale", () => {
-  const localeStorage = useLocalStorage<Locale>("locale", "system");
+  const locale = useLocalStorage<Locale>("locale", "system");
   let messagesCache: I18nMessages | undefined = undefined;
   let i18n: Composer | undefined = undefined;
 
@@ -179,7 +205,7 @@ export const useLocale = defineStore("locale", () => {
     await importMessages();
     return {
       ...i18nOptions,
-      locale: getLocale(localeStorage.value),
+      locale: getLocale(locale.value),
       messages: getMessages(),
     };
   }
@@ -187,8 +213,14 @@ export const useLocale = defineStore("locale", () => {
   async function importMessages() {
     const messages: any = {};
     for (const locale of LOCALES) {
-      const message = await import(`@repo/locales/locales/${locale}.json`);
-      messages[locale] = message.default;
+      const message = (await import(`@repo/locales/locales/${locale}.json`))
+        .default;
+      const eula = (await import(`@repo/locales/eula/${locale}.json`)).default;
+      message.shared.eula = {
+        ...message.shared.eula,
+        ...eula,
+      };
+      messages[locale] = message;
     }
     messagesCache = messages;
   }
@@ -203,11 +235,13 @@ export const useLocale = defineStore("locale", () => {
       : locale;
   }
 
-  function setLocale(locale: Locale) {
-    getI18n().locale.value = localeStorage.value = getLocale(locale);
+  function setLocale(l: Locale) {
+    locale.value = l;
+    getI18n().locale.value = getLocale(l);
   }
 
   return {
+    locale,
     injectI18n,
     getI18n,
     generateConfig,
@@ -226,14 +260,14 @@ export const useLocale = defineStore("locale", () => {
  *
  * md - 笔记本电脑（768px < 屏幕宽度 < 1024px）
  *
- * sm - 平板电脑（425px < 屏幕宽度 <= 768px）
+ * sm - 平板电脑（450px < 屏幕宽度 <= 768px）
  *
- * xs - 手机（屏幕宽度 <= 425px）
+ * xs - 手机（屏幕宽度 <= 450px） 为什么不用425px呢，因为我iPhone 12 Pro Max大于425px就很神奇
  */
 export type ScreenWidth = "lg" | "md" | "sm";
 
 export const useScreenWidth = defineStore("screenWidth", () => {
-  const isXs = useMediaQuery("(max-width: 425px)");
+  const isXs = useMediaQuery("(max-width: 450px)");
   const isSm = useMediaQuery("(max-width: 768px)");
   const isMd = useMediaQuery("(max-width: 1024px)");
 
@@ -247,5 +281,21 @@ export const useScreenWidth = defineStore("screenWidth", () => {
   return {
     width,
     isXsOrSm: computed(() => isXs.value || isSm.value),
+  };
+});
+
+/* ========== [ 鼠标位置 ]========== */
+export const useMousePosition = defineStore("mousePosition", () => {
+  const mousePosition = ref({ x: 0, y: 0 });
+
+  function onMouseMove(e: MouseEvent) {
+    mousePosition.value.x = e.clientX;
+    mousePosition.value.y = e.clientY;
+  }
+
+  return {
+    onMouseMove,
+    x: computed(() => mousePosition.value.x),
+    y: computed(() => mousePosition.value.y),
   };
 });
