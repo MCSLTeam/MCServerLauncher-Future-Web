@@ -45,7 +45,7 @@ function openLink(url: string) {
     <Modal
       v-model:visible="showEula"
       :header="t('shared.eula.title')"
-      width="60vw"
+      max-width="60vw"
     >
       <div class="eula-content">
         <div
@@ -58,21 +58,6 @@ function openLink(url: string) {
         </div>
       </div>
     </Modal>
-    <!-- TODO: 更新检查 -->
-    <SettingsItem
-      label="shared.settings.about.auto-download-updates.label"
-      desc="shared.settings.about.auto-download-updates.desc"
-    >
-      <Switch v-model="autoDownloadUpdates" />
-    </SettingsItem>
-    <SettingsItem
-      label="shared.settings.about.check-updates.label"
-      desc="shared.settings.about.check-updates.desc"
-    >
-      <Button type="primary" color="blue">{{
-        t("shared.settings.about.check-updates.button")
-      }}</Button>
-    </SettingsItem>
     <Panel>
       <div class="about__about">
         <img src="../../assets/img/MCSL.png" alt="" />
@@ -140,6 +125,21 @@ function openLink(url: string) {
         <p>{{ t("shared.settings.about.about.disclaimer") }}</p>
       </div>
     </Panel>
+    <!-- TODO: 更新检查 -->
+    <SettingsItem
+      label="shared.settings.about.auto-download-updates.label"
+      desc="shared.settings.about.auto-download-updates.desc"
+    >
+      <Switch v-model="autoDownloadUpdates" />
+    </SettingsItem>
+    <SettingsItem
+      label="shared.settings.about.check-updates.label"
+      desc="shared.settings.about.check-updates.desc"
+    >
+      <Button type="primary" color="blue">{{
+        t("shared.settings.about.check-updates.button")
+      }}</Button>
+    </SettingsItem>
     <CollapsablePanel header-divider>
       <template #header>
         <h4>{{ t("shared.settings.about.info.title") }}</h4>
@@ -191,7 +191,7 @@ function openLink(url: string) {
         </div>
       </div>
     </CollapsablePanel>
-    <CollapsablePanel header-divider :collapsed="true">
+    <CollapsablePanel header-divider>
       <template #header>
         <h4>{{ t("shared.settings.about.special-thanks.title") }}</h4>
       </template>
@@ -268,7 +268,7 @@ function openLink(url: string) {
         </Panel>
       </div>
     </CollapsablePanel>
-    <CollapsablePanel header-divider :collapsed="true">
+    <CollapsablePanel header-divider>
       <template #header>
         <h4>{{ t("shared.settings.about.dependencies.title") }}</h4>
       </template>

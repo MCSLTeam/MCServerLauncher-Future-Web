@@ -2,12 +2,12 @@ import { computed, type ComputedRef, type Ref, ref, watch } from "vue";
 import type { ColorType } from "./css.ts";
 
 // Context menu
-export let openContextMenu: (event: MouseEvent, props: any) => void = () => {};
+export let openContextmenu: (event: MouseEvent, props: any) => void = () => {};
 
-export function setOpenContextMenu(
+export function setOpenContextmenu(
   fn: (event: MouseEvent, props: any) => void,
 ) {
-  openContextMenu = fn;
+  openContextmenu = fn;
 }
 
 // Meter group

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, watchEffect } from "vue";
+import { onMounted, ref, watchEffect } from "vue";
 import { useRouter } from "vue-router";
 import { type Color, getColorVar } from "../../utils/css.ts";
 import {
@@ -54,18 +54,8 @@ watchEffect(() => {
   );
 });
 
-let interval = -1;
-
 onMounted(() => {
-  // 多刷新几遍（（（
-  interval = window.setInterval(updateBg, 50);
-  setTimeout(() => {
-    clearInterval(interval);
-  }, 1000);
-});
-
-onUnmounted(() => {
-  clearInterval(interval);
+  updateBg();
 });
 
 defineExpose({

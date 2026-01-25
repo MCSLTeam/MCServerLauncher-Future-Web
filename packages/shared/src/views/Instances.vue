@@ -6,7 +6,7 @@ import { useLocalStorage } from "@vueuse/core";
 import InputText from "@repo/ui/src/components/form/entries/InputText.vue";
 import { computed, ref } from "vue";
 import Panel from "@repo/ui/src/components/panel/Panel.vue";
-import ContextMenu from "@repo/ui/src/components/overlay/ContextMenu.vue";
+import Contextmenu from "@repo/ui/src/components/overlay/Contextmenu.vue";
 import { type MenuItem } from "@repo/ui/src/components/panel/Menu.vue";
 import router from "../router.ts";
 import { snakeToPascal } from "../utils/utils.ts";
@@ -308,7 +308,7 @@ function highlightText(text: string, searchText: string): string {
   return text;
 }
 
-function buildContextMenu(instance: any) {
+function buildContextmenu(instance: any) {
   if ((instance.status as InstanceStatus) == "installing") return undefined;
   const menuInfo: MenuItem[] = [];
   switch (instance.status) {
@@ -449,9 +449,9 @@ function buildContextMenu(instance: any) {
             @keydown.enter="router.push(`/instance/${instance.id}`)"
           >
             <template #contextmenu>
-              <ContextMenu
-                v-if="buildContextMenu(instance)"
-                :menu="buildContextMenu(instance)!"
+              <Contextmenu
+                v-if="buildContextmenu(instance)"
+                :menu="buildContextmenu(instance)!"
               />
             </template>
             <div class="instances__instance-info">

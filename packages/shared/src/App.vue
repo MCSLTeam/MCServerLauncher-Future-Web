@@ -4,11 +4,12 @@ import NotificationOverlay from "@repo/ui/src/components/overlay/notification/No
 import DashboardLayout from "./layouts/DashboardLayout.vue";
 import SetupLayout from "./layouts/SetupLayout.vue";
 import Button from "@repo/ui/src/components/form/button/Button.vue";
-import ContextMenuOverlay from "@repo/ui/src/components/overlay/ContextMenuOverlay.vue";
+import ContextmenuOverlay from "@repo/ui/src/components/overlay/ContextmenuOverlay.vue";
 import { computed } from "vue";
 import { usePageData } from "./utils/stores.ts";
 import LoadingOverlay from "./components/overlay/LoadingOverlay.vue";
 import { useI18n } from "vue-i18n";
+import CreateInstanceModal from "./components/instanceCreation/CreateInstanceModal.vue";
 
 const layout = computed(() => {
   switch (usePageData().data.layout) {
@@ -26,8 +27,17 @@ const t = useI18n().t;
 <template>
   <component v-if="layout" :is="layout" />
   <RouterView v-else />
+  <CreateInstanceModal />
   <LoadingOverlay />
-  <NotificationTemplate id="default">
+  <NotificationTemplate
+    id="default"
+    :props="
+      (notif) => ({
+        ...notif.settings.data,
+        inAnim: '0.2s cubic-bezier(0.18, 0.89, 0.32, 1.13) both fadeInRight',
+      })
+    "
+  >
     <template v-slot="notif">
       <p>{{ notif.settings.data.message }}</p>
     </template>
@@ -54,7 +64,7 @@ const t = useI18n().t;
     </template>
   </NotificationTemplate>
   <NotificationOverlay />
-  <ContextMenuOverlay />
+  <ContextmenuOverlay />
 </template>
 
 <style scoped>

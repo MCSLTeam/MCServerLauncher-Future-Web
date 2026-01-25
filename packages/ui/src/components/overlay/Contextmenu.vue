@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, ref } from "vue";
 import { type MenuInfo } from "../panel/Menu.vue";
 import type { Size } from "../../utils/utils.ts";
-import { openContextMenu } from "../../utils/internal.ts";
+import { openContextmenu } from "../../utils/internal.ts";
 
 defineOptions({
   inheritAttrs: false,
@@ -27,8 +27,8 @@ const wrapperEl = ref();
 
 let listenedElement: HTMLElement;
 
-function handleContextMenu(event: MouseEvent) {
-  openContextMenu(event, props);
+function handleContextmenu(event: MouseEvent) {
+  openContextmenu(event, props);
   event.preventDefault();
   event.stopImmediatePropagation();
 }
@@ -45,11 +45,11 @@ onMounted(() => {
   } else {
     listenedElement = wrapperEl.value.parentElement;
   }
-  listenedElement.addEventListener("contextmenu", handleContextMenu);
+  listenedElement.addEventListener("contextmenu", handleContextmenu);
 });
 
 onUnmounted(() => {
-  listenedElement.removeEventListener("contextmenu", handleContextMenu);
+  listenedElement?.removeEventListener?.("contextmenu", handleContextmenu);
 });
 </script>
 

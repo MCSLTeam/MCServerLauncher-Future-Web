@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { type ComputedRef, type Ref, ref } from "vue";
+import { type ComputedRef, onMounted, onUnmounted, type Ref, ref } from "vue";
 import Menu from "../panel/Menu.vue";
 import type { PosInfo } from "../../utils/utils.ts";
 import FloatingContent from "./FloatingContent.vue";
-import { setOpenContextMenu } from "../../utils/internal.ts";
+import { setOpenContextmenu } from "../../utils/internal.ts";
 
 defineOptions({
   inheritAttrs: false,
@@ -12,7 +12,7 @@ defineOptions({
 const floatingContentEl = ref();
 const props = ref<any>({});
 
-setOpenContextMenu((event, p) => {
+setOpenContextmenu((event, p) => {
   floatingContentEl.value.open(event.clientX, event.clientY);
   props.value = p;
 });
@@ -51,6 +51,19 @@ function locator(
   if (elemPos.value.height > innerHeight) elemY.value = 0;
   else locateY(openY, elemY, elemPos);
 }
+
+function onGlobalContextMenu(event: MouseEvent) {
+  if (floatingContentEl.value.clickedOutside(event))
+    floatingContentEl.value.close();
+}
+
+onMounted(() => {
+  document.addEventListener("contextmenu", onGlobalContextMenu);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("contextmenu", onGlobalContextMenu);
+});
 </script>
 
 <template>

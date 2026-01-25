@@ -21,7 +21,7 @@ const emit = defineEmits<{
 }>();
 
 const collapsed = defineModel<boolean>("collapsed", {
-  default: false,
+  default: true,
 });
 
 function collapse() {
@@ -81,7 +81,7 @@ defineExpose({
             <h2>{{ header }}</h2>
           </slot>
         </div>
-        <i class="fa fa-angle-down" />
+        <i class="fa fa-angle-up" />
       </div>
     </template>
     <template #contextmenu>
@@ -113,7 +113,7 @@ defineExpose({
   border-color: var(--mcsl-border-color-base);
 
   & .mcsl-collapsable-panel__header > i {
-    transform: rotate(90deg);
+    transform: rotate(-180deg);
   }
 }
 </style>

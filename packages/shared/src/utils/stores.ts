@@ -3,6 +3,8 @@ import type { BreadcrumbItem } from "@repo/ui/src/components/navigation/Breadcru
 import { computed, ref } from "vue";
 import type { PageNavigationInfo } from "@repo/ui/src/utils/utils.ts";
 import { useLocale } from "@repo/ui/src/utils/stores.ts";
+import { useLocalStorage } from "@vueuse/core";
+import { showCreateInstanceModal } from "../index.ts"; /* ========== [ 页面数据 ]========== */
 
 /* ========== [ 页面数据 ]========== */
 export type PageData = {
@@ -61,9 +63,11 @@ export const useNavigation = defineStore("navigation", () => {
     ],
     sidebarDowner: [
       {
-        label: t("shared.tasks.title"),
-        icon: "fa fa-list-check",
-        onClick() {},
+        label: t("shared.create-instance.button"),
+        icon: "fa fa-plus",
+        onClick() {
+          showCreateInstanceModal.value = true;
+        },
       },
       {
         label: t("shared.nodes.title"),
@@ -78,8 +82,8 @@ export const useNavigation = defineStore("navigation", () => {
     ],
     navbar: [
       {
-        label: t("shared.navbar.notifications"),
-        icon: "fa fa-bell",
+        label: t("shared.tasks.title"),
+        icon: "fa fa-list-check",
         onClick() {},
       },
     ],
@@ -122,5 +126,25 @@ export const useNavigation = defineStore("navigation", () => {
   return {
     getItems,
     addItem,
+  };
+});
+
+/* ========== [ 设置 ]========== */
+export const useSettings = defineStore("settings", () => {
+  const settings = useLocalStorage("settings", {
+    allowContextmenu: false,
+  });
+
+  function load() {
+    document.body.addEventListener("contextmenu", (e) => {
+      if (!settings.value.allowContextmenu) {
+        e.preventDefault();
+      }
+    });
+  }
+
+  return {
+    data: settings,
+    load,
   };
 });

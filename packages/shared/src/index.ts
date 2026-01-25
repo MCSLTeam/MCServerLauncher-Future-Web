@@ -7,6 +7,7 @@ import { useLocale } from "@repo/ui/src/utils/stores.ts";
 import router from "./router.ts";
 import dayjs from "dayjs";
 import axios from "axios";
+import { useSettings } from "./utils/stores.ts";
 
 type Platform = "web" | "app";
 
@@ -41,6 +42,8 @@ export const windowButtonTransition = computed(
 export const loading = ref(true);
 export const loadingStep = ref("");
 
+export const showCreateInstanceModal = ref(false);
+
 export async function load(
   appComponent: Component,
   load: () => void | Promise<void>,
@@ -63,7 +66,7 @@ export async function load(
 
   app.mount("#app");
 
-  document.body.oncontextmenu = () => false;
+  await useSettings().load();
 
   await loadUi();
 

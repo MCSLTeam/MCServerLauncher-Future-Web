@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import Select from "@repo/ui/src/components/form/entries/Select.vue";
+import Switch from "@repo/ui/src/components/form/entries/Switch.vue";
 import { type Locale, useLocale } from "@repo/ui/src/utils/stores.ts";
 import { computed, inject } from "vue";
 import SettingsItem from "../../components/settings/SettingsItem.vue";
+import { useSettings } from "../../utils/stores.ts";
 
 const t = useI18n().t;
 const requireRestart = inject<() => void>("requireRestart")!;
+const settings = useSettings();
 
 const messages = useLocale().getMessages();
 const locale = computed({
@@ -38,6 +41,12 @@ const locales = computed(() => [
       desc="shared.settings.general.locale.desc"
     >
       <Select v-model="locale" :options="locales" />
+    </SettingsItem>
+    <SettingsItem
+      label="shared.settings.general.allow-contextmenu.label"
+      desc="shared.settings.general.allow-contextmenu.desc"
+    >
+      <Switch v-model="settings.data.allowContextmenu" />
     </SettingsItem>
   </div>
 </template>

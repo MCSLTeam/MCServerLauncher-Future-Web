@@ -11,8 +11,8 @@ import Message from "../../panel/Message.vue";
       v-bind="{
         closeable: true,
         shadow: true,
-        inAnim: 'fadeInRight',
-        outAnim: 'fadeOut',
+        inAnim: '0.2s ease-in-out both fadeInRight',
+        outAnim: '0.2s ease-in-out both fadeOut',
 
         ...item.template.props(item),
       }"
