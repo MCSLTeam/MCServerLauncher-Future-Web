@@ -9,8 +9,8 @@ import FormItem from "@repo/ui/src/components/form/FormItem.vue";
 import {
   type Locale,
   type Theme,
-  useLocale,
   useAppearance,
+  useLocale,
 } from "@repo/ui/src/utils/stores.ts";
 import { computed } from "vue";
 import * as yup from "yup";
@@ -37,13 +37,15 @@ const themes = computed(() => [
   { label: t("shared.settings.appearance.theme.dark"), value: "dark" },
 ]);
 
-const messages = useLocale().getMessages();
+const localeStore = useLocale();
+const messages = localeStore.getMessages();
+const prevLocale = localeStore.locale;
 const locale = computed({
   get() {
-    return useLocale().locale;
+    return localeStore.locale;
   },
   set(locale: Locale) {
-    useLocale().setLocale(locale);
+    localeStore.setLocale(locale);
   },
 });
 const locales = computed(() => [
@@ -57,6 +59,11 @@ const locales = computed(() => [
     value: key,
   })),
 ]);
+
+function nextStep() {
+  if (locale.value == prevLocale) router.push("/welcome/eula");
+  else location.href = "/welcome/eula";
+}
 </script>
 
 <template>
@@ -85,7 +92,7 @@ const locales = computed(() => [
     >
       <Select :options="locales" />
     </FormItem>
-    <Button type="primary" color="primary" @click="router.push('/welcome/eula')"
+    <Button type="primary" color="primary" @click="nextStep"
       >{{ t("ui.common.next-step") }}
     </Button>
   </div>

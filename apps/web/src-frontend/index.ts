@@ -119,7 +119,7 @@ export function setShouldRegister(value: boolean) {
       component: () => import("./views/Login.vue"),
     });
 
-    router.beforeEach(async (to, _from, next) => {
+    router.beforeEach((to, _from, next) => {
       if (useAccount().accessToken) {
         if (to.path.startsWith("/auth")) next("/");
       } else {
@@ -136,7 +136,12 @@ export function setShouldRegister(value: boolean) {
       next();
     });
 
-    if (!useAccount().accessToken) await router.push("/auth");
+    if (
+      !useAccount().accessToken &&
+      !router.currentRoute.value.path.startsWith("/auth") &&
+      !router.currentRoute.value.path.startsWith("/welcome")
+    )
+      await router.push("/auth");
 
     loadingStep.value = t("web.loading.fetch-user");
 
