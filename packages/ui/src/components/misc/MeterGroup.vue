@@ -28,10 +28,10 @@ const props = withDefaults(
   },
 );
 
-const i18n = useI18n();
+const t = useI18n().t;
 
 function getLabel(item: MeterItem) {
-  return i18n.t("ui.meter-group.label", {
+  return t("ui.meter-group.label", {
     label: item.label,
     percentage: ((item.length / props.meter.length) * 100).toString(),
   });
@@ -50,7 +50,7 @@ const actualValues = computed(() => {
     ...(meter.total && meter.total > sum
       ? [
           meter.unallocated ?? {
-            label: i18n.t("ui.meter-group.unallocated"),
+            label: t("ui.meter-group.unallocated"),
             length: meter.total - sum,
             type: new ColorData("surface", "light"),
           },

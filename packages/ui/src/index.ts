@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import RelativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/zh-cn";
-import { useMousePosition, useTheme } from "./utils/stores.ts";
+import { useAppearance, useMousePosition } from "./utils/stores.ts";
 import { setLocale } from "yup";
 import { getYupLocale } from "./utils/yup.ts";
 import "./assets/css/style.scss";
@@ -12,9 +12,14 @@ dayjs.locale("zh-cn");
 
 export async function loadUi() {
   setLocale(getYupLocale());
-  useTheme().load();
+  useAppearance().load();
   document.removeEventListener("mousemove", useMousePosition().onMouseMove);
   document.addEventListener("mousemove", useMousePosition().onMouseMove);
 
-  await requestNotifPermission();
+  const onUserInteraction = () => {
+    requestNotifPermission();
+    document.removeEventListener("click", onUserInteraction);
+  };
+
+  document.addEventListener("click", onUserInteraction);
 }

@@ -13,7 +13,7 @@ const t = useI18n().t;
 <template>
   <Modal
     color="warning"
-    width="400px"
+    max-width="400px"
     :visible="showTaskExitDialog"
     :closable="false"
     :header="t('ui.notification.title.warning')"

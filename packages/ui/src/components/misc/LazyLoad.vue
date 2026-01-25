@@ -76,7 +76,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   listenedElements.forEach((el) =>
-    el.removeEventListener("scroll", detectVisible),
+    el?.removeEventListener?.("scroll", detectVisible),
   );
 });
 </script>
