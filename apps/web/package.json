@@ -30,6 +30,6 @@
   "devDependencies": {
     "@rsbuild/core": "^1.7.2",
     "typescript": "^5.9.2",
-    "vue-tsc": "^2.2.12"
+    "vue-tsc": "^3.2.1"
   }
 }
