@@ -2,6 +2,7 @@ import type { MessageProps } from "../components/panel/Message.vue";
 import { ref, shallowReactive, type VueElement } from "vue";
 import { useLocale } from "./stores.ts";
 import { useLocalStorage } from "@vueuse/core";
+import { sleep } from "./utils.ts";
 
 type TemplateInfo = {
   props: (notif: MCSLNotif) => MessageProps;
@@ -132,6 +133,7 @@ export async function requestNotifPermission() {
       },
     }).open();
     await systemNotifSettings.requestPermission();
+    await sleep(1000);
     await requestNotifPermission();
   } else if (systemNotifSettings.isPermissionGranted() == "denied") {
     shouldShowWarning = true;

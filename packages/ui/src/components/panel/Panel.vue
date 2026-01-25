@@ -31,7 +31,7 @@ const hasHeader = ref(true);
 const headerRef = ref();
 
 onMounted(() => {
-  hasHeader.value = headerRef.value.innerText.trim() !== "";
+  hasHeader.value = headerRef.value.innerText.trim() != "";
 });
 </script>
 
@@ -72,8 +72,8 @@ onMounted(() => {
 
 .mcsl-panel {
   overflow: auto;
-  background: var(--mcsl-bg-color-overlay);
   border: 1px solid var(--mcsl-border-color-base);
+  background: var(--mcsl-bg-color-overlay);
   transition: box-shadow 0.2s ease-in-out;
 }
 
@@ -90,7 +90,7 @@ onMounted(() => {
     }
 
     & > .mcsl-panel__body-wrapper > .mcsl-divider {
-      padding: calc($spacing / 2) 0;
+      padding: calc($spacing / 1.5) 0;
     }
 
     &.mcsl-panel__need-divider > .mcsl-panel__body-wrapper > .mcsl-panel__body {

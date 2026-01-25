@@ -1,20 +1,26 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import FancyBackground from "@repo/ui/src/components/misc/FancyBackground.vue";
-import { getPlatform } from "../../index.ts";
+import { platform } from "../../index.ts";
+import { onMounted, ref } from "vue";
 
 const t = useI18n().t;
+const exists = ref(true);
+
+onMounted(() => {
+  setTimeout(() => (exists.value = false), 2600);
+});
 </script>
 
 <template>
-  <div class="welcome-overlay">
+  <div class="welcome-overlay" v-if="exists">
     <FancyBackground>
       <div class="welcome-overlay__logo">
-        <img src="../../assets/MCSL.png" alt="" width="98" />
+        <img src="../../assets/img/MCSL.png" alt="" width="98" />
         <div>
           <h1>
             {{ t("shared.app.name.abbr") }} {{ t("shared.app.name.future") }}
-            {{ t(`${getPlatform()}.app.name.suffix`) }}
+            {{ t(`${platform}.app.name.suffix`) }}
           </h1>
           <h2>{{ t("shared.app.desc") }}</h2>
         </div>
@@ -32,7 +38,7 @@ const t = useI18n().t;
   top: 0;
   left: 0;
   background: var(--mcsl-bg-color-main);
-  animation: 0.5s ease-in-out 2s both welcome-overlay__out-anim;
+  animation: 0.5s ease-in-out 2s both fadeOut;
 }
 
 .welcome-overlay__logo {
@@ -43,7 +49,7 @@ const t = useI18n().t;
 
   & > img {
     width: 7rem;
-    animation: 0.5s ease-in-out 0.5s both zoomIn;
+    animation: 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.5s both zoomIn;
   }
 
   & > div {
@@ -74,7 +80,7 @@ const t = useI18n().t;
       overflow: hidden;
       height: 100%;
       max-width: 0;
-      animation: 0.75s ease-in-out 0.8s both collapseInHorizontal;
+      animation: 0.75s ease-in-out 0.95s both collapseInHorizontal;
     }
   }
 
@@ -91,16 +97,6 @@ const t = useI18n().t;
         animation: 0.5s ease-in-out 1s both fadeInUp;
       }
     }
-  }
-}
-
-@keyframes welcome-overlay__out-anim {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-    pointer-events: none;
   }
 }
 </style>

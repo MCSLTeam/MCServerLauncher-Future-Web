@@ -15,9 +15,9 @@ $vars: map.merge(
       "large": var(--mcsl-border-radius-lg),
     ),
     "spacing": (
-      "small": var(--mcsl-spacing-md),
-      "medium": var(--mcsl-spacing-lg),
-      "large": var(--mcsl-spacing-xl),
+      "small": var(--mcsl-spacing-sm),
+      "medium": var(--mcsl-spacing-md),
+      "large": var(--mcsl-spacing-lg),
     ),
   )
 );

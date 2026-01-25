@@ -142,7 +142,7 @@ $vars: map.merge(
     background: var(--mcsl-bg-color-overlay);
     border-radius: var(--mcsl-border-radius-full);
     box-shadow: var(--mcsl-box-shadow-light);
-    transition: 0.2s ease-in-out;
+    transition: 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.38);
   }
 
   &:focus-visible {
