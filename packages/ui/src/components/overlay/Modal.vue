@@ -11,7 +11,7 @@ defineOptions({
 
 const props = withDefaults(
   defineProps<{
-    width?: string;
+    maxWidth?: string;
     header?: string;
     color?: Color;
     closable?: boolean;
@@ -19,7 +19,7 @@ const props = withDefaults(
     closeOnClickOutside?: boolean;
   }>(),
   {
-    width: "600px",
+    maxWidth: "600px",
     color: "primary",
     closable: true,
     closeOnEsc: true,
@@ -86,7 +86,7 @@ defineExpose({
     <Panel
       :class="{ 'mcsl-modal__container-visible': visible }"
       :style="{
-        '--mcsl-modal__card-width': width,
+        '--mcsl-modal__card-max-width': maxWidth,
       }"
       class="mcsl-modal__card"
       size="large"
@@ -97,7 +97,7 @@ defineExpose({
           <slot :close="close" :open="open" :visible="visible" name="header">
             <h2>{{ header }}</h2>
           </slot>
-          <Button v-if="closable" icon="fas fa-xmark" rounded @click="close" />
+          <Button v-if="closable" type="text" icon="fas fa-xmark" rounded @click="close" />
         </div>
       </template>
       <slot :close="close" :open="open" :visible="visible" />
@@ -143,7 +143,7 @@ defineExpose({
 
 .mcsl-modal__card {
   width: min(
-    var(--mcsl-modal__card-width),
+    var(--mcsl-modal__card-max-width),
     calc(100% - 4 * var(--mcsl-spacing-xl))
   );
   max-height: calc(100% - 2 * var(--mcsl-spacing-xl));

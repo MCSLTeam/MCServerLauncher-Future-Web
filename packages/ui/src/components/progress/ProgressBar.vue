@@ -158,7 +158,8 @@ $size: var(--mcsl-progress-bar__size);
   gap: var(--mcsl-spacing-2xs);
 
   & > div {
-    width: 100%;
+    width: 0;
+    flex-grow: 1;
     height: $stroke-width;
     background: var(--mcsl-border-color-base);
     border-radius: var(--mcsl-border-radius-full);

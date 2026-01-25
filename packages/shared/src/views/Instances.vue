@@ -6,6 +6,8 @@ import { useLocalStorage } from "@vueuse/core";
 import InputText from "@repo/ui/src/components/form/entries/InputText.vue";
 import { computed, ref } from "vue";
 import Panel from "@repo/ui/src/components/panel/Panel.vue";
+import Contextmenu from "@repo/ui/src/components/overlay/Contextmenu.vue";
+import { type MenuItem } from "@repo/ui/src/components/panel/Menu.vue";
 import router from "../router.ts";
 import { snakeToPascal } from "../utils/utils.ts";
 import { pinyin } from "pinyin-pro";
@@ -14,17 +16,18 @@ import Button from "@repo/ui/src/components/form/button/Button.vue";
 import type { InstanceStatus } from "../utils/node/types/instance.ts";
 import { getGame } from "../utils/node/types/cores.ts";
 
+const t = useI18n().t;
+
 usePageData().set({
   layout: "dashboard",
   breadcrumbs: [
     {
-      label: useI18n().t("shared.instances.title"),
+      label: t("shared.instances.title"),
       path: "/instances",
     },
   ],
 });
 
-const t = useI18n().t;
 const search = ref("");
 const sorting = useLocalStorage("instance-sorting", {
   ascending: true,
@@ -304,10 +307,50 @@ function highlightText(text: string, searchText: string): string {
 
   return text;
 }
+
+function buildContextmenu(instance: any) {
+  if ((instance.status as InstanceStatus) == "installing") return undefined;
+  const menuInfo: MenuItem[] = [];
+  switch (instance.status) {
+    case "stopped":
+    case "crashed":
+      menuInfo.push({
+        color: "emerald",
+        icon: "fa fa-play",
+        label: t("shared.instance.action.start"),
+        onClick: () => {},
+      });
+      break;
+    case "starting":
+    case "running":
+      menuInfo.push({
+        color: "orange",
+        icon: "fa fa-rotate-right",
+        label: t("shared.instance.action.restart"),
+        onClick: () => {},
+      });
+      menuInfo.push({
+        color: "rose",
+        icon: "fa fa-stop",
+        label: t("shared.instance.action.stop"),
+        onClick: () => {},
+      });
+    // @eslint-disable-next-line no-fallthrough
+    case "stopping":
+      menuInfo.push({
+        color: "red",
+        icon: "fa fa-power-off",
+        label: t("shared.instance.action.kill"),
+        onClick: () => {},
+      });
+      break;
+  }
+  return menuInfo;
+}
 </script>
 
 <template>
-  <div>
+  <div class="instances">
     <div class="instances__searchbar">
       <InputText
         v-model="search"
@@ -385,7 +428,7 @@ function highlightText(text: string, searchText: string): string {
         />
       </div>
     </div>
-    <div>
+    <div class="instances__content">
       <div v-for="(instances, group) in sortedInstances" :key="group">
         <Divider
           v-if="!noGrouping"
@@ -405,9 +448,15 @@ function highlightText(text: string, searchText: string): string {
             @click="router.push(`/instance/${instance.id}`)"
             @keydown.enter="router.push(`/instance/${instance.id}`)"
           >
+            <template #contextmenu>
+              <Contextmenu
+                v-if="buildContextmenu(instance)"
+                :menu="buildContextmenu(instance)!"
+              />
+            </template>
             <div class="instances__instance-info">
               <!-- TODO: 图标 -->
-              <img src="../assets/MCSL.png" alt="" />
+              <img src="../assets/img/MCSL.png" alt="" />
               <div>
                 <h3 v-html="highlightText(instance.name, search)" />
                 <p>
@@ -452,8 +501,21 @@ function highlightText(text: string, searchText: string): string {
 </template>
 
 <style scoped lang="scss">
+.instances {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--mcsl-spacing-md);
+}
+
+.instances__content {
+  height: 0;
+  flex-grow: 1;
+  overflow: hidden auto;
+}
+
 .instances__searchbar {
-  margin-bottom: var(--mcsl-spacing-md);
   &,
   & > div,
   & > div > div:first-child {
