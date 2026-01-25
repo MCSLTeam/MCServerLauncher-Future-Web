@@ -1,0 +1,402 @@
+{
+  "common": [
+    {
+      "name": "animate.css",
+      "desc": "A cross-browser library of CSS animations.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://animate.style/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/animate-css/animate.css"
+        }
+      ]
+    },
+    {
+      "name": "axios",
+      "desc": "Promise based HTTP client for the browser and node.js.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://axios-http.com/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/axios/axios"
+        }
+      ]
+    },
+    {
+      "name": "dayjs",
+      "desc": "Day.js 2kB immutable date-time library alternative to Moment.js with the same modern API.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://day.js.org/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/iamkun/dayjs/"
+        }
+      ]
+    },
+    {
+      "name": "floating-vue",
+      "desc": "Easy tooltips, popovers, dropdown, menus... for Vue.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://floating-vue.starpad.dev/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/Akryum/floating-vue"
+        }
+      ]
+    },
+    {
+      "name": "Font Awesome",
+      "desc": "The internet's favorite icon library & toolkit.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://fontawesome.com/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/FortAwesome/Font-Awesome"
+        }
+      ]
+    },
+    {
+      "name": "GNU Unifont",
+      "desc": "GNU Unifont is part of the GNU Project.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://unifoundry.com/unifont/"
+        }
+      ]
+    },
+    {
+      "name": "highlight.js",
+      "desc": "JavaScript syntax highlighter with language auto-detection and zero dependencies.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://highlightjs.org/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/highlightjs/highlight.js"
+        }
+      ]
+    },
+    {
+      "name": "JSZip",
+      "desc": "Create, read and edit .zip files with Javascript.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://stuk.github.io/jszip/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/Stuk/jszip"
+        }
+      ]
+    },
+    {
+      "name": "lodash",
+      "desc": "A modern JavaScript utility library delivering modularity, performance, & extras.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://lodash.com/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/lodash/lodash"
+        }
+      ]
+    },
+    {
+      "name": "markdown-it",
+      "desc": "Markdown parser, done right. 100% CommonMark support, extensions, syntax plugins & high speed.",
+      "links": [
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/markdown-it/markdown-it"
+        }
+      ]
+    },
+    {
+      "name": "MiSans",
+      "desc": "Global Free Commercial-Use Fonts.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://hyperos.mi.com/font/"
+        }
+      ]
+    },
+    {
+      "name": "pinia",
+      "desc": "Intuitive, type safe, light and flexible Store for Vue using the composition api with DevTools support.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://pinia.vuejs.org/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/vuejs/pinia"
+        }
+      ]
+    },
+    {
+      "name": "Rsbuild",
+      "desc": "The zero-config build tool powered by Rspack.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://rsbuild.dev/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/web-infra-dev/rsbuild"
+        }
+      ]
+    },
+    {
+      "name": "Sass",
+      "desc": "Sass is the most mature, stable, and powerful professional grade CSS extension language in the world.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://sass-lang.com/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/sass/sass"
+        }
+      ]
+    },
+    {
+      "name": "Turbo Repo",
+      "desc": "Build system optimized for JavaScript and TypeScript, written in Rust.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://turborepo.dev/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/vercel/turbo"
+        }
+      ]
+    },
+    {
+      "name": "TypeScript",
+      "desc": "TypeScript is a superset of JavaScript that compiles to clean JavaScript output.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://www.typescriptlang.org/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/microsoft/TypeScript"
+        }
+      ]
+    },
+    {
+      "name": "Vue I18n",
+      "desc": "Easy, powerful, and component-oriented for Vue.js.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://vue-i18n.intlify.dev/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/intlify/vue-i18n"
+        }
+      ]
+    },
+    {
+      "name": "Vue Router",
+      "desc": "Expressive, configurable and convenient routing for Vue.js.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://router.vuejs.org/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/vuejs/router"
+        }
+      ]
+    },
+    {
+      "name": "Vue.js",
+      "desc": "An approachable, performant and versatile framework for building web user interfaces.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://vuejs.org/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/vuejs/core"
+        }
+      ]
+    },
+    {
+      "name": "VueUse",
+      "desc": "Collection of essential Vue Composition Utilities for Vue 3.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://vueuse.org/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/vueuse/vueuse"
+        }
+      ]
+    },
+    {
+      "name": "xss",
+      "desc": "Sanitize untrusted HTML (to prevent XSS) with a configuration specified by a Whitelist.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://jsxss.com/zh/index.html"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/leizongmin/js-xss"
+        }
+      ]
+    },
+    {
+      "name": "Yup",
+      "desc": "Dead simple Object schema validation.",
+      "links": [
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/jquense/yup"
+        }
+      ]
+    }
+  ],
+  "app": [
+    {
+      "name": "Tauri",
+      "desc": "Create small, fast, secure, cross-platform applications.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://tauri.app/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/tauri-apps/tauri"
+        }
+      ]
+    }
+  ],
+  "web": [
+    {
+      "name": "Actix Web",
+      "desc": "Actix Web is a powerful, pragmatic, and extremely fast web framework for Rust.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://actix.rs/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/actix/actix-web"
+        }
+      ]
+    },
+    {
+      "name": "Include Dir",
+      "desc": "The logical evolution of the include_str macro for embedding a directory tree into your binary.",
+      "links": [
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/Michael-F-Bryan/include_dir"
+        }
+      ]
+    },
+    {
+      "name": "Json Web Token",
+      "desc": "JWT lib in rust.",
+      "links": [
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/Keats/jsonwebtoken"
+        }
+      ]
+    },
+    {
+      "name": "Lazy Static",
+      "desc": "A small macro for defining lazy evaluated static variables in Rust.",
+      "links": [
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/rust-lang-nursery/lazy-static.rs"
+        }
+      ]
+    },
+    {
+      "name": "Mime Guess",
+      "desc": "MIME type guessing of file extensions for Rust.",
+      "links": [
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/abonander/mime_guess"
+        }
+      ]
+    },
+    {
+      "name": "Rand",
+      "desc": "A Rust library for random number generation.",
+      "links": [
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/rust-random/rand"
+        }
+      ]
+    },
+    {
+      "name": "Rust Crypto: Hashes",
+      "desc": "Cryptographic hash functions written in pure Rust.",
+      "links": [
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/RustCrypto/hashes"
+        }
+      ]
+    },
+    {
+      "name": "Serde",
+      "desc": "Serde is a framework for serializing and deserializing Rust data structures efficiently and generically.",
+      "links": [
+        {
+          "icon": "fa fa-globe",
+          "url": "https://serde.rs/"
+        },
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/serde-rs/serde"
+        }
+      ]
+    }
+  ]
+}

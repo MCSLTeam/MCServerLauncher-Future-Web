@@ -42,6 +42,10 @@ const props = withDefaults(
   },
 );
 
+defineEmits<{
+  (e: "click", event: MouseEvent): void;
+}>();
+
 const menuInfo = computed(() => {
   if (props.menu.length == 0) return [];
 
@@ -97,7 +101,12 @@ const menuInfo = computed(() => {
           :icon="button.icon"
           :icon-pos="button.iconPos"
           :type="button.type ?? 'text'"
-          @click="button.onClick"
+          @click="
+            (e) => {
+              button?.onClick?.(e);
+              $emit('click', e);
+            }
+          "
         >
           {{ button.label }}
         </Button>

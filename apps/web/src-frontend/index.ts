@@ -14,6 +14,7 @@ import { ref, watchEffect } from "vue";
 import { tasks } from "@repo/shared/src/utils/tasks.ts";
 import { useLocalStorage } from "@vueuse/core";
 import { useNavigation } from "@repo/shared/src/utils/stores.ts";
+import { MCSLNotif } from "@repo/ui/src/utils/notifications.ts";
 
 let shouldRegister = false;
 
@@ -55,7 +56,8 @@ export function setShouldRegister(value: boolean) {
       }
     });
 
-    useNavigation().addSidebarUpperItem(
+    useNavigation().addItem(
+      "sidebarUpper",
       {
         label: t("web.users.title"),
         icon: "fa fa-users",
@@ -64,7 +66,8 @@ export function setShouldRegister(value: boolean) {
       3,
     );
 
-    useNavigation().addNavbarItem(
+    useNavigation().addItem(
+      "navbar",
       {
         label: t("web.user-center.title"),
         icon: "fa fa-user",
@@ -79,26 +82,23 @@ export function setShouldRegister(value: boolean) {
       shouldRegister = await requestApi<boolean>(
         "/account/should-register",
         "GET",
-        undefined,
-        undefined,
-        undefined,
-        (message) => ({
-          duration: 0,
-          data: {
-            color: "danger",
-            closeable: false,
-            title: t("ui.notification.title.error"),
-            message: t("web.loading.connect-backend-error", {
-              reason: message,
-            }),
-          },
-        }),
+        (err) => {
+          new MCSLNotif({
+            duration: 0,
+            data: {
+              color: "danger",
+              closeable: false,
+              title: t("ui.notification.title.error"),
+              message: t("web.loading.connect-backend-error", {
+                reason: err.message,
+              }),
+            },
+          }).open();
+        },
       );
     } catch {
       // 阻塞直到刷新页面重试
-      while (true) {
-        await sleep(1000);
-      }
+      while (true) await sleep(1000);
     }
 
     router.addRoute({
@@ -119,7 +119,7 @@ export function setShouldRegister(value: boolean) {
       component: () => import("./views/Login.vue"),
     });
 
-    router.beforeEach(async (to, _from, next) => {
+    router.beforeEach((to, _from, next) => {
       if (useAccount().accessToken) {
         if (to.path.startsWith("/auth")) next("/");
       } else {
@@ -136,7 +136,23 @@ export function setShouldRegister(value: boolean) {
       next();
     });
 
-    if (!useAccount().accessToken) await router.push("/auth");
+    if (
+      !useAccount().accessToken &&
+      !router.currentRoute.value.path.startsWith("/auth") &&
+      !router.currentRoute.value.path.startsWith("/welcome")
+    )
+      await router.push("/auth");
+
+    loadingStep.value = t("web.loading.fetch-user");
+
+    await useAccount().updateSelfInfo();
+    setInterval(
+      async () => {
+        // 刷新权限
+        await useAccount().updateSelfInfo();
+      },
+      1000 * 60 * 5,
+    );
 
     loadingStep.value = "";
   });

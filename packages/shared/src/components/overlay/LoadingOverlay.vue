@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import FancyBackground from "@repo/ui/src/components/misc/FancyBackground.vue";
-import { getPlatform, loading, loadingStep } from "../../index.ts";
+import { platform, loading, loadingStep } from "../../index.ts";
 import { watch } from "vue";
 import Spinner from "@repo/ui/src/components/progress/Spinner.vue";
 import { animatedVisibilityExists } from "@repo/ui/src/utils/internal.ts";
@@ -28,11 +28,11 @@ watch(loading, (newValue) => {
     <FancyBackground>
       <div class="loading-overlay__container">
         <div class="loading-overlay__logo">
-          <img src="../../assets/MCSL.png" alt="" width="84" />
+          <img src="../../assets/img/MCSL.png" alt="" width="84" />
           <div>
             <h1>
               {{ t("shared.app.name.abbr") }} {{ t("shared.app.name.future") }}
-              {{ t(`${getPlatform()}.app.name.suffix`) }}
+              {{ t(`${platform}.app.name.suffix`) }}
             </h1>
             <h2>{{ t("shared.app.desc") }}</h2>
           </div>
