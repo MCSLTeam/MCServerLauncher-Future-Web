@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "prettier": "^3.8.0",
-    "turbo": "^2.7.5",
+    "turbo": "^2.7.6",
     "typescript": "^5.9.2"
   },
   "packageManager": "pnpm@10.28.0",
