@@ -1,21 +1,14 @@
-import {
-  computed,
-  type ComputedRef,
-  type Ref,
-  ref,
-  type VueElement,
-  watch,
-} from "vue";
+import { computed, type ComputedRef, type Ref, ref, watch } from "vue";
 import type { ColorType } from "./css.ts";
 
 // Context menu
-export const currContextmenu = ref<VueElement>();
+export let openContextmenu: (event: MouseEvent, props: any) => void = () => {};
 
-window.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    currContextmenu.value = undefined;
-  }
-});
+export function setOpenContextmenu(
+  fn: (event: MouseEvent, props: any) => void,
+) {
+  openContextmenu = fn;
+}
 
 // Meter group
 export const colorMap = new Map<string, ColorType>();
@@ -49,7 +42,7 @@ export function animatedVisibilityExists(
         }
       : animationDuration;
 
-  let timeout: number = -1;
+  let timeout = -1;
   watch(visible, (value) => {
     clearTimeout(timeout);
     if (value) {

@@ -7,7 +7,7 @@ import FormEntry from "@repo/ui/src/components/form/FormEntry.vue";
 import InputText from "@repo/ui/src/components/form/entries/InputText.vue";
 import { usePageData } from "@repo/shared/src/utils/stores.ts";
 import { useI18n } from "vue-i18n";
-import { requestApi } from "../utils/network.ts";
+import { notifyErr, requestApi } from "../utils/network.ts";
 import router from "@repo/shared/src/router.ts";
 import { MCSLNotif } from "@repo/ui/src/utils/notifications.ts";
 import { setShouldRegister } from "../index.ts";
@@ -62,13 +62,11 @@ async function submit() {
     await requestApi(
       "/account/register",
       "POST",
+      (e) => notifyErr(e, "web.auth.register.error"),
       {
         username: form.data.value.username,
         password: form.data.value.password,
       },
-      undefined,
-      undefined,
-      "web.auth.register.error",
     );
 
     setShouldRegister(false);

@@ -5,10 +5,7 @@ import axios, {
 } from "axios";
 import { useLocale } from "@repo/ui/src/utils/stores.ts";
 import { useAccount } from "./store.ts";
-import {
-  MCSLNotif,
-  type MCSLNotifSettings,
-} from "@repo/ui/src/utils/notifications.ts";
+import { MCSLNotif } from "@repo/ui/src/utils/notifications.ts";
 
 export type Method =
   | "GET"
@@ -19,36 +16,27 @@ export type Method =
   | "PATCH"
   | "PURGE";
 
-export type ApiErrNotifProvider = (message: string) => MCSLNotifSettings;
-
-function notifyErr(
-  path: string,
-  method: Method,
-  err: any,
-  notification?: string | ApiErrNotifProvider,
-) {
-  console.warn(`Failed to request /api${path} with method ${method}`, err);
-  const message = err instanceof Error ? err.message : err;
-  if (typeof notification == "function") {
-    new MCSLNotif(notification(message)).open();
-  } else if (notification) {
-    new MCSLNotif({
-      data: {
-        title: useLocale().getI18n().t("ui.notification.title.error"),
-        message: useLocale().getI18n().t(notification, { reason: message }),
-        color: "danger",
-      },
-    }).open();
-  }
+export function notifyErr(err: ApiError, notification: string) {
+  console.warn(
+    `Failed to request /api${err.path} with method ${err.method}`,
+    err,
+  );
+  new MCSLNotif({
+    data: {
+      title: useLocale().getI18n().t("ui.notification.title.error"),
+      message: useLocale().getI18n().t(notification, { reason: err.message }),
+      color: "danger",
+    },
+  }).open();
 }
 
 export async function request(
   path: string,
   method: Method,
+  errHandler?: (err: ApiError) => Promise<void> | void,
   data: any = {},
   headers: object = {},
   requestConfig: AxiosRequestConfig = {},
-  errNotification?: string | ApiErrNotifProvider,
 ): Promise<AxiosResponse> {
   try {
     return await axios("/api" + path, {
@@ -75,7 +63,7 @@ export async function request(
       res?.data?.err ?? (ex.status == 504 ? "network-error" : ex.message),
       e,
     );
-    notifyErr(path, method, err, errNotification);
+    await errHandler?.(err);
     throw err;
   }
 }
@@ -83,59 +71,60 @@ export async function request(
 export async function requestApi<T>(
   path: string,
   method: Method,
+  errHandler?: (err: ApiError) => Promise<void> | void,
   data?: any,
   headers?: object,
   requestConfig?: AxiosRequestConfig,
-  errNotification?: string | ApiErrNotifProvider,
 ): Promise<T> {
-  return (
-    await request(path, method, data, headers, requestConfig, errNotification)
-  ).data.data;
+  return (await request(path, method, errHandler, data, headers, requestConfig))
+    .data.data;
 }
 
 export async function requestWithToken<T>(
   path: string,
   method: Method,
+  errHandler?: (err: ApiError) => Promise<void> | void,
   data?: any,
   headers?: object,
   requestConfig?: AxiosRequestConfig,
-  errNotification?: string | ApiErrNotifProvider,
   autoRefreshToken: boolean = true,
 ): Promise<T> {
-  try {
-    if (!useAccount().accessToken) {
-      throw new ApiError(path, method, "invalid-token");
-    }
-    return await requestApi(
-      path,
-      method,
-      data,
-      {
-        ...headers,
-        Authorization: "Bearer " + useAccount().accessToken,
-      },
-      requestConfig,
-    );
-  } catch (e) {
-    if (
-      e instanceof ApiError &&
-      e.cause == "invalid-token" &&
-      autoRefreshToken
-    ) {
-      if (await useAccount().refreshToken())
-        return await requestWithToken(
-          path,
-          method,
-          data,
-          headers,
-          requestConfig,
-          errNotification,
-        );
-    }
-
-    notifyErr(path, method, e, errNotification);
-    throw e;
+  const token = useAccount().accessToken;
+  if (!token) {
+    const err = new ApiError(path, method, "invalid-token");
+    await errHandler?.(err);
+    throw err;
   }
+  return await requestApi(
+    path,
+    method,
+    async (e) => {
+      if (token) {
+        if (e.err == "invalid-token" && autoRefreshToken) {
+          await useAccount().refreshToken();
+          return await requestWithToken(
+            path,
+            method,
+            errHandler,
+            data,
+            headers,
+            requestConfig,
+            false,
+          );
+        }
+
+        if (e.err == "permission-denied") await useAccount().updateSelfInfo();
+      }
+
+      await errHandler?.(e);
+    },
+    data,
+    {
+      ...headers,
+      Authorization: "Bearer " + token,
+    },
+    requestConfig,
+  );
 }
 
 export class ApiError extends Error {

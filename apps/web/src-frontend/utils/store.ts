@@ -1,16 +1,22 @@
 import { defineStore } from "pinia";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import {
   type Serializer,
   useLocalStorage,
   useSessionStorage,
 } from "@vueuse/core";
-import router from "@repo/shared/src/router.ts";
-import { requestApi } from "./network.ts";
+import { notifyErr, requestApi, requestWithToken } from "./network.ts";
 import { MCSLNotif } from "@repo/ui/src/utils/notifications.ts";
 import { useLocale } from "@repo/ui/src/utils/stores.ts";
+import router from "@repo/shared/src/router.ts";
 
 export type TokenPair = { access_token: string; refresh_token: string };
+
+export type UserInfo = {
+  id: number;
+  name: string;
+  permissions: string[];
+};
 
 export const useAccount = defineStore("account", () => {
   const serializer: Serializer<TokenPair | null> = {
@@ -39,42 +45,67 @@ export const useAccount = defineStore("account", () => {
     return token.value?.access_token;
   });
 
-  function setToken(token: TokenPair | null, isPermanent?: boolean) {
+  async function setToken(token: TokenPair | null, isPermanent?: boolean) {
     if (isPermanent === true || isPermanent == undefined) {
       tokenPermanent.value = token;
     }
     if (isPermanent === false || isPermanent == undefined) {
       tokenTemporary.value = token;
     }
+    await updateSelfInfo();
   }
 
   async function logout() {
-    setToken(null);
-    await router.push("/");
+    if (!token.value) return;
+    await setToken(null);
+    await router.push("/auth");
   }
 
-  async function refreshToken(): Promise<boolean> {
-    // 只有永久 Token 存在时才刷新
-    if (!tokenPermanent.value) return false;
+  async function refreshToken() {
+    if (!token.value) return;
     try {
       const res = await requestApi<TokenPair>(
-        "/api/account/refresh",
+        "/account/refresh",
         "POST",
+        async (e) => {
+          if (e.err == "invalid-token") {
+            await logout();
+            const t = useLocale().getI18n().t;
+            new MCSLNotif({
+              data: {
+                title: t("ui.notification.title.warning"),
+                message: t("web.auth.login.expired"),
+                color: "warning",
+              },
+            }).open();
+          } else notifyErr(e, "web.auth.login.refresh-error");
+        },
         token.value,
       );
-      setToken(res, true);
-      return true;
+      await setToken(res, true);
     } catch {
-      const t = useLocale().getI18n().t;
-      new MCSLNotif({
-        data: {
-          title: t("ui.notification.title.warning"),
-          message: t("web.login.expired"),
-          color: "warning",
+      /* ignore */
+    }
+  }
+
+  const selfInfo = ref<UserInfo | null>(null);
+
+  async function updateSelfInfo() {
+    if (!accessToken.value) {
+      selfInfo.value = null;
+      return;
+    }
+    try {
+      selfInfo.value = await requestWithToken<UserInfo>(
+        "/user/self",
+        "GET",
+        async (err) => {
+          if (err.err == "invalid-token") await useAccount().refreshToken();
+          else notifyErr(err, "web.user-center.user-fetch-error");
         },
-      }).open();
-      await logout();
-      return false;
+      );
+    } catch {
+      /* ignore */
     }
   }
 
@@ -83,5 +114,7 @@ export const useAccount = defineStore("account", () => {
     setToken,
     logout,
     refreshToken,
+    selfInfo,
+    updateSelfInfo,
   };
 });
