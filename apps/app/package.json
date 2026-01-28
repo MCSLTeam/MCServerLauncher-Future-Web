@@ -27,7 +27,7 @@
     "vue": "^3.5.18"
   },
   "devDependencies": {
-    "@rsbuild/core": "^1.6.3",
+    "@rsbuild/core": "^1.7.2",
     "@tauri-apps/cli": "^2.8.1",
     "typescript": "^5.9.3",
     "vue-tsc": "^2.2.12"
