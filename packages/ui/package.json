@@ -8,30 +8,30 @@
     "test": "tsc --noEmit"
   },
   "devDependencies": {
-    "@eslint/js": "^9.33.0",
+    "@eslint/js": "^9.39.2",
     "@repo/configs": "workspace:*",
     "@repo/locales": "workspace:*",
-    "@types/lodash": "^4.17.20",
+    "@types/lodash": "^4.17.23",
     "@types/markdown-it": "^14.1.2",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.4",
-    "prettier": "^3.8.0",
-    "sass": "^1.90.0",
-    "typescript": "^5.9.2"
+    "eslint-plugin-prettier": "^5.5.5",
+    "prettier": "^3.8.1",
+    "sass": "^1.97.3",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@vueuse/core": "^13.7.0",
+    "@vueuse/core": "^13.9.0",
     "animate.css": "^4.1.1",
-    "dayjs": "^1.11.13",
+    "dayjs": "^1.11.19",
     "floating-vue": "^5.2.2",
     "highlight.js": "^11.11.1",
     "lodash": "^4.17.23",
     "markdown-it": "^14.1.0",
-    "pinia": "^3.0.3",
-    "vue": "^3.5.18",
-    "vue-i18n": "^11.1.11",
-    "vue-router": "^4.5.1",
+    "pinia": "^3.0.4",
+    "vue": "^3.5.27",
+    "vue-i18n": "^11.2.8",
+    "vue-router": "^4.6.4",
     "xss": "^1.0.15",
-    "yup": "^1.7.0"
+    "yup": "^1.7.1"
   }
 }
