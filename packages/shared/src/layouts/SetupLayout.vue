@@ -74,7 +74,7 @@ const t = useI18n().t;
 }
 
 .stretch-enter-active {
-  transition: 0.5s cubic-bezier(0, 1, 0, 1);
+  transition: 1s cubic-bezier(0, 1, 0, 1);
   overflow: hidden;
 }
 

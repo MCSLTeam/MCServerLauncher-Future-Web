@@ -5,10 +5,10 @@ import Panel from "@repo/ui/src/components/panel/Panel.vue";
 import { type ChartData, type ChartOptions } from "chart.js";
 import dayjs from "dayjs";
 import { formatDate, randNum } from "@repo/ui/src/utils/utils.ts";
-import { chartDatasetColor, registerChart } from "../../utils/chart.ts";
+import { chartDatasetColor, loadChart } from "../../utils/chart.ts";
 import { useI18n } from "vue-i18n";
 
-registerChart();
+loadChart();
 const t = useI18n().t;
 const info = inject<any>("instance");
 const totalMemory = 2 * 1024 ** 3;

@@ -59,7 +59,7 @@ export function buildActionContextmenu(instance: any) {
           onClick: () => {},
         },
       );
-    // @eslint-disable-next-line no-fallthrough
+    // eslint-disable-next-line no-fallthrough
     case "stopping":
       menuInfo.push({
         color: "red",

@@ -35,9 +35,9 @@ const animation = computed(() => {
   } else if (status.value == "out") {
     anim = props.outAnim;
     if (props.collapse == "vertical")
-      anim += `, 0.3s cubic-bezier(0, 1, 0, 1) both collapseOutVertical`;
+      anim += `, 1s cubic-bezier(0, 1, 0, 1) both collapseOutVertical`;
     if (props.collapse == "horizontal")
-      anim += `, 0.3s cubic-bezier(0, 1, 0, 1) both collapseOutHorizontal`;
+      anim += `, 1s cubic-bezier(0, 1, 0, 1) both collapseOutHorizontal`;
   }
   return anim;
 });

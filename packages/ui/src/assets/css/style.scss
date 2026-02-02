@@ -60,14 +60,6 @@ body,
   --suffix-color-2: var(--mcsl-color-red);
 }
 
-.font-mono {
-  font-family: var(--mcsl-font-family-mono);
-}
-
-.font-minecraft {
-  font-family: var(--mcsl-font-family-minecraft);
-}
-
 /* 主题切换动画 */
 ::view-transition-old(root),
 ::view-transition-new(root) {
@@ -122,7 +114,7 @@ html.dark::view-transition-new(root) {
   flex-shrink: 0;
 
   scrollbar-width: thin;
-  scrollbar-color: var(--mcsl-scrollbar-color) var(--mcsl-bg-color-main);
+  scrollbar-color: var(--mcsl-scrollbar-color) transparent;
 }
 
 button,
@@ -240,6 +232,16 @@ blockquote {
 }
 
 /* 动画 */
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
 @keyframes stretchInUp {
   from {
     scale: 1 0.5;
@@ -380,6 +382,108 @@ blockquote {
   }
 }
 
+/* highlight.js  */
+.hljs {
+  color: #c9d1d9;
+}
+
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  color: var(--mcsl-color-red-dark);
+}
+
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  color: var(--mcsl-color-purple-dark);
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  color: var(--mcsl-color-blue-dark);
+}
+
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  color: var(--mcsl-color-blue-darker);
+}
+
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: var(--mcsl-color-orange-dark);
+}
+
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  color: var(--mcsl-text-color-secondary);
+}
+
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  color: var(--mcsl-color-green-dark);
+}
+
+.hljs-subst {
+  color: var(--mcsl-text-color-gray);
+}
+
+.hljs-section {
+  color: var(--mcsl-color-blue-light);
+  font-weight: bold;
+}
+
+.hljs-bullet {
+  color: var(--mcsl-color-amber-darker);
+}
+
+.hljs-emphasis {
+  color: var(--mcsl-text-color-gray);
+  font-style: italic;
+}
+
+.hljs-strong {
+  color: var(--mcsl-text-color-gray);
+  font-weight: bold;
+}
+
+.hljs-addition {
+  color: var(--mcsl-color-green-darker);
+  background-color: var(--mcsl-color-green-lighter);
+}
+
+.hljs-deletion {
+  color: var(--mcsl-color-red-darker);
+  background-color: var(--mcsl-color-red-lighter);
+}
+
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+}
+
 /* 字体 */
 @font-face {
   font-family: "Minecraft";
@@ -414,6 +518,7 @@ blockquote {
   background: var(--mcsl-tooltip__bg);
   border-radius: var(--mcsl-border-radius-sm);
   padding: var(--mcsl-spacing-2xs) var(--mcsl-spacing-xs);
+
   & * {
     color: var(--mcsl-text-color-light);
   }

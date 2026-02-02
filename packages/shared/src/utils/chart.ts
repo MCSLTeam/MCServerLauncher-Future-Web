@@ -7,12 +7,8 @@ import {
 import { useLocale } from "@repo/ui/src/utils/stores.ts";
 import zoomPlugin from "chartjs-plugin-zoom";
 
-export function registerChart() {
-  Chart.register(...registerables, zoomPlugin);
-}
-
 export function loadChart() {
-  registerChart();
+  Chart.register(...registerables, zoomPlugin);
 
   Chart.defaults.color = getCSSVar("--mcsl-text-color-regular");
   Chart.defaults.borderColor = getCSSVar("--mcsl-border-color-base");
@@ -52,5 +48,3 @@ export function chartDatasetColor(color: ColorType) {
     fill: true,
   };
 }
-
-document.addEventListener("theme:change", loadChart);

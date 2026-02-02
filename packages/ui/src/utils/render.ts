@@ -194,6 +194,15 @@ hljs.registerAliases(["html", "htm", "xhtml", "mcui", "fxml"], {
   languageName: "xml",
 });
 
+export const highlightText = (string: string, lang?: string) =>
+  configuredXss.process(
+    xss.escapeHtmlEntities(
+      lang
+        ? hljs.highlight(string, { language: lang }).value
+        : hljs.highlightAuto(string).value,
+    ),
+  );
+
 export const renderHtml = (string: string) => configuredXss.process(string);
 
 export const renderMd = (string: string, options: Options = {}) =>

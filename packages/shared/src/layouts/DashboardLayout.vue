@@ -37,10 +37,10 @@ watch(sidebarCollapsedStorage, () => {
 
 <template>
   <div
-    class="dashboard"
+    class="dashboard-layout"
     :class="{
-      'dashboard__with-window-btn': windowButtonsExists,
-      'dashboard__sidebar-collapsed': sidebarCollapsed,
+      'dashboard-layout__with-window-btn': windowButtonsExists,
+      'dashboard-layout__sidebar-collapsed': sidebarCollapsed,
     }"
   >
     <DashboardSidebar
@@ -50,15 +50,15 @@ watch(sidebarCollapsedStorage, () => {
     />
     <div
       :class="{
-        'dashboard__sidebar-blocker-visible': sidebarExpanded,
+        'dashboard-layout__sidebar-blocker-visible': sidebarExpanded,
       }"
-      class="dashboard__sidebar-blocker"
+      class="dashboard-layout__sidebar-blocker"
       @click="sidebarExpanded = false"
     />
-    <div class="dashboard__main">
+    <div class="dashboard-layout__main">
       <div
         data-tauri-drag-region
-        class="dashboard__nav"
+        class="dashboard-layout__nav"
         :style="{
           transition: `${windowButtonTransition}`,
         }"
@@ -77,8 +77,10 @@ watch(sidebarCollapsedStorage, () => {
             v-else
             type="text"
             :icon="`fa fa-angles-${sidebarCollapsed ? 'right' : 'left'}`"
-            class="dashboard__collapse-btn"
-            :class="{ 'dashboard__collapse-btn-collapsed': sidebarCollapsed }"
+            class="dashboard-layout__collapse-btn"
+            :class="{
+              'dashboard-layout__collapse-btn-collapsed': sidebarCollapsed,
+            }"
             rounded
             size="small"
             v-tooltip="t('shared.navbar.collapse-sidebar')"
@@ -115,7 +117,7 @@ watch(sidebarCollapsedStorage, () => {
           />
         </div>
       </div>
-      <div class="dashboard__content">
+      <div class="dashboard-layout__content">
         <RouterView v-slot="{ Component }">
           <transition mode="out-in" name="fade" :duration="250">
             <component :is="Component" />
@@ -130,14 +132,14 @@ watch(sidebarCollapsedStorage, () => {
 @use "@repo/ui/src/assets/css/utils";
 @use "@repo/ui/src/components/SmallerContent";
 
-.dashboard {
+.dashboard-layout {
   width: 100%;
   height: 100%;
   background: var(--mcsl-bg-color-overlay);
   overflow: hidden;
 }
 
-.dashboard__main {
+.dashboard-layout__main {
   position: absolute;
   top: 0;
   right: 0;
@@ -147,7 +149,7 @@ watch(sidebarCollapsedStorage, () => {
   flex-direction: column;
   transition: 0.2s ease-in-out;
 
-  .dashboard__sidebar-collapsed > & {
+  .dashboard-layout__sidebar-collapsed > & {
     width: calc(
       100% - utils.get-size-var("height", "large", SmallerContent.$vars) - var(
           --mcsl-spacing-lg
@@ -160,7 +162,7 @@ watch(sidebarCollapsedStorage, () => {
   }
 }
 
-.dashboard__nav {
+.dashboard-layout__nav {
   padding: var(--mcsl-spacing-md);
   padding-top: var(--mcsl-spacing-xl);
   height: 1rem;
@@ -179,14 +181,14 @@ watch(sidebarCollapsedStorage, () => {
     var(--mcsl-font-size-md) * 1.5 + var(--mcsl-spacing-4xs) * 2
   );
 
-  .dashboard__with-window-btn.dashboard__sidebar-collapsed & {
+  .dashboard-layout__with-window-btn.dashboard-layout__sidebar-collapsed & {
     // 右移
     transform: translateX($btn-width);
     width: calc(100% - 2 * var(--mcsl-spacing-md) - $btn-width);
   }
 
   @media (max-width: 450px) {
-    .dashboard__with-window-btn & {
+    .dashboard-layout__with-window-btn & {
       // 右移
       $offset: calc(3 * $btn-width);
       transform: translateX($offset) !important;
@@ -195,7 +197,7 @@ watch(sidebarCollapsedStorage, () => {
   }
 
   @media (max-width: 768px) {
-    .dashboard__with-window-btn & > div:first-child {
+    .dashboard-layout__with-window-btn & > div:first-child {
       gap: 0;
       & > nav {
         margin-left: var(--mcsl-spacing-md);
@@ -204,7 +206,7 @@ watch(sidebarCollapsedStorage, () => {
   }
 }
 
-.dashboard__content {
+.dashboard-layout__content {
   margin: var(--mcsl-spacing-md);
   margin-top: 0;
   background: var(--mcsl-bg-color-main);
@@ -218,7 +220,7 @@ watch(sidebarCollapsedStorage, () => {
   );
 }
 
-.dashboard__sidebar-blocker {
+.dashboard-layout__sidebar-blocker {
   z-index: 5;
   position: absolute;
   top: 0;
@@ -229,7 +231,7 @@ watch(sidebarCollapsedStorage, () => {
   transition: 0.2s ease-in-out;
 }
 
-.dashboard__sidebar-blocker-visible {
+.dashboard-layout__sidebar-blocker-visible {
   pointer-events: all;
   background: utils.transparent(var(--mcsl-color-surface-darker), 50%);
 }

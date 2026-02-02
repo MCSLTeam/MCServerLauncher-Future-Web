@@ -146,7 +146,7 @@ defineExpose({
   transform: translate(0);
   animation:
     var(--mcsl-message__anim-out),
-    0.5s 0.2s cubic-bezier(0, 1, 0, 1) collapseOutVertical;
+    1s 0.2s cubic-bezier(0, 1, 0, 1) collapseOutVertical;
 
   &.mcsl-message__visible {
     animation:

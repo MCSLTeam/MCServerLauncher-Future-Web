@@ -93,7 +93,6 @@ defineExpose({
 
 <style lang="scss" scoped>
 .mcsl-collapsable-panel {
-  border-color: var(--mcsl-border-color-dark);
   transition: 0.2s ease-in-out;
 
   & .mcsl-collapsable-panel__header {
@@ -132,12 +131,11 @@ defineExpose({
 .mcsl-collapsable-panel.mcsl-collapsable-panel__collapsed {
   & > .mcsl-panel__header {
     padding-bottom: 0;
-    border-color: transparent;
   }
 
   & > .mcsl-panel__body-wrapper {
     max-height: 0;
-    transition: 0.3s cubic-bezier(0, 1, 0, 1);
+    transition: 1s cubic-bezier(0, 1, 0, 1);
   }
 }
 

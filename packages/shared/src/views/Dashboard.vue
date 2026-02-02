@@ -3,6 +3,10 @@ import { usePageData } from "../utils/stores.ts";
 import { useI18n } from "vue-i18n";
 import { getExecutableType } from "../utils/node/types/instanceInstallationType.ts";
 import { MCSLNotif } from "@repo/ui/src/utils/notifications.ts";
+import { ref } from "vue";
+import Button from "@repo/ui/src/components/form/button/Button.vue";
+import Modal from "@repo/ui/src/components/overlay/Modal.vue";
+import BaseTextEditor from "@repo/ui/src/components/editor/BaseTextEditor.vue";
 
 usePageData().set({
   layout: "dashboard",
@@ -37,10 +41,38 @@ async function handleFileChange(event: Event) {
     }).open();
   }
 }
+
+const showEditor = ref(false);
+const editorText = ref("");
 </script>
 
 <template>
-  <input type="file" @change="handleFileChange" />
+  <div class="dashboard">
+    <input type="file" @change="handleFileChange" />
+    <Button type="primary" @click="showEditor = true">打开文本编辑器</Button>
+    <Modal
+      v-model:visible="showEditor"
+      header="文本编辑器"
+      max-width="80vw"
+      :close-on-esc="false"
+      :close-on-click-outside="false"
+    >
+      <BaseTextEditor class="editor" v-model="editorText" />
+    </Modal>
+  </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mcsl-spacing-2xs);
+}
+</style>
+
+<style lang="scss">
+.editor {
+  width: 100%;
+  height: calc(80vh - 2 * var(--mcsl-spacing-md));
+}
+</style>
