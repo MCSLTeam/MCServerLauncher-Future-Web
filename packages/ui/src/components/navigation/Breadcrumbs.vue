@@ -13,17 +13,14 @@ const props = defineProps<{
   iconSeperator?: boolean;
 }>();
 
-const actualSeperator = computed(() => props.seperator ?? "fa fa-angle-right");
-const actuallyIconSeperator = computed(() =>
-  props.seperator == undefined ? true : props.iconSeperator,
-);
+const actualSeperator = computed(() => props.seperator ?? "/");
 </script>
 
 <template>
   <nav class="mcsl-breadcrumbs">
     <template v-for="(item, index) in items" :key="index">
       <span v-if="index > 0">
-        <i v-if="actuallyIconSeperator" :class="actualSeperator" />
+        <i v-if="iconSeperator" :class="iconSeperator" />
         <template v-else>{{ actualSeperator }} </template>
       </span>
       <RouterLink :to="item.path">

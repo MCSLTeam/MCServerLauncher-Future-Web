@@ -34,6 +34,43 @@ const router = createRouter({
       component: async () => await import("./views/Instances.vue"),
     },
     {
+      path: "/instance/:instanceId",
+      name: "Instance",
+      component: async () => await import("./views/instance/Instance.vue"),
+      redirect: (to) => {
+        return `/instance/${to.params.instanceId}/overview`;
+      },
+
+      children: [
+        {
+          path: "/instance/:instanceId/overview",
+          name: "Instance - Overview",
+          component: async () => await import("./views/instance/Overview.vue"),
+        },
+        {
+          path: "/instance/:instanceId/console",
+          name: "Instance - Console",
+          component: async () => await import("./views/instance/Console.vue"),
+        },
+        {
+          path: "/instance/:instanceId/files",
+          name: "Instance - Files",
+          component: async () => await import("./views/instance/Files.vue"),
+        },
+        {
+          path: "/instance/:instanceId/automation",
+          name: "Instance - Automation",
+          component: async () =>
+            await import("./views/instance/Automation.vue"),
+        },
+        {
+          path: "/instance/:instanceId/settings",
+          name: "Instance - Settings",
+          component: async () => await import("./views/instance/Settings.vue"),
+        },
+      ],
+    },
+    {
       path: "/resource-center",
       name: "Resource Center",
       component: async () => await import("./views/ResourceCenter.vue"),
@@ -66,9 +103,16 @@ const router = createRouter({
             await import("./views/settings/Appearance.vue"),
         },
         {
-          path: "/settings/instance",
-          name: "Settings - Instance",
-          component: async () => await import("./views/settings/Instance.vue"),
+          path: "/settings/instance-creation",
+          name: "Settings - Instance Creation",
+          component: async () =>
+            await import("./views/settings/InstanceCreation.vue"),
+        },
+        {
+          path: "/settings/instance-management",
+          name: "Settings - Instance Management",
+          component: async () =>
+            await import("./views/settings/InstanceManagement.vue"),
         },
         {
           path: "/settings/about",

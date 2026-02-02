@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { throttle as throttleFunc } from "../../utils/utils.ts";
 
 defineOptions({
@@ -15,6 +15,7 @@ const props = withDefaults(
       | "opacity-0"
       | "always-show";
     throttle?: number;
+    parent?: HTMLElement;
   }>(),
   {
     mode: "v-if",
@@ -22,62 +23,72 @@ const props = withDefaults(
   },
 );
 
-export type ScrollInfo = {
-  direction: "up" | "down";
-  type: "in" | "out";
-};
-
-const emit = defineEmits<(e: "update", info: ScrollInfo) => void>();
-
 const wrapper = ref();
 const visible = ref(false);
 
-let direction: "up" | "down" = "down";
-let lastY = 0;
+let direction = ref<"up" | "down">("down");
 
 const detectVisible = throttleFunc(() => {
-  const rect = wrapper.value.getBoundingClientRect();
-  if (!rect) {
+  if (!wrapper.value) {
     visible.value = false;
     return;
   }
-  const { x, y, width, height } = rect;
-
-  if (lastY < y) direction = "up";
-  else direction = "down";
-  lastY = y;
+  const rect = wrapper.value.getBoundingClientRect();
+  const pRect = mergeRect(
+    document.body.getBoundingClientRect(),
+    props.parent?.getBoundingClientRect(),
+  );
 
   visible.value =
-    x + width > scrollX &&
-    x < scrollX + innerWidth &&
-    y + height > scrollY &&
-    y < scrollY + innerHeight;
+    rect.right > pRect.left &&
+    rect.left < pRect.right &&
+    rect.bottom > pRect.top &&
+    rect.top < pRect.bottom;
 }, props.throttle);
 
-watch(visible, (value) => {
-  emit("update", {
-    direction,
-    type: value ? "in" : "out",
-  });
-});
+function mergeRect(rect1: DOMRect, rect2?: DOMRect) {
+  if (!rect2) return rect1;
+  return {
+    left: Math.min(rect1.left, rect2.left),
+    top: Math.min(rect1.top, rect2.top),
+    right: Math.max(rect1.right, rect2.right),
+    bottom: Math.max(rect1.bottom, rect2.bottom),
+  };
+}
 
 const listenedElements: HTMLElement[] = [];
+const elementLastScrollTops: number[] = [];
+
+function onElementScroll(event: Event) {
+  const el = event.target as HTMLElement;
+  const lastScrollTop = elementLastScrollTops[listenedElements.indexOf(el)]!;
+  if (lastScrollTop < el.scrollTop) direction.value = "down";
+  else direction.value = "up";
+  elementLastScrollTops[listenedElements.indexOf(el)] = el.scrollTop;
+  detectVisible();
+}
 
 onMounted(() => {
   let el = wrapper.value;
   while (true) {
     el = el?.parentElement ?? undefined;
     if (!el) break;
-    el.addEventListener("scroll", detectVisible);
+    el.addEventListener("scroll", onElementScroll);
     listenedElements.push(el);
+    elementLastScrollTops.push(el.scrollTop);
   }
   detectVisible();
 });
 
 onUnmounted(() => {
   listenedElements.forEach((el) =>
-    el?.removeEventListener?.("scroll", detectVisible),
+    el?.removeEventListener?.("scroll", onElementScroll),
   );
+});
+
+defineExpose({
+  visible: computed(() => visible.value),
+  direction: computed(() => direction.value),
 });
 </script>
 

@@ -7,7 +7,7 @@ import { windowButtonsExists, windowButtonTransition } from "../index.ts";
 import { useNavigation, usePageData } from "../utils/stores.ts";
 import router from "../router.ts";
 import { useI18n } from "vue-i18n";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useScreenWidth } from "@repo/ui/src/utils/stores.ts";
 import { animatedVisibilityExists } from "@repo/ui/src/utils/internal.ts";
 import { navigateTo } from "@repo/ui/src/utils/utils.ts";
@@ -24,6 +24,14 @@ const navbarItems = useNavigation().getItems("navbar");
 
 router.afterEach(() => {
   sidebarExpanded.value = false;
+});
+
+watch(sidebarCollapsedStorage, () => {
+  window.dispatchEvent(
+    new CustomEvent("sidebar:collapse", {
+      detail: sidebarCollapsed.value,
+    }),
+  );
 });
 </script>
 
@@ -137,7 +145,7 @@ router.afterEach(() => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  transition: 0.3s ease-in-out;
+  transition: 0.2s ease-in-out;
 
   .dashboard__sidebar-collapsed > & {
     width: calc(
@@ -218,7 +226,7 @@ router.afterEach(() => {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  transition: 0.3s ease-in-out;
+  transition: 0.2s ease-in-out;
 }
 
 .dashboard__sidebar-blocker-visible {

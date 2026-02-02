@@ -11,7 +11,7 @@ const t = useI18n().t;
 </script>
 
 <template>
-  <Panel border>
+  <Panel>
     <div class="settings-item">
       <div>
         <h4>{{ t(label) }}</h4>

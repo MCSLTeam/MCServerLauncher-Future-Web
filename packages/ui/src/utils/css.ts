@@ -61,7 +61,8 @@ export type ColorVar =
   | "text-color-regular"
   | "text-color-secondary"
   | "text-color-gray"
-  | "text-color-opposite";
+  | "text-color-opposite"
+  | "text-color-white";
 
 export type CSSSize =
   | "4xs"
@@ -140,6 +141,12 @@ export function getShadow(
         `0 8px 10px -6px ${new ColorData(color, "default", 0.3).getCss()}`
       );
   }
+}
+
+export function getCSSVar(name: string) {
+  return window
+    .getComputedStyle(document.documentElement)
+    .getPropertyValue(name);
 }
 
 export function getStatusIcon(

@@ -13,7 +13,7 @@ withDefaults(
     size?: Size;
     placeholder?: string;
     password?: boolean;
-    clearBtn?: boolean;
+    clearable?: boolean;
   }>(),
   {
     size: "medium",
@@ -22,7 +22,7 @@ withDefaults(
     disabled: false,
     placeholder: "",
     password: false,
-    clearBtn: false,
+    clearable: false,
   },
 );
 
@@ -100,7 +100,7 @@ if (formField) {
         formField?.onFocus($event);
       "
     />
-    <div v-if="clearBtn">
+    <div v-if="clearable">
       <Button
         type="text"
         rounded
@@ -139,12 +139,16 @@ if (formField) {
     }
 
     & > div {
-      width: calc($height + 2px); // 加上border宽度
-      height: calc($height + 2px);
+      width: calc($height - 1px);
+      height: calc($height - 1px);
 
       & > button {
         width: calc($height - $spacing);
         height: calc($height - $spacing);
+
+        & * {
+          font-size: var(--mcsl-font-size-sm);
+        }
       }
     }
   }

@@ -7,9 +7,12 @@ import InputText from "@repo/ui/src/components/form/entries/InputText.vue";
 import { computed, ref } from "vue";
 import Panel from "@repo/ui/src/components/panel/Panel.vue";
 import Contextmenu from "@repo/ui/src/components/overlay/Contextmenu.vue";
-import { type MenuItem } from "@repo/ui/src/components/panel/Menu.vue";
 import router from "../router.ts";
-import { snakeToPascal } from "../utils/utils.ts";
+import {
+  buildActionContextmenu,
+  getStatusColor,
+  snakeToPascal,
+} from "../utils/utils.ts";
 import { pinyin } from "pinyin-pro";
 import Divider from "@repo/ui/src/components/misc/Divider.vue";
 import Button from "@repo/ui/src/components/form/button/Button.vue";
@@ -92,23 +95,6 @@ const instances = ref<Record<string, any[]>>({
     },
   ],
 });
-
-function getStatusColor(status: InstanceStatus) {
-  switch (status) {
-    case "running":
-      return "green";
-    case "stopped":
-      return "gray";
-    case "starting":
-      return "emerald";
-    case "stopping":
-      return "orange";
-    case "crashed":
-      return "red";
-    case "installing":
-      return "blue";
-  }
-}
 
 function shouldStatusRipple(status: InstanceStatus) {
   return (
@@ -257,13 +243,13 @@ function getTypeInfo(instance: any) {
     (game == "terraria" && instance.type != "terraria")
   )
     return `${snakeToPascal(instance.type).replaceAll("+", " +")} ${instance.gameVersion}`;
-  return `${t(`shared.instances.types.${game}`)} ${instance.loaderVersion}`;
+  return `${t(`shared.instance.types.${game}`)} ${instance.loaderVersion}`;
 }
 
 function getTypeTooltip(instance: any) {
   const game = getGame(instance.type);
   if (instance.gameVersion != instance.loaderVersion)
-    return `${t(`shared.instances.types.${game}`)} ${instance.gameVersion} - ${snakeToPascal(instance.type).replaceAll("+", " +")} ${instance.loaderVersion}`;
+    return `${t(`shared.instance.types.${game}`)} ${instance.gameVersion} - ${snakeToPascal(instance.type).replaceAll("+", " +")} ${instance.loaderVersion}`;
   return undefined;
 }
 
@@ -307,46 +293,6 @@ function highlightText(text: string, searchText: string): string {
 
   return text;
 }
-
-function buildContextmenu(instance: any) {
-  if ((instance.status as InstanceStatus) == "installing") return undefined;
-  const menuInfo: MenuItem[] = [];
-  switch (instance.status) {
-    case "stopped":
-    case "crashed":
-      menuInfo.push({
-        color: "emerald",
-        icon: "fa fa-play",
-        label: t("shared.instance.action.start"),
-        onClick: () => {},
-      });
-      break;
-    case "starting":
-    case "running":
-      menuInfo.push({
-        color: "orange",
-        icon: "fa fa-rotate-right",
-        label: t("shared.instance.action.restart"),
-        onClick: () => {},
-      });
-      menuInfo.push({
-        color: "rose",
-        icon: "fa fa-stop",
-        label: t("shared.instance.action.stop"),
-        onClick: () => {},
-      });
-    // @eslint-disable-next-line no-fallthrough
-    case "stopping":
-      menuInfo.push({
-        color: "red",
-        icon: "fa fa-power-off",
-        label: t("shared.instance.action.kill"),
-        onClick: () => {},
-      });
-      break;
-  }
-  return menuInfo;
-}
 </script>
 
 <template>
@@ -354,7 +300,7 @@ function buildContextmenu(instance: any) {
     <div class="instances__searchbar">
       <InputText
         v-model="search"
-        clear-btn
+        clearable
         :placeholder="t('shared.instances.sorting.search-placeholder')"
       />
       <div>
@@ -450,8 +396,8 @@ function buildContextmenu(instance: any) {
           >
             <template #contextmenu>
               <Contextmenu
-                v-if="buildContextmenu(instance)"
-                :menu="buildContextmenu(instance)!"
+                  v-if="instance.status != 'installing'"
+                :menu="buildActionContextmenu(instance)!"
               />
             </template>
             <div class="instances__instance-info">
@@ -484,7 +430,7 @@ function buildContextmenu(instance: any) {
               :style="{
                 '--instances__instance-status-color': `var(--mcsl-color-${getStatusColor(instance.status)}-400)`,
               }"
-              v-tooltip="t(`shared.instances.status.${instance.status}`)"
+              v-tooltip="t(`shared.instance.status.${instance.status}`)"
             />
           </Panel>
         </div>

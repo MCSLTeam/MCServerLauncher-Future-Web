@@ -33,7 +33,8 @@ export type NavigationType =
   | "sidebarUpper"
   | "sidebarDowner"
   | "navbar"
-  | "settings";
+  | "settings"
+  | "instance";
 export const useNavigation = defineStore("navigation", () => {
   const t = useLocale().getI18n().t;
 
@@ -99,14 +100,51 @@ export const useNavigation = defineStore("navigation", () => {
         icon: "fa fa-brush",
       },
       {
-        label: t("shared.settings.instance.title"),
-        link: "/settings/instance",
+        label: t("shared.settings.instance-creation.title"),
+        link: "/settings/instance-creation",
+        icon: "fa fa-plus",
+      },
+      {
+        label: t("shared.settings.instance-management.title"),
+        link: "/settings/instance-management",
         icon: "fa fa-server",
       },
       {
         label: t("shared.settings.about.title"),
         link: "/settings/about",
         icon: "fa fa-circle-info",
+      },
+    ],
+    instance: [
+      {
+        label: t("shared.instance.overview.title"),
+        link: "./overview",
+        isSubpage: path => /\/instance\/[a-zA-Z0-9-]+\/overview/.test(path),
+        icon: "fa fa-chart-line",
+      },
+      {
+        label: t("shared.instance.console.title"),
+        link: "./console",
+        isSubpage: path => /\/instance\/[a-zA-Z0-9-]+\/console/.test(path),
+        icon: "fa fa-terminal",
+      },
+      {
+        label: t("shared.instance.files.title"),
+        link: "./files",
+        isSubpage: path => /\/instance\/[a-zA-Z0-9-]+\/files/.test(path),
+        icon: "fa fa-folder-open",
+      },
+      {
+        label: t("shared.instance.automation.title"),
+        link: "./automation",
+        isSubpage: path => /\/instance\/[a-zA-Z0-9-]+\/automation/.test(path),
+        icon: "fa fa-calendar",
+      },
+      {
+        label: t("shared.instance.settings.title"),
+        link: "./settings",
+        isSubpage: path => /\/instance\/[a-zA-Z0-9-]+\/settings/.test(path),
+        icon: "fa fa-gear",
       },
     ],
   });
@@ -133,6 +171,7 @@ export const useNavigation = defineStore("navigation", () => {
 export const useSettings = defineStore("settings", () => {
   const settings = useLocalStorage("settings", {
     allowContextmenu: false,
+    useTerminalInput: false,
   });
 
   function load() {

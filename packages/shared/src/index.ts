@@ -8,6 +8,7 @@ import router from "./router.ts";
 import dayjs from "dayjs";
 import axios from "axios";
 import { useSettings } from "./utils/stores.ts";
+import "@xterm/xterm/css/xterm.css"
 
 type Platform = "web" | "app";
 
@@ -36,7 +37,7 @@ export const commitHash = import.meta.env.COMMIT_HASH;
 
 export const windowButtonsExists = ref(false);
 export const windowButtonTransition = computed(
-  () => `0.3s ${windowButtonsExists.value ? "" : "0.5s"} ease-in-out`,
+  () => `0.2s ${windowButtonsExists.value ? "" : "0.5s"} ease-in-out`,
 );
 
 export const loading = ref(true);
@@ -66,7 +67,7 @@ export async function load(
 
   app.mount("#app");
 
-  await useSettings().load();
+  useSettings().load();
 
   await loadUi();
 

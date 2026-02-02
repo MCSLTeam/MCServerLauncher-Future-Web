@@ -6,14 +6,14 @@
 @use "utils";
 
 :root {
-  --font-sans:
-    "MiSans VF", "PingFang SC", Inter, -apple-system, BlinkMacSystemFont,
-    Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans,
-    Helvetica Neue, sans-serif;
-  --font-minecraft: "Minecraft", "GNU Unifont", var(--font-sans);
-  --font-mono:
-    ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono,
-    monospace;
+  --mcsl-font-family-sans: "MiSans VF", "PingFang SC", Inter, -apple-system, BlinkMacSystemFont,
+  Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans,
+  Helvetica Neue, sans-serif;
+  --mcsl-font-family-minecraft: Minecraft, GNU Unifont, var(--mcsl-font-family-sans);
+  --mcsl-font-family-mono: JetBrains Mono, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono,
+  monospace;
+
+  font-family: var(--mcsl-font-family-sans);
 
   &.light {
     color-scheme: light;
@@ -53,16 +53,16 @@ body,
 }
 
 .app {
-  --suffix-color-1: var(--mcsl-color-amber-400);
+  --suffix-color-1: var(--mcsl-color-amber);
   --suffix-color-2: var(--mcsl-color-red);
 }
 
 .font-mono {
-  font-family: var(--font-mono);
+  font-family: var(--mcsl-font-family-mono);
 }
 
 .font-minecraft {
-  font-family: var(--font-minecraft);
+  font-family: var(--mcsl-font-family-minecraft);
 }
 
 /* 主题切换动画 */
@@ -113,7 +113,6 @@ html.dark::view-transition-new(root) {
 /* 排版 */
 * {
   color: var(--mcsl-text-color-regular);
-  font-family: var(--font-sans);
   font-weight: var(--mcsl-font-weight-base);
   font-size: var(--mcsl-font-size-md);
   line-height: 1.2;
@@ -121,6 +120,10 @@ html.dark::view-transition-new(root) {
 
   scrollbar-width: thin;
   scrollbar-color: var(--mcsl-scrollbar-color) var(--mcsl-bg-color-main);
+}
+
+button, input, select, textarea, optgroup {
+  font-family: inherit;
 }
 
 strong {
@@ -373,14 +376,12 @@ blockquote {
 /* 字体 */
 @font-face {
   font-family: "Minecraft";
-  src: url("https://www.minecraft.net/etc.clientlibs/minecraftnet/clientlibs/clientlib-site/resources/fonts/Minecraft-Seven_v2.woff2")
-    format("woff");
+  src: url("https://www.minecraft.net/etc.clientlibs/minecraftnet/clientlibs/clientlib-site/resources/fonts/Minecraft-Seven_v2.woff2") format("woff");
 }
 
 @font-face {
   font-family: "GNU Unifont";
-  src: url("https://www.unifoundry.com/pub/unifont/unifont-17.0.03/font-builds/unifont-17.0.03.otf")
-    format("opentype");
+  src: url("https://www.unifoundry.com/pub/unifont/unifont-17.0.03/font-builds/unifont-17.0.03.otf") format("opentype");
 }
 
 /* Floating Vue  */
@@ -395,8 +396,8 @@ blockquote {
 
 .v-popper--theme-tooltip .v-popper__inner {
   background: utils.transparent(
-    var(--mcsl-bg-color-overlay-opposite),
-    var(--mcsl-tooltip__bg-opacity)
+      var(--mcsl-bg-color-overlay-opposite),
+      var(--mcsl-tooltip__bg-opacity)
   );
   border-radius: var(--mcsl-border-radius-sm);
   padding: var(--mcsl-spacing-2xs) var(--mcsl-spacing-xs);
@@ -408,8 +409,8 @@ blockquote {
 
 .v-popper--theme-tooltip .v-popper__arrow-outer {
   border-color: utils.transparent(
-    var(--mcsl-bg-color-overlay-opposite),
-    var(--mcsl-tooltip__bg-opacity)
+      var(--mcsl-bg-color-overlay-opposite),
+      var(--mcsl-tooltip__bg-opacity)
   );
 }
 

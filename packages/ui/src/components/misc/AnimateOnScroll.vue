@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue";
-import LazyLoad, { type ScrollInfo } from "./LazyLoad.vue";
+import { computed, onMounted, ref, watch, watchEffect } from "vue";
+import LazyLoad from "./LazyLoad.vue";
 
 defineOptions({
   inheritAttrs: false,
@@ -10,8 +10,9 @@ const props = withDefaults(
   defineProps<{
     up?: string;
     down?: string;
-    nowrap?: boolean;
+    wrap?: boolean;
     default?: "up" | "down" | "none" | string;
+    parent?: HTMLElement;
     lazyload?:
       | "v-if"
       | "display-none"
@@ -20,15 +21,15 @@ const props = withDefaults(
       | "no";
   }>(),
   {
-    nowrap: false,
+    wrap: false,
     default: "down",
     lazyload: "no",
   },
 );
 
-const info = ref<ScrollInfo>();
+const lazyLoad = ref();
 
-const defaultAnimation = computed(() => {
+function getDefaultAnim() {
   switch (props.default) {
     case "up":
       return props.up ?? props.down;
@@ -39,19 +40,23 @@ const defaultAnimation = computed(() => {
     default:
       return props.default;
   }
-});
+}
 
-const animation = computed(() => {
-  if (!info.value) return defaultAnimation.value;
-  if (info.value.type === "in") {
-    switch (info.value.direction) {
-      case "up":
-        return props.up ?? props.down;
-      case "down":
-        return props.down ?? props.up;
-    }
-  }
-  return undefined;
+const animation = ref(getDefaultAnim());
+
+onMounted(() => {
+  watch(
+    computed(() => lazyLoad.value.visible),
+    (value) => {
+      if (value)
+        animation.value =
+          lazyLoad.value.direction === "up"
+            ? (props.up ?? props.down)
+            : (props.down ?? props.up);
+      else animation.value = undefined;
+    },
+  );
+  watchEffect(() => {});
 });
 </script>
 
@@ -59,15 +64,12 @@ const animation = computed(() => {
   <LazyLoad
     :mode="lazyload == 'no' ? 'always-show' : lazyload"
     :throttle="5"
-    @update="info = $event"
+    :parent="parent"
+    ref="lazyLoad"
   >
     <div
-      :class="{
-        'mcsl-animate-on-scroll__wrap': !nowrap,
-        'mcsl-animate-on-scroll__nowrap': nowrap,
-      }"
       :style="{
-        '--mcsl-animate-on-scroll__animation': animation,
+        animation,
       }"
       v-bind="$attrs"
     >
@@ -77,13 +79,4 @@ const animation = computed(() => {
 </template>
 
 <style lang="scss" scoped>
-.mcsl-animate-on-scroll__wrap {
-  animation: var(--mcsl-animate-on-scroll__animation);
-}
-
-.mcsl-animate-on-scroll__nowrap {
-  & > * {
-    animation: var(--mcsl-animate-on-scroll__animation);
-  }
-}
 </style>

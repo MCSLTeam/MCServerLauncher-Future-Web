@@ -110,8 +110,6 @@ defineExpose({
 }
 
 .mcsl-collapsable-panel.mcsl-collapsable-panel__collapsed {
-  border-color: var(--mcsl-border-color-base);
-
   & .mcsl-collapsable-panel__header > i {
     transform: rotate(-180deg);
   }
@@ -126,7 +124,8 @@ defineExpose({
 
   & > .mcsl-panel__body-wrapper {
     overflow: hidden;
-    animation: 0.8s ease-in-out both collapseInVertical;
+    max-height: 1000px;
+    transition: 0.8s ease-in-out;
   }
 }
 
@@ -137,7 +136,8 @@ defineExpose({
   }
 
   & > .mcsl-panel__body-wrapper {
-    animation: 0.3s cubic-bezier(0, 1, 0, 1) both collapseOutVertical;
+    max-height: 0;
+    transition: 0.3s cubic-bezier(0, 1, 0, 1);
   }
 }
 

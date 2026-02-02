@@ -59,5 +59,9 @@ export const fullscreen = ref(false);
     },
   });
 
-  await load(App, async () => {});
+  await load(
+    App,
+    async () => {},
+    async () => {},
+  );
 })();
