@@ -132,6 +132,7 @@ defineExpose({
 
 .mcsl-nav-tabs {
   width: fit-content;
+  max-width: 100%;
   position: relative;
   background: var(--mcsl-bg-color-overlay);
   border-radius: var(--mcsl-border-radius-full);

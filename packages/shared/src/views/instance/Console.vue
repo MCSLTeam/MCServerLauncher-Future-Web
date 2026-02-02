@@ -9,8 +9,10 @@ import { useSettings } from "../../utils/stores.ts";
 import InputText from "@repo/ui/src/components/form/entries/InputText.vue";
 import Button from "@repo/ui/src/components/form/button/Button.vue";
 import Divider from "@repo/ui/src/components/misc/Divider.vue";
+import {useI18n} from "vue-i18n";
 
 const settings = useSettings();
+const t = useI18n().t;
 let term: Terminal;
 const fitAddon = new FitAddon();
 const termEl = ref();
@@ -62,6 +64,7 @@ onMounted(async () => {
     overviewRuler: {
       width: 4,
     },
+    convertEol: true,
     cursorBlink: true,
     cursorStyle: "underline",
     disableStdin: !settings.data.useTerminalInput,
@@ -75,29 +78,33 @@ onMounted(async () => {
   term.open(termEl.value);
 
   let lastY = 0;
-  termEl.value.querySelector(".xterm-screen").addEventListener("touchstart", (e) => {
-    if (e.touches.length != 1) return;
-    lastY = e.touches[0]!.clientY;
-    e.preventDefault();
-  });
+  termEl.value
+    .querySelector(".xterm-screen")
+    .addEventListener("touchstart", (e: TouchEvent) => {
+      if (e.touches.length != 1) return;
+      lastY = e.touches[0]!.clientY;
+      e.preventDefault();
+    });
 
-  termEl.value.querySelector(".xterm-screen").addEventListener("touchmove", (e) => {
-    if (e.touches.length != 1) return;
-    const newY = e.touches[0]!.clientY;
-    term.scrollLines(Math.round(-(newY - lastY) / 10));
-    lastY = newY;
-    e.preventDefault();
+  termEl.value
+    .querySelector(".xterm-screen")
+    .addEventListener("touchmove", (e: TouchEvent) => {
+      if (e.touches.length != 1) return;
+      const newY = e.touches[0]!.clientY;
+      term.scrollLines(Math.round(-(newY - lastY) / 10));
+      lastY = newY;
+      e.preventDefault();
+    });
+
+  term.onData((data) => {
+    if (settings.data.useTerminalInput) {
+      console.log(
+        `终端输入：${data} (${Array.from(data)
+          .map((c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`)
+          .join("")})`,
+      );
+    }
   });
-  setInterval(() => {
-    term.write("颜色代码测试\r\n");
-    term.write("红色: \x1b[31m红色文本\x1b[0m\r\n");
-    term.write("绿色: \x1b[32m绿色文本\x1b[0m\r\n");
-    term.write("黄色: \x1b[33m黄色文本\x1b[0m\r\n");
-    term.write("蓝色: \x1b[34m蓝色文本\x1b[0m\r\n");
-    term.write("品红色: \x1b[35m品红色文本\x1b[0m\r\n");
-    term.write("青色: \x1b[36m青色文本\x1b[0m\r\n");
-    term.write("白色: \x1b[37m白色文本\x1b[0m\r\n");
-  }, 500);
 });
 
 onUnmounted(() => {
@@ -108,7 +115,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <Panel>
+  <Panel class="console">
     <div
       class="mcsl-xterm-container"
       :class="{
@@ -118,9 +125,12 @@ onUnmounted(() => {
       <div ref="termEl"></div>
       <Divider v-if="!settings.data.useTerminalInput" spacing="xs" />
       <div v-if="!settings.data.useTerminalInput" class="console__input">
-        <InputText placeholder="输入指令" clearable />
+        <InputText
+          :placeholder="t('shared.instance.console.input.placeholder')"
+          clearable
+        />
         <Button type="primary" color="primary" icon="fa fa-paper-plane">
-          发送
+          {{ t("shared.instance.console.input.send") }}
         </Button>
       </div>
     </div>
@@ -128,9 +138,24 @@ onUnmounted(() => {
 </template>
 
 <style scoped lang="scss">
+.console {
+  height: calc(100% - 2 * var(--mcsl-spacing-md) - 2px);
+}
+
 .console__input {
   display: flex;
   gap: var(--mcsl-spacing-2xs);
+}
+
+.mcsl-xterm-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 2 * var(--mcsl-spacing-md));
+
+  & > div:first-child {
+    height: 0;
+    flex-grow: 1;
+  }
 }
 </style>
 

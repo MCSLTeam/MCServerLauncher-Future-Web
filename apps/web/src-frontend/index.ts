@@ -38,13 +38,29 @@ export function setShouldRegister(value: boolean) {
   });
 
   await load(App, async () => {
-    const t = useLocale().getI18n().t;
+    router.addRoute({
+      path: "/auth",
+      name: "Auth",
+      redirect: () => (shouldRegister ? "/auth/register" : "/auth/login"),
+    });
+
+    router.addRoute({
+      path: "/auth/register",
+      name: "Auth - Register",
+      component: () => import("./views/Register.vue"),
+    });
+
+    router.addRoute({
+      path: "/auth/login",
+      name: "Auth - Login",
+      component: () => import("./views/Login.vue"),
+    });
 
     watchEffect(() => {
       if (
-        tasks.value.length > 0 &&
-        !disableTaskExitDialog.value &&
-        !taskExitDialogShown
+          tasks.value.length > 0 &&
+          !disableTaskExitDialog.value &&
+          !taskExitDialogShown
       ) {
         showTaskExitDialog.value = taskExitDialogShown = true;
       }
@@ -55,7 +71,8 @@ export function setShouldRegister(value: boolean) {
         e.preventDefault();
       }
     });
-
+  }, async () => {
+    const t = useLocale().getI18n().t;
     useNavigation().addItem(
       "sidebarUpper",
       {
@@ -100,24 +117,6 @@ export function setShouldRegister(value: boolean) {
       // 阻塞直到刷新页面重试
       while (true) await sleep(1000);
     }
-
-    router.addRoute({
-      path: "/auth",
-      name: "Auth",
-      redirect: () => (shouldRegister ? "/auth/register" : "/auth/login"),
-    });
-
-    router.addRoute({
-      path: "/auth/register",
-      name: "Auth - Register",
-      component: () => import("./views/Register.vue"),
-    });
-
-    router.addRoute({
-      path: "/auth/login",
-      name: "Auth - Login",
-      component: () => import("./views/Login.vue"),
-    });
 
     router.beforeEach((to, _from, next) => {
       if (useAccount().accessToken) {

@@ -1,4 +1,6 @@
 import { type RouteLocationRaw, type Router } from "vue-router";
+import type { Dayjs } from "dayjs";
+import { useLocale } from "./stores.ts";
 
 export type Size = "small" | "medium" | "large";
 
@@ -45,4 +47,12 @@ export function randNum(min?: number, max?: number) {
     return Math.floor(Math.random() * (max - min)) + min; // 含最小值，不含最大值
   else if (min != undefined) return randNum(0, min);
   else return Math.random();
+}
+
+export function formatDate(
+  date: Dayjs,
+  type: "datetime" | "date" | "time" = "datetime",
+) {
+  const t = useLocale().getI18n().t;
+  return date.format(t(`dayjs.format.${type}`));
 }

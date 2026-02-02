@@ -68,7 +68,7 @@ export class MCSLNotif {
   open() {
     if (this._closed) return;
     this.opened.value = true;
-    if (Notification.permission == "granted" && this.isSystem) {
+    if (systemNotifSettings.isPermissionGranted() == "granted" && this.isSystem) {
       const systemNotif = this.template.systemNotif(this);
       if (systemNotif) {
         this.systemNotif = systemNotifSettings.send(

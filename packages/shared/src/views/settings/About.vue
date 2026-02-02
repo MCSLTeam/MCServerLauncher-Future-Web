@@ -19,6 +19,8 @@ import Panel from "@repo/ui/src/components/panel/Panel.vue";
 import CollapsablePanel from "@repo/ui/src/components/panel/CollapsablePanel.vue";
 import { renderMd } from "@repo/ui/src/utils/render.ts";
 import dependencies from "../../assets/dependencies.json";
+import dayjs from "dayjs";
+import { formatDate } from "@repo/ui/src/utils/utils.ts";
 
 const t = useI18n().t;
 const mcslQQGroup =
@@ -120,7 +122,7 @@ function openLink(url: string) {
           />
         </div>
         <p>
-          {{ t("shared.app.copyright", { year: new Date().getFullYear() }) }}
+          {{ t("shared.app.copyright", { year: dayjs().year() }) }}
         </p>
         <p>{{ t("shared.settings.about.about.disclaimer") }}</p>
       </div>
@@ -167,7 +169,9 @@ function openLink(url: string) {
           <div
             v-html="
               renderMd(
-                t('shared.settings.about.info.build.time', { buildTime }),
+                t('shared.settings.about.info.build.time', {
+                  buildTime: formatDate(buildTime),
+                }),
               )
             "
           />

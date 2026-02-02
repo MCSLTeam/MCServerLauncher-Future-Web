@@ -69,6 +69,8 @@ async function submit() {
 
     await useAccount().setToken(tokenPair, form.data.value.remember);
 
+    await router.push("/");
+
     new MCSLNotif({
       data: {
         color: "success",
@@ -76,8 +78,6 @@ async function submit() {
         message: t("web.auth.login.success"),
       },
     }).open();
-
-    await router.push("/");
   } catch {
     canSubmit = true;
   }

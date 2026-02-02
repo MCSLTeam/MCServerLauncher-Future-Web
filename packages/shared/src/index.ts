@@ -47,10 +47,14 @@ export const showCreateInstanceModal = ref(false);
 
 export async function load(
   appComponent: Component,
-  load: () => void | Promise<void>,
+  preLoad: () => void | Promise<void>,
+  postload: () => void | Promise<void>,
 ) {
   const app = createApp(appComponent);
   app.use(createPinia());
+
+  await preLoad();
+
   app.use(FloatingVue, {
     themes: {
       tooltip: {
@@ -71,7 +75,7 @@ export async function load(
 
   await loadUi();
 
-  await load();
+  await postload();
 
   loading.value = false;
   loadingStep.value = useLocale().getI18n().t("ui.loading.success");

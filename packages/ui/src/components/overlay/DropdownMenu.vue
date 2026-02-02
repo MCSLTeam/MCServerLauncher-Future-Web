@@ -8,7 +8,7 @@ defineOptions({
   inheritAttrs: false,
 });
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     menu: MenuInfo;
     followWidth?: boolean;
@@ -21,6 +21,7 @@ withDefaults(
     bodyClass?: string;
     bodyStyle?: string;
     scrollable?: boolean;
+    closeOnClickMenu?: boolean;
   }>(),
   {
     size: "medium",
@@ -30,6 +31,7 @@ withDefaults(
     headerStyle: "",
     bodyClass: "",
     bodyStyle: "",
+    closeOnClickMenu: true,
   },
 );
 
@@ -74,6 +76,11 @@ defineExpose({
           ? `calc(${dropdownContentRef.triggererWidth}px - var(--mcsl-spacing-xs))`
           : undefined,
       }"
+      @click="
+        () => {
+          if (closeOnClickMenu) dropdownContentRef.close();
+        }
+      "
     >
       <template #header>
         <slot name="header" />

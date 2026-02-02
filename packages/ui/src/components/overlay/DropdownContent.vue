@@ -135,6 +135,7 @@ async function open() {
 }
 
 const relocate = throttle(() => {
+  if (!opened.value) return;
   const { x, y } = getOpenPos();
   floatingContentEl.value.locate(x, y);
 }, 10);

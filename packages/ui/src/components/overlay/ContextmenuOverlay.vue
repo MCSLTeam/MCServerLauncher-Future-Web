@@ -53,7 +53,10 @@ function locator(
 }
 
 function onGlobalContextMenu(event: MouseEvent) {
-  if (floatingContentEl.value.clickedOutside(event))
+  if (
+    floatingContentEl.value.opened.value &&
+    floatingContentEl.value.clickedOutside(event)
+  )
     floatingContentEl.value.close();
 }
 
