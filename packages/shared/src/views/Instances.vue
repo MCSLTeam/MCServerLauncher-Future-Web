@@ -396,7 +396,7 @@ function highlightText(text: string, searchText: string): string {
           >
             <template #contextmenu>
               <Contextmenu
-                  v-if="instance.status != 'installing'"
+                v-if="instance.status != 'installing'"
                 :menu="buildActionContextmenu(instance)!"
               />
             </template>

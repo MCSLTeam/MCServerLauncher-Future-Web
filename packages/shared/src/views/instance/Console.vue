@@ -9,7 +9,7 @@ import { useSettings } from "../../utils/stores.ts";
 import InputText from "@repo/ui/src/components/form/entries/InputText.vue";
 import Button from "@repo/ui/src/components/form/button/Button.vue";
 import Divider from "@repo/ui/src/components/misc/Divider.vue";
-import {useI18n} from "vue-i18n";
+import { useI18n } from "vue-i18n";
 
 const settings = useSettings();
 const t = useI18n().t;
@@ -52,7 +52,7 @@ onMounted(async () => {
       green: getCSSVar("--mcsl-color-green"),
       magenta: getCSSVar("--mcsl-color-pink"),
       red: getCSSVar("--mcsl-color-red"),
-      white: getCSSVar("--mcsl-text-color-white"),
+      white: getCSSVar("--mcsl-text-color-ansi-white"),
       yellow: getCSSVar("--mcsl-color-yellow"),
       scrollbarSliderBackground: getCSSVar("--mcsl-scrollbar-color"),
       scrollbarSliderHoverBackground: getCSSVar("--mcsl-scrollbar-color"),

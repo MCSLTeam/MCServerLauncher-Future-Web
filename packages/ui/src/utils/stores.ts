@@ -39,6 +39,7 @@ export const useAppearance = defineStore("appearance", () => {
       document.documentElement.classList.remove(prevActualTheme);
       document.documentElement.classList.add(currActualTheme);
       prevActualTheme = currActualTheme;
+      document.dispatchEvent(new Event("theme:change"));
     };
 
     // 添加过渡样式

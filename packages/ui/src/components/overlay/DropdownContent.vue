@@ -102,7 +102,7 @@ function locateYHorizontal(
   elemY.value = clamp(
     openY - elemRect.value.height / 2,
     0,
-      triggererOffsetParent.value.offsetHeight - elemRect.value.height,
+    triggererOffsetParent.value.offsetHeight - elemRect.value.height,
   );
 }
 
@@ -113,10 +113,12 @@ function locator(
   elemY: Ref<number>,
   elemRect: ComputedRef<PosInfo>,
 ) {
-  if (elemRect.value.width > triggererOffsetParent.value.offsetWidth) elemX.value = 0;
+  if (elemRect.value.width > triggererOffsetParent.value.offsetWidth)
+    elemX.value = 0;
   else if (isVertical.value) locateXVertical(openX, elemX, elemRect);
   else locateXHorizontal(openX, elemX, elemRect, triggererEl.value.offsetWidth);
-  if (elemRect.value.height > triggererOffsetParent.value.offsetHeight) elemY.value = 0;
+  if (elemRect.value.height > triggererOffsetParent.value.offsetHeight)
+    elemY.value = 0;
   else if (isVertical.value)
     locateYVertical(openY, elemY, elemRect, triggererEl.value.offsetHeight);
   else locateYHorizontal(openY, elemY, elemRect);

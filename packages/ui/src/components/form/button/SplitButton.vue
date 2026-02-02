@@ -104,6 +104,8 @@ defineEmits<(e: "click", event: MouseEvent) => void>();
 
 <style lang="scss" scoped>
 .mcsl-split-button {
+  width: fit-content;
+  height: fit-content;
   display: flex;
   justify-content: center;
   align-items: center;

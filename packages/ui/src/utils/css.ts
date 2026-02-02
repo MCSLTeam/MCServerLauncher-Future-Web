@@ -1,10 +1,14 @@
-const COLOR_TYPES = [
+export const NAMED_COLOR_TYPES = [
   "primary",
   "success",
   "warning",
   "danger",
   "help",
   "surface",
+];
+export type NamedColorType = (typeof NAMED_COLOR_TYPES)[number];
+
+export const NORMAL_COLOR_TYPES = [
   "emerald",
   "green",
   "lime",
@@ -22,6 +26,10 @@ const COLOR_TYPES = [
   "pink",
   "rose",
   "red",
+] as const;
+export type NormalColorType = (typeof NORMAL_COLOR_TYPES)[number];
+
+export const BG_COLOR_TYPES = [
   "slate",
   "gray",
   "zinc",
@@ -29,7 +37,13 @@ const COLOR_TYPES = [
   "stone",
   "ocean",
 ] as const;
+export type BgColorType = (typeof BG_COLOR_TYPES)[number];
 
+export const COLOR_TYPES = [
+  ...NAMED_COLOR_TYPES,
+  ...NORMAL_COLOR_TYPES,
+  ...BG_COLOR_TYPES,
+] as const;
 export type ColorType = (typeof COLOR_TYPES)[number];
 
 export type ColorStep =
@@ -62,7 +76,7 @@ export type ColorVar =
   | "text-color-secondary"
   | "text-color-gray"
   | "text-color-opposite"
-  | "text-color-white";
+  | "text-color-light";
 
 export type CSSSize =
   | "4xs"
@@ -98,8 +112,12 @@ export class ColorData {
           ? `var(--mcsl-color-${this.type})`
           : `var(--mcsl-color-${this.type}-${this.step})`;
     if (this.opacity == 1) return cssVar;
-    return `color-mix(in srgb, transparent, ${cssVar} ${this.opacity * 100}%)`;
+    return transparent(cssVar, this.opacity);
   }
+}
+
+export function transparent(color: string, opacity: number) {
+  return `color-mix(in srgb, transparent, ${color} ${opacity * 100}%)`;
 }
 
 export type Color = ColorData | ColorType | ColorVar;

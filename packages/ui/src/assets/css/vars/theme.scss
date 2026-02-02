@@ -59,6 +59,10 @@ $named-steps: (
     "light": map.get($default-step, "light") + 300,
     "dark": map.get($default-step, "dark") - 300,
   ),
+  "chart-line": (
+    "light": 400,
+    "dark": 500,
+  ),
 );
 
 $box-shadow-default: (
@@ -155,7 +159,7 @@ $color-vars: (
     "dark": [ "surface",
     400],
   ),
-  "text-color-white": (
+  "text-color-ansi-white": (
     "light": [ "surface",
     400],
     "dark": [ "surface",

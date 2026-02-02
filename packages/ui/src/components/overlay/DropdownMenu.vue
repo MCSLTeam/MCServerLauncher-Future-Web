@@ -8,7 +8,7 @@ defineOptions({
   inheritAttrs: false,
 });
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     menu: MenuInfo;
     followWidth?: boolean;

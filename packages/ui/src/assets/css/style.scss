@@ -6,12 +6,15 @@
 @use "utils";
 
 :root {
-  --mcsl-font-family-sans: "MiSans VF", "PingFang SC", Inter, -apple-system, BlinkMacSystemFont,
-  Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans,
-  Helvetica Neue, sans-serif;
-  --mcsl-font-family-minecraft: Minecraft, GNU Unifont, var(--mcsl-font-family-sans);
-  --mcsl-font-family-mono: JetBrains Mono, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono,
-  monospace;
+  --mcsl-font-family-sans:
+    "MiSans VF", "PingFang SC", Inter, -apple-system, BlinkMacSystemFont,
+    Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans,
+    Helvetica Neue, sans-serif;
+  --mcsl-font-family-minecraft:
+    Minecraft, GNU Unifont, var(--mcsl-font-family-sans);
+  --mcsl-font-family-mono:
+    JetBrains Mono, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
+    Liberation Mono, monospace;
 
   font-family: var(--mcsl-font-family-sans);
 
@@ -91,7 +94,7 @@ html.dark::view-transition-new(root) {
 /* 过渡动画 */
 .blur-enter-active,
 .blur-leave-active {
-  transition: all 0.25s;
+  transition: 0.25s ease-in-out !important;
 }
 
 .blur-enter-from,
@@ -102,7 +105,7 @@ html.dark::view-transition-new(root) {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: all 0.25s;
+  transition: 0.25s ease-in-out !important;
 }
 
 .fade-enter-from,
@@ -122,7 +125,11 @@ html.dark::view-transition-new(root) {
   scrollbar-color: var(--mcsl-scrollbar-color) var(--mcsl-bg-color-main);
 }
 
-button, input, select, textarea, optgroup {
+button,
+input,
+select,
+textarea,
+optgroup {
   font-family: inherit;
 }
 
@@ -376,12 +383,14 @@ blockquote {
 /* 字体 */
 @font-face {
   font-family: "Minecraft";
-  src: url("https://www.minecraft.net/etc.clientlibs/minecraftnet/clientlibs/clientlib-site/resources/fonts/Minecraft-Seven_v2.woff2") format("woff");
+  src: url("https://www.minecraft.net/etc.clientlibs/minecraftnet/clientlibs/clientlib-site/resources/fonts/Minecraft-Seven_v2.woff2")
+    format("woff");
 }
 
 @font-face {
   font-family: "GNU Unifont";
-  src: url("https://www.unifoundry.com/pub/unifont/unifont-17.0.03/font-builds/unifont-17.0.03.otf") format("opentype");
+  src: url("https://www.unifoundry.com/pub/unifont/unifont-17.0.03/font-builds/unifont-17.0.03.otf")
+    format("opentype");
 }
 
 /* Floating Vue  */
@@ -394,24 +403,24 @@ blockquote {
   --mcsl-tooltip__bg-opacity: 90%;
 }
 
-.v-popper--theme-tooltip .v-popper__inner {
-  background: utils.transparent(
-      var(--mcsl-bg-color-overlay-opposite),
+:root {
+  --mcsl-tooltip__bg: #{utils.transparent(
+      var(--mcsl-color-surface-800),
       var(--mcsl-tooltip__bg-opacity)
-  );
+    )};
+}
+
+.v-popper--theme-tooltip .v-popper__inner {
+  background: var(--mcsl-tooltip__bg);
   border-radius: var(--mcsl-border-radius-sm);
   padding: var(--mcsl-spacing-2xs) var(--mcsl-spacing-xs);
-
   & * {
-    color: var(--mcsl-text-color-opposite) !important;
+    color: var(--mcsl-text-color-light);
   }
 }
 
 .v-popper--theme-tooltip .v-popper__arrow-outer {
-  border-color: utils.transparent(
-      var(--mcsl-bg-color-overlay-opposite),
-      var(--mcsl-tooltip__bg-opacity)
-  );
+  border-color: var(--mcsl-tooltip__bg);
 }
 
 // Dropdown

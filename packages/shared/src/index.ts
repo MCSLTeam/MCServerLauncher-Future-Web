@@ -8,7 +8,8 @@ import router from "./router.ts";
 import dayjs from "dayjs";
 import axios from "axios";
 import { useSettings } from "./utils/stores.ts";
-import "@xterm/xterm/css/xterm.css"
+import "@xterm/xterm/css/xterm.css";
+import { loadChart } from "./utils/chart.ts";
 
 type Platform = "web" | "app";
 
@@ -74,6 +75,8 @@ export async function load(
   useSettings().load();
 
   await loadUi();
+
+  loadChart();
 
   await postload();
 

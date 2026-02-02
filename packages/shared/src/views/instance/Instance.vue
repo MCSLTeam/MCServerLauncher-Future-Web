@@ -7,7 +7,7 @@ import SplitButton from "@repo/ui/src/components/form/button/SplitButton.vue";
 import Spinner from "@repo/ui/src/components/progress/Spinner.vue";
 import DropdownMenu from "@repo/ui/src/components/overlay/DropdownMenu.vue";
 import { useI18n } from "vue-i18n";
-import { ref } from "vue";
+import { provide, ref } from "vue";
 import NotFound from "../NotFound.vue";
 import { buildActionContextmenu, getStatusColor } from "../../utils/utils.ts";
 
@@ -29,6 +29,7 @@ usePageData().set({
 });
 
 const info = ref<any | null | undefined>(undefined);
+provide("instance", info);
 
 (async () => {
   // TODO: 数据获取
@@ -169,8 +170,6 @@ const info = ref<any | null | undefined>(undefined);
 }
 
 .instance__header {
-  justify-content: space-between;
-
   &,
   & > div {
     display: flex;

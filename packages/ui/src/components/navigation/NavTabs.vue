@@ -119,7 +119,6 @@ defineExpose({
     }
 
     & .mcsl-nav-tabs__bg {
-      width: calc(var(--mcsl-nav-tabs__btns-width) + $padding - 2px);
       height: calc(100% - 2 * $padding);
       margin: $padding;
 
@@ -188,10 +187,12 @@ defineExpose({
 }
 
 .mcsl-nav-tabs__bg {
+  width: calc(var(--mcsl-nav-tabs__btns-width) - 1px);
   position: absolute;
   top: 0;
   left: 0;
   overflow: hidden;
+  border-radius: var(--mcsl-border-radius-full);
 
   & > div {
     background: var(--mcsl-nav-tabs__bg);
