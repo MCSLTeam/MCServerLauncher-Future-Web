@@ -2,6 +2,10 @@
 import { onMounted, ref, watch } from "vue";
 import { highlightText } from "../../utils/render.ts";
 
+defineProps<{
+  lang?: string;
+}>();
+
 const value = defineModel<string>({
   required: false,
   default: "",
@@ -9,44 +13,51 @@ const value = defineModel<string>({
 
 const container = ref();
 const editor = ref();
-const cursorLocator = ref();
-const cursor = ref();
-
-const scrollWidth = ref(0);
-const scrollHeight = ref(0);
-const scrollTop = ref(0);
-const scrollLeft = ref(0);
+const caretLocator = ref();
+const caret = ref();
 
 const isComposing = ref(false);
-
+const showCaret = ref(false);
 const shownText = ref("");
+const lineNumsShadow = ref(false);
+const showFooterShadow = ref(false);
 
 function refresh() {
   const text = editor.value.value;
-  shownText.value = text ?? value.value;
+  shownText.value = text;
 
-  scrollWidth.value = editor.value.scrollWidth;
-  scrollHeight.value = editor.value.scrollHeight;
-  scrollTop.value = editor.value.scrollTop;
-  scrollLeft.value = editor.value.scrollLeft;
+  const scrollHeight = editor.value.scrollHeight;
+  const offsetHeight = editor.value.offsetHeight;
+  const scrollLeft = editor.value.scrollLeft;
+  const scrollTop = editor.value.scrollTop;
+  container.value.setAttribute(
+    "style",
+    `--mcsl-base-text-editor__scroll-width: ${editor.value.scrollWidth}px; ` +
+      `--mcsl-base-text-editor__scroll-height: ${scrollHeight}px; ` +
+      `--mcsl-base-text-editor__scroll-top: -${scrollTop}px; ` +
+      `--mcsl-base-text-editor__scroll-left: -${scrollLeft}px;`,
+  );
+
+  showCaret.value = document.activeElement == editor.value;
+  lineNumsShadow.value = scrollLeft > 0;
+  showFooterShadow.value = scrollTop + offsetHeight < scrollHeight;
 
   // 计算光标的位置
   const selectionEnd = editor.value.selectionEnd;
-  const textBeforeCursor = text.substring(0, selectionEnd);
-  cursorLocator.value.innerText = textBeforeCursor;
+  caretLocator.value.innerText = text.substring(0, selectionEnd);
 
   // 插入元素定位光标位置
-  const cuLocator = document.createElement("span");
-  cuLocator.textContent = "|";
-  cursorLocator.value.appendChild(cuLocator);
-  cursor.value.style.transform = `translate(${cuLocator.offsetLeft - scrollLeft.value}px, ${cuLocator.offsetTop - scrollTop.value}px)`;
+  const cLocator = document.createElement("span");
+  cLocator.textContent = "|";
+  caretLocator.value.appendChild(cLocator);
+  caret.value.style.transform = `translate(${cLocator.offsetLeft}px, ${cLocator.offsetTop}px)`;
 
   // 重置动画状态
-  const lastAnim = cursor.value.style.animation;
-  cursor.value.style.animation = "none";
+  const lastAnim = caret.value.style.animation;
+  caret.value.style.animation = "none";
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-  cursor.value.offsetHeight; // 触发重绘
-  cursor.value.style.animation = lastAnim;
+  caret.value.offsetHeight; // 触发重绘
+  caret.value.style.animation = lastAnim;
 }
 
 // 用于在外部更改model时同步
@@ -66,79 +77,83 @@ watch(value, (newValue) => {
 onMounted(() => {
   refresh();
 });
+
+defineExpose({
+  showFooterShadow
+})
 </script>
 
 <template>
-  <div
-    class="mcsl-editor"
-    ref="container"
-    :style="{
-      '--mcsl-editor__scroll-width': `${scrollWidth}px`,
-      '--mcsl-editor__scroll-height': `${scrollHeight}px`,
-      '--mcsl-editor__scroll-left': `${-scrollLeft}px`,
-      '--mcsl-editor__scroll-top': `${-scrollTop}px`,
-    }"
-  >
+  <div class="mcsl-base-text-editor" ref="container">
     <div
-      class="mcsl-editor__line-nums"
+      class="mcsl-base-text-editor__line-nums"
       :class="{
-        'mcsl-editor__line-nums-shadow': scrollLeft > 0,
+        'mcsl-base-text-editor__line-nums-shadow': lineNumsShadow,
       }"
     >
       <div
         v-for="(_value, index) in value.split('\n')"
         :key="index"
-        class="mcsl-editor__line-num"
+        class="mcsl-base-text-editor__line-num"
       >
         {{ index + 1 }}
       </div>
     </div>
-    <div class="mcsl-editor__content">
+    <div class="mcsl-base-text-editor__content">
       <textarea
         ref="editor"
         v-model="value"
-        class="mcsl-editor__textarea"
+        class="mcsl-base-text-editor__textarea"
         @input="refresh"
         @scroll="refresh"
         @click="refresh"
-        @select="refresh"
+        @selectionchange="refresh"
         @keyup="refresh"
+        @focus="refresh"
+        @blur="refresh"
         @compositionstart="isComposing = true"
         @compositionend="isComposing = false"
         spellcheck="false"
       />
-      <div ref="cursor" class="mcsl-editor__cursor" />
+      <pre class="mcsl-base-text-editor__mirror">
+          <span
+              ref="caret"
+              class="mcsl-base-text-editor__caret"
+              :class="{
+                'mcsl-base-text-editor__caret-visible': showCaret,
+              }"
+          />
+        </pre>
       <pre
-        ref="cursorLocator"
-        class="mcsl-editor__mirror mcsl-editor__locator"
+        ref="caretLocator"
+        class="mcsl-base-text-editor__mirror mcsl-base-text-editor__locator"
       />
       <pre
-        class="mcsl-editor__mirror"
-        v-html="highlightText(shownText, 'typescript')"
+        class="mcsl-base-text-editor__mirror"
+        v-html="highlightText(shownText, lang)"
       />
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-.mcsl-editor {
+.mcsl-base-text-editor {
   display: flex;
   border-radius: var(--mcsl-border-radius-sm);
   background: var(--mcsl-bg-color-main);
   overflow: hidden;
-  align-items: stretch;
 
   & * {
     font-family: var(--mcsl-font-family-mono);
   }
 }
 
-.mcsl-editor__line-nums {
+.mcsl-base-text-editor__line-nums {
   z-index: 1;
   position: relative;
-  top: var(--mcsl-editor__scroll-top);
+  top: var(--mcsl-base-text-editor__scroll-top);
   left: 0;
-  height: var(--mcsl-editor__scroll-height);
+  height: var(--mcsl-base-text-editor__scroll-height);
   width: min-content;
   display: flex;
   flex-direction: column;
@@ -153,19 +168,19 @@ onMounted(() => {
   }
 }
 
-.mcsl-editor__line-nums-shadow {
+.mcsl-base-text-editor__line-nums-shadow {
   box-shadow: var(--mcsl-box-shadow-base);
 }
 
-.mcsl-editor__content {
+.mcsl-base-text-editor__content {
   width: 0;
   height: 100%;
   flex-grow: 1;
   transform: translate(0);
 }
 
-.mcsl-editor__textarea,
-.mcsl-editor__mirror {
+.mcsl-base-text-editor__textarea,
+.mcsl-base-text-editor__mirror {
   margin: 0;
   padding: var(--mcsl-spacing-2xs);
   outline: none;
@@ -175,37 +190,43 @@ onMounted(() => {
   text-wrap: nowrap;
 }
 
-.mcsl-editor__textarea {
+.mcsl-base-text-editor__textarea {
   width: calc(100% - 2 * var(--mcsl-spacing-2xs));
   height: calc(100% - 2 * var(--mcsl-spacing-2xs));
   color: transparent;
   caret-color: transparent;
 }
 
-.mcsl-editor__mirror {
+.mcsl-base-text-editor__mirror {
   position: absolute;
   pointer-events: none;
-  width: var(--mcsl-editor__scroll-width);
-  height: var(--mcsl-editor__scroll-height);
-  top: var(--mcsl-editor__scroll-top);
-  left: var(--mcsl-editor__scroll-left);
+  width: var(--mcsl-base-text-editor__scroll-width);
+  height: var(--mcsl-base-text-editor__scroll-height);
+  top: var(--mcsl-base-text-editor__scroll-top);
+  left: var(--mcsl-base-text-editor__scroll-left);
 }
 
-.mcsl-editor__locator {
+.mcsl-base-text-editor__locator {
   opacity: 0;
 }
 
-.mcsl-editor__cursor {
+.mcsl-base-text-editor__caret {
   position: absolute;
   top: 0;
   left: 0;
   width: 2px;
   height: 17px;
+  opacity: 0;
   background-color: var(--mcsl-color-primary);
   border-radius: var(--mcsl-border-radius-full);
   z-index: 1;
   pointer-events: none;
+  animation: none;
   transition: 0.1s ease-out;
-  animation: blink 1s step-end infinite;
+}
+
+.mcsl-base-text-editor__caret-visible {
+  opacity: 1;
+  animation: blink 1s 0.1s step-end infinite;
 }
 </style>
