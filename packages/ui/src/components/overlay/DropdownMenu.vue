@@ -11,6 +11,7 @@ defineOptions({
 withDefaults(
   defineProps<{
     menu: MenuInfo;
+    maxHeight?: string;
     followWidth?: boolean;
     defaultPos?: "top" | "bottom";
     header?: string;
@@ -20,20 +21,17 @@ withDefaults(
     headerStyle?: string;
     bodyClass?: string;
     bodyStyle?: string;
-    scrollable?: boolean;
     closeOnClickMenu?: boolean;
   }>(),
   {
-    size: "medium",
-    followWidth: false,
+    maxHeight: "50vh",
     defaultPos: "bottom",
-    headerClass: "",
-    headerStyle: "",
-    bodyClass: "",
-    bodyStyle: "",
     closeOnClickMenu: true,
+    headerDivider: true,
   },
 );
+
+defineEmits<(e: "close" | "open" | "locate") => void>();
 
 const dropdownContentRef = ref();
 
@@ -47,7 +45,13 @@ defineExpose({
 </script>
 
 <template>
-  <DropdownContent ref="dropdownContentRef" :default-pos="defaultPos">
+  <DropdownContent
+    ref="dropdownContentRef"
+    :default-pos="defaultPos"
+    @close="$emit('close')"
+    @open="$emit('open')"
+    @locate="$emit('locate')"
+  >
     <template #triggerer="{ open, close, toggle, opened, relocate }">
       <slot
         name="triggerer"
@@ -65,7 +69,7 @@ defineExpose({
       :header-class="headerClass"
       :header-divider="headerDivider"
       :header-style="headerStyle"
-      :scrollable="scrollable"
+      scrollable
       :menu="menu"
       :size="size"
       shadow
@@ -75,6 +79,7 @@ defineExpose({
         width: followWidth
           ? `calc(${dropdownContentRef.triggererWidth}px - var(--mcsl-spacing-xs))`
           : undefined,
+        maxHeight,
       }"
       @click="
         () => {

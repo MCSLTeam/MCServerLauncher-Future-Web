@@ -1,0 +1,99 @@
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
+}
+code.hljs {
+  padding: 3px 5px;
+}
+
+.hljs {
+  color: var(--mcsl-text-color-regular);
+  background: var(--mcsl-bg-color-main);
+}
+.hljs-keyword,
+.hljs-operator {
+  color: var(--mcsl-color-rose-dark);
+}
+.hljs-pattern-match {
+  color: var(--mcsl-color-rose-dark);
+}
+.hljs-pattern-match .hljs-constructor {
+  color: var(--mcsl-color-sky);
+}
+.hljs-function {
+  color: var(--mcsl-color-sky);
+}
+.hljs-function .hljs-params {
+  color: var(--mcsl-color-lime);
+}
+.hljs-function .hljs-params .hljs-typing {
+  color: var(--mcsl-color-orange);
+}
+.hljs-module-access .hljs-module {
+  color: var(--mcsl-color-purple);
+}
+.hljs-constructor {
+  color: var(--mcsl-color-yellow);
+}
+.hljs-constructor .hljs-string {
+  color: var(--mcsl-color-lime-dark);
+}
+.hljs-comment,
+.hljs-quote {
+  color: var(--mcsl-text-color-gray);
+  font-style: italic;
+}
+.hljs-doctag,
+.hljs-formula {
+  color: var(--mcsl-color-purple-dark);
+}
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+  color: var(--mcsl-color-rose);
+}
+.hljs-literal {
+  color: var(--mcsl-color-teal);
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: var(--mcsl-color-lime-darker);
+}
+.hljs-built_in,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: var(--mcsl-color-amber-dark);
+}
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: var(--mcsl-color-amber);
+}
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: var(--mcsl-color-sky);
+}
+.hljs-emphasis {
+  font-style: italic;
+}
+.hljs-strong {
+  font-weight: bold;
+}
+.hljs-link {
+  text-decoration: underline;
+}

@@ -2,18 +2,21 @@
 import Panel from "./Panel.vue";
 import type { Size } from "../../utils/utils.ts";
 
-defineProps<{
-  disabled?: boolean;
-  header?: string;
-  headerDivider?: boolean;
-  shadow?: "always" | "hover" | "never";
-  size?: Size;
-  headerClass?: string;
-  headerStyle?: string;
-  bodyClass?: string;
-  bodyStyle?: string;
-  scrollable?: boolean;
-}>();
+withDefaults(
+  defineProps<{
+    disabled?: boolean;
+    header?: string;
+    headerDivider?: boolean;
+    shadow?: "always" | "hover" | "never";
+    size?: Size;
+    headerClass?: string;
+    headerStyle?: string;
+    bodyClass?: string;
+    bodyStyle?: string;
+    scrollable?: boolean;
+  }>(),
+  { headerDivider: true },
+);
 
 const emit = defineEmits<{
   (e: "collapse"): void;

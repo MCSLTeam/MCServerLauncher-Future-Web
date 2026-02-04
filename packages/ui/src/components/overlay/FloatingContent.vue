@@ -1,12 +1,5 @@
 <script lang="ts" setup>
-import {
-  computed,
-  type ComputedRef,
-  nextTick,
-  onUnmounted,
-  type Ref,
-  ref,
-} from "vue";
+import { computed, nextTick, onUnmounted, type Ref, ref } from "vue";
 import { animatedVisibilityExists } from "../../utils/internal.ts";
 import type { PosInfo } from "../../utils/utils.ts";
 
@@ -21,7 +14,7 @@ const props = withDefaults(
       openY: number,
       elemX: Ref<number>,
       elemY: Ref<number>,
-      elemRect: ComputedRef<PosInfo>,
+      posInfo: PosInfo,
     ) => void;
     transition?: boolean;
     inAnim?: string;
@@ -38,6 +31,8 @@ const props = withDefaults(
   },
 );
 
+const emit = defineEmits<(e: "close" | "open" | "locate") => void>();
+
 const visible = ref(false);
 const { exist, status } = animatedVisibilityExists(visible, 200, {
   afterShow: () => {
@@ -48,25 +43,28 @@ const { exist, status } = animatedVisibilityExists(visible, 200, {
   },
 });
 const wrapperEl = ref();
-const posInfo = computed(() => {
+const top = ref<number>(0);
+const left = ref<number>(0);
+
+function getPosInfo() {
   return {
     x: left.value,
     y: top.value,
     width: wrapperEl.value?.offsetWidth ?? 0,
     height: wrapperEl.value?.offsetHeight ?? 0,
   };
-});
-const top = ref<number>(0);
-const left = ref<number>(0);
+}
 
 function canFullyShow(axis: "x" | "y") {
-  const elemPos = posInfo.value[axis];
-  const elemLength = posInfo.value[axis == "x" ? "width" : "height"];
+  const posInfo = getPosInfo();
+  const elemPos = posInfo[axis];
+  const elemLength = posInfo[axis == "x" ? "width" : "height"];
   const windowLength = axis == "x" ? innerWidth : innerHeight;
   return elemPos >= 0 && elemPos + elemLength <= windowLength;
 }
 
 async function open(x: number, y: number) {
+  emit("open");
   exist.value = true; // 渲染元素以定位
   await nextTick();
   locate(x, y);
@@ -74,7 +72,8 @@ async function open(x: number, y: number) {
 }
 
 function locate(x: number, y: number) {
-  props.locator(x, y, left, top, posInfo);
+  emit("locate");
+  props.locator(x, y, left, top, getPosInfo());
   if (props.position == "absolute") {
     left.value += scrollX;
     top.value += scrollY;
@@ -83,6 +82,7 @@ function locate(x: number, y: number) {
 
 function close() {
   visible.value = false;
+  emit("close");
 }
 
 function clickedOutside(event: MouseEvent) {

@@ -4,9 +4,9 @@ import { useI18n } from "vue-i18n";
 import { getExecutableType } from "../utils/node/types/instanceInstallationType.ts";
 import { MCSLNotif } from "@repo/ui/src/utils/notifications.ts";
 import { ref } from "vue";
-import Button from "@repo/ui/src/components/form/button/Button.vue";
 import Modal from "@repo/ui/src/components/overlay/Modal.vue";
-import BaseTextEditor from "@repo/ui/src/components/editor/BaseTextEditor.vue";
+import CodeEditor from "@repo/ui/src/components/editor/CodeEditor.vue";
+import { deserializeNBTToTag, serializeTagToSNBT } from "nbt-parser";
 
 usePageData().set({
   layout: "dashboard",
@@ -18,7 +18,7 @@ usePageData().set({
   ],
 });
 
-async function handleFileChange(event: Event) {
+async function handleCoreDetect(event: Event) {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
   if (file) {
@@ -44,12 +44,37 @@ async function handleFileChange(event: Event) {
 
 const showEditor = ref(false);
 const editorText = ref("");
+
+async function handleNbtEdit(event: Event) {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (file) {
+    if (file.size > 1024 * 1024 * 128) {
+      new MCSLNotif({
+        data: {
+          title: "文件大小超出限制",
+          message: "请选择小于 128MB 的文件",
+        },
+      }).open();
+      return;
+    }
+    editorText.value = serializeTagToSNBT(
+      deserializeNBTToTag(new Uint8Array(await file.arrayBuffer()), "java"),
+      {
+        format: "multiline",
+      },
+    );
+    showEditor.value = true;
+  }
+}
 </script>
 
 <template>
   <div class="dashboard">
-    <input type="file" @change="handleFileChange" />
-    <Button type="primary" @click="showEditor = true">打开文本编辑器</Button>
+    <p>核心检测</p>
+    <input type="file" @change="handleCoreDetect" />
+    <p>NBT编辑（上传Java版.dat文件）</p>
+    <input type="file" accept=".dat" @change="handleNbtEdit" />
     <Modal
       v-model:visible="showEditor"
       header="文本编辑器"
@@ -57,7 +82,7 @@ const editorText = ref("");
       :close-on-esc="false"
       :close-on-click-outside="false"
     >
-      <BaseTextEditor class="editor" v-model="editorText" />
+      <CodeEditor class="editor" v-model="editorText" default-lang="snbt" />
     </Modal>
   </div>
 </template>

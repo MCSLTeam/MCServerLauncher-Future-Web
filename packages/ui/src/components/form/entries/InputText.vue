@@ -161,6 +161,7 @@ if (formField) {
 
 .mcsl-input-text > input {
   margin: 0;
+  background: var(--mcsl-bg-color-overlay);
   border: 1px solid var(--mcsl-border-color-base);
   outline: 0 solid transparent;
   outline-offset: -2px; // 覆盖 border

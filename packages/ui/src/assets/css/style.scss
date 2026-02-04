@@ -1,6 +1,7 @@
 @use "./fontawesome.min.css";
 @use "animate.css";
 @use "floating-vue/dist/style.css";
+@use "highlightjs";
 @use "./vars/colors";
 @use "./vars/theme";
 @use "utils";
@@ -383,106 +384,6 @@ blockquote {
 }
 
 /* highlight.js  */
-.hljs {
-  color: #c9d1d9;
-}
-
-.hljs-doctag,
-.hljs-keyword,
-.hljs-meta .hljs-keyword,
-.hljs-template-tag,
-.hljs-template-variable,
-.hljs-type,
-.hljs-variable.language_ {
-  color: var(--mcsl-color-red-dark);
-}
-
-.hljs-title,
-.hljs-title.class_,
-.hljs-title.class_.inherited__,
-.hljs-title.function_ {
-  color: var(--mcsl-color-purple-dark);
-}
-
-.hljs-attr,
-.hljs-attribute,
-.hljs-literal,
-.hljs-meta,
-.hljs-number,
-.hljs-operator,
-.hljs-variable,
-.hljs-selector-attr,
-.hljs-selector-class,
-.hljs-selector-id {
-  color: var(--mcsl-color-blue-dark);
-}
-
-.hljs-regexp,
-.hljs-string,
-.hljs-meta .hljs-string {
-  color: var(--mcsl-color-blue-darker);
-}
-
-.hljs-built_in,
-.hljs-symbol {
-  /* prettylights-syntax-variable */
-  color: var(--mcsl-color-orange-dark);
-}
-
-.hljs-comment,
-.hljs-code,
-.hljs-formula {
-  color: var(--mcsl-text-color-secondary);
-}
-
-.hljs-name,
-.hljs-quote,
-.hljs-selector-tag,
-.hljs-selector-pseudo {
-  color: var(--mcsl-color-green-dark);
-}
-
-.hljs-subst {
-  color: var(--mcsl-text-color-gray);
-}
-
-.hljs-section {
-  color: var(--mcsl-color-blue-light);
-  font-weight: bold;
-}
-
-.hljs-bullet {
-  color: var(--mcsl-color-amber-darker);
-}
-
-.hljs-emphasis {
-  color: var(--mcsl-text-color-gray);
-  font-style: italic;
-}
-
-.hljs-strong {
-  color: var(--mcsl-text-color-gray);
-  font-weight: bold;
-}
-
-.hljs-addition {
-  color: var(--mcsl-color-green-darker);
-  background-color: var(--mcsl-color-green-lighter);
-}
-
-.hljs-deletion {
-  color: var(--mcsl-color-red-darker);
-  background-color: var(--mcsl-color-red-lighter);
-}
-
-.hljs-char.escape_,
-.hljs-link,
-.hljs-params,
-.hljs-property,
-.hljs-punctuation,
-.hljs-tag {
-  /* purposely ignored */
-}
 
 /* 字体 */
 @font-face {

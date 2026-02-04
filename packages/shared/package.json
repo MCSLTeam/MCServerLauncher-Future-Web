@@ -35,6 +35,7 @@
     "dayjs": "^1.11.19",
     "floating-vue": "^5.2.2",
     "jszip": "^3.10.1",
+    "nbt-parser": "^1.0.2",
     "pinia": "^3.0.4",
     "pinyin-pro": "^3.28.0",
     "vue": "^3.5.27",

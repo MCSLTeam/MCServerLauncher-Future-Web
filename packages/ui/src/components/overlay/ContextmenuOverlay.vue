@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { type ComputedRef, onMounted, onUnmounted, type Ref, ref } from "vue";
+import { onMounted, onUnmounted, type Ref, ref } from "vue";
 import Menu from "../panel/Menu.vue";
 import type { PosInfo } from "../../utils/utils.ts";
 import FloatingContent from "./FloatingContent.vue";
@@ -17,24 +17,16 @@ setOpenContextmenu((event, p) => {
   props.value = p;
 });
 
-function locateX(
-  openX: number,
-  elemX: Ref<number>,
-  elemPos: ComputedRef<PosInfo>,
-) {
+function locateX(openX: number, elemX: Ref<number>, posInfo: PosInfo) {
   for (const pos of ["left", "right"]) {
-    elemX.value = pos == "left" ? openX : openX - elemPos.value.width;
+    elemX.value = pos == "left" ? openX : openX - posInfo.width;
     if (floatingContentEl.value.canFullyShow("x")) return;
   }
 }
 
-function locateY(
-  openY: number,
-  elemY: Ref<number>,
-  elemPos: ComputedRef<PosInfo>,
-) {
+function locateY(openY: number, elemY: Ref<number>, posInfo: PosInfo) {
   for (const pos of ["top", "bottom"]) {
-    elemY.value = pos == "top" ? openY : openY - elemPos.value.height;
+    elemY.value = pos == "top" ? openY : openY - posInfo.height;
     if (floatingContentEl.value.canFullyShow("y")) return;
   }
 }
@@ -44,12 +36,12 @@ function locator(
   openY: number,
   elemX: Ref<number>,
   elemY: Ref<number>,
-  elemPos: ComputedRef<PosInfo>,
+  posInfo: PosInfo,
 ) {
-  if (elemPos.value.width > innerWidth) elemX.value = 0;
-  else locateX(openX, elemX, elemPos);
-  if (elemPos.value.height > innerHeight) elemY.value = 0;
-  else locateY(openY, elemY, elemPos);
+  if (posInfo.width > innerWidth) elemX.value = 0;
+  else locateX(openX, elemX, posInfo);
+  if (posInfo.height > innerHeight) elemY.value = 0;
+  else locateY(openY, elemY, posInfo);
 }
 
 function onGlobalContextMenu(event: MouseEvent) {

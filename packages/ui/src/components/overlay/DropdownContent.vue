@@ -1,12 +1,5 @@
 <script lang="ts" setup>
-import {
-  computed,
-  type ComputedRef,
-  onMounted,
-  onUnmounted,
-  type Ref,
-  ref,
-} from "vue";
+import { computed, onMounted, onUnmounted, type Ref, ref } from "vue";
 import { type PosInfo, throttle } from "../../utils/utils.ts";
 import { clamp } from "@vueuse/core";
 import FloatingContent from "./FloatingContent.vue";
@@ -19,6 +12,8 @@ const props = withDefaults(
     defaultPos: "bottom",
   },
 );
+
+defineEmits<(e: "close" | "open" | "locate") => void>();
 
 const wrapperEl = ref();
 const triggererEl = ref();
@@ -44,22 +39,18 @@ const inAnim = computed(() => {
   }
 });
 
-function locateXVertical(
-  openX: number,
-  elemX: Ref<number>,
-  elemRect: ComputedRef<PosInfo>,
-) {
+function locateXVertical(openX: number, elemX: Ref<number>, posInfo: PosInfo) {
   elemX.value = clamp(
-    openX - elemRect.value.width / 2,
+    openX - posInfo.width / 2,
     0,
-    triggererOffsetParent.value.offsetWidth - elemRect.value.width,
+    triggererOffsetParent.value.offsetWidth - posInfo.width,
   );
 }
 
 function locateYVertical(
   openY: number,
   elemY: Ref<number>,
-  elemRect: ComputedRef<PosInfo>,
+  posInfo: PosInfo,
   triggererHeight: number,
 ) {
   for (const p of [
@@ -68,7 +59,7 @@ function locateYVertical(
   ]) {
     elemY.value =
       p == "top"
-        ? openY - triggererHeight / 2 - elemRect.value.height
+        ? openY - triggererHeight / 2 - posInfo.height
         : openY + triggererHeight / 2;
     animType.value = p as "top" | "bottom";
     if (floatingContentEl.value.canFullyShow("y")) return;
@@ -78,7 +69,7 @@ function locateYVertical(
 function locateXHorizontal(
   openX: number,
   elemX: Ref<number>,
-  elemRect: ComputedRef<PosInfo>,
+  posInfo: PosInfo,
   triggererWidth: number,
 ) {
   for (const p of [
@@ -87,22 +78,22 @@ function locateXHorizontal(
   ]) {
     elemX.value =
       p == "left"
-        ? openX - triggererWidth / 2 - elemRect.value.width
+        ? openX - triggererWidth / 2 - posInfo.width
         : openX + triggererWidth / 2;
     animType.value = p as "left" | "right";
-    if (floatingContentEl.value.canFullyShow("y")) return;
+    if (floatingContentEl.value.canFullyShow("x")) return;
   }
 }
 
 function locateYHorizontal(
   openY: number,
   elemY: Ref<number>,
-  elemRect: ComputedRef<PosInfo>,
+  posInfo: PosInfo,
 ) {
   elemY.value = clamp(
-    openY - elemRect.value.height / 2,
+    openY - posInfo.height / 2,
     0,
-    triggererOffsetParent.value.offsetHeight - elemRect.value.height,
+    triggererOffsetParent.value.offsetHeight - posInfo.height,
   );
 }
 
@@ -111,17 +102,16 @@ function locator(
   openY: number,
   elemX: Ref<number>,
   elemY: Ref<number>,
-  elemRect: ComputedRef<PosInfo>,
+  posInfo: PosInfo,
 ) {
-  if (elemRect.value.width > triggererOffsetParent.value.offsetWidth)
-    elemX.value = 0;
-  else if (isVertical.value) locateXVertical(openX, elemX, elemRect);
-  else locateXHorizontal(openX, elemX, elemRect, triggererEl.value.offsetWidth);
-  if (elemRect.value.height > triggererOffsetParent.value.offsetHeight)
+  if (posInfo.width > triggererOffsetParent.value.offsetWidth) elemX.value = 0;
+  else if (isVertical.value) locateXVertical(openX, elemX, posInfo);
+  else locateXHorizontal(openX, elemX, posInfo, triggererEl.value.offsetWidth);
+  if (posInfo.height > triggererOffsetParent.value.offsetHeight)
     elemY.value = 0;
   else if (isVertical.value)
-    locateYVertical(openY, elemY, elemRect, triggererEl.value.offsetHeight);
-  else locateYHorizontal(openY, elemY, elemRect);
+    locateYVertical(openY, elemY, posInfo, triggererEl.value.offsetHeight);
+  else locateYHorizontal(openY, elemY, posInfo);
 }
 
 function getOpenPos() {
@@ -171,7 +161,7 @@ defineExpose({
 
 <template>
   <div ref="wrapperEl" class="mcsl-dropdown-content">
-    <div ref="triggererEl">
+    <div ref="triggererEl" class="mcsl-dropdown-content__triggerer">
       <slot
         :close="close"
         :open="open"
@@ -188,10 +178,18 @@ defineExpose({
       :out-anim="`0.1s ease-in-out both reverse ${inAnim}`"
       class="mcsl-dropdown-content__dropdown"
       position="absolute"
+      @close="$emit('close')"
+      @open="$emit('open')"
+      @locate="$emit('locate')"
     >
       <slot name="default" />
     </FloatingContent>
   </div>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.mcsl-dropdown-content__triggerer {
+  height: 100%;
+  width: 100%;
+}
+</style>

@@ -1,6 +1,7 @@
 import MarkdownIt, { type Options } from "markdown-it";
 import * as xss from "xss";
 import hljs from "highlight.js";
+import snbt from "highlightjs-snbt";
 
 export const configuredXss = new xss.FilterXSS({
   whiteList: {
@@ -184,6 +185,7 @@ export const md = (options: Options = {}) => {
   return md;
 };
 
+hljs.registerLanguage("snbt", snbt);
 hljs.registerAliases(["js"], { languageName: "javascript" });
 hljs.registerAliases(["py"], { languageName: "python" });
 hljs.registerAliases(["kt"], { languageName: "kotlin" });

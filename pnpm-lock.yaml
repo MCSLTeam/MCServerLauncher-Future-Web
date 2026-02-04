@@ -166,6 +166,9 @@ importers:
       jszip:
         specifier: ^3.10.1
         version: 3.10.1
+      nbt-parser:
+        specifier: ^1.0.2
+        version: 1.0.2
       pinia:
         specifier: ^3.0.4
         version: 3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3))
@@ -248,12 +251,18 @@ importers:
       highlight.js:
         specifier: ^11.11.1
         version: 11.11.1
+      highlightjs-snbt:
+        specifier: ^0.1.4
+        version: 0.1.4
       lodash:
         specifier: ^4.17.23
         version: 4.17.23
       markdown-it:
         specifier: ^14.1.0
         version: 14.1.0
+      nbt-parser:
+        specifier: ^1.0.2
+        version: 1.0.2
       pinia:
         specifier: ^3.0.4
         version: 3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3))
@@ -1563,6 +1572,9 @@ packages:
     resolution: {integrity: sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==}
     engines: {node: '>=12.0.0'}
 
+  highlightjs-snbt@0.1.4:
+    resolution: {integrity: sha512-yFbj9LXSGPKc00vlQThHWCC24NSFFGaBXLrZ9MM2nMVYpn0ANy6cDzhXNgRo8SPauysjzdABaJj9hE//wDlejA==}
+
   hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
 
@@ -1758,6 +1770,9 @@ packages:
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
+  nbt-parser@1.0.2:
+    resolution: {integrity: sha512-OeH4AUt+hy9hSidKZh2RITcsNE9o5VNyRVOE3ZkY3wATc2fexd9T3ANvH7I/NqSuIjVJhDeXJsGVulC7p35x/A==}
+
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
@@ -1804,6 +1819,9 @@ packages:
 
   pako@1.0.11:
     resolution: {integrity: sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==}
+
+  pako@2.1.0:
+    resolution: {integrity: sha512-w+eufiZ1WuJYgPXbV/PO3NCMEc3xqylkKHzp8bxp1uW4qaSNQUkwmLLEc3kKsfz8lpV1F8Ht3U1Cm+9Srog2ug==}
 
   parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
@@ -3742,6 +3760,8 @@ snapshots:
 
   highlight.js@11.11.1: {}
 
+  highlightjs-snbt@0.1.4: {}
+
   hookable@5.5.3: {}
 
   ignore@5.3.2: {}
@@ -3924,6 +3944,10 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
+  nbt-parser@1.0.2:
+    dependencies:
+      pako: 2.1.0
+
   neo-async@2.6.2: {}
 
   node-addon-api@7.1.1:
@@ -3972,6 +3996,8 @@ snapshots:
       p-limit: 3.1.0
 
   pako@1.0.11: {}
+
+  pako@2.1.0: {}
 
   parent-module@1.0.1:
     dependencies:

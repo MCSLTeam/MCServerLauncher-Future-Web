@@ -79,8 +79,8 @@ onMounted(() => {
 });
 
 defineExpose({
-  showFooterShadow
-})
+  showFooterShadow,
+});
 </script>
 
 <template>

@@ -95,6 +95,16 @@
       ]
     },
     {
+      "name": "highlightjs-snbt (By MCSLTeam)",
+      "desc": "Minecraft SNBT (Stringified NamedBinary Tags) highlighting for highlight.js.",
+      "links": [
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/MCSLTeam/highlightjs-snbt"
+        }
+      ]
+    },
+    {
       "name": "JSZip",
       "desc": "Create, read and edit .zip files with Javascript.",
       "links": [
@@ -139,6 +149,16 @@
         {
           "icon": "fa fa-globe",
           "url": "https://hyperos.mi.com/font/"
+        }
+      ]
+    },
+    {
+      "name": "NBT Parser (By MCSLTeam)",
+      "desc": "Minecraft NBT (NamedBinary Tags) parser for Node.js.",
+      "links": [
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/MCSLTeam/nbt-parser"
         }
       ]
     },

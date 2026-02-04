@@ -3,7 +3,7 @@ import { onMounted, ref } from "vue";
 import type { Size } from "../../utils/utils.ts";
 import Divider from "../misc/Divider.vue";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     header?: string;
     headerDivider?: boolean;
@@ -28,10 +28,12 @@ withDefaults(
 );
 
 const hasHeader = ref(true);
-const headerRef = ref();
+const headerEl = ref();
+const textHeader = ref();
 
 onMounted(() => {
-  hasHeader.value = headerRef.value.innerText.trim() != "";
+  if (!props.header) textHeader.value?.remove?.();
+  hasHeader.value = headerEl.value.innerHTML.trim() != "";
 });
 </script>
 
@@ -47,14 +49,14 @@ onMounted(() => {
   >
     <slot name="contextmenu" />
     <div
-      ref="headerRef"
+      ref="headerEl"
       v-if="hasHeader"
       :class="headerClass"
       :style="headerStyle"
       class="mcsl-panel__header"
     >
       <slot name="header">
-        <h2>{{ header }}</h2>
+        <h2 ref="textHeader">{{ header }}</h2>
       </slot>
     </div>
     <div class="mcsl-panel__body-wrapper">

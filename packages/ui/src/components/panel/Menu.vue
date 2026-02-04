@@ -39,6 +39,7 @@ const props = withDefaults(
   }>(),
   {
     shadow: false,
+    headerDivider: true,
   },
 );
 
@@ -140,7 +141,7 @@ $vars: map.merge(
   $spacing: utils.get-size-var("spacing", $size, $vars);
   .mcsl-size-#{$size} {
     &.mcsl-panel.mcsl-menu {
-      width: calc(utils.get-size-var("width", $size, $vars) - 2 * $spacing);
+      min-width: calc(utils.get-size-var("width", $size, $vars) - 2 * $spacing);
       border-radius: utils.get-size-var("border-radius", $size, $vars);
       padding: $spacing;
     }

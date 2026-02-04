@@ -142,7 +142,7 @@ function openLink(url: string) {
         t("shared.settings.about.check-updates.button")
       }}</Button>
     </SettingsItem>
-    <CollapsablePanel header-divider>
+    <CollapsablePanel>
       <template #header>
         <h4>{{ t("shared.settings.about.info.title") }}</h4>
       </template>
@@ -195,7 +195,7 @@ function openLink(url: string) {
         </div>
       </div>
     </CollapsablePanel>
-    <CollapsablePanel header-divider>
+    <CollapsablePanel>
       <template #header>
         <h4>{{ t("shared.settings.about.special-thanks.title") }}</h4>
       </template>
@@ -272,7 +272,7 @@ function openLink(url: string) {
         </Panel>
       </div>
     </CollapsablePanel>
-    <CollapsablePanel header-divider>
+    <CollapsablePanel>
       <template #header>
         <h4>{{ t("shared.settings.about.dependencies.title") }}</h4>
       </template>
