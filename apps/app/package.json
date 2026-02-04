@@ -18,7 +18,7 @@
     "@repo/configs": "workspace:*",
     "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",
-    "@tauri-apps/api": "^2.9.1",
+    "@tauri-apps/api": "^2.10.1",
     "@tauri-apps/plugin-notification": "~2.3.3",
     "@tauri-apps/plugin-opener": "~2.5.3",
     "@tauri-apps/plugin-os": "~2.3.2",
