@@ -19,7 +19,7 @@
     "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",
     "@vueuse/core": "^14.2.0",
-    "axios": "^1.13.4",
+    "axios": "^1.13.5",
     "eslint": "^9.39.2",
     "pinia": "^3.0.4",
     "vue": "^3.5.27",
