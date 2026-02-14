@@ -72,30 +72,6 @@ const t = useI18n().t;
     width: calc(100% - 2 * var(--mcsl-spacing-lg) - 2 * var(--mcsl-spacing-md));
   }
 }
-
-.stretch-enter-active {
-  transition: 1s cubic-bezier(0, 1, 0, 1);
-  overflow: hidden;
-}
-
-.stretch-leave-active {
-  transition: 0.5s ease-in-out;
-  overflow: hidden;
-}
-
-.stretch-enter-from,
-.stretch-leave-to {
-  max-width: 0 !important;
-  max-height: 0 !important;
-  opacity: 0;
-}
-
-.stretch-enter-to,
-.stretch-leave-from {
-  max-width: 999px;
-  max-height: 999px;
-  opacity: 1;
-}
 </style>
 
 <style lang="scss">

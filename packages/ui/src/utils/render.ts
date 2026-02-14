@@ -186,22 +186,13 @@ export const md = (options: Options = {}) => {
 };
 
 hljs.registerLanguage("snbt", snbt);
-hljs.registerAliases(["js"], { languageName: "javascript" });
-hljs.registerAliases(["py"], { languageName: "python" });
-hljs.registerAliases(["kt"], { languageName: "kotlin" });
-hljs.registerAliases(["json5"], { languageName: "json" });
-hljs.registerAliases(["toml"], { languageName: "ini" });
-hljs.registerAliases(["yml"], { languageName: "yaml" });
-hljs.registerAliases(["html", "htm", "xhtml", "mcui", "fxml"], {
-  languageName: "xml",
-});
 
-export const highlightText = (string: string, lang?: string) =>
+export const highlightText = (string: string, lang?: string | string[]) =>
   configuredXss.process(
     xss.escapeHtmlEntities(
-      lang
+      typeof lang === "string"
         ? hljs.highlight(string, { language: lang }).value
-        : hljs.highlightAuto(string).value,
+        : hljs.highlightAuto(string, lang).value,
     ),
   );
 

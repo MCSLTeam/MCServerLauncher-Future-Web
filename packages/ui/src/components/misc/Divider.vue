@@ -41,10 +41,10 @@ withDefaults(
   display: flex;
   align-items: center;
   position: relative;
-  width: 100%;
 }
 
 .mcsl-divider__type-horizontal {
+  width: 100%;
   padding: var(--mcsl-divider__spacing) 0;
 
   &::before {
@@ -59,6 +59,7 @@ withDefaults(
 }
 
 .mcsl-divider__type-vertical {
+  height: 100%;
   flex-direction: column;
   padding: 0 var(--mcsl-divider__spacing);
 

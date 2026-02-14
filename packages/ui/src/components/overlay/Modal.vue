@@ -1,9 +1,11 @@
 <script lang="ts" setup>
-import { watch } from "vue";
+// Cleanup focus trap on component unmount
+import { onUnmounted, ref, watch } from "vue";
 import Button from "../form/button/Button.vue";
 import Panel from "../panel/Panel.vue";
 import { type Color, getColorVar } from "../../utils/css.ts";
 import { animatedVisibilityExists } from "../../utils/internal.ts";
+import { createFocusTrap } from "focus-trap";
 
 defineOptions({
   inheritAttrs: false,
@@ -13,17 +15,26 @@ const props = withDefaults(
   defineProps<{
     maxWidth?: string;
     header?: string;
+    headerDivider?: boolean;
+    headerClass?: string;
+    headerStyle?: string;
+    bodyClass?: string;
+    bodyStyle?: string;
+    scrollable?: boolean;
     color?: Color;
     closable?: boolean;
     closeOnEsc?: boolean;
     closeOnClickOutside?: boolean;
+    autoClose?: boolean;
   }>(),
   {
     maxWidth: "600px",
     color: "primary",
+    headerDivider: true,
     closable: true,
     closeOnEsc: true,
     closeOnClickOutside: true,
+    autoClose: true,
   },
 );
 
@@ -33,17 +44,23 @@ const visible = defineModel<boolean>("visible", {
 
 const emit = defineEmits<{
   (e: "open"): void;
+  (e: "closing"): void;
   (e: "close"): void;
 }>();
 
 const { exist } = animatedVisibilityExists(visible, 200);
+
+// Focus trap instance
+const focusTrap = ref<ReturnType<typeof createFocusTrap> | null>(null);
+const modalRef = ref<HTMLElement | null>(null);
 
 function open() {
   visible.value = true;
 }
 
 function close() {
-  visible.value = false;
+  emit("closing");
+  if (props.autoClose) visible.value = false;
 }
 
 function handleKeyDown(event: KeyboardEvent) {
@@ -57,22 +74,42 @@ watch(visible, (value) => {
     emit("open");
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", handleKeyDown);
+    setTimeout(() => {
+      focusTrap.value = createFocusTrap(modalRef.value!, {
+        escapeDeactivates: false,
+        allowOutsideClick: true,
+        returnFocusOnDeactivate: true,
+      });
+      focusTrap.value.activate();
+    }, 0);
   } else {
     emit("close");
     document.body.style.overflow = "auto";
     window.removeEventListener("keydown", handleKeyDown);
+    if (focusTrap.value) {
+      focusTrap.value.deactivate();
+      focusTrap.value = null;
+    }
   }
 });
 
 defineExpose({
   open,
-  close,
+  close() {
+    visible.value = false;
+  },
   visible,
+});
+
+onUnmounted(() => {
+  if (focusTrap.value) {
+    focusTrap.value.deactivate();
+  }
 });
 </script>
 
 <template>
-  <div v-if="exist" class="mcsl-modal">
+  <div v-if="exist" ref="modalRef" class="mcsl-modal">
     <div
       :class="{
         'mcsl-modal__overlay-visible': visible,
@@ -88,6 +125,12 @@ defineExpose({
       :style="{
         '--mcsl-modal__card-max-width': maxWidth,
       }"
+      :header-divider="headerDivider"
+      :header-class="headerClass"
+      :header-style="headerStyle"
+      :body-class="bodyClass"
+      :body-style="bodyStyle"
+      :scrollable="scrollable"
       class="mcsl-modal__card"
       size="large"
       v-bind="$attrs"

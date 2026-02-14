@@ -86,6 +86,11 @@ const router = createRouter({
       component: async () => await import("./views/Nodes.vue"),
     },
     {
+      path: "/create-instance/script",
+      name: "Instance Creation - Script",
+      component: async () => await import("./views/createInstance/Script.vue"),
+    },
+    {
       path: "/settings",
       name: "Settings",
       component: async () => await import("./views/settings/Settings.vue"),

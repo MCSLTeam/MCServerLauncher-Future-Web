@@ -87,7 +87,8 @@ onMounted(() => {
     padding: $spacing;
 
     &.mcsl-panel__shadow-always,
-    &.mcsl-panel__shadow-hover:hover {
+    &.mcsl-panel__shadow-hover:hover,
+    &.mcsl-panel__shadow-hover:focus-visible {
       box-shadow: utils.get-size-var("box-shadow", $size, $vars);
     }
 
@@ -98,6 +99,16 @@ onMounted(() => {
     &.mcsl-panel__need-divider > .mcsl-panel__body-wrapper > .mcsl-panel__body {
       padding-top: $spacing;
     }
+  }
+}
+
+.mcsl-panel {
+  outline: 0 solid transparent;
+  outline-offset: -2px; // 覆盖 border
+  transition: 0.2s ease-in-out;
+
+  &:focus-visible {
+    outline: 3px solid var(--mcsl-color-help);
   }
 }
 

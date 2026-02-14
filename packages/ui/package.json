@@ -24,6 +24,7 @@
     "animate.css": "^4.1.1",
     "dayjs": "^1.11.19",
     "floating-vue": "^5.2.2",
+    "focus-trap": "^8.0.0",
     "highlight.js": "^11.11.1",
     "highlightjs-snbt": "^0.1.4",
     "lodash": "^4.17.23",

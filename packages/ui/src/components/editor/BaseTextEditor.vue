@@ -3,7 +3,7 @@ import { onMounted, ref, watch } from "vue";
 import { highlightText } from "../../utils/render.ts";
 
 defineProps<{
-  lang?: string;
+  lang?: string | string[];
 }>();
 
 const value = defineModel<string>({

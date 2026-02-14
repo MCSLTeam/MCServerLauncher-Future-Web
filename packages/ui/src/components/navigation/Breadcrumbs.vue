@@ -3,7 +3,7 @@ import { computed } from "vue";
 
 export type BreadcrumbItem = {
   label: string;
-  path: string;
+  path?: string;
   icon?: string;
 };
 
@@ -23,10 +23,10 @@ const actualSeperator = computed(() => props.seperator ?? "/");
         <i v-if="iconSeperator" :class="iconSeperator" />
         <template v-else>{{ actualSeperator }} </template>
       </span>
-      <RouterLink :to="item.path">
+      <component :is="item.path ? 'RouterLink' : 'p'" :to="item.path">
         <i v-if="item.icon" :class="item.icon" />
         {{ item.label }}
-      </RouterLink>
+      </component>
     </template>
   </nav>
 </template>

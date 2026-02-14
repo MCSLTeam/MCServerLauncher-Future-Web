@@ -9,7 +9,7 @@ import InputText from "../form/entries/InputText.vue";
 const t = useI18n().t;
 
 const props = defineProps<{
-  defaultLang?: string;
+  defaultLang?: string | string[];
 }>();
 
 const value = defineModel<string>({
@@ -38,8 +38,8 @@ const filteredLangs = computed(() => {
         searchMatch(l.lang ?? "auto", langFilter.value),
     );
 });
-function langLabel(lang?: string) {
-  if (lang == undefined) return t("ui.editor.lang.auto");
+function langLabel(lang?: string | string[]) {
+  if (lang == undefined || Array.isArray(lang)) return t("ui.editor.lang.auto");
   else return hljs.getLanguage(lang)?.name ?? lang;
 }
 

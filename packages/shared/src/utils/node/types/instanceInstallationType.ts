@@ -1,17 +1,16 @@
 import type { Core } from "./cores.ts";
 import JSZip from "jszip";
 
-const EXECUTABLE_INSTALLATION_TYPES = [
+const EXECUTABLE_TYPES = [
   "forge_installer",
   "fabric_installer",
   "spigot_buildtools",
   "executable",
 ] as const;
-export type ExecutableInstallationType =
-  (typeof EXECUTABLE_INSTALLATION_TYPES)[number];
+export type ExecutableType = (typeof EXECUTABLE_TYPES)[number];
 
 export const INSTALLATION_TYPES = [
-  ...EXECUTABLE_INSTALLATION_TYPES,
+  "core",
   "script",
   "archive",
   "mcslpack",
@@ -19,10 +18,11 @@ export const INSTALLATION_TYPES = [
 export type InstallationType = (typeof INSTALLATION_TYPES)[number];
 
 export type ExecutableInfo = {
-  installationType: ExecutableInstallationType;
+  installationType: ExecutableType;
   coreType: Core;
 };
 
+/* ===== [ 核心检测 ] ===== */
 const implementationTitle: Record<string, ExecutableInfo | Core> = {
   LegacyFabricInstaller: {
     installationType: "fabric_installer",

@@ -510,13 +510,6 @@ function highlightText(text: string, searchText: string): string {
 
 .instances__instance {
   transform: translate(0);
-  outline: 0 solid transparent;
-  outline-offset: -2px; // 覆盖 border
-  transition: 0.2s ease-in-out;
-
-  &:focus-visible {
-    outline: 3px solid var(--mcsl-color-help);
-  }
 }
 
 .instances__instance-info {
