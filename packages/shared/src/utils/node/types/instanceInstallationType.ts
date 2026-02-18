@@ -1,7 +1,7 @@
 import type { Core } from "./cores.ts";
 import JSZip from "jszip";
 
-const EXECUTABLE_TYPES = [
+export const EXECUTABLE_TYPES = [
   "forge_installer",
   "fabric_installer",
   "spigot_buildtools",

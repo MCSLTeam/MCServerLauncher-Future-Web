@@ -47,6 +47,7 @@ function getInstallationTypeIcon(type: "core" | "script" | "pack") {
       <div>
         <Button
           v-for="type in ['core', 'script', 'pack']"
+          :key="type"
           @click="
             router.push(`/create-instance/${type}`);
             showCreateInstanceModal = false;
@@ -54,7 +55,7 @@ function getInstallationTypeIcon(type: "core" | "script" | "pack") {
           class="select-type__btn"
           v-tooltip="t(`shared.create-instance.type.${type}.desc`)"
           block
-          :icon="getInstallationTypeIcon(type)"
+          :icon="getInstallationTypeIcon(type as any)"
           size="large"
         >
           {{ t(`shared.create-instance.type.${type}.title`) }}

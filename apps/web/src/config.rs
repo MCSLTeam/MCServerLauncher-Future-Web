@@ -1,20 +1,19 @@
-use crate::utils::generate_random_secret;
 use log::{error, info};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
+use crate::MAIN_DIR_NAME;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct WebConfig {
     pub host: String,
     pub port: u16,
-    pub auth_secret: String,
 }
 
 const CONFIG_FILE_NAME: &str = "config.json";
 
-pub fn ensure_config(main_dir: &Path) -> std::io::Result<()> {
-    let config_file = main_dir.join(CONFIG_FILE_NAME);
+pub fn ensure_config() -> std::io::Result<()> {
+    let config_file = Path::new(MAIN_DIR_NAME).join(CONFIG_FILE_NAME);
 
     if config_file.exists() {
         return Ok(());
@@ -23,7 +22,6 @@ pub fn ensure_config(main_dir: &Path) -> std::io::Result<()> {
     let config = WebConfig {
         host: "0.0.0.0".to_string(),
         port: 11451,
-        auth_secret: generate_random_secret(128),
     };
 
     let config_json = serde_json::to_string_pretty(&config)?;

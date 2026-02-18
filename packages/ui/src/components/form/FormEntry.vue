@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { inject, provide, ref, watch } from "vue";
 import type { FormFieldInstance, FormInstance } from "../../utils/form.ts";
-import Message from "../panel/Message.vue";
+import Message from "../misc/Message.vue";
 import type { Size } from "../../utils/utils.ts";
 import type { CSSSize } from "../../utils/css.ts";
 

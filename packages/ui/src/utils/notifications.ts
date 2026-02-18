@@ -1,4 +1,4 @@
-import type { MessageProps } from "../components/panel/Message.vue";
+import type { MessageProps } from "../components/misc/Message.vue";
 import { ref, shallowReactive, type VueElement } from "vue";
 import { useLocale } from "./stores.ts";
 import { useLocalStorage } from "@vueuse/core";

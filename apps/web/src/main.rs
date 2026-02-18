@@ -1,5 +1,6 @@
 mod api;
 mod config;
+mod token;
 mod user;
 mod utils;
 
@@ -35,30 +36,34 @@ async fn main() -> std::io::Result<()> {
         info!("Created main directory");
     }
 
-    config::ensure_config(&main_dir)?;
-    user::load_users(&main_dir)?;
+    config::ensure_config()?;
+    user::load_users()?;
+    token::load_tokens()?;
 
     let config = config::load_config(&main_dir)?;
 
     let bind_addr = format!("{}:{}", config.host, config.port);
 
     HttpServer::new(move || {
-        let mut app = App::new()
-            .wrap(Logger::default())
-            .app_data(web::Data::new(config.clone()));
+        let mut app = App::new().wrap(Logger::default());
 
         app = app.service(
             web::scope("/api")
                 .service(api::api_index)
                 .service(api::api_account_login)
-                .service(api::api_account_refresh)
                 .service(api::api_account_register)
                 .service(api::api_account_should_register)
                 .service(api::api_user_create)
                 .service(api::api_user_update)
                 .service(api::api_user_update_password)
                 .service(api::api_user_delete)
-                .service(api::api_user_get_self),
+                .service(api::api_user_get_self)
+                .service(api::api_user_get_all)
+                .service(api::api_session_get_self)
+                .service(api::api_session_get_all)
+                .service(api::api_session_delete_self)
+                .service(api::api_session_delete_id)
+                .service(api::api_session_delete_username),
         );
 
         #[cfg(not(debug_assertions))]

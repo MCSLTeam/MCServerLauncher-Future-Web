@@ -174,7 +174,7 @@ defineExpose({
   }
 
   & > div {
-    width: calc(100% - $size);
+    width: calc(100% - $size - var(--mcsl-message__spacing));
   }
 
   & > .mcsl-message__close-btn {

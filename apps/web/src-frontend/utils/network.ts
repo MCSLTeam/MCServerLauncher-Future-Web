@@ -87,9 +87,8 @@ export async function requestWithToken<T>(
   data?: any,
   headers?: object,
   requestConfig?: AxiosRequestConfig,
-  autoRefreshToken: boolean = true,
 ): Promise<T> {
-  const token = useAccount().accessToken;
+  const token = useAccount().token;
   if (!token) {
     const err = new ApiError(path, method, "invalid-token");
     await errHandler?.(err);
@@ -99,24 +98,21 @@ export async function requestWithToken<T>(
     path,
     method,
     async (e) => {
-      if (token) {
-        if (e.err == "invalid-token" && autoRefreshToken) {
-          await useAccount().refreshToken();
-          return await requestWithToken(
-            path,
-            method,
-            errHandler,
-            data,
-            headers,
-            requestConfig,
-            false,
-          );
-        }
-
-        if (e.err == "permission-denied") await useAccount().updateSelfInfo();
-      }
-
       await errHandler?.(e);
+
+      if (token) {
+        if (e.err == "permission-denied") await useAccount().updateSelfInfo();
+        if (e.err == "invalid-token") {
+          await useAccount().logout();
+          new MCSLNotif({
+            data: {
+              title: useLocale().getI18n().t("ui.notification.title.warning"),
+              message: useLocale().getI18n().t("web.auth.login.expired"),
+              color: "warning",
+            },
+          }).open();
+        }
+      }
     },
     data,
     {
@@ -134,10 +130,8 @@ export class ApiError extends Error {
     public readonly err: string,
     public readonly cause?: any,
   ) {
-    super(
-      useLocale()
-        .getI18n()
-        .t("web.api.error." + err),
-    );
+    const key = "web.api.error." + err;
+    const localized = useLocale().getI18n().t(key);
+    super(key != localized ? localized : err);
   }
 }

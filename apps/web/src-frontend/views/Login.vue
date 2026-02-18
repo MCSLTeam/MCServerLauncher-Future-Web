@@ -61,10 +61,7 @@ async function submit() {
       "/account/login",
       "POST",
       (e) => notifyErr(e, "web.auth.login.error"),
-      {
-        username: form.data.value.username,
-        password: form.data.value.password,
-      },
+      form.data.value,
     );
 
     await useAccount().setToken(tokenPair, form.data.value.remember);

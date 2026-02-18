@@ -122,7 +122,7 @@ export function setShouldRegister(value: boolean) {
       }
 
       router.beforeEach((to, _from, next) => {
-        if (useAccount().accessToken) {
+        if (useAccount().token) {
           if (to.path.startsWith("/auth")) next("/");
         } else {
           if (!to.path.startsWith("/auth") && !to.path.startsWith("/welcome"))
@@ -139,13 +139,13 @@ export function setShouldRegister(value: boolean) {
       });
 
       if (
-        !useAccount().accessToken &&
+        !useAccount().token &&
         !router.currentRoute.value.path.startsWith("/auth") &&
         !router.currentRoute.value.path.startsWith("/welcome")
       )
         await router.push("/auth");
 
-      loadingStep.value = t("web.loading.fetch-user");
+      loadingStep.value = t("web.loading.user-fetch");
 
       await useAccount().updateSelfInfo();
       setInterval(

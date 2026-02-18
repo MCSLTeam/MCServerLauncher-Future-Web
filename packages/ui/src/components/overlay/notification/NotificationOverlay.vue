@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { MCSLNotif, notifications } from "../../../utils/notifications.ts";
-import Message from "../../panel/Message.vue";
+import Message from "../../misc/Message.vue";
 </script>
 
 <template>

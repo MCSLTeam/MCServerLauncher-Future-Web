@@ -5,7 +5,7 @@ import {
   removeTemplate,
 } from "../../../utils/notifications.ts";
 import { onMounted, onUnmounted, type VueElement } from "vue";
-import type { MessageProps } from "../../panel/Message.vue";
+import type { MessageProps } from "../../misc/Message.vue";
 
 const props = withDefaults(
   defineProps<{
