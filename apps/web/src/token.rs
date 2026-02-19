@@ -289,7 +289,9 @@ pub fn get_user_by_token(token: &str) -> Result<User, HttpResponse> {
     let token_info = token_info.unwrap();
     let user = get_user(token_info.user.as_ref());
 
-    if (!token_info.remember && token_info.created_at + TEMP_TOKEN_EXPIRE_MILLIS < current_time()) || user.is_none() {
+    if (!token_info.remember && token_info.created_at + TEMP_TOKEN_EXPIRE_MILLIS < current_time())
+        || user.is_none()
+    {
         tokens.remove(token);
         cache.1 = current_time();
         save_tokens(&*cache)?;
@@ -300,4 +302,37 @@ pub fn get_user_by_token(token: &str) -> Result<User, HttpResponse> {
     }
 
     Ok(user.unwrap())
+}
+
+pub fn cleanup_expired_tokens() -> Result<usize, HttpResponse> {
+    let mut cache = acquire_write_lock(&TOKENS_CACHE)?;
+    let tokens = cache.0.as_mut().expect("Tokens cache not initialized");
+
+    let current_time = current_time();
+    let tokens_to_delete: Vec<(String, SessionInfo)> = tokens
+        .iter()
+        .filter(|(_, token_info)| {
+            let user = get_user(token_info.user.as_ref());
+            (!token_info.remember
+                && token_info.created_at + TEMP_TOKEN_EXPIRE_MILLIS < current_time)
+                || user.is_none()
+        })
+        .map(|(token, token_info)| (token.clone(), token_info.clone()))
+        .collect();
+
+    let deleted_permanent_count = tokens_to_delete
+        .iter()
+        .filter(|(_, token_info)| token_info.remember)
+        .count();
+
+    tokens_to_delete.iter().for_each(|(token, _)| {
+        tokens.remove(token);
+    });
+
+    if deleted_permanent_count > 0 {
+        cache.1 = current_time;
+        save_tokens(&*cache)?;
+    }
+
+    Ok(deleted_permanent_count)
 }

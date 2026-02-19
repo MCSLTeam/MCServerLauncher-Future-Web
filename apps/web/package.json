@@ -18,18 +18,18 @@
     "@repo/configs": "workspace:*",
     "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",
-    "@vueuse/core": "^14.2.0",
+    "@vueuse/core": "^14.2.1",
     "axios": "^1.13.5",
-    "eslint": "^9.39.2",
+    "eslint": "^10.0.0",
     "pinia": "^3.0.4",
-    "vue": "^3.5.27",
+    "vue": "^3.5.28",
     "vue-i18n": "^11.2.8",
-    "vue-router": "^4.6.4",
+    "vue-router": "^5.0.2",
     "yup": "^1.7.1"
   },
   "devDependencies": {
-    "@rsbuild/core": "^1.7.2",
+    "@rsbuild/core": "^1.7.3",
     "typescript": "^5.9.3",
-    "vue-tsc": "^2.2.12"
+    "vue-tsc": "^3.2.4"
   }
 }

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue";
-import { type Color } from "../../utils/css.ts";
+import { type Color, getColorVar } from "../../utils/css.ts";
 
 const props = withDefaults(
   defineProps<{

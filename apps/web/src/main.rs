@@ -40,6 +40,20 @@ async fn main() -> std::io::Result<()> {
     user::load_users()?;
     token::load_tokens()?;
 
+    tokio::spawn(async {
+        use tokio::time::{interval, Duration};
+
+        let mut interval = interval(Duration::from_secs(3600));
+
+        loop {
+            interval.tick().await;
+
+            if let Err(e) = token::cleanup_expired_tokens() {
+                error!("Failed to cleanup expired tokens: {:?}", e);
+            }
+        }
+    });
+
     let config = config::load_config(&main_dir)?;
 
     let bind_addr = format!("{}:{}", config.host, config.port);

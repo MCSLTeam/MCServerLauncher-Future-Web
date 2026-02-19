@@ -25,7 +25,7 @@ const { exist, status } = animatedVisibilityExists(
 );
 
 const animation = computed(() => {
-  let anim: string | null = null;
+  let anim: string = "";
   if (status.value == "in") {
     anim = props.inAnim;
     if (props.collapse == "vertical")

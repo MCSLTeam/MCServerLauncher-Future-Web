@@ -28,7 +28,13 @@ export const customVueConfig = [
       "vue/valid-template-root": "warn",
       "vue/no-multiple-template-root": "off",
       "vue/first-attribute-linebreak": "off",
-      "vue/ html-self-closing": "off", // 交给 prettier 处理
+      "vue/html-self-closing": "off", // 交给 prettier 处理
+    },
+  },
+  {
+    files: ["**/*.vue"],
+    rules: {
+      "no-useless-assignment": "off", // Vue 模板中使用的变量会被误判为无用赋值
     },
   },
   {

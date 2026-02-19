@@ -278,17 +278,11 @@ function openLink(url: string) {
       </template>
       <div class="about__dependencies">
         <div
-          v-for="([platform, dependencies], index) in Object.entries(
-            dependencies,
-          )"
+          v-for="([platform, deps], index) in Object.entries(dependencies)"
           :key="index"
         >
           <h5>{{ t(`shared.settings.about.dependencies.${platform}`) }}</h5>
-          <Panel
-            v-for="(dependency, index) in dependencies"
-            size="small"
-            :key="index"
-          >
+          <Panel v-for="(dependency, index) in deps" size="small" :key="index">
             <div class="about__dependency">
               <div>
                 <h5>{{ dependency.name }}</h5>

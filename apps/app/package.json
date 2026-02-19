@@ -18,18 +18,18 @@
     "@repo/configs": "workspace:*",
     "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",
-    "@tauri-apps/api": "^2.9.1",
+    "@tauri-apps/api": "^2.10.1",
     "@tauri-apps/plugin-notification": "~2.3.3",
     "@tauri-apps/plugin-opener": "~2.5.3",
     "@tauri-apps/plugin-os": "~2.3.2",
     "@tauri-apps/plugin-process": "~2.3.1",
-    "eslint": "^9.39.2",
-    "vue": "^3.5.27"
+    "eslint": "^10.0.0",
+    "vue": "^3.5.28"
   },
   "devDependencies": {
-    "@rsbuild/core": "^1.7.2",
-    "@tauri-apps/cli": "^2.9.6",
+    "@rsbuild/core": "^1.7.3",
+    "@tauri-apps/cli": "^2.10.0",
     "typescript": "^5.9.3",
-    "vue-tsc": "^2.2.12"
+    "vue-tsc": "^3.2.4"
   }
 }

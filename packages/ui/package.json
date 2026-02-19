@@ -5,10 +5,10 @@
   "scripts": {
     "lint": "eslint; prettier --check .",
     "fix": "eslint --fix; prettier --write --list-different .",
-    "test": "tsc --noEmit"
+    "test": "vue-tsc --noEmit"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
+    "@eslint/js": "^10.0.1",
     "@repo/configs": "workspace:*",
     "@repo/locales": "workspace:*",
     "@types/lodash": "^4.17.23",
@@ -20,7 +20,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@vueuse/core": "^13.9.0",
+    "@vueuse/core": "^14.2.1",
     "animate.css": "^4.1.1",
     "dayjs": "^1.11.19",
     "floating-vue": "^5.2.2",
@@ -28,12 +28,13 @@
     "highlight.js": "^11.11.1",
     "highlightjs-snbt": "^0.1.4",
     "lodash": "^4.17.23",
-    "markdown-it": "^14.1.0",
+    "markdown-it": "^14.1.1",
     "nbt-parser": "^1.0.2",
     "pinia": "^3.0.4",
-    "vue": "^3.5.27",
+    "vue": "^3.5.28",
     "vue-i18n": "^11.2.8",
-    "vue-router": "^4.6.4",
+    "vue-router": "^5.0.2",
+    "vue-tsc": "^3.2.4",
     "xss": "^1.0.15",
     "yup": "^1.7.1"
   }
