@@ -12,7 +12,7 @@ import { notifyErr, requestApi } from "../utils/network.ts";
 import router from "@repo/shared/src/router.ts";
 import { MCSLNotif } from "@repo/ui/src/utils/notifications.ts";
 import { useRoute } from "vue-router";
-import { type TokenPair, useAccount } from "../utils/store.ts";
+import { useAccount } from "../utils/store.ts";
 
 usePageData().set({
   breadcrumbs: [],
@@ -57,14 +57,14 @@ async function submit() {
   canSubmit = false;
 
   try {
-    const tokenPair = await requestApi<TokenPair>(
+    const token = await requestApi<string>(
       "/account/login",
       "POST",
       (e) => notifyErr(e, "web.auth.login.error"),
       form.data.value,
     );
 
-    await useAccount().setToken(tokenPair, form.data.value.remember);
+    await useAccount().setToken(token, form.data.value.remember);
 
     await router.push("/");
 
