@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import { useRouter } from "vue-router";
-import { ColorData, type ColorType, getShadow } from "../../../utils/css.ts";
-import type { Size } from "../../../utils/utils.ts";
+import { ColorData, type ColorType, getShadow } from "../../utils/css.ts";
+import type { Size } from "../../utils/utils.ts";
 
 const props = withDefaults(
   defineProps<{
@@ -161,8 +161,8 @@ const onClick = computed(() =>
 </template>
 
 <style lang="scss" scoped>
-@use "../../../assets/css/utils";
-@use "../../Content" as *;
+@use "../../assets/css/utils";
+@use "../Content" as *;
 
 @each $size in utils.$sizes {
   .mcsl-size-#{$size}.mcsl-button {

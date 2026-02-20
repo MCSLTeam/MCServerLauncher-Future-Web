@@ -1,7 +1,6 @@
 {
   "name": "@repo/ui",
   "type": "module",
-  "private": true,
   "scripts": {
     "lint": "eslint; prettier --check .",
     "fix": "eslint --fix; prettier --write --list-different .",

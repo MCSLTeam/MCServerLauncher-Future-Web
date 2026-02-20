@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
-import Button from "@repo/ui/src/components/form/button/Button.vue";
+import Button from "@repo/ui/src/components/button/Button.vue";
 import { usePageData } from "../../utils/stores.ts";
 import router from "../../router.ts";
 import Modal from "@repo/ui/src/components/overlay/Modal.vue";

@@ -4,7 +4,7 @@ import { useI18n } from "vue-i18n";
 import { disableTaskExitDialog, showTaskExitDialog } from "../index.ts";
 import FormItem from "@repo/ui/src/components/form/FormItem.vue";
 import Checkbox from "@repo/ui/src/components/form/entries/Checkbox.vue";
-import Button from "@repo/ui/src/components/form/button/Button.vue";
+import Button from "@repo/ui/src/components/button/Button.vue";
 import * as yup from "yup";
 
 const t = useI18n().t;

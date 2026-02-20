@@ -28,7 +28,7 @@ watch(loading, (newValue) => {
     <FancyBackground>
       <div class="loading-overlay__container">
         <div class="loading-overlay__logo">
-          <img src="../../assets/img/MCSL.png" alt="" width="84" />
+          <img src="../../assets/img/MCSL.png" alt="" />
           <div>
             <h1>
               {{ t("shared.app.name.abbr") }} {{ t("shared.app.name.future") }}

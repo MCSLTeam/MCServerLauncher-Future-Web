@@ -2,8 +2,8 @@
 import { useRoute } from "vue-router";
 import { useNavigation, usePageData } from "../../utils/stores.ts";
 import NavTabs from "@repo/ui/src/components/navigation/NavTabs.vue";
-import Button from "@repo/ui/src/components/form/button/Button.vue";
-import SplitButton from "@repo/ui/src/components/form/button/SplitButton.vue";
+import Button from "@repo/ui/src/components/button/Button.vue";
+import SplitButton from "@repo/ui/src/components/button/SplitButton.vue";
 import Spinner from "@repo/ui/src/components/progress/Spinner.vue";
 import DropdownMenu from "@repo/ui/src/components/overlay/DropdownMenu.vue";
 import { useI18n } from "vue-i18n";
@@ -131,7 +131,7 @@ provide("instance", info);
         </DropdownMenu>
       </div>
     </div>
-    <NavTabs :tabs="useNavigation().getItems('instance').value" />
+    <NavTabs :tabs="useNavigation().get('instance').value" />
     <div class="instance__content">
       <RouterView v-slot="{ Component }">
         <transition mode="out-in" name="fade" :duration="250">

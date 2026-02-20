@@ -15,7 +15,7 @@ import {
 } from "../utils/utils.ts";
 import { pinyin } from "pinyin-pro";
 import Divider from "@repo/ui/src/components/misc/Divider.vue";
-import Button from "@repo/ui/src/components/form/button/Button.vue";
+import Button from "@repo/ui/src/components/button/Button.vue";
 import type { InstanceStatus } from "../utils/node/types/instance.ts";
 import { getGame } from "../utils/node/types/cores.ts";
 

@@ -3,6 +3,10 @@ import Modal from "@repo/ui/src/components/overlay/Modal.vue";
 import { useI18n } from "vue-i18n";
 import Button from "@repo/ui/src/components/button/Button.vue";
 
+defineProps<{
+  title: string;
+}>();
+
 defineEmits(["confirm"]);
 
 const t = useI18n().t;
@@ -15,11 +19,12 @@ const visible = defineModel<boolean>("visible", {
 <template>
   <Modal
     v-model:visible="visible"
-    :header="t('shared.close-confirm.title')"
+    :header="title"
     max-width="300px"
+    :header-divider="false"
+    :close-btn="false"
   >
-    <p>{{ t("shared.close-confirm.desc") }}</p>
-    <div class="close-confirm__actions">
+    <div class="confirm__actions">
       <Button
         color="danger"
         @click="
@@ -27,7 +32,7 @@ const visible = defineModel<boolean>("visible", {
           $emit('confirm');
         "
       >
-        {{ t("ui.common.close") }}
+        {{ t("ui.common.confirm") }}
       </Button>
       <Button type="primary" color="primary" @click="visible = false">
         {{ t("ui.common.cancel") }}
@@ -37,10 +42,7 @@ const visible = defineModel<boolean>("visible", {
 </template>
 
 <style scoped lang="scss">
-.close-confirm__actions {
-  width: fit-content;
-  margin-top: var(--mcsl-spacing-xs);
-  margin-left: auto;
+.confirm__actions {
   display: flex;
   gap: var(--mcsl-spacing-2xs);
 

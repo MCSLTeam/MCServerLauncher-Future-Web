@@ -16,7 +16,7 @@ const props = withDefaults(
   {
     props: (notif: MCSLNotif) => notif.settings.data,
     systemNotif: (notif: MCSLNotif) => ({
-      title: notif.settings.data.title,
+      title: notif.settings.data.header,
       body: notif.settings.data.message,
     }),
   },

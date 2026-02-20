@@ -7,7 +7,7 @@ import { sleep } from "@repo/ui/src/utils/utils.ts";
 import { getCSSVar } from "@repo/ui/src/utils/css.ts";
 import { useSettings } from "../../utils/stores.ts";
 import InputText from "@repo/ui/src/components/form/entries/InputText.vue";
-import Button from "@repo/ui/src/components/form/button/Button.vue";
+import Button from "@repo/ui/src/components/button/Button.vue";
 import Divider from "@repo/ui/src/components/misc/Divider.vue";
 import { useI18n } from "vue-i18n";
 

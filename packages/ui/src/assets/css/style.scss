@@ -130,6 +130,28 @@ html.dark::view-transition-new(root) {
   opacity: 1;
 }
 
+.stretch-vertical-enter-active {
+  transition: 1s cubic-bezier(0, 1, 0, 1);
+  overflow: hidden;
+}
+
+.stretch-vertical-leave-active {
+  transition: 0.5s ease-in-out;
+  overflow: hidden;
+}
+
+.stretch-vertical-enter-from,
+.stretch-vertical-leave-to {
+  max-height: 0 !important;
+  opacity: 0;
+}
+
+.stretch-vertical-enter-to,
+.stretch-vertical-leave-from {
+  max-height: 999px;
+  opacity: 1;
+}
+
 /* 排版 */
 * {
   color: var(--mcsl-text-color-regular);
@@ -253,6 +275,57 @@ blockquote {
   h5,
   h6 {
     margin: var(--mcsl-spacing-xs) 0;
+  }
+}
+
+/* 表格 */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: var(--mcsl-border-radius-md);
+  overflow: hidden;
+  outline: 1px solid var(--mcsl-border-color-base);
+  outline-offset: -1px;
+}
+
+thead {
+  background-color: var(--mcsl-bg-color-main);
+
+  & > tr > th {
+    padding-top: var(--mcsl-spacing-xs);
+  }
+}
+
+tbody > tr {
+  &:hover {
+    background-color: #{utils.transparent(var(--mcsl-color-primary), 5%)};
+  }
+
+  &:last-child {
+    border-bottom: none;
+
+    & > td {
+      padding-bottom: var(--mcsl-spacing-xs);
+    }
+  }
+}
+
+tr {
+  border-bottom: 1px solid var(--mcsl-border-color-base);
+  transition: 0.2s ease-in-out;
+}
+
+th,
+td {
+  text-align: left;
+  padding: var(--mcsl-spacing-2xs) 0;
+
+  &:first-child {
+    padding-left: var(--mcsl-spacing-xs);
+  }
+
+  &:last-child {
+    padding-right: var(--mcsl-spacing-xs);
   }
 }
 

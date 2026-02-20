@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import Panel from "./Panel.vue";
-import Button from "../form/button/Button.vue";
+import Button from "../button/Button.vue";
 import type { ColorType } from "../../utils/css.ts";
 import type { Size } from "../../utils/utils.ts";
 import Divider from "../misc/Divider.vue";

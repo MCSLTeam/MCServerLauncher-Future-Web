@@ -66,7 +66,7 @@ function searchMatch(a: string, b: string) {
           ref="langDropdown"
           :menu="filteredLangs"
           :follow-width="false"
-          @open="langFilter = ''"
+          @closed="langFilter = ''"
           default-pos="top"
         >
           <template #triggerer="{ toggle }">

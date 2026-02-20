@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import DashboardSidebar from "../components/dashboard/DashboardSidebar.vue";
 import Breadcrumbs from "@repo/ui/src/components/navigation/Breadcrumbs.vue";
-import Button from "@repo/ui/src/components/form/button/Button.vue";
+import Button from "@repo/ui/src/components/button/Button.vue";
 import { useLocalStorage } from "@vueuse/core";
 import { windowButtonsExists, windowButtonTransition } from "../index.ts";
 import { useNavigation, usePageData } from "../utils/stores.ts";
@@ -20,7 +20,7 @@ const sidebarCollapsed = computed(
 );
 const sidebarExpanded = ref(false);
 const { exist: sidebarBg } = animatedVisibilityExists(sidebarExpanded, 300);
-const navbarItems = useNavigation().getItems("navbar");
+const navbarItems = useNavigation().get("navbar");
 
 router.afterEach(() => {
   sidebarExpanded.value = false;

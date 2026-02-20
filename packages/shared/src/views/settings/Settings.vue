@@ -32,7 +32,7 @@ provide("requireRestart", requireRestart);
 
 <template>
   <div class="settings">
-    <NavTabs :tabs="useNavigation().getItems('settings').value" />
+    <NavTabs :tabs="useNavigation().get('settings').value" />
     <div class="settings__content">
       <RouterView v-slot="{ Component }">
         <transition mode="out-in" name="fade" :duration="250">

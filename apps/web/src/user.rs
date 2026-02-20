@@ -33,17 +33,17 @@ pub struct UserInput {
 
 #[derive(Serialize, Debug)]
 pub struct UserOutput {
-    pub created_at: u128,
     pub username: String,
     pub permissions: Vec<String>,
+    pub created_at: u128,
 }
 
 impl User {
     pub fn to_output(&self) -> UserOutput {
         UserOutput {
-            created_at: self.info.created_at,
             username: self.username.clone(),
             permissions: self.info.permissions.clone(),
+            created_at: self.info.created_at,
         }
     }
 
@@ -69,6 +69,16 @@ impl User {
         }
 
         Ok(false)
+    }
+
+    pub fn verify_password(&self, password: &str) -> Result<(), HttpResponse> {
+        match sha256(password) == self.info.password {
+            true => Ok(()),
+            false => Err(HttpResponse::Unauthorized().json(FailedResponse {
+                status: "failed",
+                err: "login-failed",
+            })),
+        }
     }
 }
 
@@ -282,13 +292,7 @@ pub fn delete_user(username: &str) -> Result<(), HttpResponse> {
 pub fn verify_password(name: &str, password: &str) -> Result<User, HttpResponse> {
     match get_user(name) {
         Some(user) => {
-            let hashed_password = sha256(password);
-            if hashed_password != user.info.password {
-                return Err(HttpResponse::Unauthorized().json(FailedResponse {
-                    status: "failed",
-                    err: "login-failed",
-                }));
-            }
+            user.verify_password(password)?;
             Ok(user)
         }
         None => Err(HttpResponse::Unauthorized().json(FailedResponse {

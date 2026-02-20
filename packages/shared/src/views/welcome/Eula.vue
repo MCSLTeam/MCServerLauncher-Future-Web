@@ -6,7 +6,7 @@ import { onMounted, onUnmounted, ref, watch } from "vue";
 import Spinner from "@repo/ui/src/components/progress/Spinner.vue";
 import router, { firstLoad } from "../../router.ts";
 import { close, getEula } from "../../index.ts";
-import Button from "@repo/ui/src/components/form/button/Button.vue";
+import Button from "@repo/ui/src/components/button/Button.vue";
 
 usePageData().set({
   breadcrumbs: [],

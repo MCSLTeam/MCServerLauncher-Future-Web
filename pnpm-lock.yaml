@@ -81,6 +81,9 @@ importers:
       axios:
         specifier: ^1.13.5
         version: 1.13.5
+      dayjs:
+        specifier: ^1.11.19
+        version: 1.11.19
       eslint:
         specifier: ^10.0.0
         version: 10.0.0(jiti@2.6.1)

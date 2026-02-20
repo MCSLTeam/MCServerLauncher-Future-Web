@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import type { Size } from "../../utils/utils.ts";
-import Button from "../form/button/Button.vue";
+import Button from "../button/Button.vue";
 
 const props = withDefaults(
   defineProps<{

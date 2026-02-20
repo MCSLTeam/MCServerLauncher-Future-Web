@@ -10,7 +10,7 @@ const t = useI18n().t;
 <template>
   <FancyBackground>
     <div class="logo">
-      <img src="../assets/img/MCSL.png" alt="" width="98" />
+      <img src="../assets/img/MCSL.png" alt="" />
       <h1>
         {{ t("shared.app.name.abbr") }} {{ t("shared.app.name.future") }}
         {{ t(`${platform}.app.name.suffix`) }}

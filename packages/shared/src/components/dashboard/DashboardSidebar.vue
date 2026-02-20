@@ -49,7 +49,6 @@ const navigationInfo = useNavigation();
       <img
         src="../../assets/img/MCSL.png"
         alt=""
-        width="35"
         v-tooltip.right="
           sidebarCollapsed
             ? `$${t('shared.app.name.abbr')} ${t('shared.app.name.future')} ${t(`${platform}.app.name.suffix`)} (${versionCodename} v${version})`
@@ -70,14 +69,14 @@ const navigationInfo = useNavigation();
     <Divider spacing="md" />
     <div class="dashboard-sidebar__content-grow">
       <Sidebar
-        :pages="navigationInfo.getItems('sidebarUpper').value"
+        :pages="navigationInfo.get('sidebarUpper').value"
         :size="sidebarCollapsed ? 'large' : 'medium'"
         :collapsed="sidebarCollapsed"
       />
       <div class="dashboard-sidebar__content">
         <Divider spacing="md" />
         <Sidebar
-          :pages="navigationInfo.getItems('sidebarDowner').value"
+          :pages="navigationInfo.get('sidebarDowner').value"
           :size="sidebarCollapsed ? 'large' : 'medium'"
           :collapsed="sidebarCollapsed"
         />

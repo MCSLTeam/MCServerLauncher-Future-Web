@@ -16,7 +16,11 @@ export type Method =
   | "PATCH"
   | "PURGE";
 
-export function notifyErr(err: ApiError, notification: string) {
+export function notifyErr(
+  err: ApiError,
+  notification: string,
+  color: string = "danger",
+) {
   console.warn(
     `Failed to request /api${err.path} with method ${err.method}`,
     err,
@@ -25,7 +29,7 @@ export function notifyErr(err: ApiError, notification: string) {
     data: {
       title: useLocale().getI18n().t("ui.notification.title.error"),
       message: useLocale().getI18n().t(notification, { reason: err.message }),
-      color: "danger",
+      color,
     },
   }).open();
 }
@@ -103,7 +107,7 @@ export async function requestWithToken<T>(
       if (token) {
         if (e.err == "permission-denied") await useAccount().updateSelfInfo();
         if (e.err == "invalid-token") {
-          await useAccount().logout();
+          await useAccount().logout(false);
           new MCSLNotif({
             data: {
               title: useLocale().getI18n().t("ui.notification.title.warning"),

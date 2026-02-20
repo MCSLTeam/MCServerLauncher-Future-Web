@@ -4,7 +4,7 @@ import { inject, onMounted, onUpdated, provide, reactive, ref } from "vue";
 
 const props = defineProps<{
   form: FormInstance<any>;
-  title?: string;
+  header?: string;
   labelWidthLeft?: string;
   labelWidthRight?: string;
 }>();
@@ -73,8 +73,11 @@ function refreshLabelWidth() {
   actualLabelWidth.right = rightMax + "px";
 }
 
+const headerEl = ref();
+
 onMounted(() => {
   refreshLabelWidth();
+  if (headerEl.value.innerText.trim() == "") headerEl.value.remove();
 });
 
 onUpdated(() => {
@@ -92,9 +95,9 @@ onUpdated(() => {
       '--mcsl-form__label-width-right': actualLabelWidth.right,
     }"
   >
-    <div class="mcsl-form__title">
+    <div class="mcsl-form__header" ref="headerEl">
       <slot name="title">
-        <h2 class="mcsl-form__title-default">{{ title }}</h2>
+        <h2 class="mcsl-form__header-default">{{ header }}</h2>
       </slot>
     </div>
     <slot />
@@ -114,12 +117,12 @@ onUpdated(() => {
   margin-top: var(--mcsl-spacing-2xs);
 }
 
-.mcsl-form__title {
+.mcsl-form__header {
   width: 100%;
   margin-bottom: var(--mcsl-spacing-sm);
 }
 
-.mcsl-form__title-default {
+.mcsl-form__header-default {
   width: 100%;
   text-align: center;
   color: var(--mcsl-text-color-secondary);

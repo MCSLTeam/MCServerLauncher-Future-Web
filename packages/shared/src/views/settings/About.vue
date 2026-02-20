@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
-import Button from "@repo/ui/src/components/form/button/Button.vue";
+import Button from "@repo/ui/src/components/button/Button.vue";
 import SettingsItem from "../../components/settings/SettingsItem.vue";
 import Switch from "@repo/ui/src/components/form/entries/Switch.vue";
 import { ref } from "vue";
@@ -203,7 +203,7 @@ function openLink(url: string) {
         <Panel size="small">
           <div class="about__special-thank">
             <div>
-              <img src="../../assets/img/bangbang93.jpg" alt="" width="42" />
+              <img src="../../assets/img/bangbang93.jpg" alt="" />
               <div>
                 <h5>bangbang93</h5>
                 <p>{{ t("shared.settings.about.special-thanks.bmcl.desc") }}</p>
@@ -219,7 +219,7 @@ function openLink(url: string) {
         <Panel size="small">
           <div class="about__special-thank">
             <div>
-              <img src="../../assets/img/iNKORE.png" alt="" width="42" />
+              <img src="../../assets/img/iNKORE.png" alt="" />
               <div>
                 <h5>iNKORE Studios</h5>
                 <p>
@@ -237,7 +237,7 @@ function openLink(url: string) {
         <Panel size="small">
           <div class="about__special-thank">
             <div>
-              <img src="../../assets/img/BakaXL.png" alt="" width="42" />
+              <img src="../../assets/img/BakaXL.png" alt="" />
               <div>
                 <h5>BakaXL</h5>
                 <p>
@@ -255,7 +255,7 @@ function openLink(url: string) {
         <Panel size="small">
           <div class="about__special-thank">
             <div>
-              <img src="../../assets/img/MCSL.png" alt="" width="42" />
+              <img src="../../assets/img/MCSL.png" alt="" />
               <div>
                 <h5>
                   {{ t("shared.settings.about.special-thanks.qq.title") }}

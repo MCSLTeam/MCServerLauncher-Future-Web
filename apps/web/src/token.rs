@@ -15,7 +15,6 @@ use std::sync::{Arc, RwLock};
 pub struct SessionInfo {
     pub user: String,
     pub token_id: String,
-    #[serde(skip, default = "default_remember")]
     pub remember: bool,
     pub user_agent: String,
     pub last_active_ip: String,
@@ -23,8 +22,37 @@ pub struct SessionInfo {
     pub created_at: u128,
 }
 
-fn default_remember() -> bool {
-    true
+#[derive(Serialize, Deserialize)]
+pub struct SessionStorage {
+    pub user: String,
+    pub token_id: String,
+    pub user_agent: String,
+    pub last_active_ip: String,
+    pub last_active_at: u128,
+    pub created_at: u128,
+}
+
+fn session_info_to_storage(info: SessionInfo) -> SessionStorage {
+    SessionStorage {
+        user: info.user,
+        token_id: info.token_id,
+        user_agent: info.user_agent,
+        last_active_ip: info.last_active_ip,
+        last_active_at: info.last_active_at,
+        created_at: info.created_at,
+    }
+}
+
+fn session_storage_to_info(storage: SessionStorage) -> SessionInfo {
+    SessionInfo {
+        user: storage.user,
+        token_id: storage.token_id,
+        remember: false,
+        user_agent: storage.user_agent,
+        last_active_ip: storage.last_active_ip,
+        last_active_at: storage.last_active_at,
+        created_at: storage.created_at,
+    }
 }
 
 const TOKENS_FILE_NAME: &str = "user_tokens.json";
@@ -62,20 +90,29 @@ pub fn load_tokens() -> Result<(), Error> {
         e
     })?;
 
-    let tokens: HashMap<String, SessionInfo> = serde_json::from_str(&tokens_json).map_err(|e| {
-        error!(
-            "Failed to parse tokens file at {}: {}",
-            tokens_file.display(),
+    let tokens: HashMap<String, SessionStorage> =
+        serde_json::from_str(&tokens_json).map_err(|e| {
+            error!(
+                "Failed to parse tokens file at {}: {}",
+                tokens_file.display(),
+                e
+            );
             e
-        );
-        e
-    })?;
+        })?;
 
     let mut cache = TOKENS_CACHE.write().map_err(|e| {
         error!("Failed to acquire write lock: {}", e);
         Error::new(std::io::ErrorKind::Other, "Failed to acquire lock")
     })?;
-    *cache = (Some(tokens), current_time());
+    *cache = (
+        Some(
+            tokens
+                .into_iter()
+                .map(|(k, v)| (k, session_storage_to_info(v)))
+                .collect(),
+        ),
+        current_time(),
+    );
 
     Ok(())
 }
@@ -90,6 +127,7 @@ pub fn save_tokens(
         &tokens
             .iter()
             .filter(|(_, token_info)| token_info.remember)
+            .map(|(k, v)| (k.clone(), session_info_to_storage(v.clone())))
             .collect::<HashMap<_, _>>(),
     )
     .map_err(|e| {
@@ -181,6 +219,24 @@ pub fn create_session(
     Ok(token)
 }
 
+pub fn delete_token(token: &str) -> Result<(), HttpResponse> {
+    let mut cache = acquire_write_lock(&TOKENS_CACHE)?;
+    let tokens = cache.0.as_mut().expect("Tokens cache not initialized");
+    match tokens.remove(token) {
+        Some(token) => {
+            cache.1 = current_time();
+            save_tokens(&*cache)?;
+
+            info!("User {} deleted session {}", token.user, token.token_id);
+            Ok(())
+        }
+        None => Err(HttpResponse::NotFound().json(FailedResponse {
+            status: "failed",
+            err: "session-not-found",
+        })),
+    }
+}
+
 pub fn delete_token_by_id(token_id: &str) -> Result<(), HttpResponse> {
     let mut cache = acquire_write_lock(&TOKENS_CACHE)?;
     let tokens = cache.0.as_mut().expect("Tokens cache not initialized");
@@ -193,7 +249,7 @@ pub fn delete_token_by_id(token_id: &str) -> Result<(), HttpResponse> {
     if token.is_none() {
         return Err(HttpResponse::NotFound().json(FailedResponse {
             status: "failed",
-            err: "token-not-found",
+            err: "session-not-found",
         }));
     }
 
@@ -228,16 +284,19 @@ pub fn delete_token_by_username(username: &str) -> Result<(), HttpResponse> {
     Ok(())
 }
 
-pub fn get_session_info(token_id: &str) -> Result<SessionInfo, HttpResponse> {
+pub fn get_session_info_by_id(token_id: &str) -> Result<SessionInfo, HttpResponse> {
     let cache = acquire_read_lock(&TOKENS_CACHE)?;
     let tokens = cache.0.as_ref().expect("Tokens cache not initialized");
 
-    let token_info = tokens.get(token_id);
+    let token_info = tokens
+        .iter()
+        .find(|(_, token_info)| token_info.token_id == token_id)
+        .map(|(_, token_info)| token_info.clone());
 
     if token_info.is_none() {
         return Err(HttpResponse::NotFound().json(FailedResponse {
             status: "failed",
-            err: "token-not-found",
+            err: "session-not-found",
         }));
     }
 

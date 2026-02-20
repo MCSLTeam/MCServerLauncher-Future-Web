@@ -10,7 +10,7 @@ import { useAccount } from "./utils/store.ts";
 import { requestApi } from "./utils/network.ts";
 import { useLocale } from "@repo/ui/src/utils/stores.ts";
 import { sleep } from "@repo/ui/src/utils/utils.ts";
-import { ref, watchEffect } from "vue";
+import { ref, shallowRef, watchEffect } from "vue";
 import { tasks } from "@repo/shared/src/utils/tasks.ts";
 import { useLocalStorage } from "@vueuse/core";
 import { useNavigation } from "@repo/shared/src/utils/stores.ts";
@@ -28,6 +28,9 @@ let taskExitDialogShown = false;
 export function setShouldRegister(value: boolean) {
   shouldRegister = value;
 }
+
+export const showUserCenterModal = ref(false);
+export const userCenterPage = shallowRef<[string, any]>();
 
 (async () => {
   setPlatform("web");
@@ -76,7 +79,7 @@ export function setShouldRegister(value: boolean) {
     },
     async () => {
       const t = useLocale().getI18n().t;
-      useNavigation().addItem(
+      useNavigation().add(
         "sidebarUpper",
         {
           label: t("web.users.title"),
@@ -86,12 +89,14 @@ export function setShouldRegister(value: boolean) {
         3,
       );
 
-      useNavigation().addItem(
+      useNavigation().add(
         "navbar",
         {
           label: t("web.user-center.title"),
           icon: "fa fa-user",
-          onClick() {},
+          onClick() {
+            showUserCenterModal.value = true;
+          },
         },
         1,
       );

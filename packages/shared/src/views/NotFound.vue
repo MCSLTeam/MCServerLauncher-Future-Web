@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import { usePageData } from "../utils/stores.ts";
-import Button from "@repo/ui/src/components/form/button/Button.vue";
+import Button from "@repo/ui/src/components/button/Button.vue";
 import FancyBackground from "@repo/ui/src/components/misc/FancyBackground.vue";
 import { onMounted, onUnmounted, ref } from "vue";
 import router from "../router.ts";

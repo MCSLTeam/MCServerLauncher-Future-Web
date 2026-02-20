@@ -1,6 +1,7 @@
 use crate::token::{
-    create_session, delete_token_by_id, delete_token_by_username, get_session_info, get_session_infos,
-    get_tokens_by_user, get_user_by_token, update_token_info, SessionInfo,
+    create_session, delete_token, delete_token_by_id, delete_token_by_username, get_session_info_by_id,
+    get_session_infos, get_tokens_by_user, get_user_by_token, update_token_info,
+    SessionInfo,
 };
 use crate::user::{
     add_user, delete_user, get_users, is_user_empty, update_user, verify_password, User, UserInput,
@@ -51,24 +52,24 @@ fn get_client_ip(req: &HttpRequest) -> String {
     "unknown".to_string()
 }
 
-pub fn get_optional_user_from_headers(http_request: &HttpRequest) -> Option<User> {
-    let token = match http_request.headers().get("Authorization") {
+fn get_token_from_headers(http_request: &HttpRequest) -> Option<&str> {
+    match http_request.headers().get("Authorization") {
         Some(header) => match header.to_str() {
             Ok(value) => {
                 if value.starts_with("Bearer ") {
-                    &value[7..]
+                    Some(&value[7..])
                 } else {
-                    return None;
+                    None
                 }
             }
-            Err(_) => {
-                return None;
-            }
+            Err(_) => None,
         },
-        None => {
-            return None;
-        }
-    };
+        None => None,
+    }
+}
+
+fn get_optional_user_from_headers(http_request: &HttpRequest) -> Option<User> {
+    let token = get_token_from_headers(http_request)?;
 
     match get_user_by_token(token) {
         Ok(user) => {
@@ -79,7 +80,7 @@ pub fn get_optional_user_from_headers(http_request: &HttpRequest) -> Option<User
     }
 }
 
-pub fn get_user_from_headers(http_request: &HttpRequest) -> Result<User, HttpResponse> {
+fn get_user_from_headers(http_request: &HttpRequest) -> Result<User, HttpResponse> {
     match get_optional_user_from_headers(http_request) {
         Some(user) => Ok(user),
         None => Err(HttpResponse::Unauthorized().json(FailedResponse {
@@ -89,7 +90,7 @@ pub fn get_user_from_headers(http_request: &HttpRequest) -> Result<User, HttpRes
     }
 }
 
-pub fn verify_user_permission(
+fn verify_user_permission(
     http_request: &HttpRequest,
     permission: String,
 ) -> Result<User, HttpResponse> {
@@ -194,6 +195,27 @@ pub async fn api_account_register(data: web::Json<RegisterRequest>) -> impl Resp
     }
 }
 
+#[get("/account/logout")]
+pub async fn api_account_logout(http_request: HttpRequest) -> impl Responder {
+    let token = match get_token_from_headers(&http_request) {
+        Some(token) => token,
+        None => {
+            return HttpResponse::Forbidden().json(FailedResponse {
+                status: "failed",
+                err: "invalid-token",
+            });
+        }
+    };
+
+    match delete_token(token) {
+        Ok(()) => HttpResponse::Ok().json(SuccessResponse {
+            status: "success",
+            data: (),
+        }),
+        Err(res) => res,
+    }
+}
+
 #[post("/user/create")]
 pub async fn api_user_create(
     data: web::Json<UserInput>,
@@ -212,8 +234,8 @@ pub async fn api_user_create(
     }
 }
 
-#[put("/user/{username}")]
-pub async fn api_user_update(
+#[put("/user/info/{username}")]
+pub async fn api_user_update_info(
     username: web::Path<String>,
     data: web::Json<UserInput>,
     http_request: HttpRequest,
@@ -256,6 +278,7 @@ pub async fn api_user_delete(
 
 #[derive(Deserialize)]
 pub struct ChangePasswordRequest {
+    old_password: String,
     password: String,
 }
 
@@ -268,6 +291,10 @@ pub async fn api_user_update_password(
         Ok(user) => user,
         Err(res) => return res,
     };
+
+    if let Err(res) = user.verify_password(&data.old_password) {
+        return res;
+    }
 
     match update_user(
         &user.username,
@@ -285,8 +312,8 @@ pub async fn api_user_update_password(
     }
 }
 
-#[get("/user/self")]
-pub async fn api_user_get_self(http_request: HttpRequest) -> impl Responder {
+#[get("/user/info/self")]
+pub async fn api_user_get_info_self(http_request: HttpRequest) -> impl Responder {
     let user = match get_user_from_headers(&http_request) {
         Ok(user) => user,
         Err(res) => return res,
@@ -298,8 +325,8 @@ pub async fn api_user_get_self(http_request: HttpRequest) -> impl Responder {
     })
 }
 
-#[get("/user/all")]
-pub async fn api_user_get_all(http_request: HttpRequest) -> impl Responder {
+#[get("/user/info/all")]
+pub async fn api_user_get_info_all(http_request: HttpRequest) -> impl Responder {
     let current_user = match get_user_from_headers(&http_request) {
         Ok(user) => user,
         Err(res) => return res,
@@ -317,9 +344,17 @@ pub async fn api_user_get_all(http_request: HttpRequest) -> impl Responder {
                 return true;
             }
             let read_permission = format!("mcsl.web.user.{}.info.read", user.username);
+            let change_permission = format!("mcsl.web.user.{}.info.change", user.username);
+            let delete_permission = format!("mcsl.web.user.{}.info.delete", user.username);
             current_user
                 .verify_permission(&read_permission)
                 .unwrap_or(false)
+                || current_user
+                    .verify_permission(&change_permission)
+                    .unwrap_or(false)
+                || current_user
+                    .verify_permission(&delete_permission)
+                    .unwrap_or(false)
         })
         .map(|user| user.to_output())
         .collect();
@@ -356,7 +391,7 @@ pub async fn api_session_delete_id(
         Err(res) => return res,
     };
 
-    let session_info = match get_session_info(&id) {
+    let session_info = match get_session_info_by_id(&id) {
         Ok(info) => info,
         Err(res) => return res,
     };
@@ -400,9 +435,13 @@ pub async fn api_session_get_all(http_request: HttpRequest) -> impl Responder {
                 return true;
             }
             let read_permission = format!("mcsl.web.user.{}.session.read", session.user);
+            let delete_permission = format!("mcsl.web.user.{}.session.delete", session.user);
             current_user
                 .verify_permission(&read_permission)
                 .unwrap_or(false)
+                || current_user
+                    .verify_permission(&delete_permission)
+                    .unwrap_or(false)
         })
         .collect();
 

@@ -16,7 +16,7 @@ onMounted(() => {
   <div class="welcome-overlay" v-if="exists">
     <FancyBackground>
       <div class="welcome-overlay__logo">
-        <img src="../../assets/img/MCSL.png" alt="" width="98" />
+        <img src="../../assets/img/MCSL.png" alt="" />
         <div>
           <h1>
             {{ t("shared.app.name.abbr") }} {{ t("shared.app.name.future") }}

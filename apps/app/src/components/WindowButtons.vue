@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Button from "@repo/ui/src/components/form/button/Button.vue";
+import Button from "@repo/ui/src/components/button/Button.vue";
 import { platform } from "@tauri-apps/plugin-os";
 import { exit } from "@tauri-apps/plugin-process";
 import { getCurrentWindow } from "@tauri-apps/api/window";

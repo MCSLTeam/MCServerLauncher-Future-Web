@@ -1,7 +1,6 @@
 {
   "name": "@repo/shared",
   "type": "module",
-  "private": true,
   "scripts": {
     "dev": "rsbuild dev",
     "lint": "eslint; prettier --check .",

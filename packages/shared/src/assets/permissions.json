@@ -1,0 +1,21 @@
+{
+  "permissions": [
+    "mcsl.web.user.create",
+    "mcsl.web.user.{username}.delete",
+    "mcsl.web.user.{username}.info.change",
+    "mcsl.web.user.{username}.info.read",
+    "mcsl.web.user.{username}.session.delete",
+    "mcsl.web.user.{username}.session.read"
+  ],
+  "parents": {
+    "mcsl.web.user.{username}.info.delete": [
+      "mcsl.web.user.{username}.info.read"
+    ],
+    "mcsl.web.user.{username}.info.change": [
+      "mcsl.web.user.{username}.info.read"
+    ],
+    "mcsl.web.user.{username}.session.delete": [
+      "mcsl.web.user.{username}.session.read"
+    ]
+  }
+}

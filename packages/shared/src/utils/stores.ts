@@ -149,21 +149,17 @@ export const useNavigation = defineStore("navigation", () => {
     ],
   });
 
-  function addItem(
-    type: NavigationType,
-    item: PageNavigationInfo,
-    index: number,
-  ) {
+  function add(type: NavigationType, item: PageNavigationInfo, index: number) {
     items.value[type].splice(index, 0, item);
   }
 
-  function getItems(type: NavigationType) {
+  function get(type: NavigationType) {
     return computed(() => items.value[type]);
   }
 
   return {
-    getItems,
-    addItem,
+    get,
+    add,
   };
 });
 

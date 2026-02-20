@@ -14,16 +14,16 @@ export type PosInfo = {
 export type PageNavigationInfo = {
   label: string;
   link?: RouteLocationRaw | string;
-  onClick?: () => void;
+  onClick?: () => void | Promise<void>;
   disabled?: boolean;
   icon?: string;
   isSubpage?: (path: string) => boolean;
 };
 
-export function navigateTo(info: PageNavigationInfo, router: Router) {
+export async function navigateTo(info: PageNavigationInfo, router: Router) {
   if (info.disabled) return;
-  if (info.link) router.push(info.link);
-  if (info.onClick) info.onClick();
+  if (info.link) await router.push(info.link);
+  if (info.onClick) await info.onClick();
 }
 
 export function throttle(callback: (...args: any[]) => void, interval: number) {

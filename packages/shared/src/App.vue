@@ -3,7 +3,7 @@ import NotificationTemplate from "@repo/ui/src/components/overlay/notification/N
 import NotificationOverlay from "@repo/ui/src/components/overlay/notification/NotificationOverlay.vue";
 import DashboardLayout from "./layouts/DashboardLayout.vue";
 import SetupLayout from "./layouts/SetupLayout.vue";
-import Button from "@repo/ui/src/components/form/button/Button.vue";
+import Button from "@repo/ui/src/components/button/Button.vue";
 import ContextmenuOverlay from "@repo/ui/src/components/overlay/ContextmenuOverlay.vue";
 import { computed } from "vue";
 import { usePageData } from "./utils/stores.ts";

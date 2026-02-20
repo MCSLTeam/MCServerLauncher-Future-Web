@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-// Cleanup focus trap on component unmount
 import { onUnmounted, ref, watch } from "vue";
-import Button from "../form/button/Button.vue";
+import Button from "../button/Button.vue";
 import Panel from "../panel/Panel.vue";
 import { type Color, getColorVar } from "../../utils/css.ts";
 import { animatedVisibilityExists } from "../../utils/internal.ts";
@@ -23,6 +22,7 @@ const props = withDefaults(
     scrollable?: boolean;
     color?: Color;
     closable?: boolean;
+    closeBtn?: boolean;
     closeOnEsc?: boolean;
     closeOnClickOutside?: boolean;
     autoClose?: boolean;
@@ -32,6 +32,7 @@ const props = withDefaults(
     color: "primary",
     headerDivider: true,
     closable: true,
+    closeBtn: true,
     closeOnEsc: true,
     closeOnClickOutside: true,
     autoClose: true,
@@ -44,13 +45,19 @@ const visible = defineModel<boolean>("visible", {
 
 const emit = defineEmits<{
   (e: "open"): void;
+  (e: "opened"): void;
   (e: "closing"): void;
   (e: "close"): void;
+  (e: "closed"): void;
 }>();
 
-const { exist } = animatedVisibilityExists(visible, 200);
+const { exist } = animatedVisibilityExists(visible, 200, {
+  beforeShow: () => emit("open"),
+  afterShow: () => emit("opened"),
+  beforeHide: () => emit("close"),
+  afterHide: () => emit("closed"),
+});
 
-// Focus trap instance
 const focusTrap = ref<ReturnType<typeof createFocusTrap> | null>(null);
 const modalRef = ref<HTMLElement | null>(null);
 
@@ -71,7 +78,6 @@ function handleKeyDown(event: KeyboardEvent) {
 
 watch(visible, (value) => {
   if (value) {
-    emit("open");
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", handleKeyDown);
     setTimeout(() => {
@@ -83,7 +89,6 @@ watch(visible, (value) => {
       focusTrap.value.activate();
     }, 0);
   } else {
-    emit("close");
     document.body.style.overflow = "auto";
     window.removeEventListener("keydown", handleKeyDown);
     if (focusTrap.value) {
@@ -141,7 +146,7 @@ onUnmounted(() => {
             <h2>{{ header }}</h2>
           </slot>
           <Button
-            v-if="closable"
+            v-if="closable && closeBtn"
             type="text"
             icon="fas fa-xmark"
             rounded

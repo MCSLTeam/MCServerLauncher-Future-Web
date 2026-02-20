@@ -9,7 +9,7 @@ import {
   getShadow,
   getStatusIcon,
 } from "../../utils/css.ts";
-import Button from "../form/button/Button.vue";
+import Button from "../button/Button.vue";
 
 export type MessageProps = {
   color?: ColorType;

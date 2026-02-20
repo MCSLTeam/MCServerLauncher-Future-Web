@@ -5,7 +5,7 @@ import {
   type Size,
 } from "../../utils/utils.ts";
 import type { Color } from "../../utils/css.ts";
-import Button from "../form/button/Button.vue";
+import Button from "../button/Button.vue";
 import { useRouter } from "vue-router";
 import { computed } from "vue";
 

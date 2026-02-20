@@ -2,7 +2,7 @@
 import { useI18n } from "vue-i18n";
 import { usePageData } from "../../utils/stores.ts";
 import router from "../../router.ts";
-import Button from "@repo/ui/src/components/form/button/Button.vue";
+import Button from "@repo/ui/src/components/button/Button.vue";
 import Select from "@repo/ui/src/components/form/entries/Select.vue";
 import SelectButton from "@repo/ui/src/components/form/entries/SelectButton.vue";
 import FormItem from "@repo/ui/src/components/form/FormItem.vue";

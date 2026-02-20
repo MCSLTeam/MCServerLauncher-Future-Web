@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Button from "@repo/ui/src/components/form/button/Button.vue";
+import Button from "@repo/ui/src/components/button/Button.vue";
 import { createForm } from "@repo/ui/src/utils/form.ts";
 import * as yup from "yup";
 import Form from "@repo/ui/src/components/form/Form.vue";
@@ -86,7 +86,7 @@ async function submit() {
         password: form.data.value.password,
       },
     });
-  } catch {
+  } finally {
     canSubmit = true;
   }
 }
@@ -121,6 +121,10 @@ async function submit() {
 
   @media (max-width: 450px) {
     width: 100%;
+  }
+
+  & > h2 {
+    margin-bottom: var(--mcsl-spacing-2xs);
   }
 }
 </style>
