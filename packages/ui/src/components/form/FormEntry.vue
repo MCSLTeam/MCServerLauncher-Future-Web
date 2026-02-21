@@ -146,7 +146,7 @@ provide("mcsl-form-field", {
 }
 
 .mcsl-form-entry__width-fit {
-  flex-grow: 1;
+  flex: 1;
 }
 
 .mcsl-form-entry__label-top > div {
@@ -154,7 +154,7 @@ provide("mcsl-form-field", {
 }
 
 .mcsl-form-entry > div > div {
-  flex-grow: 1;
+  flex: 1;
   display: flex;
 }
 

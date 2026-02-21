@@ -56,3 +56,14 @@ export function formatDate(
   const t = useLocale().getI18n().t;
   return date.format(t(`dayjs.format.${type}`));
 }
+
+const sizeUnits = ["B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB"] as const;
+
+export function humanReadableSize(bytes: number) {
+  const exponent = Math.min(
+    Math.floor(Math.log(bytes) / Math.log(1024)),
+    sizeUnits.length - 1,
+  );
+  const size = (bytes / Math.pow(1024, exponent)).toFixed(2);
+  return `${size} ${sizeUnits[exponent]}`;
+}

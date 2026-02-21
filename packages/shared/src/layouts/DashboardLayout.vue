@@ -212,7 +212,7 @@ watch(sidebarCollapsedStorage, () => {
   background: var(--mcsl-bg-color-main);
   border: 1px solid var(--mcsl-border-color-base);
   border-radius: var(--mcsl-border-radius-2xl);
-  flex-grow: 1;
+  flex: 1;
   padding: var(--mcsl-spacing-md);
   overflow: auto;
   height: calc(

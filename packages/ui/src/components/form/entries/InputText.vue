@@ -155,7 +155,7 @@ if (formField) {
 }
 
 .mcsl-input-text {
-  flex-grow: 1;
+  flex: 1;
   transform: translate(0);
 }
 

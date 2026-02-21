@@ -158,7 +158,7 @@ html.dark::view-transition-new(root) {
   font-weight: var(--mcsl-font-weight-base);
   font-size: var(--mcsl-font-size-md);
   line-height: 1.2;
-  flex-shrink: 0;
+  flex: 0 0 auto;
 
   scrollbar-width: thin;
   scrollbar-color: var(--mcsl-scrollbar-color) transparent;

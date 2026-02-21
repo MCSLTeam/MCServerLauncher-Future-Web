@@ -157,7 +157,7 @@ provide("instance", info);
 
 .instance__content {
   height: 0;
-  flex-grow: 1;
+  flex: 1;
   overflow: hidden auto;
 }
 
@@ -179,7 +179,7 @@ provide("instance", info);
 
   & > div:first-child {
     width: 0;
-    flex-grow: 1;
+    flex: 1;
 
     & > img {
       width: 3rem;

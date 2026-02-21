@@ -54,7 +54,7 @@ provide("requireRestart", requireRestart);
 
 .settings__content {
   height: 0;
-  flex-grow: 1;
+  flex: 1;
   overflow: hidden auto;
 }
 </style>

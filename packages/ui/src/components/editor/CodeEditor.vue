@@ -104,7 +104,7 @@ function searchMatch(a: string, b: string) {
 
 .mcsl-code-editor > div:first-child {
   height: 0;
-  flex-grow: 1;
+  flex: 1;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }

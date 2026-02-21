@@ -164,7 +164,7 @@ function findLabel(value: any) {
 }
 
 .mcsl-select {
-  flex-grow: 1;
+  flex: 1;
 }
 
 .mcsl-select__btn {

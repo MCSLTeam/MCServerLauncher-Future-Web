@@ -39,7 +39,7 @@ const t = useI18n().t;
 
   & > div:first-child {
     width: 0;
-    flex-grow: 1;
+    flex: 1;
 
     & > p {
       margin-top: var(--mcsl-spacing-4xs);

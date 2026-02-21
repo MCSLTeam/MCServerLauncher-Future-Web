@@ -175,7 +175,7 @@ defineExpose({
 .mcsl-base-text-editor__content {
   width: 0;
   height: 100%;
-  flex-grow: 1;
+  flex: 1;
   transform: translate(0);
 }
 

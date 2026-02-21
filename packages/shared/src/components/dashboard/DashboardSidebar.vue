@@ -177,7 +177,7 @@ $collapsed-width: utils.get-size-var("height", "large", SmallerContent.$vars);
 
 .dashboard-sidebar__content-grow {
   @extend .dashboard-sidebar__content;
-  flex-grow: 1;
+  flex: 1;
 }
 
 .dashboard-sidebar__collapsed {

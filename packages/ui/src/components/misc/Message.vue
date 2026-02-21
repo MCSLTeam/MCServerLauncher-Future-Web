@@ -15,6 +15,7 @@ export type MessageProps = {
   color?: ColorType;
   variant?: "text" | "outlined" | "default";
   icon?: string;
+  closeIcon?: string;
   inAnim?: string;
   outAnim?: string;
   closeable?: boolean;
@@ -27,11 +28,14 @@ const props = withDefaults(defineProps<MessageProps>(), {
   size: "medium",
   color: "primary",
   variant: "default",
+  closeIcon: "fa fa-xmark",
   inAnim: "0.2s ease-in-out both stretchInDown",
   outAnim: "0.2s ease-in-out both stretchOutUp",
   shadow: false,
   closeable: false,
 });
+
+const emit = defineEmits<(e: "open" | "opened" | "close" | "closed") => void>();
 
 const actualIcon = computed(() => props.icon ?? getStatusIcon(props.color));
 
@@ -39,7 +43,20 @@ const visible = defineModel<boolean>("visible", {
   default: true,
 });
 
-const { exist } = animatedVisibilityExists(visible, 500);
+const { exist } = animatedVisibilityExists(visible, 500, {
+  beforeShow() {
+    emit("open");
+  },
+  afterShow() {
+    emit("opened");
+  },
+  beforeHide() {
+    emit("close");
+  },
+  afterHide() {
+    emit("closed");
+  },
+});
 
 const isSurface = computed(() => props.color == "surface");
 
@@ -101,7 +118,7 @@ defineExpose({
         v-if="closeable"
         :color="color"
         class="mcsl-message__close-btn"
-        icon="fa fa-xmark"
+        :icon="closeIcon"
         rounded
         type="text"
         @click="close"
@@ -114,16 +131,23 @@ defineExpose({
 @use "../../assets/css/utils";
 @use "../Content" as *;
 
+$btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
+
 @each $size in utils.$sizes {
   .mcsl-size-#{$size}.mcsl-message {
-    --mcsl-message__spacing: #{utils.get-size-var("spacing", $size, $vars)};
+    $original-spacing: utils.get-size-var("spacing", $size, $vars);
+    --mcsl-message__spacing: #{$original-spacing};
     border-radius: utils.get-size-var("border-radius", $size, $vars);
 
     & > .mcsl-message__content {
       $spacing: var(--mcsl-message__spacing);
-      gap: $spacing;
+      gap: $original-spacing;
       padding: $spacing;
       width: calc(100% - 2 * $spacing);
+
+      & > div {
+        width: calc(100% - $btn-size - $original-spacing);
+      }
 
       & .mcsl-message__title {
         margin-bottom: calc($spacing / 2);
@@ -163,25 +187,20 @@ defineExpose({
   }
 
   --mcsl-message__icon-font-size: var(--mcsl-font-size-md);
-  $size: calc(var(--mcsl-message__icon-font-size) * 1.2);
 
   & > i {
-    width: $size;
-    height: $size;
+    width: $btn-size;
+    height: $btn-size;
     display: flex;
     justify-content: center;
     align-items: center;
   }
 
-  & > div {
-    width: calc(100% - $size - var(--mcsl-message__spacing));
-  }
-
   & > .mcsl-message__close-btn {
     position: absolute;
     min-width: 0;
-    width: $size;
-    height: $size;
+    width: $btn-size;
+    height: $btn-size;
     padding: 0;
 
     &:not(:hover):not(:active) {

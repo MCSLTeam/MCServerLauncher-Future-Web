@@ -38,8 +38,7 @@ const visible = defineModel<boolean>("visible", {
 
 <style scoped lang="scss">
 .close-confirm__actions {
-  width: fit-content;
-  margin-top: var(--mcsl-spacing-xs);
+  margin-top: var(--mcsl-spacing-2xs);
   margin-left: auto;
   display: flex;
   gap: var(--mcsl-spacing-2xs);

@@ -107,7 +107,7 @@ if (formField) {
   .mcsl-size-#{$size}.mcsl-textarea {
     $spacing: calc(utils.get-size-var("spacing", $size, $vars));
     $height: utils.get-size-var("height", $size, $vars);
-    flex-grow: 1;
+    flex: 1;
     height: calc(2 * $height);
     min-height: $height;
     padding: $spacing;

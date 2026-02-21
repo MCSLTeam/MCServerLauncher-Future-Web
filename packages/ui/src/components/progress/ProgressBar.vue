@@ -159,7 +159,7 @@ $size: var(--mcsl-progress-bar__size);
 
   & > div {
     width: 0;
-    flex-grow: 1;
+    flex: 1;
     height: $stroke-width;
     background: var(--mcsl-border-color-base);
     border-radius: var(--mcsl-border-radius-full);

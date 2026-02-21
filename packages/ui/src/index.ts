@@ -6,6 +6,7 @@ import { setLocale } from "yup";
 import { getYupLocale } from "./utils/yup.ts";
 import "./assets/css/style.scss";
 import { requestNotifPermission } from "./utils/notifications.ts";
+import { isDragging } from "./utils/upload.ts";
 
 dayjs.extend(RelativeTime);
 dayjs.locale("zh-cn");
@@ -22,4 +23,28 @@ export async function loadUi() {
   };
 
   document.addEventListener("click", onUserInteraction);
+
+  let dragTimeout = -1;
+
+  window.addEventListener("dragover", () => {
+    clearTimeout(dragTimeout);
+    isDragging.value = true;
+  });
+
+  window.addEventListener("dragleave", () => {
+    clearTimeout(dragTimeout);
+    dragTimeout = window.setTimeout(() => {
+      isDragging.value = false;
+    }, 100);
+  });
+
+  window.addEventListener("drop", () => {
+    isDragging.value = false;
+    clearTimeout(dragTimeout);
+  });
+
+  window.addEventListener("blur", () => {
+    isDragging.value = false;
+    clearTimeout(dragTimeout);
+  });
 }

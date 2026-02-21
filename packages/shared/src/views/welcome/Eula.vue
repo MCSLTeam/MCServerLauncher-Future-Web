@@ -105,7 +105,7 @@ onUnmounted(() => {
 }
 
 .eula-content {
-  flex-shrink: 2;
+  flex: 1 2;
   overflow: auto;
   padding: var(--mcsl-spacing-xs);
   background: var(--mcsl-bg-color-main);

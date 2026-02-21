@@ -457,7 +457,7 @@ function highlightText(text: string, searchText: string): string {
 
 .instances__content {
   height: 0;
-  flex-grow: 1;
+  flex: 1;
   overflow: hidden auto;
 }
 
@@ -473,7 +473,7 @@ function highlightText(text: string, searchText: string): string {
   @media (min-width: 769px) {
     & .mcsl-select {
       width: 12rem;
-      flex-grow: 0;
+      flex: 0;
     }
   }
 
@@ -484,7 +484,7 @@ function highlightText(text: string, searchText: string): string {
       width: 100%;
     }
     & > div > div:first-child {
-      flex-grow: 1;
+      flex: 1;
     }
   }
 
