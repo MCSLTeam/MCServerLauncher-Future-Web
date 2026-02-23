@@ -73,7 +73,7 @@ fn get_optional_user_from_headers(http_request: &HttpRequest) -> Option<User> {
 
     match get_user_by_token(token) {
         Ok(user) => {
-            update_token_info(token, &get_client_ip(http_request));
+            update_token_info(token, http_request, &get_client_ip(http_request));
             Some(user)
         }
         Err(_) => None,
@@ -138,7 +138,7 @@ pub async fn api_account_login(
             .get("User-Agent")
             .unwrap()
             .to_str()
-            .unwrap()
+            .unwrap_or("unknown")
             .to_string(),
     ) {
         Ok(token_pair) => HttpResponse::Ok().json(SuccessResponse {

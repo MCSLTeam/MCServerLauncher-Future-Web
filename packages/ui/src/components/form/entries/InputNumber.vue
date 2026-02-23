@@ -1,28 +1,26 @@
 <script lang="ts" setup>
-import { inject, ref, watch } from "vue";
+import { inject, onMounted, onUnmounted, ref, watch } from "vue";
 import type { FormFieldData } from "../FormEntry.vue";
 import { ColorData, type ColorType, getColorVar } from "../../../utils/css.ts";
 import type { Size } from "../../../utils/utils.ts";
 import Button from "../../button/Button.vue";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     color?: ColorType;
     invalid?: boolean;
     disabled?: boolean;
     size?: Size;
-    placeholder?: string;
-    password?: boolean;
-    clearable?: boolean;
+    step?: number;
+    min?: number;
+    max?: number;
   }>(),
   {
     size: "medium",
     color: "primary",
     invalid: false,
     disabled: false,
-    placeholder: "",
-    password: false,
-    clearable: false,
+    step: 1,
   },
 );
 
@@ -32,24 +30,26 @@ defineEmits<{
   (e: "focus", event: Event): void;
 }>();
 
-const model = defineModel<string>({
+const model = defineModel<number>({
   required: false,
-  default: "",
+  default: 0,
 });
 
-const showPassword = ref(false);
+const mouseDown = ref(false);
+const addMouseOver = ref(false);
+const subMouseOver = ref(false);
 
 const formField = inject("mcsl-form-field", undefined) as
   | FormFieldData
   | undefined;
 
 if (formField) {
-  if (typeof formField.field.data.value != "string") {
+  if (typeof formField.field.data.value != "number") {
     console.error(
-      "[MCSL-UI] The type of the value for a <InputText> component is not string.",
+      "[MCSL-UI] The type of the value for a <InputNumber> component is not number.",
     );
     throw new Error(
-      "The type of the value for a <InputText> component is not string.",
+      "The type of the value for a <InputNumber> component is not number.",
     );
   }
 
@@ -63,6 +63,74 @@ if (formField) {
     if (value != formField.field.data.value) formField.field.data.value = value;
   });
 }
+
+function parseNumber(value: string) {
+  const number = Number(value);
+  return Number.isNaN(number) ? Math.max(props.min ?? 0, 0) : number;
+}
+
+function add() {
+  model.value += props.step;
+  if (props.max && model.value > props.max) model.value = props.max;
+}
+
+function sub() {
+  model.value -= props.step;
+  if (props.min && model.value < props.min) model.value = props.min;
+}
+
+let interval = -1;
+let addStatus: "none" | "wait" | "add" = "none";
+let subStatus: "none" | "wait" | "sub" = "none";
+
+function handleMouseDown() {
+  mouseDown.value = true;
+}
+
+function handleMouseUp() {
+  mouseDown.value = false;
+}
+
+onMounted(() => {
+  interval = setInterval(() => {
+    if (mouseDown.value && addMouseOver.value) {
+      if (addStatus == "none") {
+        addStatus = "wait";
+        setTimeout(() => {
+          if (addStatus == "wait") addStatus = "add";
+        }, 500);
+      }
+      if (addStatus == "add") {
+        add();
+      }
+    } else {
+      addStatus = "none";
+    }
+
+    if (mouseDown.value && subMouseOver.value) {
+      if (subStatus == "none") {
+        subStatus = "wait";
+        setTimeout(() => {
+          if (subStatus == "wait") subStatus = "sub";
+        }, 500);
+      }
+      if (subStatus == "sub") {
+        sub();
+      }
+    } else {
+      subStatus = "none";
+    }
+  }, 50);
+
+  window.addEventListener("mousedown", handleMouseDown);
+  window.addEventListener("mouseup", handleMouseUp);
+});
+
+onUnmounted(() => {
+  clearInterval(interval);
+  window.removeEventListener("mousedown", handleMouseDown);
+  window.removeEventListener("mouseup", handleMouseUp);
+});
 </script>
 
 <template>
@@ -83,8 +151,7 @@ if (formField) {
           new ColorData(color, 'dark'),
         ),
       }"
-      :placeholder="placeholder"
-      :type="password && !showPassword ? 'password' : 'text'"
+      type="number"
       @blur="
         $emit('blur', $event);
         formField?.onBlur($event);
@@ -93,9 +160,9 @@ if (formField) {
         (e) => {
           $emit('input', e);
           if (formField) {
-            formField.field.data.value = model = (
-              e.currentTarget as HTMLInputElement
-            ).value;
+            formField.field.data.value = model = parseNumber(
+              (e.currentTarget as HTMLInputElement).value,
+            );
             formField.onInput(e);
           }
         }
@@ -105,22 +172,24 @@ if (formField) {
         formField?.onFocus($event);
       "
     />
-    <div v-if="clearable">
+    <div>
       <Button
         type="text"
         rounded
         size="small"
-        icon="fa fa-xmark"
-        @click="model = ''"
+        icon="fa fa-minus"
+        @mousedown="sub"
+        @mouseenter="subMouseOver = true"
+        @mouseleave="subMouseOver = false"
       />
-    </div>
-    <div v-else-if="password">
       <Button
         type="text"
         rounded
         size="small"
-        :icon="showPassword ? 'fa fa-eye-slash' : 'fa fa-eye'"
-        @click="showPassword = !showPassword"
+        icon="fa fa-plus"
+        @mousedown="add"
+        @mouseenter="addMouseOver = true"
+        @mouseleave="addMouseOver = false"
       />
     </div>
   </div>
@@ -164,6 +233,7 @@ if (formField) {
 }
 
 .mcsl-input-text > input {
+  appearance: textfield; // mozilla hide arrows
   margin: 0;
   background: var(--mcsl-bg-color-overlay);
   border: 1px solid var(--mcsl-border-color-base);
@@ -171,8 +241,9 @@ if (formField) {
   outline-offset: -2px; // 覆盖 border
   transition: 0.2s ease-in-out;
 
-  &::placeholder {
-    color: var(--mcsl-text-color-gray);
+  &::-webkit-inner-spin-button, // webkit / chromium hide arrows
+  &::-webkit-outer-spin-button {
+    appearance: none;
   }
 }
 
@@ -217,7 +288,7 @@ if (formField) {
   position: absolute;
   top: 0;
   right: 0;
-  width: 2.25rem;
+  width: 4rem;
   display: flex;
   justify-content: center;
   align-items: center;

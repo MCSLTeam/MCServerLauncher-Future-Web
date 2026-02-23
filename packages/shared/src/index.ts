@@ -43,8 +43,6 @@ export const windowButtonTransition = computed(
 export const loading = ref(true);
 export const loadingStep = ref("");
 
-export const showCreateInstanceModal = ref(false);
-
 export async function load(
   appComponent: Component,
   preLoad: () => void | Promise<void>,

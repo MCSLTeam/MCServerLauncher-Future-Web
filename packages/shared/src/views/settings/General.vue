@@ -37,14 +37,14 @@ const locales = computed(() => [
 <template>
   <div class="settings__section">
     <SettingsItem
-      label="shared.settings.general.locale.label"
-      desc="shared.settings.general.locale.desc"
+      :label="t('shared.settings.general.locale.label')"
+      :desc="t('shared.settings.general.locale.desc')"
     >
       <Select v-model="locale" :options="locales" />
     </SettingsItem>
     <SettingsItem
-      label="shared.settings.general.allow-contextmenu.label"
-      desc="shared.settings.general.allow-contextmenu.desc"
+      :label="t('shared.settings.general.allow-contextmenu.label')"
+      :desc="t('shared.settings.general.allow-contextmenu.desc')"
     >
       <Switch v-model="settings.data.allowContextmenu" />
     </SettingsItem>

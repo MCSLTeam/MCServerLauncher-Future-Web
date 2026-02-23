@@ -4,7 +4,7 @@ import FancyBackground from "@repo/ui/src/components/misc/FancyBackground.vue";
 import { platform, loading, loadingStep } from "../../index.ts";
 import { watch } from "vue";
 import Spinner from "@repo/ui/src/components/progress/Spinner.vue";
-import { animatedVisibilityExists } from "@repo/ui/src/utils/internal.ts";
+import { animatedVisibilityExists } from "@repo/ui/src/utils/utils.ts";
 
 const t = useI18n().t;
 const startTime = Date.now();

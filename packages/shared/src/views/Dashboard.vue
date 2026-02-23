@@ -13,7 +13,7 @@ usePageData().set({
   breadcrumbs: [
     {
       label: useI18n().t("shared.dashboard.title"),
-      path: "/dashboard",
+      link: "/dashboard",
     },
   ],
 });

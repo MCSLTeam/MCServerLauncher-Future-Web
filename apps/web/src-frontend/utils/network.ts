@@ -102,8 +102,6 @@ export async function requestWithToken<T>(
     path,
     method,
     async (e) => {
-      await errHandler?.(e);
-
       if (token) {
         if (e.err == "permission-denied") await useAccount().updateSelfInfo();
         if (e.err == "invalid-token") {
@@ -115,8 +113,10 @@ export async function requestWithToken<T>(
               color: "warning",
             },
           }).open();
+          return;
         }
       }
+      await errHandler?.(e);
     },
     data,
     {

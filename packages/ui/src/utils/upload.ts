@@ -2,6 +2,7 @@ import { MCSLNotif } from "./notifications.ts";
 import { useLocale } from "./stores.ts";
 import { ref } from "vue";
 import { humanReadableSize } from "./utils.ts";
+import mime from "mime";
 
 export type UploadConfig = {
   accept: string[];
@@ -17,7 +18,7 @@ export async function openFileSelector(
   const { accept = [], maxCount = 1 } = config;
   const input = document.createElement("input");
   input.type = "file";
-  if (accept.length > 1) input.accept = accept.join(", ");
+  if (accept.length > 0) input.accept = accept.join(", ");
   input.multiple = maxCount > 1;
   input.click();
   return new Promise((resolve, reject) => {
@@ -67,7 +68,7 @@ export function handleUpload(
             title: t("ui.notification.title.error"),
             message: t("ui.upload.error.accept", {
               filename: file.name,
-              accept: accept.join(", "),
+              accept: accept.map((m) => mime.getExtension(m)).join(", "),
             }),
           },
         }).open();
@@ -93,6 +94,5 @@ export function handleUpload(
     result = result.slice(0, maxCount);
   }
 
-  if (result.length == 0) throw new Error("No files selected");
-  else return result;
+  return result;
 }

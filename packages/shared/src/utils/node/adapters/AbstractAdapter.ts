@@ -7,7 +7,7 @@ import type {
 } from "../types/instance.ts";
 import type { ComputedRef } from "vue";
 import type { DirectoryData, FileData, FilePath } from "../types/files.ts";
-import type { JavaRuntimeInfo, SystemInfo } from "../types/system.ts";
+import type { JavaInfo, SystemInfo } from "../types/system.ts";
 
 export abstract class AbstractAdapter {
   // 基本操作
@@ -15,7 +15,7 @@ export abstract class AbstractAdapter {
 
   abstract getSystemInfo(): Promise<SystemInfo>;
 
-  abstract getJavaInfo(deep: boolean): Promise<JavaRuntimeInfo[]>;
+  abstract getJavaInfo(deep: boolean): Promise<JavaInfo[]>;
 
   // 实例操作
   private readonly instanceIcons: Map<string, Uint8Array> = new Map();

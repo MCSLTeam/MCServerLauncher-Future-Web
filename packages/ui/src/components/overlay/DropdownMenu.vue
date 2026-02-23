@@ -2,7 +2,7 @@
 import Menu, { type MenuInfo } from "../panel/Menu.vue";
 import type { Size } from "../../utils/utils.ts";
 import DropdownContent from "./DropdownContent.vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 defineOptions({
   inheritAttrs: false,
@@ -11,7 +11,6 @@ defineOptions({
 withDefaults(
   defineProps<{
     menu: MenuInfo;
-    maxHeight?: string;
     followWidth?: boolean;
     defaultPos?: "top" | "bottom";
     header?: string;
@@ -24,7 +23,6 @@ withDefaults(
     closeOnClickMenu?: boolean;
   }>(),
   {
-    maxHeight: "50vh",
     defaultPos: "bottom",
     closeOnClickMenu: true,
     headerDivider: true,
@@ -34,6 +32,14 @@ withDefaults(
 defineEmits<(e: "close" | "open" | "locate") => void>();
 
 const dropdownContentRef = ref();
+const maxHeight = computed(() =>
+  Math.max(
+    dropdownContentRef.value.triggererPos.y,
+    window.innerHeight -
+      dropdownContentRef.value.triggererPos.y -
+      dropdownContentRef.value.triggererPos.height,
+  ),
+);
 
 defineExpose({
   open: () => dropdownContentRef.value?.open(),
@@ -77,9 +83,9 @@ defineExpose({
       class="mcsl-dropdown-menu__menu"
       :style="{
         width: followWidth
-          ? `calc(${dropdownContentRef.triggererWidth}px - var(--mcsl-spacing-xs))`
+          ? `calc(${dropdownContentRef.triggererPos.width}px - var(--mcsl-spacing-xs))`
           : undefined,
-        maxHeight,
+        maxHeight: `calc(${maxHeight}px - var(--mcsl-spacing-lg) - 2 * var(--mcsl-spacing-2xs))`,
       }"
       @click="
         () => {

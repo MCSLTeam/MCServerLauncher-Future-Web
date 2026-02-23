@@ -9,6 +9,7 @@ withDefaults(
     labelPos?: "left" | "right" | "top" | "bottom";
     type?: "mc" | "ripples" | "spinner";
     color?: Color;
+    block?: boolean;
     size?: Size;
   }>(),
   {
@@ -17,13 +18,18 @@ withDefaults(
     labelPos: "bottom",
     type: "spinner",
     color: "text-color-regular",
+    block: false,
   },
 );
 </script>
 
 <template>
   <div
-    :class="[`mcsl-size-${size}`, `mcsl-spinner__label-${labelPos}`]"
+    :class="{
+      [`mcsl-size-${size}`]: true,
+      [`mcsl-spinner__label-${labelPos}`]: true,
+      'mcsl-spinner__block': block,
+    }"
     :style="{
       '--mcsl-spinner__color': getColorVar(color),
     }"
@@ -52,8 +58,10 @@ $vars: (
   .mcsl-size-#{$size}.mcsl-spinner {
     $spinner-size: #{map.get(map.get($vars, "spinner-size"), $size)};
 
-    width: $spinner-size;
-    height: $spinner-size;
+    & > svg {
+      width: $spinner-size;
+      height: $spinner-size;
+    }
   }
 }
 
@@ -78,5 +86,11 @@ $vars: (
   &.mcsl-spinner__label.right {
     flex-direction: row;
   }
+}
+
+.mcsl-spinner__block {
+  width: 100%;
+  height: 100%;
+  min-height: 6rem;
 }
 </style>

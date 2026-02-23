@@ -47,8 +47,13 @@ if (formField) {
   }
 
   model.value = formField.field.data.value;
+
+  watch(formField.field.data, (value) => {
+    if (value != model.value) model.value = value;
+  });
+
   watch(model, (value) => {
-    formField.field.data.value = value;
+    if (value != formField.field.data.value) formField.field.data.value = value;
   });
 }
 </script>

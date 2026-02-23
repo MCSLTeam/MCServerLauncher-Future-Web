@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, nextTick, onUnmounted, type Ref, ref } from "vue";
-import { animatedVisibilityExists } from "../../utils/internal.ts";
+import { animatedVisibilityExists } from "../../utils/utils.ts";
 import type { PosInfo } from "../../utils/utils.ts";
 
 defineOptions({

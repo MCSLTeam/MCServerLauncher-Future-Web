@@ -10,6 +10,7 @@ import { humanReadableSize, type Size } from "../../utils/utils.ts";
 import { onMounted, onUnmounted, ref } from "vue";
 import { MCSLNotif } from "../../utils/notifications.ts";
 import FileInfo from "./FileInfo.vue";
+import mime from "mime";
 
 const props = withDefaults(
   defineProps<{
@@ -35,6 +36,7 @@ const files = defineModel<File[]>({
 const t = useI18n().t;
 
 function setFiles(newValue: File[]) {
+  if (newValue.length == 0) return;
   if (!props.clearOnSelect) newValue = [...newValue, ...files.value];
   newValue = Array.from(new Set(newValue));
   const maxCount = props.config.maxCount ?? 0;
@@ -66,24 +68,24 @@ async function handleClick() {
 const currentTip = ref("");
 const showTip = ref(true);
 const tips: string[] = [];
-if (props.config.maxSize ?? 1 < 1) {
+if ((props.config.maxCount ?? 1) < 1) {
   tips.push(t("ui.upload.dropper.tip.multiple"));
 }
-if (props.config.maxSize ?? 1 > 1) {
+if ((props.config.maxCount ?? 1) > 1) {
   tips.push(
     t("ui.upload.dropper.tip.multiple-count", {
-      maxSize: humanReadableSize(props.config.maxSize!),
+      maxCount: props.config.maxCount,
     }),
   );
 }
 if ((props.config.accept ?? []).length > 0) {
   tips.push(
     t("ui.upload.dropper.tip.accept", {
-      accept: props.config.accept?.join(", "),
+      accept: props.config.accept!.map((m) => mime.getExtension(m)).join(", "),
     }),
   );
 }
-if (props.config.maxSize ?? 0 > 0) {
+if ((props.config.maxSize ?? 0) > 0) {
   tips.push(
     t("ui.upload.dropper.tip.size", {
       maxSize: humanReadableSize(props.config.maxSize!),
@@ -94,9 +96,8 @@ if (props.config.maxSize ?? 0 > 0) {
 let interval = -1;
 
 onMounted(() => {
-  if (tips.length > 0) {
-    currentTip.value = tips[0]!;
-
+  if (tips.length > 0) currentTip.value = tips[0]!;
+  if (tips.length > 1)
     interval = setInterval(() => {
       showTip.value = false;
       setTimeout(() => {
@@ -107,7 +108,6 @@ onMounted(() => {
         showTip.value = true;
       }, 500);
     }, 3000);
-  }
 });
 
 onUnmounted(() => {
@@ -157,15 +157,17 @@ onUnmounted(() => {
 @each $size in utils.$sizes {
   .mcsl-size-#{$size}.mcsl-file-dropper {
     border-radius: utils.get-size-var("border-radius", $size, $vars);
-    padding: calc(utils.get-size-var("spacing", $size, $vars) * 2);
+    $padding: calc(utils.get-size-var("spacing", $size, $vars) * 2);
+    padding: $padding;
+    width: calc(100% - 2 * $padding);
   }
 }
 
 .mcsl-file-dropper {
-  width: 100%;
-  min-height: 10rem;
+  min-height: 8rem;
   border: 1.5px dashed var(--mcsl-border-color-base);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   cursor: pointer;
@@ -214,14 +216,12 @@ onUnmounted(() => {
 .mcsl-file-dropper__subtitle {
   color: var(--mcsl-text-color-regular);
   font-size: var(--mcsl-font-size-md);
-  overflow: hidden;
-  max-height: 0;
-  transition: 0.3s cubic-bezier(0, 1, 0, 1);
+  opacity: 0;
+  transition: 0.2s ease-in-out;
 }
 
 .mcsl-file-dropper__subtitle-show {
-  max-height: 999px;
-  transition: 0.8s ease-in-out;
+  opacity: 1;
 }
 
 .mcsl-file-dropper__tip {

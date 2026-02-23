@@ -143,6 +143,16 @@
       ]
     },
     {
+      "name": "mime",
+      "desc": "Mime types for JavaScript.",
+      "links": [
+        {
+          "icon": "fab fa-github",
+          "url": "https://github.com/broofa/mime"
+        }
+      ]
+    },
+    {
       "name": "MiSans",
       "desc": "Global Free Commercial-Use Fonts.",
       "links": [

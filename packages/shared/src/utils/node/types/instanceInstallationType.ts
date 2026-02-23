@@ -19,7 +19,7 @@ export type InstallationType = (typeof INSTALLATION_TYPES)[number];
 
 export type ExecutableInfo = {
   installationType: ExecutableType;
-  coreType: Core;
+  coreType: Core | "jar";
 };
 
 /* ===== [ 核心检测 ] ===== */

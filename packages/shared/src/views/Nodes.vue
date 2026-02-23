@@ -7,7 +7,7 @@ usePageData().set({
   breadcrumbs: [
     {
       label: useI18n().t("shared.nodes.title"),
-      path: "/nodes",
+      link: "/nodes",
     },
   ],
 });

@@ -28,6 +28,7 @@
     "highlightjs-snbt": "^0.1.4",
     "lodash": "^4.17.23",
     "markdown-it": "^14.1.1",
+    "mime": "^4.1.0",
     "nbt-parser": "^1.0.2",
     "pinia": "^3.0.4",
     "vue": "^3.5.28",

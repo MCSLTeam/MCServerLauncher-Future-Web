@@ -45,10 +45,12 @@ export type MCJEProxyCore = (typeof MCJE_PROXY_CORES)[number];
 
 export const MCJE_CORES = [
   "vanilla",
-  ...MCJE_MOD_CORES,
-  ...MCJE_PLUGIN_CORES,
-  ...MCJE_HYBRID_CORES,
-  ...MCJE_PROXY_CORES,
+  ...[
+    ...MCJE_MOD_CORES,
+    ...MCJE_PLUGIN_CORES,
+    ...MCJE_HYBRID_CORES,
+    ...MCJE_PROXY_CORES,
+  ].toSorted(),
 ] as const;
 export type MCJECore = (typeof MCJE_CORES)[number];
 
@@ -67,12 +69,21 @@ export type MCCore = (typeof MC_CORES)[number];
 export const TERRARIA_CORES = ["terraria", "tshock"] as const;
 export type TerrariaCore = (typeof TERRARIA_CORES)[number];
 
+/* ========== [ Frpc ]========== */
+export const FRPC_CORES = [
+  "frpc",
+  "me_frp",
+  "lo_cyan_frp",
+  "moss_frp",
+  "open_frp",
+] as const;
+export type FrpcCore = (typeof FRPC_CORES)[number];
+
 /* ========== [ 所有核心 ]========== */
 export const CORES = [
   ...MC_CORES,
   ...TERRARIA_CORES,
-  "frpc",
-  "jar",
+  ...FRPC_CORES,
   "universal",
 ] as const;
 export type Core = (typeof CORES)[number];
@@ -98,13 +109,21 @@ export function getMCLoaderType(core: MCCore): MCLoaderType {
   throw new Error("Unknown mc instance type");
 }
 
-export type GameType = "mc" | "terraria" | "frpc" | "unknown";
+export const CORE_CATEGORIES = [
+  "mcje",
+  "mcbe",
+  "terraria",
+  "frpc",
+  "universal",
+] as const;
+export type CoreCategory = (typeof CORE_CATEGORIES)[number];
 
-export function getGame(core: Core): GameType {
-  if (core == "frpc") return core;
-  if (core == "universal" || core == "jar") return "unknown";
+export function getCategory(core: Core): CoreCategory {
+  if (core == "universal") return "universal";
 
-  if (MC_CORES.includes(core as any)) return "mc";
+  if (MCJE_CORES.includes(core as any)) return "mcje";
+  if (MCBE_CORES.includes(core as any)) return "mcbe";
   if (TERRARIA_CORES.includes(core as any)) return "terraria";
+  if (FRPC_CORES.includes(core as any)) return "frpc";
   throw new Error("Unknown instance type");
 }

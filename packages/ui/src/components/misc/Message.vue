@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import type { Size } from "../../utils/utils.ts";
-import { animatedVisibilityExists } from "../../utils/internal.ts";
+import { animatedVisibilityExists } from "../../utils/utils.ts";
 import {
   ColorData,
   type ColorType,
@@ -15,7 +15,6 @@ export type MessageProps = {
   color?: ColorType;
   variant?: "text" | "outlined" | "default";
   icon?: string;
-  closeIcon?: string;
   inAnim?: string;
   outAnim?: string;
   closeable?: boolean;
@@ -28,7 +27,6 @@ const props = withDefaults(defineProps<MessageProps>(), {
   size: "medium",
   color: "primary",
   variant: "default",
-  closeIcon: "fa fa-xmark",
   inAnim: "0.2s ease-in-out both stretchInDown",
   outAnim: "0.2s ease-in-out both stretchOutUp",
   shadow: false,
@@ -114,15 +112,18 @@ defineExpose({
           <slot :close="close" :open="open" name="buttons" />
         </div>
       </div>
-      <Button
-        v-if="closeable"
-        :color="color"
-        class="mcsl-message__close-btn"
-        :icon="closeIcon"
-        rounded
-        type="text"
-        @click="close"
-      />
+      <div class="mcsl-message__close-btn">
+        <slot name="close-btn" :close="close">
+          <Button
+            v-if="closeable"
+            :color="color"
+            icon="fa fa-xmark"
+            rounded
+            type="text"
+            @click="close"
+          />
+        </slot>
+      </div>
     </div>
   </div>
 </template>
@@ -145,7 +146,7 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
       padding: $spacing;
       width: calc(100% - 2 * $spacing);
 
-      & > div {
+      & > div:not(.mcsl-message__close-btn) {
         width: calc(100% - $btn-size - $original-spacing);
       }
 
@@ -196,22 +197,14 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
     align-items: center;
   }
 
-  & > .mcsl-message__close-btn {
-    position: absolute;
-    min-width: 0;
-    width: $btn-size;
-    height: $btn-size;
-    padding: 0;
-
-    &:not(:hover):not(:active) {
-      background: transparent;
-    }
-  }
-
   & .mcsl-message__buttons {
     display: flex;
     justify-content: flex-end;
   }
+}
+
+.mcsl-message__close-btn {
+  position: absolute;
 }
 
 .mcsl-message__variant-text {
@@ -241,5 +234,24 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
     transparent 90%
   );
   backdrop-filter: blur(5px);
+}
+</style>
+
+<style lang="scss">
+$btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
+
+.mcsl-message__close-btn > .mcsl-button {
+  min-width: 0 !important;
+  width: $btn-size !important;
+  height: $btn-size !important;
+  padding: 0 !important;
+
+  & > i {
+    font-size: var(--mcsl-font-size-sm);
+  }
+
+  &:not(:hover):not(:active) {
+    background: transparent !important;
+  }
 }
 </style>

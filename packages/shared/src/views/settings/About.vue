@@ -55,9 +55,7 @@ function openLink(url: string) {
           class="mcsl-typography"
           v-html="renderMd(eula, { html: false })"
         />
-        <div v-else class="spinner">
-          <Spinner />
-        </div>
+        <Spinner block size="large" />
       </div>
     </Modal>
     <Panel>
@@ -129,14 +127,14 @@ function openLink(url: string) {
     </Panel>
     <!-- TODO: 更新检查 -->
     <SettingsItem
-      label="shared.settings.about.auto-download-updates.label"
-      desc="shared.settings.about.auto-download-updates.desc"
+      :label="t('shared.settings.about.auto-download-updates.label')"
+      :desc="t('shared.settings.about.auto-download-updates.desc')"
     >
       <Switch v-model="autoDownloadUpdates" />
     </SettingsItem>
     <SettingsItem
-      label="shared.settings.about.check-updates.label"
-      desc="shared.settings.about.check-updates.desc"
+      :label="t('shared.settings.about.check-updates.label')"
+      :desc="t('shared.settings.about.check-updates.desc')"
     >
       <Button type="primary" color="blue">{{
         t("shared.settings.about.check-updates.button")
@@ -399,9 +397,6 @@ function openLink(url: string) {
   border-radius: var(--mcsl-border-radius-md);
   & > .spinner {
     height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
   }
 
   @media (max-width: 450px) {

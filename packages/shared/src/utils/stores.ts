@@ -1,15 +1,13 @@
 import { defineStore } from "pinia";
-import type { BreadcrumbItem } from "@repo/ui/src/components/navigation/Breadcrumbs.vue";
 import { computed, ref } from "vue";
 import type { PageNavigationInfo } from "@repo/ui/src/utils/utils.ts";
 import { useLocale } from "@repo/ui/src/utils/stores.ts";
 import { useLocalStorage } from "@vueuse/core";
-import { showCreateInstanceModal } from "../index.ts"; /* ========== [ 页面数据 ]========== */
 
 /* ========== [ 页面数据 ]========== */
 export type PageData = {
   layout: "dashboard" | "setup" | "none";
-  breadcrumbs: BreadcrumbItem[];
+  breadcrumbs: PageNavigationInfo[];
 };
 
 export const usePageData = defineStore("pagaData", () => {
@@ -64,11 +62,10 @@ export const useNavigation = defineStore("navigation", () => {
     ],
     sidebarDowner: [
       {
-        label: t("shared.create-instance.button"),
+        label: t("shared.create.button"),
+        link: "/create",
         icon: "fa fa-plus",
-        onClick() {
-          showCreateInstanceModal.value = true;
-        },
+        isSubpage: (path: string) => path.startsWith("/create"),
       },
       {
         label: t("shared.nodes.title"),
@@ -79,6 +76,7 @@ export const useNavigation = defineStore("navigation", () => {
         label: t("shared.settings.title"),
         link: "/settings",
         icon: "fa fa-gear",
+        isSubpage: (path: string) => path.startsWith("/settings"),
       },
     ],
     navbar: [

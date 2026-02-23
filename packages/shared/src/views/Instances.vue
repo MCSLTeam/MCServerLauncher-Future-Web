@@ -17,7 +17,7 @@ import { pinyin } from "pinyin-pro";
 import Divider from "@repo/ui/src/components/misc/Divider.vue";
 import Button from "@repo/ui/src/components/button/Button.vue";
 import type { InstanceStatus } from "../utils/node/types/instance.ts";
-import { getGame } from "../utils/node/types/cores.ts";
+import { getCategory } from "../utils/node/types/cores.ts";
 
 const t = useI18n().t;
 
@@ -26,7 +26,7 @@ usePageData().set({
   breadcrumbs: [
     {
       label: t("shared.instances.title"),
-      path: "/instances",
+      link: "/instances",
     },
   ],
 });
@@ -237,19 +237,17 @@ const sortedInstances = computed(() => {
 });
 
 function getTypeInfo(instance: any) {
-  const game = getGame(instance.type);
-  if (
-    (game == "mc" && instance.type != "vanilla") ||
-    (game == "terraria" && instance.type != "terraria")
-  )
+  const category = getCategory(instance.type);
+  if (category == "universal") return t(`shared.instance.type.universal`);
+  if (instance.type != category)
     return `${snakeToPascal(instance.type).replaceAll("+", " +")} ${instance.gameVersion}`;
-  return `${t(`shared.instance.types.${game}`)} ${instance.loaderVersion}`;
+  return `${t(`shared.instance.type.${category}`)} ${instance.loaderVersion}`;
 }
 
 function getTypeTooltip(instance: any) {
-  const game = getGame(instance.type);
+  const category = getCategory(instance.type);
   if (instance.gameVersion != instance.loaderVersion)
-    return `${t(`shared.instance.types.${game}`)} ${instance.gameVersion} - ${snakeToPascal(instance.type).replaceAll("+", " +")} ${instance.loaderVersion}`;
+    return `${t(`shared.instance.type.${category}`)} ${instance.gameVersion} - ${snakeToPascal(instance.type).replaceAll("+", " +")} ${instance.loaderVersion}`;
   return undefined;
 }
 
@@ -473,7 +471,6 @@ function highlightText(text: string, searchText: string): string {
   @media (min-width: 769px) {
     & .mcsl-select {
       width: 12rem;
-      flex: 0;
     }
   }
 

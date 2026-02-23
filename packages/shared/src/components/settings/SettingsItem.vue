@@ -1,22 +1,19 @@
 <script setup lang="ts">
 import Panel from "@repo/ui/src/components/panel/Panel.vue";
-import { useI18n } from "vue-i18n";
 
 defineProps<{
   label: string;
   desc: string;
 }>();
-
-const t = useI18n().t;
 </script>
 
 <template>
   <Panel>
     <div class="settings-item">
       <div>
-        <h4>{{ t(label) }}</h4>
+        <h4>{{ label }}</h4>
         <p>
-          {{ t(desc) }}
+          {{ desc }}
         </p>
       </div>
       <div>

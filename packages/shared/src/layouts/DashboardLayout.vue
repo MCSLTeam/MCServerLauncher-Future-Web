@@ -9,7 +9,7 @@ import router from "../router.ts";
 import { useI18n } from "vue-i18n";
 import { computed, ref, watch } from "vue";
 import { useScreenWidth } from "@repo/ui/src/utils/stores.ts";
-import { animatedVisibilityExists } from "@repo/ui/src/utils/internal.ts";
+import { animatedVisibilityExists } from "@repo/ui/src/utils/utils.ts";
 import { navigateTo } from "@repo/ui/src/utils/utils.ts";
 
 const t = useI18n().t;

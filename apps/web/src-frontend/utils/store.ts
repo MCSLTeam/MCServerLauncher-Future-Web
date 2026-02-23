@@ -11,7 +11,6 @@ import {
   userCenterPage,
 } from "../index.ts";
 import type { UserInfo } from "./types.ts";
-import { showCreateInstanceModal } from "@repo/shared/src";
 
 /* ========== [ 账号 ]========== */
 export const useAccount = defineStore("account", () => {
@@ -40,7 +39,6 @@ export const useAccount = defineStore("account", () => {
 
     showUserCenterModal.value = false;
     showTaskExitDialog.value = false;
-    showCreateInstanceModal.value = false;
 
     try {
       await requestWithToken<void>("/account/logout", "GET", (err) => {

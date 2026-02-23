@@ -3,7 +3,7 @@ import { onUnmounted, ref, watch } from "vue";
 import Button from "../button/Button.vue";
 import Panel from "../panel/Panel.vue";
 import { type Color, getColorVar } from "../../utils/css.ts";
-import { animatedVisibilityExists } from "../../utils/internal.ts";
+import { animatedVisibilityExists } from "../../utils/utils.ts";
 import { createFocusTrap } from "focus-trap";
 
 defineOptions({

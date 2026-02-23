@@ -12,7 +12,7 @@ usePageData().set({
   breadcrumbs: [
     {
       label: t("shared.settings.title"),
-      path: "/settings",
+      link: "/settings",
     },
   ],
 });

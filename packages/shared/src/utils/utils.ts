@@ -3,6 +3,7 @@ import { type MenuItem } from "@repo/ui/src/components/panel/Menu.vue";
 import { useLocale } from "@repo/ui/src/utils/stores.ts";
 
 export function snakeToPascal(snakeStr: string) {
+  if (snakeStr == "me_frp") return "MEFrp"; // 特殊处理awa
   return snakeStr
     .split("_")
     .filter((word) => word.length > 0)

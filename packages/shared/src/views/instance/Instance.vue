@@ -19,11 +19,11 @@ usePageData().set({
   breadcrumbs: [
     {
       label: t("shared.instances.title"),
-      path: "/instances",
+      link: "/instances",
     },
     {
       label: instanceId,
-      path: "/instance/" + instanceId,
+      link: "/instance/" + instanceId,
     },
   ],
 });
@@ -52,11 +52,11 @@ provide("instance", info);
     breadcrumbs: [
       {
         label: t("shared.instances.title"),
-        path: "/instances",
+        link: "/instances",
       },
       {
         label: info.value.name,
-        path: "/instance/" + instanceId,
+        link: "/instance/" + instanceId,
       },
     ],
   });

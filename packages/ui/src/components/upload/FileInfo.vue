@@ -2,6 +2,7 @@
 import { useI18n } from "vue-i18n";
 import Message from "../misc/Message.vue";
 import { humanReadableSize } from "../../utils/utils.ts";
+import Button from "../button/Button.vue";
 
 const t = useI18n().t;
 
@@ -9,10 +10,6 @@ const files = defineModel<File[]>({
   required: false,
   default: [],
 });
-
-function deleteFile(file: File) {
-  files.value = files.value.filter((f) => f != file);
-}
 </script>
 
 <template>
@@ -23,12 +20,20 @@ function deleteFile(file: File) {
       :key="file.name + file.lastModified"
       icon="fa fa-link"
       closeable
-      close-icon="fa fa-trash-can"
       color="surface"
       variant="text"
-      @closed="deleteFile(file)"
+      @closed="files = files.filter((f) => f != file)"
       @click.stop=""
     >
+      <template #close-btn="{ close }">
+        <Button
+          color="danger"
+          icon="fa fa-trash-can"
+          rounded
+          type="text"
+          @click="close"
+        />
+      </template>
       <p class="mcsl-file-info__text">
         <strong>{{ file.name }}</strong>
         - {{ humanReadableSize(file.size) }}

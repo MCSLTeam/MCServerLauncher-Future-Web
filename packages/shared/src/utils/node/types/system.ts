@@ -1,13 +1,11 @@
 export type JavaType = "jdk" | "jre";
 
-export interface System {
-  type: JavaType; // System 类型
-  version: string; // System 版本
-  vendor: string; // System 供应商
-}
-
-export interface JavaRuntimeInfo extends System {
-  path: string; // System 路径
+export interface JavaInfo {
+  path: string;
+  type: JavaType;
+  version: string;
+  vendor: string;
+  arch: string;
 }
 
 export interface SystemInfo {

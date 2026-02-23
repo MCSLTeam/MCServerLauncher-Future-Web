@@ -9,7 +9,6 @@ import { computed } from "vue";
 import { usePageData } from "./utils/stores.ts";
 import LoadingOverlay from "./components/overlay/LoadingOverlay.vue";
 import { useI18n } from "vue-i18n";
-import SelectInstallationTypeModal from "./components/createInstance/SelectInstallationTypeModal.vue";
 
 const layout = computed(() => {
   switch (usePageData().data.layout) {
@@ -27,7 +26,6 @@ const t = useI18n().t;
 <template>
   <component v-if="layout" :is="layout" />
   <RouterView v-else />
-  <SelectInstallationTypeModal />
   <LoadingOverlay />
   <NotificationTemplate
     id="default"

@@ -104,7 +104,7 @@ refresh();
         </tr>
       </tbody>
     </table>
-    <Spinner v-else class="sessions__spinner" />
+    <Spinner v-else block />
   </div>
 </template>
 
@@ -123,12 +123,5 @@ refresh();
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: help;
-}
-
-.sessions__spinner {
-  height: 6rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 </style>

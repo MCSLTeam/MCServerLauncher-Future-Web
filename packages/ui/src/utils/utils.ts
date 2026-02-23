@@ -1,6 +1,7 @@
 import { type RouteLocationRaw, type Router } from "vue-router";
 import type { Dayjs } from "dayjs";
 import { useLocale } from "./stores.ts";
+import { computed, type ComputedRef, ref, type Ref, watch } from "vue";
 
 export type Size = "small" | "medium" | "large";
 
@@ -49,6 +50,63 @@ export function randNum(min?: number, max?: number) {
   else return Math.random();
 }
 
+export function animatedVisibilityExists(
+  visible: Ref<boolean> | ComputedRef<boolean>,
+  animationDuration:
+    | number
+    | {
+        in: number;
+        out: number;
+      },
+  hooks?: {
+    beforeShow?: () => void;
+    afterShow?: () => void;
+    beforeHide?: () => void;
+    afterHide?: () => void;
+  },
+): {
+  exist: Ref<boolean>;
+  status: ComputedRef<"in" | "out" | "show" | "hide">;
+} {
+  const exist = ref(visible.value);
+  const status = ref<"in" | "out" | "show" | "hide">(visible ? "show" : "hide");
+
+  const duration =
+    typeof animationDuration === "number"
+      ? {
+          in: animationDuration,
+          out: animationDuration,
+        }
+      : animationDuration;
+
+  let timeout = -1;
+  watch(visible, (value) => {
+    clearTimeout(timeout);
+    if (value) {
+      // open
+      exist.value = true;
+      status.value = "in";
+      hooks?.beforeShow?.();
+      if (hooks?.afterShow) {
+        timeout = window.setTimeout(() => {
+          status.value = "show";
+          hooks?.afterShow?.();
+        }, duration.in);
+      }
+    } else {
+      // close
+      status.value = "out";
+      hooks?.beforeHide?.();
+      timeout = window.setTimeout(() => {
+        exist.value = false;
+        status.value = "hide";
+        hooks?.afterHide?.();
+      }, duration.out);
+    }
+  });
+  return { exist, status: computed(() => status.value) };
+}
+
 export function formatDate(
   date: Dayjs,
   type: "datetime" | "date" | "time" = "datetime",
@@ -60,6 +118,7 @@ export function formatDate(
 const sizeUnits = ["B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB"] as const;
 
 export function humanReadableSize(bytes: number) {
+  if (bytes == 0) return "0 " + sizeUnits[0];
   const exponent = Math.min(
     Math.floor(Math.log(bytes) / Math.log(1024)),
     sizeUnits.length - 1,

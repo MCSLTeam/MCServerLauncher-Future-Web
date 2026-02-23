@@ -2,7 +2,7 @@ use crate::api::FailedResponse;
 use crate::user::{get_user, User};
 use crate::utils::{acquire_read_lock, acquire_write_lock, current_time, generate_random_string};
 use crate::MAIN_DIR_NAME;
-use actix_web::HttpResponse;
+use actix_web::{HttpRequest, HttpResponse};
 use log::{error, info};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -316,12 +316,19 @@ pub fn get_tokens_by_user(user: &User) -> Result<Vec<SessionInfo>, HttpResponse>
     Ok(token_infos)
 }
 
-pub fn update_token_info(token: &str, ip: &str) {
+pub fn update_token_info(token: &str, req: &HttpRequest, ip: &str) {
     match TOKENS_CACHE.write() {
         Ok(mut cache) => {
             let tokens = cache.0.as_mut().expect("Tokens cache not initialized");
 
             if let Some(token_info) = tokens.get_mut(token) {
+                token_info.user_agent = req
+                    .headers()
+                    .get("User-Agent")
+                    .unwrap()
+                    .to_str()
+                    .unwrap_or("unknown")
+                    .to_string();
                 token_info.last_active_ip = ip.to_string();
                 token_info.last_active_at = current_time();
             }

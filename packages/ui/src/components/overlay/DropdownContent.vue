@@ -155,7 +155,9 @@ defineExpose({
   toggle,
   opened,
   relocate,
-  triggererWidth: computed(() => triggererEl.value.offsetWidth),
+  triggererPos: computed(
+    () => triggererEl.value.getBoundingClientRect() as PosInfo,
+  ),
 });
 </script>
 

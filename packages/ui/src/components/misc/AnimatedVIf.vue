@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { animatedVisibilityExists } from "../../utils/internal.ts";
+import { animatedVisibilityExists } from "../../utils/utils.ts";
 import { computed } from "vue";
 
 const props = withDefaults(

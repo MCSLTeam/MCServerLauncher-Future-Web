@@ -5,14 +5,20 @@ import { createForm } from "../../utils/form.ts";
 import * as yup from "yup";
 import { computed, type ComputedRef, provide, watch } from "vue";
 
-const props = defineProps<{
-  schema?: yup.Schema;
-  validationTrigger?: "input" | "blur";
-  width?: string;
-  labelPos?: "left" | "right" | "top";
-  entryPos?: "left" | "right" | "center" | "full";
-  size?: Size;
-}>();
+const props = withDefaults(
+  defineProps<{
+    schema?: yup.Schema;
+    validationTrigger?: "input" | "blur";
+    width?: string;
+    showLabel?: boolean;
+    labelPos?: "left" | "right" | "top";
+    entryPos?: "left" | "right" | "center" | "full";
+    size?: Size;
+  }>(),
+  {
+    showLabel: true,
+  },
+);
 
 type EventData = {
   value: any;
@@ -71,6 +77,7 @@ defineExpose({
 <template>
   <FormEntry
     :width="width"
+    :show-label="showLabel"
     :label-pos="labelPos"
     :entry-pos="entryPos"
     :size="size"

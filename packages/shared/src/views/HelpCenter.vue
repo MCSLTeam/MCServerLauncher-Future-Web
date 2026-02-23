@@ -7,7 +7,7 @@ usePageData().set({
   breadcrumbs: [
     {
       label: useI18n().t("shared.help-center.title"),
-      path: "/help-center",
+      link: "/help-center",
     },
   ],
 });

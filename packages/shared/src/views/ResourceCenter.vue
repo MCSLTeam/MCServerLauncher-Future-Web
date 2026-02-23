@@ -7,7 +7,7 @@ usePageData().set({
   breadcrumbs: [
     {
       label: useI18n().t("shared.resource-center.title"),
-      path: "/resource-center",
+      link: "/resource-center",
     },
   ],
 });

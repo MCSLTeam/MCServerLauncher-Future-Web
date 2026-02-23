@@ -17,6 +17,7 @@ const props = withDefaults(
   defineProps<{
     name: string;
     width?: string;
+    showLabel?: boolean;
     labelPos?: "left" | "right" | "top";
     entryPos?: "left" | "right" | "center" | "full";
     gap?: CSSSize;
@@ -25,6 +26,7 @@ const props = withDefaults(
   {
     size: "medium",
     width: "100%",
+    showLabel: true,
     labelPos: "left",
     entryPos: "right",
     gap: "xs",
@@ -119,7 +121,7 @@ provide("mcsl-form-field", {
     class="mcsl-form-entry"
   >
     <div :style="{ gap: `var(--mcsl-spacing-${gap})` }">
-      <label v-if="field.label" :for="id">{{ field.label }}</label>
+      <label v-if="showLabel && field.label" :for="id">{{ field.label }}</label>
       <div>
         <slot />
       </div>

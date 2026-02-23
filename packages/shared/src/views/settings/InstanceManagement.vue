@@ -13,8 +13,8 @@ const settings = useSettings();
 <template>
   <div class="settings__section">
     <SettingsItem
-      label="shared.settings.instance-management.use-terminal-input.label"
-      desc="shared.settings.instance-management.use-terminal-input.desc"
+      :label="t('shared.settings.instance-management.use-terminal-input.label')"
+      :desc="t('shared.settings.instance-management.use-terminal-input.desc')"
     >
       <Switch v-model="settings.data.useTerminalInput" />
     </SettingsItem>

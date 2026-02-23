@@ -1,17 +1,15 @@
 <script lang="ts" setup>
 import { computed } from "vue";
-
-export type BreadcrumbItem = {
-  label: string;
-  path?: string;
-  icon?: string;
-};
+import { navigateTo, type PageNavigationInfo } from "../../utils/utils.ts";
+import { useRouter } from "vue-router";
 
 const props = defineProps<{
-  items: BreadcrumbItem[];
+  items: PageNavigationInfo[];
   seperator?: string;
   iconSeperator?: boolean;
 }>();
+
+const router = useRouter();
 
 const actualSeperator = computed(() => props.seperator ?? "/");
 </script>
@@ -23,7 +21,11 @@ const actualSeperator = computed(() => props.seperator ?? "/");
         <i v-if="iconSeperator" :class="iconSeperator" />
         <template v-else>{{ actualSeperator }} </template>
       </span>
-      <component :is="item.path ? 'RouterLink' : 'p'" :to="item.path">
+      <component
+        :is="(item.link || item.onClick) && !item.disabled ? 'a' : 'p'"
+        href="javascript:void(0)"
+        @click="navigateTo(item, router)"
+      >
         <i v-if="item.icon" :class="item.icon" />
         {{ item.label }}
       </component>

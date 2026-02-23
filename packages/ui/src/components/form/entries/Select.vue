@@ -51,12 +51,18 @@ const formField = inject("mcsl-form-field", undefined) as
 
 if (formField) {
   model.value = formField.field.data.value;
+
+  watch(formField.field.data, (value) => {
+    if (value != model.value) model.value = value;
+  });
+
   watch(model, (value) => {
-    formField.field.data.value = value;
+    if (value != formField.field.data.value) formField.field.data.value = value;
   });
 }
 
 const allOptions = computed(() => {
+  if (props.options.length == 0) return [];
   if ((props.options[0] as any).group) {
     return (props.options as any).flatMap(
       (group: { group: string; options: SelectionItem[] }) => group.options,
@@ -103,7 +109,9 @@ const menu = computed(() => {
 });
 
 function findLabel(value: any) {
-  return allOptions.value.find((item: any) => item.value == value)?.label;
+  return (
+    allOptions.value.find((item: any) => item.value == value)?.label ?? value
+  );
 }
 </script>
 
@@ -130,11 +138,17 @@ function findLabel(value: any) {
           }"
           :disabled="disabled"
         >
-          <span v-if="!model">{{ placeholder }}</span>
+          <span class="mcsl-select__placeholder" v-if="!model">
+            {{ placeholder }}
+          </span>
           <span v-else>
-            <span v-if="model && prefix">{{ prefix }}</span>
+            <span class="mcsl-select__placeholder" v-if="model && prefix">
+              {{ prefix }}
+            </span>
             <span v-if="model">{{ findLabel(model) }}</span>
-            <span v-if="model && suffix">{{ suffix }}</span>
+            <span class="mcsl-select__placeholder" v-if="model && suffix">
+              {{ suffix }}
+            </span>
           </span>
           <i class="fa fa-angle-down" :class="{ 'fa-rotate-180': opened }" />
         </button>
@@ -184,8 +198,13 @@ function findLabel(value: any) {
     transition: 0.2s ease-in-out;
   }
 
-  & > span > span {
-    color: var(--mcsl-text-color-secondary);
+  & > span {
+    width: 0;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
   }
 }
 
@@ -224,5 +243,9 @@ function findLabel(value: any) {
       color: var(--mcsl-color-danger);
     }
   }
+}
+
+.mcsl-select__placeholder {
+  color: var(--mcsl-text-color-gray);
 }
 </style>

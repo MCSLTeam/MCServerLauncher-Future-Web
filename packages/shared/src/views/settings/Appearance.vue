@@ -53,14 +53,14 @@ const renderings = computed(() => [
 <template>
   <div class="settings__section">
     <SettingsItem
-      label="shared.settings.appearance.theme.label"
-      desc="shared.settings.appearance.theme.desc"
+      :label="t('shared.settings.appearance.theme.label')"
+      :desc="t('shared.settings.appearance.theme.desc')"
     >
       <SelectButton v-model="theme" :options="themes" />
     </SettingsItem>
     <SettingsItem
-      label="shared.settings.appearance.rendering.label"
-      :desc="`shared.settings.appearance.rendering.${rendering}.desc`"
+      :label="t('shared.settings.appearance.rendering.label')"
+      :desc="t(`shared.settings.appearance.rendering.${rendering}.desc`)"
     >
       <!-- TODO: 渲染模式 -->
       <SelectButton v-model="rendering" :options="renderings" />

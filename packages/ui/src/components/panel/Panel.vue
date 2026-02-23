@@ -43,7 +43,9 @@ onMounted(() => {
       [`mcsl-size-${size}`]: true,
       [`mcsl-panel__shadow-${shadow}`]: shadow !== 'never',
       'mcsl-panel__need-divider': !headerDivider && hasHeader,
-      'mcsl-panel__not-scrollable': !scrollable,
+    }"
+    :style="{
+      overflow: scrollable ? 'auto' : 'hidden',
     }"
     class="mcsl-panel"
   >
@@ -73,10 +75,16 @@ onMounted(() => {
 @use "../../assets/css/utils";
 
 .mcsl-panel {
-  overflow: auto;
   border: 1px solid var(--mcsl-border-color-base);
   background: var(--mcsl-bg-color-overlay);
-  transition: box-shadow 0.2s ease-in-out;
+
+  outline: 0 solid transparent;
+  outline-offset: -2px; // 覆盖 border
+  transition: 0.2s ease-in-out;
+
+  &:focus-visible {
+    outline: 3px solid var(--mcsl-color-help);
+  }
 }
 
 @each $size in utils.$sizes {
@@ -102,26 +110,9 @@ onMounted(() => {
   }
 }
 
-.mcsl-panel {
-  outline: 0 solid transparent;
-  outline-offset: -2px; // 覆盖 border
-  transition: 0.2s ease-in-out;
-
-  &:focus-visible {
-    outline: 3px solid var(--mcsl-color-help);
-  }
-}
-
 .mcsl-panel__header {
   & * {
     color: var(--mcsl-text-color-primary);
-  }
-}
-
-.mcsl-panel__not-scrollable {
-  & > .mcsl-panel__body-wrapper,
-  & .mcsl-panel__body {
-    height: 100%;
   }
 }
 </style>

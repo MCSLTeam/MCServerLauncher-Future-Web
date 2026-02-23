@@ -60,9 +60,7 @@ onUnmounted(() => {
         class="mcsl-typography"
         v-html="renderMd(eula, { html: false })"
       />
-      <div v-else class="spinner">
-        <Spinner />
-      </div>
+      <Spinner v-else block />
     </div>
     <div class="eula-actions">
       <Button @click="router.push('/welcome/setup')">{{
@@ -110,12 +108,6 @@ onUnmounted(() => {
   padding: var(--mcsl-spacing-xs);
   background: var(--mcsl-bg-color-main);
   border-radius: var(--mcsl-border-radius-md);
-  & > .spinner {
-    height: 6rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
 
   @media (max-width: 450px) {
     height: 100%;
