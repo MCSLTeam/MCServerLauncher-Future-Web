@@ -4,15 +4,16 @@ Guide for agents working on the MCServerLauncher-Future-Web shared package.
 
 ## Project Overview
 
-**shared** is a shared package within the MCServerLauncher-Future-Web monorepo. It contains shared utilities, types, and constants used across different applications (like the web frontend and Tauri app).
+**shared** is a shared package within the MCServerLauncher-Future-Web monorepo. It contains shared utilities, types, and constants used across different applications (like the web server and desktop app).
 
 - **Repository**: MCServerLauncher-Future-Web
-- **Language**: TypeScript
+- **Language**: Vue3, TypeScript
 - **Architecture**: Monorepo Package (Turborepo)
 
 ## Essential Commands
 
 ```bash
+# Run all below in the project root
 # Lint the shared package
 pnpm --filter @repo/shared run lint
 
@@ -46,5 +47,7 @@ packages/shared/
 
 ## References
 
+- [Vue 3 Documentation](https://vuejs.org/)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 - [Turborepo Documentation](https://turbo.build/repo/docs)
+- [RsBuild Documentation](https://rsbuild.dev/)

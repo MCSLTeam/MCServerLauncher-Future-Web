@@ -4,11 +4,11 @@ Guide for agents working on the MCServerLauncher-Future-Web Tauri application.
 
 ## Project Overview
 
-**mcsl-future-tauri** is the Tauri-based desktop application wrapper for the MCServerLauncher-Future-Web project. It packages the web frontend into a native desktop application.
+**MCSL-Future-Tauri** is the Tauri-based desktop application wrapper for the MCServerLauncher-Future-Web project. It packages the web frontend into a native desktop application. Also, it has the ability to connect to MCSL-Future-Web web servers.
 
 - **Repository**: MCServerLauncher-Future-Web
-- **Language**: Rust, TypeScript, Vue 3
-- **Framework**: Tauri
+- **Language**: Rust, TypeScript
+- **Framework**: Vue 3, Tauri, Rsbuild
 - **Architecture**: Monorepo App (Turborepo)
 
 ## Essential Commands
@@ -48,6 +48,7 @@ apps/app/
 
 ## References
 
-- [Tauri Documentation](https://tauri.app/)
 - [Vue 3 Documentation](https://vuejs.org/)
+- [Tauri Documentation](https://tauri.app/)
 - [Rust Documentation](https://www.rust-lang.org/learn)
+- [RsBuild Documentation](https://rsbuild.dev/)

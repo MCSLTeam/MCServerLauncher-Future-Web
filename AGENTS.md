@@ -4,21 +4,30 @@ Guide for AI agents working on the MCServerLauncher-Future-Web project.
 
 ## Project Overview
 
-**MCServerLauncher-Future-Web** is the web frontend and next-generation client for the MCServerLauncher-Future project. It is a monorepo containing a web interface, a Tauri-based desktop application, and a Rust-based daemon.
+**MCServerLauncher-Future-Web** is the web-based client for the MCServerLauncher-Future project. It is a monorepo
+containing a web server and a Tauri-based desktop application.
 
 - **Repository**: MCServerLauncher-Future-Web
 - **Architecture**: Monorepo (Turborepo)
 - **Package Manager**: pnpm
 
+## Subprojects
+
+- **MCSL Future Web**: A web panel acting as a client for MCSL Future daemons.
+- **MCSL Future Tauri**: A local client which can connect to both web panel and daemons.
+
 ## Monorepo Structure
 
 The project is organized as a monorepo using Turborepo and pnpm workspaces.
 
-- `apps/`: Contains the main applications.
-  - `mcsl-future-web`: The web frontend application.
-  - `mcsl-future-tauri`: The Tauri desktop application wrapper.
-  - `mcsl-future-daemon-rs`: The Rust-based daemon.
 - `packages/`: Shared packages and libraries.
+    - `configs/`: Contains common plugin configs.
+    - `ui/`: The ui components for MCSL Future Web.
+    - `locales/`: A git submodule containing i18n translations.
+    - `shared/`: Common codes and pages for both web server and desktop app.
+- `apps/`: Contains the main applications.
+    - `app/`: The desktop app and unique code of MCSL Future Tauri.
+    - `web/`: The web server and unique code of MCSL Future Web.
 
 ## Essential Commands
 
@@ -40,11 +49,6 @@ pnpm run app:build  # Build Tauri app
 pnpm run app:lint   # Lint Tauri app
 pnpm run app:test   # Test Tauri app
 
-# Daemon Commands
-pnpm run daemon:dev   # Start Rust daemon development server
-pnpm run daemon:build # Build Rust daemon
-pnpm run daemon:test  # Test Rust daemon
-
 # Global Commands
 pnpm run build      # Build all packages
 pnpm run lint       # Lint all packages
@@ -53,9 +57,12 @@ pnpm run test       # Test all packages
 
 ## Technology Stack
 
-- **Frontend**: Vue 3, TypeScript, Vite (likely, based on standard Vue 3 setups)
-- **Desktop App**: Tauri (Rust + Web Frontend)
-- **Daemon**: Rust
+- **Web**:
+    - Frontend: Vue 3, TypeScript, RsBuild
+    - Backend: Rust Actix Web
+- **App**: Tauri
+    - Frontend: Vue 3, TypeScript, RsBuild
+    - Backend: Tauri
 - **Build Tool**: Turborepo
 - **Package Manager**: pnpm
 
@@ -63,6 +70,7 @@ pnpm run test       # Test all packages
 
 本项目的开发与维护过程中，得到了 AI 代理（如 Cline 等）的协助。
 AI 代理主要参与了以下工作：
+
 - 代码重构与优化
 - 国际化 (i18n) 支持
 - Bug 修复与逻辑完善
@@ -72,7 +80,6 @@ AI 代理主要参与了以下工作：
 
 - Ensure all tests pass and code builds successfully before committing.
 - Follow the monorepo structure and place code in the appropriate app or package.
-- Use `pnpm` for managing dependencies.
 
 ## References
 
@@ -80,3 +87,4 @@ AI 代理主要参与了以下工作：
 - [Tauri Documentation](https://tauri.app/)
 - [Turborepo Documentation](https://turbo.build/repo/docs)
 - [Rust Documentation](https://www.rust-lang.org/learn)
+- [RsBuild Documentation](https://rsbuild.dev/)
