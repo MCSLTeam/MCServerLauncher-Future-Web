@@ -96,16 +96,17 @@ export const useAppearance = defineStore("appearance", () => {
           const viewTransition = document.startViewTransition(set);
 
           // 从鼠标处开始扩散
-          const mousePos = useMousePosition();
+          const mouseX = useMousePosition().x;
+          const mouseY = useMousePosition().y;
 
           const endRadius = Math.hypot(
-            Math.max(mousePos.x, innerWidth - mousePos.x),
-            Math.max(mousePos.y, innerHeight - mousePos.y),
+            Math.max(mouseX, innerWidth - mouseX),
+            Math.max(mouseY, innerHeight - mouseY),
           );
           viewTransition.ready.then(() => {
             const clipPath = [
-              `circle(0px at ${mousePos.x}px ${mousePos.y}px)`,
-              `circle(${endRadius}px at ${mousePos.x}px ${mousePos.y}px)`,
+              `circle(0px at ${mouseX}px ${mouseY}px)`,
+              `circle(${endRadius}px at ${mouseX}px ${mouseY}px)`,
             ];
             document.documentElement.animate(
               {
@@ -294,8 +295,14 @@ export const useMousePosition = defineStore("mousePosition", () => {
     mousePosition.value.y = e.clientY;
   }
 
+  function onMouseOut() {
+    mousePosition.value.x = -999;
+    mousePosition.value.y = -999;
+  }
+
   return {
     onMouseMove,
+    onMouseOut,
     x: computed(() => mousePosition.value.x),
     y: computed(() => mousePosition.value.y),
   };

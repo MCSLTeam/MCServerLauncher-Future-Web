@@ -74,7 +74,6 @@ async function submit() {
     new MCSLNotif({
       data: {
         color: "success",
-        title: t("ui.notification.title.success"),
         message: t("web.auth.register.success"),
       },
     }).open();
@@ -93,8 +92,7 @@ async function submit() {
 </script>
 
 <template>
-  <div class="register">
-    <h2>{{ t("web.auth.register.title") }}</h2>
+  <div class="register" :header="t('web.auth.register.title')">
     <Form :form="form" @submit="submit">
       <FormEntry name="username">
         <InputText :placeholder="t('web.auth.username.format')" />

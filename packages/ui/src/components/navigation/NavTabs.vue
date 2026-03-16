@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, watchEffect } from "vue";
 import { useRouter } from "vue-router";
-import { type Color, getColorVar } from "../../utils/css.ts";
+import { ColorData, type ColorType, getColorVar } from "../../utils/css.ts";
 import {
   navigateTo,
   type PageNavigationInfo,
@@ -11,7 +11,7 @@ import {
 const props = withDefaults(
   defineProps<{
     tabs: PageNavigationInfo[];
-    color?: Color;
+    color?: ColorType;
     size?: Size;
     shadow?: "never" | "hover" | "always";
   }>(),
@@ -66,7 +66,12 @@ defineExpose({
 <template>
   <div
     :style="{
-      '--mcsl-nav-tabs__bg': getColorVar(color),
+      '--mcsl-nav-tabs__color': getColorVar(color),
+      '--mcsl-nav-tabs__color-bg': new ColorData(
+        color,
+        'default',
+        0.2,
+      ).getCss(),
     }"
     class="mcsl-nav-tabs"
     :class="[`mcsl-size-${size}`, `mcsl-nav-tabs__shadow-${shadow}`]"
@@ -95,7 +100,7 @@ defineExpose({
         <div
           :style="{
             '--mcsl-nav-tabs__bg-left': `${offsetLeft}px`,
-            width: `${offsetWidth}px`,
+            '--mcsl-nav-tabs__bg-width': `${offsetWidth}px`,
           }"
         />
       </div>
@@ -119,6 +124,7 @@ defineExpose({
     }
 
     & .mcsl-nav-tabs__bg {
+      width: calc(var(--mcsl-nav-tabs__btns-width) + $padding - 0.26px);
       height: calc(100% - 2 * $padding);
       margin: $padding;
 
@@ -152,7 +158,7 @@ defineExpose({
 
 .mcsl-nav-tabs__btns > button {
   z-index: 1;
-  border: none;
+  border: 1px solid transparent;
   outline: 0 solid transparent;
   outline-offset: 1px;
   display: flex;
@@ -164,14 +170,31 @@ defineExpose({
   cursor: pointer;
   transition: 0.2s ease-in-out;
 
+  &:not(.mcsl-nav-tabs__btn-active):hover {
+    border-color: var(--mcsl-border-color-base);
+    background: var(--mcsl-bg-color-dark);
+  }
+
+  &:not(.mcsl-nav-tabs__btn-active):active {
+    border-color: var(--mcsl-border-color-dark);
+    background: var(--mcsl-bg-color-darker);
+    transition: 0.1s ease-in-out;
+  }
+
   & > i {
     font-size: var(--mcsl-font-size-sm);
     transition: 0.2s ease-in-out;
   }
 
-  &.mcsl-nav-tabs__btn-active,
-  &.mcsl-nav-tabs__btn-active > i {
-    color: var(--mcsl-text-color-light);
+  &.mcsl-nav-tabs__btn-active {
+    transition:
+      color 0.2s ease-in-out,
+      all 0.05s ease-in-out;
+
+    &,
+    & > i {
+      color: var(--mcsl-nav-tabs__color);
+    }
   }
 
   &:focus-visible {
@@ -180,14 +203,13 @@ defineExpose({
 
   &:disabled {
     z-index: 5;
-    color: var(--mcsl-text-color-gray);
+    color: var(--mcsl-text-color-secondary);
     cursor: not-allowed;
     background: var(--mcsl-bg-color-dark);
   }
 }
 
 .mcsl-nav-tabs__bg {
-  width: calc(var(--mcsl-nav-tabs__btns-width) - 1px);
   position: absolute;
   top: 0;
   left: 0;
@@ -195,10 +217,12 @@ defineExpose({
   border-radius: var(--mcsl-border-radius-full);
 
   & > div {
-    background: var(--mcsl-nav-tabs__bg);
-    height: 100%;
+    background: var(--mcsl-nav-tabs__color-bg);
+    width: calc(var(--mcsl-nav-tabs__bg-width) - 2px);
+    height: calc(100% - 2px);
+    border: 1px solid var(--mcsl-nav-tabs__color);
     border-radius: var(--mcsl-border-radius-full);
-    transition: 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    transition: 0.2s ease-out;
   }
 }
 </style>

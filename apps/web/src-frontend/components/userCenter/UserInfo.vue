@@ -75,7 +75,6 @@ async function submit() {
     new MCSLNotif({
       data: {
         color: "success",
-        title: t("ui.notification.title.success"),
         message: t("web.user-center.password-reset.success"),
       },
     }).open();
@@ -92,7 +91,6 @@ async function clearSessions() {
   new MCSLNotif({
     data: {
       color: "success",
-      title: t("ui.notification.title.success"),
       message: t("web.user-center.sessions.clear.success"),
     },
   }).open();

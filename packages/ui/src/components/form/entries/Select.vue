@@ -171,7 +171,7 @@ function findLabel(value: any) {
     border-radius: utils.get-size-var("border-radius", $size, $vars);
 
     &::placeholder {
-      color: var(--mcsl-text-color-gray);
+      color: var(--mcsl-text-color-secondary);
       font-size: utils.get-size-var("font-size", $size, $vars);
     }
   }
@@ -246,6 +246,6 @@ function findLabel(value: any) {
 }
 
 .mcsl-select__placeholder {
-  color: var(--mcsl-text-color-gray);
+  color: var(--mcsl-text-color-secondary);
 }
 </style>

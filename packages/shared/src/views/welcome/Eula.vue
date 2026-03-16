@@ -52,9 +52,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="welcome-setup">
+  <div class="eula" :class="{ 'eula-loaded': eula }">
     <h2>{{ t("shared.eula.title") }}</h2>
-    <div class="eula-content">
+    <div class="eula__content">
       <div
         v-if="eula"
         class="mcsl-typography"
@@ -62,7 +62,7 @@ onUnmounted(() => {
       />
       <Spinner v-else block />
     </div>
-    <div class="eula-actions">
+    <div class="eula__actions">
       <Button @click="router.push('/welcome/setup')">{{
         t("ui.common.prev-step")
       }}</Button>
@@ -83,15 +83,18 @@ onUnmounted(() => {
 </template>
 
 <style scoped lang="scss">
-.welcome-setup {
+.eula {
   width: min(60rem, 70vw);
-  max-height: 30rem;
   height: 100%;
   display: flex;
   flex-direction: column;
   flex: 1;
   overflow: hidden;
   gap: var(--mcsl-spacing-xs);
+
+  &.eula-loaded {
+    height: min(30rem, calc(100vh - 20rem));
+  }
 
   & > Button {
     align-self: flex-end;
@@ -102,7 +105,7 @@ onUnmounted(() => {
   }
 }
 
-.eula-content {
+.eula__content {
   flex: 1 2;
   overflow: auto;
   padding: var(--mcsl-spacing-xs);
@@ -114,7 +117,7 @@ onUnmounted(() => {
   }
 }
 
-.eula-actions {
+.eula__actions {
   display: flex;
   gap: var(--mcsl-spacing-xs);
   justify-content: flex-end;

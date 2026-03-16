@@ -96,6 +96,6 @@ onUnmounted(() => {
 
 <style lang="scss">
 .mcsl-contextmenu-overlay {
-  z-index: 10000;
+  z-index: 4000;
 }
 </style>

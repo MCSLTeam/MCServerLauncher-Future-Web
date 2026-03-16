@@ -351,7 +351,7 @@ function openLink(url: string) {
   }
 
   & > p {
-    color: var(--mcsl-text-color-gray);
+    color: var(--mcsl-text-color-secondary);
     margin-top: var(--mcsl-spacing-4xs);
     text-align: center;
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
-import FancyBackground from "@repo/ui/src/components/misc/FancyBackground.vue";
+import Background from "@repo/ui/src/components/misc/Background.vue";
 import { platform, loading, loadingStep } from "../../index.ts";
 import { watch } from "vue";
 import Spinner from "@repo/ui/src/components/progress/Spinner.vue";
@@ -25,7 +25,7 @@ watch(loading, (newValue) => {
     :class="{ 'loading-overlay__hidden': !loading }"
     v-if="exist"
   >
-    <FancyBackground>
+    <Background>
       <div class="loading-overlay__container">
         <div class="loading-overlay__logo">
           <img src="../../assets/img/MCSL.png" alt="" />
@@ -42,7 +42,7 @@ watch(loading, (newValue) => {
           {{ loadingStep.trim() == "" ? t("ui.loading.default") : loadingStep }}
         </div>
       </div>
-    </FancyBackground>
+    </Background>
   </div>
 </template>
 
@@ -101,7 +101,7 @@ watch(loading, (newValue) => {
     }
 
     & > h2 {
-      color: var(--mcsl-text-color-gray);
+      color: var(--mcsl-text-color-secondary);
       font-size: var(--mcsl-font-size-xl);
       font-weight: var(--mcsl-font-weight-base);
       text-wrap: nowrap;
@@ -125,6 +125,6 @@ watch(loading, (newValue) => {
   align-items: center;
   justify-content: center;
   gap: var(--mcsl-spacing-2xs);
-  color: var(--mcsl-text-color-gray);
+  color: var(--mcsl-text-color-secondary);
 }
 </style>

@@ -74,7 +74,6 @@ export type ColorVar =
   | "text-color-primary"
   | "text-color-regular"
   | "text-color-secondary"
-  | "text-color-gray"
   | "text-color-opposite"
   | "text-color-light";
 

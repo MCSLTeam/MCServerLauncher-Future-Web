@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import FancyBackground from "@repo/ui/src/components/misc/FancyBackground.vue";
+import Background from "@repo/ui/src/components/misc/Background.vue";
 import Panel from "@repo/ui/src/components/panel/Panel.vue";
 import { useI18n } from "vue-i18n";
 import { platform } from "../index.ts";
@@ -8,7 +8,7 @@ const t = useI18n().t;
 </script>
 
 <template>
-  <FancyBackground>
+  <Background>
     <div class="logo">
       <img src="../assets/img/MCSL.png" alt="" />
       <h1>
@@ -19,12 +19,12 @@ const t = useI18n().t;
     </div>
     <Panel class="auth-panel" body-class="auth-body">
       <RouterView v-slot="{ Component }">
-        <transition mode="out-in" name="stretch" :duration="500">
+        <transition mode="out-in" name="collapse" :duration="250">
           <component :is="Component" />
         </transition>
       </RouterView>
     </Panel>
-  </FancyBackground>
+  </Background>
 </template>
 
 <style scoped lang="scss">
@@ -52,7 +52,7 @@ const t = useI18n().t;
   }
 
   & > h2 {
-    color: var(--mcsl-text-color-gray);
+    color: var(--mcsl-text-color-secondary);
     font-size: var(--mcsl-font-size-xl);
     font-weight: var(--mcsl-font-weight-base);
   }

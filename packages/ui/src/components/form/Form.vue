@@ -119,14 +119,10 @@ onUpdated(() => {
 
 .mcsl-form__header {
   width: 100%;
-  margin-bottom: var(--mcsl-spacing-sm);
+  margin-bottom: var(--mcsl-spacing-2xs);
 }
 
 .mcsl-form__header-default {
-  width: 100%;
-  text-align: center;
-  color: var(--mcsl-text-color-secondary);
   font-size: var(--mcsl-font-size-xl);
-  font-weight: var(--mcsl-font-weight-base);
 }
 </style>

@@ -31,6 +31,8 @@ export const fullscreen = ref(false);
   await win.onResized(refresh);
   await refresh();
 
+  document.documentElement.classList.add(platform());
+
   if (platform() == "macos") {
     watchEffect(() => {
       windowButtonsExists.value = !fullscreen.value;

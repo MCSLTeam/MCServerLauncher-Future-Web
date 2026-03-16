@@ -86,15 +86,15 @@ $color-vars: (
   ),
   "bg-color-dark": (
     "light": [ "surface",
-    100],
+    50],
     "dark": [ "surface",
     800],
   ),
   "bg-color-darker": (
     "light": [ "surface",
-    200],
+    100],
     "dark": [ "surface",
-    700],
+    800],
   ),
   "bg-color-overlay-opposite": (
     "light": [ "surface",
@@ -143,21 +143,15 @@ $color-vars: (
   ),
   "text-color-regular": (
     "light": [ "surface",
-    700],
+    600],
     "dark": [ "surface",
     200],
   ),
   "text-color-secondary": (
     "light": [ "surface",
-    600],
-    "dark": [ "surface",
-    300],
-  ),
-  "text-color-gray": (
-    "light": [ "surface",
     500],
     "dark": [ "surface",
-    400],
+    300],
   ),
   "text-color-ansi-white": (
     "light": [ "surface",

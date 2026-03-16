@@ -25,8 +25,8 @@ sidebar.value[0]!.onClick!();
       <transition
         v-if="userCenterPage"
         mode="out-in"
-        name="stretch-vertical"
-        :duration="500"
+        name="collapse-vertical"
+        :duration="250"
       >
         <component :is="userCenterPage[1]" />
       </transition>

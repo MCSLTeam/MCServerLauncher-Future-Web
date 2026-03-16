@@ -33,7 +33,6 @@ async function deleteSession() {
   new MCSLNotif({
     data: {
       color: "success",
-      title: t("ui.notification.title.success"),
       message: t("web.user-center.sessions.delete.success"),
     },
   }).open();

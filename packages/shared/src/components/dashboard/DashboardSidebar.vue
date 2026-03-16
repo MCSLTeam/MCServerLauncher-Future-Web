@@ -159,7 +159,7 @@ $collapsed-width: utils.get-size-var("height", "large", SmallerContent.$vars);
 
     & > p {
       width: fit-content;
-      color: var(--mcsl-text-color-gray);
+      color: var(--mcsl-text-color-secondary);
       font-size: var(--mcsl-font-size-sm);
       cursor: help;
     }

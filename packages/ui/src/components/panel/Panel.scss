@@ -1,4 +1,5 @@
 @use "sass:map";
+@use "../../assets/css/utils";
 @use "../Content";
 
 $vars: map.merge(
@@ -10,9 +11,9 @@ $vars: map.merge(
       "large": var(--mcsl-box-shadow-dark),
     ),
     "border-radius": (
-      "small": var(--mcsl-border-radius-sm),
-      "medium": var(--mcsl-border-radius-md),
-      "large": var(--mcsl-border-radius-lg),
+      "small": calc(var(--mcsl-spacing-sm) / 2 + utils.get-size-var("border-radius", "small", Content.$vars)),
+      "medium": calc(var(--mcsl-spacing-md) / 2 + utils.get-size-var("border-radius", "medium", Content.$vars)),
+      "large": calc(var(--mcsl-spacing-lg) / 2 + utils.get-size-var("border-radius", "large", Content.$vars)),
     ),
     "spacing": (
       "small": var(--mcsl-spacing-sm),

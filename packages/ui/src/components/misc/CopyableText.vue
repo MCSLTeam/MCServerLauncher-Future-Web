@@ -66,13 +66,13 @@ onUnmounted(() => {
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  background: var(--mcsl-bg-color-dark);
+  background: var(--mcsl-border-color-light);
   gap: var(--mcsl-spacing-4xs);
   cursor: pointer;
   transition: 0.2s ease-in-out;
 
   &:hover {
-    background: var(--mcsl-bg-color-darker);
+    background: var(--mcsl-border-color-base);
   }
 }
 </style>

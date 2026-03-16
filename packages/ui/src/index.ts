@@ -14,8 +14,10 @@ dayjs.locale("zh-cn");
 export async function loadUi() {
   setLocale(getYupLocale());
   useAppearance().load();
-  document.removeEventListener("mousemove", useMousePosition().onMouseMove);
-  document.addEventListener("mousemove", useMousePosition().onMouseMove);
+  window.removeEventListener("mousemove", useMousePosition().onMouseMove);
+  window.removeEventListener("mouseout", useMousePosition().onMouseOut);
+  window.addEventListener("mousemove", useMousePosition().onMouseMove);
+  window.addEventListener("mouseout", useMousePosition().onMouseOut);
 
   const onUserInteraction = () => {
     requestNotifPermission();

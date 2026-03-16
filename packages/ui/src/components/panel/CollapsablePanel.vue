@@ -147,7 +147,7 @@ defineExpose({
 
   & .mcsl-collapsable-panel__header {
     cursor: not-allowed;
-    color: var(--mcsl-text-color-gray);
+    color: var(--mcsl-text-color-secondary);
   }
 }
 </style>

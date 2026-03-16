@@ -98,7 +98,7 @@ let interval = -1;
 onMounted(() => {
   if (tips.length > 0) currentTip.value = tips[0]!;
   if (tips.length > 1)
-    interval = setInterval(() => {
+    interval = window.setInterval(() => {
       showTip.value = false;
       setTimeout(() => {
         currentTip.value =
@@ -225,7 +225,7 @@ onUnmounted(() => {
 }
 
 .mcsl-file-dropper__tip {
-  color: var(--mcsl-text-color-gray);
+  color: var(--mcsl-text-color-secondary);
   margin-top: var(--mcsl-spacing-4xs);
 }
 

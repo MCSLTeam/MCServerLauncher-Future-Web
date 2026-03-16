@@ -31,7 +31,7 @@ defineProps<{
   & > p {
     margin-top: var(--mcsl-spacing-4xs);
     margin-bottom: var(--mcsl-spacing-2xs);
-    color: var(--mcsl-text-color-gray);
+    color: var(--mcsl-text-color-secondary);
     font-size: var(--mcsl-font-size-sm);
   }
 }

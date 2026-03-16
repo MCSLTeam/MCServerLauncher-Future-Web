@@ -30,6 +30,7 @@ export const config: RsbuildConfig = {
       "import.meta.env.APP_VERSION": JSON.stringify(pkg.versions.version),
       "import.meta.env.APP_VERSION_APP": JSON.stringify(pkg.versions.app),
       "import.meta.env.APP_VERSION_WEB": JSON.stringify(pkg.versions.web),
+      "import.meta.env.IS_ACTION_BUILD": JSON.stringify(process.env.IS_ACTION_BUILD === "true"),
       "import.meta.env.BUILD_TIME": JSON.stringify(new Date().toISOString()),
       "import.meta.env.COMMIT_HASH": JSON.stringify(
         execSync("git rev-parse HEAD").toString().trim(),

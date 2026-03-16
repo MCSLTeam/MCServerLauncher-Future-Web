@@ -546,7 +546,7 @@ function highlightText(text: string, searchText: string): string {
       & > i.fa-question-circle {
         cursor: help;
         margin-left: var(--mcsl-spacing-4xs);
-        color: var(--mcsl-text-color-gray);
+        color: var(--mcsl-text-color-secondary);
       }
     }
   }
@@ -599,7 +599,7 @@ function highlightText(text: string, searchText: string): string {
   grid-column: 1 / -1;
   text-align: center;
   padding: var(--mcsl-spacing-xl);
-  color: var(--mcsl-text-color-gray);
+  color: var(--mcsl-text-color-secondary);
   font-size: var(--mcsl-font-size-lg);
 }
 </style>

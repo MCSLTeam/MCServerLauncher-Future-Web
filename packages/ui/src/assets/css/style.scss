@@ -7,15 +7,12 @@
 @use "utils";
 
 :root {
-  --mcsl-font-family-sans:
-    "MiSans VF", "PingFang SC", Inter, -apple-system, BlinkMacSystemFont,
-    Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans,
-    Helvetica Neue, sans-serif;
-  --mcsl-font-family-minecraft:
-    Minecraft, GNU Unifont, var(--mcsl-font-family-sans);
-  --mcsl-font-family-mono:
-    JetBrains Mono, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
-    Liberation Mono, monospace;
+  --mcsl-font-family-sans: "MiSans VF", "PingFang SC", Inter, -apple-system, BlinkMacSystemFont,
+  Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans,
+  Helvetica Neue, sans-serif;
+  --mcsl-font-family-minecraft: Minecraft, GNU Unifont, var(--mcsl-font-family-sans);
+  --mcsl-font-family-mono: JetBrains Mono, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
+  Liberation Mono, monospace;
 
   font-family: var(--mcsl-font-family-sans);
 
@@ -47,7 +44,7 @@ body,
   background: var(--mcsl-bg-color-main);
 }
 
-#app {
+.app:not(.macos) #app {
   border-radius: var(--mcsl-border-radius-lg);
 }
 
@@ -73,11 +70,11 @@ html.dark::view-transition-old(root) {
 }
 
 html.dark::view-transition-new(root) {
-  z-index: 999;
+  z-index: 10000;
 }
 
 ::view-transition-old(root) {
-  z-index: 999;
+  z-index: 10000;
 }
 
 ::view-transition-new(root) {
@@ -106,50 +103,42 @@ html.dark::view-transition-new(root) {
   opacity: 0;
 }
 
-.stretch-enter-active {
-  transition: 1s cubic-bezier(0, 1, 0, 1);
-  overflow: hidden;
+.collapse-enter-active {
+  animation: 0.25s ease-in-out both collapseInVertical, 0.25s ease-in-out both collapseInHorizontal;
 }
 
-.stretch-leave-active {
+.collapse-leave-active {
+  animation: 0.5s cubic-bezier(0, 1, 0, 1) both collapseOutVertical, 0.5s cubic-bezier(0, 1, 0, 1) both collapseOutHorizontal;
+}
+
+.collapse-enter-active,
+.collapse-leave-active {
   transition: 0.5s ease-in-out;
   overflow: hidden;
 }
 
-.stretch-enter-from,
-.stretch-leave-to {
-  max-width: 0 !important;
-  max-height: 0 !important;
+.collapse-enter-from,
+.collapse-leave-to {
   opacity: 0;
 }
 
-.stretch-enter-to,
-.stretch-leave-from {
-  max-width: 999px;
-  max-height: 999px;
-  opacity: 1;
+.collapse-vertical-enter-active {
+  animation: 0.25s ease-in-out both collapseInVertical;
 }
 
-.stretch-vertical-enter-active {
-  transition: 1s cubic-bezier(0, 1, 0, 1);
-  overflow: hidden;
+.collapse-vertical-leave-active {
+  animation: 0.5s cubic-bezier(0, 1, 0, 1) both collapseOutVertical;
 }
 
-.stretch-vertical-leave-active {
+.collapse-vertical-enter-active,
+.collapse-vertical-leave-active {
   transition: 0.5s ease-in-out;
   overflow: hidden;
 }
 
-.stretch-vertical-enter-from,
-.stretch-vertical-leave-to {
-  max-height: 0 !important;
+.collapse-vertical-enter-from,
+.collapse-vertical-leave-to {
   opacity: 0;
-}
-
-.stretch-vertical-enter-to,
-.stretch-vertical-leave-from {
-  max-height: 999px;
-  opacity: 1;
 }
 
 /* 排版 */
@@ -485,14 +474,12 @@ td {
 /* 字体 */
 @font-face {
   font-family: "Minecraft";
-  src: url("https://www.minecraft.net/etc.clientlibs/minecraftnet/clientlibs/clientlib-site/resources/fonts/Minecraft-Seven_v2.woff2")
-    format("woff");
+  src: url("https://www.minecraft.net/etc.clientlibs/minecraftnet/clientlibs/clientlib-site/resources/fonts/Minecraft-Seven_v2.woff2") format("woff");
 }
 
 @font-face {
   font-family: "GNU Unifont";
-  src: url("https://www.unifoundry.com/pub/unifont/unifont-17.0.03/font-builds/unifont-17.0.03.otf")
-    format("opentype");
+  src: url("https://www.unifoundry.com/pub/unifont/unifont-17.0.03/font-builds/unifont-17.0.03.otf") format("opentype");
 }
 
 /* Floating Vue  */

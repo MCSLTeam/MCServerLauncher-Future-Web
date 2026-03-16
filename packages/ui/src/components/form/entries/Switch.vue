@@ -135,7 +135,7 @@ $vars: map.merge(
   outline: 0 solid transparent;
   outline-offset: 2px;
   border-radius: var(--mcsl-border-radius-full);
-  background: var(--mcsl-bg-color-darker);
+  background: var(--mcsl-border-color-base);
   transform: translate(0);
   transition: 0.2s ease-in-out;
 
@@ -144,7 +144,7 @@ $vars: map.merge(
     position: absolute;
     top: calc(var(--mcsl-spacing-2xs) / 2);
     left: calc(var(--mcsl-spacing-2xs) / 2);
-    background: var(--mcsl-bg-color-overlay);
+    background: var(--mcsl-text-color-light);
     border-radius: var(--mcsl-border-radius-full);
     box-shadow: var(--mcsl-box-shadow-light);
     transition: 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.38);

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
-import FancyBackground from "@repo/ui/src/components/misc/FancyBackground.vue";
+import Background from "@repo/ui/src/components/misc/Background.vue";
 import { platform } from "../../index.ts";
 import { onMounted, ref } from "vue";
 
@@ -14,7 +14,7 @@ onMounted(() => {
 
 <template>
   <div class="welcome-overlay" v-if="exists">
-    <FancyBackground>
+    <Background>
       <div class="welcome-overlay__logo">
         <img src="../../assets/img/MCSL.png" alt="" />
         <div>
@@ -25,7 +25,7 @@ onMounted(() => {
           <h2>{{ t("shared.app.desc") }}</h2>
         </div>
       </div>
-    </FancyBackground>
+    </Background>
   </div>
 </template>
 
@@ -70,7 +70,7 @@ onMounted(() => {
     }
 
     & > h2 {
-      color: var(--mcsl-text-color-gray);
+      color: var(--mcsl-text-color-secondary);
       font-size: var(--mcsl-font-size-xl);
       font-weight: var(--mcsl-font-weight-base);
       text-wrap: nowrap;

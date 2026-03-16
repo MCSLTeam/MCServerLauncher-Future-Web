@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { onUnmounted, ref, watch } from "vue";
+import { computed, onUnmounted, ref, watch } from "vue";
 import Button from "../button/Button.vue";
 import Panel from "../panel/Panel.vue";
 import { type Color, getColorVar } from "../../utils/css.ts";
 import { animatedVisibilityExists } from "../../utils/utils.ts";
 import { createFocusTrap } from "focus-trap";
+import { modals } from "../../utils/internal.ts";
 
 defineOptions({
   inheritAttrs: false,
@@ -51,10 +52,23 @@ const emit = defineEmits<{
   (e: "closed"): void;
 }>();
 
+const modalId = Date.now();
+const modalIndex = computed(
+  () => modals.value.length - modals.value.indexOf(modalId) - 1,
+);
 const { exist } = animatedVisibilityExists(visible, 200, {
-  beforeShow: () => emit("open"),
+  beforeShow: () => {
+    modals.value.push(modalId);
+    emit("open");
+    setTimeout(() => {
+      if (modalRef.value) document.body.appendChild(modalRef.value);
+    });
+  },
   afterShow: () => emit("opened"),
-  beforeHide: () => emit("close"),
+  beforeHide: () => {
+    emit("close");
+    modals.value = modals.value.filter((id) => id != modalId);
+  },
   afterHide: () => emit("closed"),
 });
 
@@ -110,11 +124,13 @@ onUnmounted(() => {
   if (focusTrap.value) {
     focusTrap.value.deactivate();
   }
+  modals.value = modals.value.filter((id) => id != modalId);
 });
 </script>
 
 <template>
   <div v-if="exist" ref="modalRef" class="mcsl-modal">
+    <slot name="modals" />
     <div
       :class="{
         'mcsl-modal__overlay-visible': visible,
@@ -129,6 +145,7 @@ onUnmounted(() => {
       :class="{ 'mcsl-modal__container-visible': visible }"
       :style="{
         '--mcsl-modal__card-max-width': maxWidth,
+        transform: `scale(${1 - modalIndex * 0.05}) translateY(-${modalIndex * 1.25}rem)`,
       }"
       :header-divider="headerDivider"
       :header-class="headerClass"
@@ -149,7 +166,6 @@ onUnmounted(() => {
             v-if="closable && closeBtn"
             type="text"
             icon="fas fa-xmark"
-            rounded
             @click="close"
           />
         </div>
@@ -213,6 +229,10 @@ onUnmounted(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    & > button {
+      border-radius: var(--mcsl-border-radius-md);
+    }
   }
 }
 

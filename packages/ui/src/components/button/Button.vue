@@ -103,7 +103,7 @@ const onClick = computed(() =>
         ? 'var(--mcsl-text-color-primary)'
         : `var(--mcsl-color-${color}-darker)`,
       '--mcsl-button__text-color-disabled': isSurface
-        ? 'var(--mcsl-text-color-gray)'
+        ? 'var(--mcsl-text-color-secondary)'
         : `var(--mcsl-color-${color}-light)`,
       // Bg
       '--mcsl-button__bg': 'var(--mcsl-bg-color-overlay)',
@@ -113,7 +113,7 @@ const onClick = computed(() =>
       '--mcsl-button__bg-active': isSurface
         ? 'var(--mcsl-bg-color-darker)'
         : new ColorData(props.color, 'default', 0.25).getCss(),
-      '--mcsl-button__bg-disabled': 'var(--mcsl-bg-color-darker)',
+      '--mcsl-button__bg-disabled': 'var(--mcsl-border-color-base)',
       // Border
       '--mcsl-button__border': isSurface
         ? 'var(--mcsl-border-color-base)'
@@ -260,12 +260,16 @@ const onClick = computed(() =>
 .mcsl-button__type-text {
   background: var(--mcsl-button__bg);
 
+  border: 1px var(--mcsl-button__border-type) transparent;
+
   & > .mcsl-button__label,
   & > .mcsl-button__icon {
     color: var(--mcsl-button__text-color);
   }
 
   &:hover {
+    border: 1px var(--mcsl-button__border-type) var(--mcsl-button__border-hover);
+
     & > .mcsl-button__label,
     & > .mcsl-button__icon {
       color: var(--mcsl-button__text-color-hover);
@@ -275,6 +279,9 @@ const onClick = computed(() =>
   }
 
   &:active {
+    border: 1px var(--mcsl-button__border-type)
+      var(--mcsl-button__border-active);
+
     & > .mcsl-button__label,
     & > .mcsl-button__icon {
       color: var(--mcsl-button__text-color-active);
@@ -297,6 +304,7 @@ const onClick = computed(() =>
   }
 }
 
+.mcsl-button__type-text,
 .mcsl-button__type-default {
   --mcsl-button__border-type: solid;
 }
@@ -308,16 +316,8 @@ const onClick = computed(() =>
 .mcsl-button__type-default,
 .mcsl-button__type-dashed {
   @extend .mcsl-button__type-text;
+
   border: 1px var(--mcsl-button__border-type) var(--mcsl-button__border);
-
-  &:hover {
-    border: 1px var(--mcsl-button__border-type) var(--mcsl-button__border-hover);
-  }
-
-  &:active {
-    border: 1px var(--mcsl-button__border-type)
-      var(--mcsl-button__border-active);
-  }
 
   &:disabled {
     border: 1px var(--mcsl-button__border-type)

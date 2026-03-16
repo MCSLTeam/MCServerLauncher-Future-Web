@@ -2,7 +2,7 @@
 import { useI18n } from "vue-i18n";
 import { usePageData } from "../utils/stores.ts";
 import Button from "@repo/ui/src/components/button/Button.vue";
-import FancyBackground from "@repo/ui/src/components/misc/FancyBackground.vue";
+import Background from "@repo/ui/src/components/misc/Background.vue";
 import { onMounted, onUnmounted, ref } from "vue";
 import router from "../router.ts";
 
@@ -36,7 +36,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <FancyBackground>
+  <Background>
     <div class="not-found">
       <h1>{{ t("shared.404.title") }}</h1>
       <h3>{{ t("shared.404.subtitle") }}</h3>
@@ -47,7 +47,7 @@ onUnmounted(() => {
         }}</Button>
       </div>
     </div>
-  </FancyBackground>
+  </Background>
 </template>
 
 <style scoped lang="scss">
@@ -59,7 +59,7 @@ onUnmounted(() => {
   gap: var(--mcsl-spacing-4xs);
 
   & > h3 {
-    color: var(--mcsl-text-color-gray);
+    color: var(--mcsl-text-color-secondary);
   }
 
   & > div {

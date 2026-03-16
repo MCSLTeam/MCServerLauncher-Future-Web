@@ -145,7 +145,7 @@ defineExpose({
 .mcsl-floating-content {
   top: -9999px;
   left: -9999px;
-  z-index: 5000;
+  z-index: 2000;
 }
 
 .mcsl-floating-content__transition {

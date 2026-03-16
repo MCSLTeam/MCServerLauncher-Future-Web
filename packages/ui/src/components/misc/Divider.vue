@@ -1,18 +1,22 @@
 <script lang="ts" setup>
+import { type Color, getColorVar } from "../../utils/css.ts";
+
 withDefaults(
   defineProps<{
     spacing?: "4xs" | "2xs" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "4xl";
     variant?: "solid" | "dotted" | "dashed";
     type?: "horizontal" | "vertical";
     textPos?: "start" | "center" | "end";
-    bgColor?: string;
+    borderColor?: Color;
+    bgColor?: Color;
   }>(),
   {
     spacing: "md",
     variant: "solid",
     type: "horizontal",
     textPos: "center",
-    bgColor: "var(--mcsl-bg-color-overlay)",
+    borderColor: "border-color-base",
+    bgColor: "bg-color-overlay",
   },
 );
 </script>
@@ -26,7 +30,8 @@ withDefaults(
     ]"
     :style="{
       '--mcsl-divider__spacing': `var(--mcsl-spacing-${spacing})`,
-      '--mcsl-divider__bg-color': bgColor,
+      '--mcsl-divider__border-color': getColorVar(borderColor),
+      '--mcsl-divider__bg-color': getColorVar(bgColor),
     }"
     class="mcsl-divider"
   >
@@ -78,7 +83,7 @@ withDefaults(
   position: absolute;
   display: block;
   content: "";
-  border: 0.5px var(--mcsl-border-color-base);
+  border: 0.5px var(--mcsl-divider__border-color);
   border-radius: var(--mcsl-border-radius-full);
 }
 

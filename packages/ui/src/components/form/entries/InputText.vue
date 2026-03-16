@@ -172,7 +172,7 @@ if (formField) {
   transition: 0.2s ease-in-out;
 
   &::placeholder {
-    color: var(--mcsl-text-color-gray);
+    color: var(--mcsl-text-color-secondary);
   }
 }
 

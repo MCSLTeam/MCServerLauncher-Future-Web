@@ -92,7 +92,7 @@ function handleMouseUp() {
 }
 
 onMounted(() => {
-  interval = setInterval(() => {
+  interval = window.setInterval(() => {
     if (mouseDown.value && addMouseOver.value) {
       if (addStatus == "none") {
         addStatus = "wait";

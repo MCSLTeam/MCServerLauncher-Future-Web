@@ -110,7 +110,7 @@ function go(p: number) {
   align-items: center;
 
   & > i {
-    color: var(--mcsl-text-color-gray);
+    color: var(--mcsl-text-color-secondary);
   }
 }
 </style>

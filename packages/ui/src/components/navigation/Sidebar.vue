@@ -36,6 +36,7 @@ function isActive(info: PageNavigationInfo) {
       v-for="(info, index) in pages"
       :key="index"
       :disabled="info.disabled"
+      class="sidebar__btn"
       :class="{
         'sidebar__btn-active': isActive(info) && !info.disabled,
         'sidebar__btn-collapsed': collapsed,
@@ -59,10 +60,18 @@ function isActive(info: PageNavigationInfo) {
 
 .sidebar {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar__btn {
+  border-radius: var(--mcsl-border-radius-md) !important;
 }
 
 .sidebar__btn-active {
   background: utils.transparent(var(--mcsl-color-primary), 10%);
+  border: 1px solid var(--mcsl-color-primary-lighter);
 }
 
 .sidebar__btn-collapsed {

@@ -30,7 +30,11 @@ export const version =
   (platform == "web"
     ? import.meta.env.APP_VERSION_WEB
     : import.meta.env.APP_VERSION_APP) +
-  (import.meta.env.DEV ? "-dev" : "");
+  (import.meta.env.DEV
+    ? "-dev"
+    : import.meta.env.IS_ACTION_BUILD
+      ? "-nightly"
+      : "");
 export const buildTime = dayjs(import.meta.env.BUILD_TIME);
 export const commitBranch = import.meta.env.COMMIT_BRANCH;
 export const commitHash = import.meta.env.COMMIT_HASH;

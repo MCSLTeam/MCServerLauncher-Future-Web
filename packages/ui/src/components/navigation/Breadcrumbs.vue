@@ -40,7 +40,7 @@ const actualSeperator = computed(() => props.seperator ?? "/");
 
   & > span,
   & > span > i {
-    color: var(--mcsl-text-color-gray);
+    color: var(--mcsl-text-color-secondary);
   }
 
   & > a {

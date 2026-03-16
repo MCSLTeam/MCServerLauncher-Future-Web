@@ -80,6 +80,8 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: Build app
+        env:
+          IS_ACTION_BUILD: true
         run: pnpm app:build
 
       - name: Upload Artifacts
