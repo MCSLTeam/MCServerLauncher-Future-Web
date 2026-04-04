@@ -1,6 +1,7 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
+  "globalPassThroughEnv": ["CARGO_HOME", "RUSTUP_HOME", "RUSTUP_TOOLCHAIN"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -17,6 +18,14 @@
       "dependsOn": ["^test"]
     },
     "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "frontend:dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "backend:dev": {
       "cache": false,
       "persistent": true
     }

@@ -15,6 +15,7 @@
     "app:lint": "turbo run app#lint",
     "web:build": "turbo run web#build",
     "web:build:docker": "cd apps/web; pnpm build:docker; cd -",
+    "web:dev": "turbo run web#frontend:dev web#backend:dev",
     "web:dev:frontend": "turbo run web#frontend:dev",
     "web:dev:backend": "turbo run web#backend:dev",
     "web:fix": "turbo run fix --filter=mcsl-future-web",
