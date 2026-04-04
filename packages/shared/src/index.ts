@@ -71,11 +71,11 @@ export async function load(
   app.use(i18n);
   useLocale().injectI18n(i18n.global as any);
 
-  app.mount("#app");
+  await loadUi();
 
   useSettings().load();
 
-  await loadUi();
+  app.mount("#app");
 
   await postload();
 
