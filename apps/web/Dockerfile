@@ -1,17 +1,17 @@
 # 构建阶段 - 前端构建
 FROM node:18-alpine AS frontend-builder
 
-RUN npm install -g pnpm
+RUN npm install -g bun
 
 WORKDIR /app
 
 COPY . .
 
-RUN pnpm install --frozen-lockfile
+RUN bun install --frozen-lockfile
 
 WORKDIR apps/web
 
-RUN pnpm frontend:build
+RUN bun run frontend:build
 
 # 构建阶段 - Rust后端构建
 FROM rust:alpine AS backend-builder
