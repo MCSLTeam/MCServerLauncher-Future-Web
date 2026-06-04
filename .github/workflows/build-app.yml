@@ -37,25 +37,26 @@ jobs:
         with:
           submodules: "true"
 
-      - name: Install bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
+          version: 10.17.0
           run_install: false
 
       - name: Setup node
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
-          cache: "bun"
-          cache-dependency-path: bun.lock
+          cache: "pnpm"
+          cache-dependency-path: pnpm-lock.yaml
 
-      - name: Cache bun store
+      - name: Cache pnpm store
         uses: actions/cache@v4
         with:
-          path: ${{ matrix.platform == 'windows-latest' && '~\\AppData\\Local\\bun-store' || '~/.bun-store' }}
-          key: ${{ matrix.platform }}-bun-${{ hashFiles('bun.lock') }}
+          path: ~/.pnpm-store
+          key: ${{ matrix.platform }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ matrix.platform }}-bun-
+            ${{ matrix.platform }}-pnpm-
 
       - name: Cache Cargo registry
         uses: actions/cache@v4
@@ -70,8 +71,8 @@ jobs:
           restore-keys: |
             ${{ matrix.platform }}-cargo-
 
-      - name: Install NPM dependencies
-        run: bun install --no-frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
 
       - name: Install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-latest'
@@ -82,7 +83,7 @@ jobs:
       - name: Build app
         env:
           IS_ACTION_BUILD: true
-        run: bun app:build
+        run: pnpm app:build
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v5
