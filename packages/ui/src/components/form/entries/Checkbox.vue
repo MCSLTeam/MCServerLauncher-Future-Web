@@ -122,7 +122,11 @@ if (formField) {
   outline: 0 solid transparent;
   outline-offset: 2px;
   transform: translate(0);
-  transition: 0.2s ease-in-out;
+  transition:
+    border-color 0.14s ease-out,
+    background-color 0.14s ease-out,
+    outline-color 0.14s ease-out,
+    color 0.14s ease-out;
 
   &::before {
     position: absolute;

@@ -169,7 +169,11 @@ if (formField) {
   border: 1px solid var(--mcsl-border-color-base);
   outline: 0 solid transparent;
   outline-offset: -2px; // 覆盖 border
-  transition: 0.2s ease-in-out;
+  transition:
+    background-color 0.14s ease-out,
+    border-color 0.14s ease-out,
+    outline-color 0.14s ease-out,
+    color 0.14s ease-out;
 
   &::placeholder {
     color: var(--mcsl-text-color-secondary);

@@ -84,18 +84,18 @@ html.dark::view-transition-new(root) {
 /* 过渡动画 */
 .blur-enter-active,
 .blur-leave-active {
-  transition: 0.25s ease-in-out !important;
+  transition: 0.12s ease-out !important;
 }
 
 .blur-enter-from,
 .blur-leave-to {
   opacity: 0;
-  filter: blur(1rem);
+  filter: blur(0.18rem);
 }
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: 0.25s ease-in-out !important;
+  transition: 0.12s ease-out !important;
 }
 
 .fade-enter-from,
@@ -104,16 +104,16 @@ html.dark::view-transition-new(root) {
 }
 
 .collapse-enter-active {
-  animation: 0.25s ease-in-out both collapseInVertical, 0.25s ease-in-out both collapseInHorizontal;
+  animation: 0.18s ease-out both collapseInVertical, 0.18s ease-out both collapseInHorizontal;
 }
 
 .collapse-leave-active {
-  animation: 0.5s cubic-bezier(0, 1, 0, 1) both collapseOutVertical, 0.5s cubic-bezier(0, 1, 0, 1) both collapseOutHorizontal;
+  animation: 0.24s ease-out both collapseOutVertical, 0.24s ease-out both collapseOutHorizontal;
 }
 
 .collapse-enter-active,
 .collapse-leave-active {
-  transition: 0.5s ease-in-out;
+  transition: 0.24s ease-out;
   overflow: hidden;
 }
 

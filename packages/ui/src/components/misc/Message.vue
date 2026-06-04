@@ -27,8 +27,8 @@ const props = withDefaults(defineProps<MessageProps>(), {
   size: "medium",
   color: "primary",
   variant: "default",
-  inAnim: "0.2s ease-in-out both stretchInDown",
-  outAnim: "0.2s ease-in-out both stretchOutUp",
+  inAnim: "0.14s ease-out both fadeInUp",
+  outAnim: "0.14s ease-out both fadeOut",
   shadow: false,
   closeable: false,
 });
@@ -222,7 +222,7 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
   border: 1px solid var(--mcsl-message__border-color);
 
   &.mcsl-message__shadowed {
-    box-shadow: var(--mcsl-message__box-shadow);
+    box-shadow: var(--mcsl-box-shadow-light);
   }
 }
 
@@ -231,9 +231,8 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
   background: color-mix(
     in srgb,
     var(--mcsl-message__bg-color),
-    transparent 90%
+    transparent 94%
   );
-  backdrop-filter: blur(5px);
 }
 </style>
 

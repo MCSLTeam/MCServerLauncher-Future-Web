@@ -1,0 +1,5 @@
+<script setup lang="ts">
+import Panel from "@repo/ui/src/components/panel/Panel.vue";
+import Alert from "@repo/ui/src/components/misc/Alert.vue";
+</script>
+<template><div class="page-shell"><Panel class="doc-section" shadow="hover"><template #header><h2>Style Effects</h2></template><p class="note">Alert surfaces should be stronger than InfoBar but still quiet enough for admin dashboards.</p></Panel><Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><div class="stack"><Alert title="Warning" color="warning">This action will restart the instance.</Alert><Alert title="Error" color="danger">The selected file failed checksum validation.</Alert></div></Panel><Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="note">title, color and slot-based body content, sharing the same message base with calmer motion.</p></Panel></div></template><style scoped lang="scss">.page-shell{display:grid;gap:18px}.stack{display:grid;gap:14px}.note{color:var(--mcsl-text-color-regular);line-height:1.7}.doc-section :deep(.mcsl-panel__header h2){margin:0;font-weight:600}</style>

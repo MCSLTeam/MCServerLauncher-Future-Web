@@ -204,10 +204,10 @@ onUnmounted(() => {
     utils.transparent(var(--mcsl-modal__overlay-bg), 10%)
   );
 
-  animation: 0.2s ease-in-out both mcsl-modal__overlay-out;
+  animation: 0.14s ease-out both mcsl-modal__overlay-out;
 
   &.mcsl-modal__overlay-visible {
-    animation: 0.2s ease-in-out both mcsl-modal__overlay-in;
+    animation: 0.14s ease-out both mcsl-modal__overlay-in;
   }
 }
 
@@ -217,12 +217,12 @@ onUnmounted(() => {
     calc(100% - 4 * var(--mcsl-spacing-xl))
   );
   max-height: calc(100% - 2 * var(--mcsl-spacing-xl));
-  border-radius: var(--mcsl-border-radius-2xl);
+  border-radius: var(--mcsl-border-radius-sm);
   z-index: 1002;
-  animation: 0.2s ease-in-out both fadeOutDown;
+  animation: 0.16s ease-out both fadeOutDown;
 
   &.mcsl-modal__container-visible {
-    animation: 0.2s ease-in-out fadeInUp;
+    animation: 0.16s ease-out fadeInUp;
   }
 
   & .mcsl-modal__header {
@@ -239,22 +239,18 @@ onUnmounted(() => {
 @keyframes mcsl-modal__overlay-in {
   from {
     opacity: 0;
-    backdrop-filter: none;
   }
   to {
     opacity: 1;
-    backdrop-filter: blur(5px);
   }
 }
 
 @keyframes mcsl-modal__overlay-out {
   from {
     opacity: 1;
-    backdrop-filter: blur(5px);
   }
   to {
     opacity: 0;
-    backdrop-filter: none;
   }
 }
 </style>

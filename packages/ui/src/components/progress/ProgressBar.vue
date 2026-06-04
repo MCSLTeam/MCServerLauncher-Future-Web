@@ -164,7 +164,6 @@ $size: var(--mcsl-progress-bar__size);
     background: var(--mcsl-border-color-base);
     border-radius: var(--mcsl-border-radius-full);
     overflow: hidden;
-    transition: 0.2s ease-in-out;
   }
 
   & > div::before {
@@ -173,7 +172,7 @@ $size: var(--mcsl-progress-bar__size);
     height: 100%;
     border-radius: var(--mcsl-border-radius-full);
     background: $stroke-color;
-    transition: 0.2s ease-in-out;
+    transition: transform 0.14s ease-out, width 0.14s ease-out;
 
     .mcsl-progress-bar__mode-line & {
       width: $progress;

@@ -1,0 +1,5 @@
+<script setup lang="ts">
+import Panel from "@repo/ui/src/components/panel/Panel.vue";
+import InfoBar from "@repo/ui/src/components/misc/InfoBar.vue";
+</script>
+<template><div class="page-shell"><Panel class="doc-section" shadow="hover"><template #header><h2>Style Effects</h2></template><p class="note">WinUI-style inline information bars with calmer color surfaces.</p></Panel><Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><div class="stack"><InfoBar title="Update available" color="help">A newer runtime pack is available.</InfoBar><InfoBar title="Attention" color="warning">One dependency needs manual review.</InfoBar></div></Panel><Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="note">title, color, closable, and inherited message-style content slots.</p></Panel></div></template><style scoped lang="scss">.page-shell{display:grid;gap:18px}.stack{display:grid;gap:14px}.note{color:var(--mcsl-text-color-regular);line-height:1.7}.doc-section :deep(.mcsl-panel__header h2){margin:0;font-weight:600}</style>

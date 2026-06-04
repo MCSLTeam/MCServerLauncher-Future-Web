@@ -32,4 +32,10 @@ const page = defineModel<number>("page", {
   />
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.mcsl-items-pagination {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+</style>

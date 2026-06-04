@@ -75,12 +75,16 @@ onMounted(() => {
 @use "../../assets/css/utils";
 
 .mcsl-panel {
-  border: 1px solid var(--mcsl-border-color-base);
-  background: var(--mcsl-bg-color-overlay);
+  border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 88%, transparent);
+  background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 96%, transparent);
 
   outline: 0 solid transparent;
   outline-offset: -2px; // 覆盖 border
-  transition: 0.2s ease-in-out;
+  transition:
+    background-color 0.14s ease-out,
+    border-color 0.14s ease-out,
+    box-shadow 0.14s ease-out,
+    outline-color 0.14s ease-out;
 
   &:focus-visible {
     outline: 3px solid var(--mcsl-color-help);

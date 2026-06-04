@@ -18,7 +18,7 @@ const actualSeperator = computed(() => props.seperator ?? "/");
   <nav class="mcsl-breadcrumbs">
     <template v-for="(item, index) in items" :key="index">
       <span v-if="index > 0">
-        <i v-if="iconSeperator" :class="iconSeperator" />
+        <i v-if="iconSeperator" :class="String(iconSeperator)" />
         <template v-else>{{ actualSeperator }} </template>
       </span>
       <component
@@ -36,37 +36,39 @@ const actualSeperator = computed(() => props.seperator ?? "/");
 <style lang="scss" scoped>
 .mcsl-breadcrumbs {
   display: flex;
-  gap: var(--mcsl-spacing-2xs);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mcsl-spacing-4xs);
 
   & > span,
   & > span > i {
     color: var(--mcsl-text-color-secondary);
+    font-size: var(--mcsl-font-size-sm);
   }
 
-  & > a {
-    display: flex;
+  & > a,
+  & > p {
+    display: inline-flex;
     align-items: center;
     gap: var(--mcsl-spacing-4xs);
     text-decoration: none;
+    color: var(--mcsl-text-color-secondary);
+    transition: color 0.14s ease-out;
+  }
 
-    &,
-    & > i {
-      color: var(--mcsl-text-color-secondary);
-    }
+  & > a > i,
+  & > p > i {
+    color: inherit;
+  }
 
-    &:last-child {
-      font-weight: var(--mcsl-font-weight-bold);
+  & > :last-child {
+    font-weight: var(--mcsl-font-weight-bold);
+    color: var(--mcsl-text-color-primary);
+  }
 
-      &,
-      & > i {
-        color: var(--mcsl-text-color-primary);
-      }
-    }
-
-    &:hover,
-    &:hover > i {
-      color: var(--mcsl-color-primary);
-    }
+  & > a:hover,
+  & > a:hover > i {
+    color: var(--mcsl-color-primary);
   }
 }
 </style>
