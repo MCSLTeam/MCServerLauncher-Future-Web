@@ -14,11 +14,14 @@
     "app:fix": "turbo run fix --filter=mcsl-future-tauri",
     "app:lint": "turbo run app#lint",
     "web:build": "turbo run web#build",
-    "web:build:docker": "cd apps/web; bun run build:docker; cd -",
+    "web:build:docker": "cd apps/web; pnpm run build:docker; cd -",
     "web:dev": "turbo run web#frontend:dev web#backend:dev",
     "web:dev:frontend": "turbo run web#frontend:dev",
     "web:dev:backend": "turbo run web#backend:dev",
     "web:fix": "turbo run fix --filter=mcsl-future-web",
+    "gallery:dev": "turbo run gallery#dev",
+    "gallery:build": "turbo run gallery#build",
+    "gallery:lint": "turbo run gallery#lint",
     "web:lint": "turbo run web#lint",
     "ui:lint": "turbo run ui#lint",
     "shared:lint": "turbo run shared#lint",
@@ -32,7 +35,7 @@
     "turbo": "^2.8.10",
     "typescript": "^6.0.2"
   },
-  "packageManager": "bun@1.3.11",
+  "packageManager": "pnpm@11.1.2",
   "engines": {
     "node": ">=18"
   },

@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "identifier": "cn.com.mcsl.future.tauri",
   "build": {
-    "beforeDevCommand": "bun frontend:dev",
+    "beforeDevCommand": "pnpm frontend:dev",
     "devUrl": "http://localhost:3001/",
-    "beforeBuildCommand": "bun frontend:build",
+    "beforeBuildCommand": "pnpm frontend:build",
     "frontendDist": "../dist"
   },
   "app": {

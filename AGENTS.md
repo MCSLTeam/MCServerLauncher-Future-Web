@@ -8,7 +8,7 @@ Guide for agents working on the MCServerLauncher-Future-Web project.
 
 - **Repository**: MCServerLauncher-Future-Web
 - **Architecture**: Monorepo (Turborepo)
-- **Package Manager**: Bun (migrated from pnpm in 2026)
+- **Package Manager**: pnpm
 - **License**: GPLv3
 - **Team**: MCSLTeam
 - **Copyright**: © 2022-2026 MCSLTeam
@@ -19,32 +19,32 @@ Guide for agents working on the MCServerLauncher-Future-Web project.
 
 ```bash
 # Install dependencies
-bun install
+pnpm install
 
 # Web Panel Commands
-bun run web:dev              # Start both frontend and backend dev servers
-bun run web:dev:frontend     # Start only frontend dev server
-bun run web:dev:backend      # Start only backend dev server (Rust)
-bun run web:build            # Build web panel (frontend + backend)
-bun run web:build:docker     # Build Docker image
-bun run web:lint             # Lint web panel
-bun run web:fix              # Fix linting issues
+pnpm web:dev              # Start both frontend and backend dev servers
+pnpm web:dev:frontend     # Start only frontend dev server
+pnpm web:dev:backend      # Start only backend dev server (Rust)
+pnpm web:build            # Build web panel (frontend + backend)
+pnpm web:build:docker     # Build Docker image
+pnpm web:lint             # Lint web panel
+pnpm web:fix              # Fix linting issues
 
 # Tauri App Commands
-bun run app:dev              # Start Tauri app development
-bun run app:build            # Build Tauri app
-bun run app:lint             # Lint Tauri app
-bun run app:fix              # Fix linting issues
+pnpm app:dev              # Start Tauri app development
+pnpm app:build            # Build Tauri app
+pnpm app:lint             # Lint Tauri app
+pnpm app:fix              # Fix linting issues
 
 # Global Commands
-bun run build                # Build all packages
-bun run lint                 # Lint all packages
-bun run fix                  # Fix all linting issues
-bun run test                 # Test all packages
+pnpm build                # Build all packages
+pnpm lint                 # Lint all packages
+pnpm fix                  # Fix all linting issues
+pnpm test                 # Test all packages
 
 # Package-specific Commands
-bun run ui:lint              # Lint UI package
-bun run shared:lint          # Lint shared package
+pnpm ui:lint              # Lint UI package
+pnpm shared:lint          # Lint shared package
 ```
 
 ## Project Structure
@@ -100,7 +100,7 @@ MCServerLauncher-Future-Web/
 │
 ├── turbo.json               # Turborepo configuration
 ├── package.json             # Root package.json
-├── bun.lock                 # Bun lockfile
+├── pnpm-lock.yaml                 # pnpm lockfile
 ├── Cargo.toml               # Rust workspace config
 └── Cargo.lock               # Rust lockfile
 ```
@@ -243,20 +243,20 @@ MCServerLauncher-Future-Web/
 
 ### Starting Development
 
-1. **Install dependencies**: `bun install`
-2. **Start web panel**: `bun run web:dev` (starts both frontend and backend)
-3. **Start Tauri app**: `bun run app:dev`
+1. **Install dependencies**: `pnpm install`
+2. **Start web panel**: `pnpm web:dev` (starts both frontend and backend)
+3. **Start Tauri app**: `pnpm app:dev`
 
 ### Building for Production
 
-1. **Web panel**: `bun run web:build` (builds frontend, then Rust backend)
-2. **Tauri app**: `bun run app:build` (creates platform-specific installers)
-3. **Docker**: `bun run web:build:docker` (builds Docker image)
+1. **Web panel**: `pnpm web:build` (builds frontend, then Rust backend)
+2. **Tauri app**: `pnpm app:build` (creates platform-specific installers)
+3. **Docker**: `pnpm web:build:docker` (builds Docker image)
 
 ### Linting and Formatting
 
-- Run `bun run lint` to check all packages
-- Run `bun run fix` to auto-fix issues
+- Run `pnpm lint` to check all packages
+- Run `pnpm fix` to auto-fix issues
 - ESLint and Prettier configs are shared via `@repo/configs`
 
 ## Turborepo Configuration
@@ -272,9 +272,9 @@ The `turbo.json` file defines:
 
 ### Package Manager Migration
 
-- Project recently migrated from pnpm to Bun
-- Use `bun install` instead of `pnpm install`
-- Lockfile is now `bun.lock` instead of `pnpm-lock.yaml`
+- Project uses pnpm workspaces
+- Use `pnpm install` instead of `pnpm install`
+- Lockfile is `pnpm-lock.yaml`
 
 ### Git Submodule (locales)
 
@@ -297,14 +297,14 @@ The `turbo.json` file defines:
 
 - Main branch is `master`
 - Ensure all tests pass and code compiles before committing
-- Run `bun run lint` before committing
-- Run `bun run test` to verify type checking
+- Run `pnpm lint` before committing
+- Run `pnpm test` to verify type checking
 - Follow monorepo structure: place code in appropriate app or package
 - Update locale submodule when adding new translation keys
 
 ## Recent Development Activity
 
-- **Package Manager Migration**: Switched from pnpm to Bun (870702a)
+- **Package Manager Migration**: Package manager migrated back to pnpm
 - **Theme Fixes**: Resolved CSS flashbang issues (e26d305)
 - **UI Loading**: Improved initialization order (526b999)
 - **Features**: Instance creation, file upload, user center (ad7b45a, e56ee99, ecd5891)
@@ -322,13 +322,13 @@ The `turbo.json` file defines:
 
 ### Web Panel
 
-- **Docker**: Use `bun run web:build:docker` to build image
+- **Docker**: Use `pnpm web:build:docker` to build image
 - **Linux Setup**: Installation script available at `setup_en.sh`
-- **Manual**: Build with `bun run web:build`, deploy Rust binary + frontend dist
+- **Manual**: Build with `pnpm web:build`, deploy Rust binary + frontend dist
 
 ### Tauri App
 
-- **Platform-specific**: `bun run app:build` creates installers
+- **Platform-specific**: `pnpm app:build` creates installers
 - **Windows**: `.exe` installer
 - **macOS**: `.dmg` or `.app` bundle
 - **Linux**: `.AppImage` or `.deb`
@@ -356,4 +356,4 @@ The `turbo.json` file defines:
 - [Rust Documentation](https://www.rust-lang.org/learn)
 - [RsBuild Documentation](https://rsbuild.dev/)
 - [Actix-web Documentation](https://actix.rs/)
-- [Bun Documentation](https://bun.sh/docs)
+- [pnpm Documentation](https://pnpm.io/)
