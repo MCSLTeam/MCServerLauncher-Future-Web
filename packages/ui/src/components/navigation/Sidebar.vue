@@ -9,8 +9,13 @@ import Button from "../button/Button.vue";
 import { useRouter } from "vue-router";
 import { computed } from "vue";
 
-const router = useRouter();
-const path = computed(() => router.currentRoute.value.path);
+let router: ReturnType<typeof useRouter> | undefined;
+try {
+  router = useRouter();
+} catch {
+  router = undefined;
+}
+const path = computed(() => router?.currentRoute.value.path ?? "");
 
 withDefaults(
   defineProps<{
@@ -48,7 +53,7 @@ function isActive(info: PageNavigationInfo) {
       :color="isActive(info) ? 'primary' : undefined"
       :size="size"
       v-tooltip.right="collapsed ? info.label : undefined"
-      @click="navigateTo(info, router)"
+      @click="router ? navigateTo(info, router) : info.onClick?.()"
     >
       <template v-if="!collapsed">{{ info.label }}</template>
     </Button>
@@ -62,16 +67,27 @@ function isActive(info: PageNavigationInfo) {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
 }
 
 .sidebar__btn {
-  border-radius: var(--mcsl-border-radius-md) !important;
+  min-height: 2.4rem;
+  border-radius: calc(var(--mcsl-border-radius-sm) - 1px) !important;
+  border: 1px solid transparent !important;
+  transition:
+    background-color 0.14s ease-out,
+    border-color 0.14s ease-out,
+    color 0.14s ease-out !important;
+}
+
+.sidebar__btn:hover:not(.sidebar__btn-active):not(:disabled) {
+  background: color-mix(in srgb, var(--mcsl-bg-color-dark) 92%, transparent);
+  border-color: color-mix(in srgb, var(--mcsl-border-color-base) 92%, transparent);
 }
 
 .sidebar__btn-active {
-  background: utils.transparent(var(--mcsl-color-primary), 10%);
-  border: 1px solid var(--mcsl-color-primary-lighter);
+  background: color-mix(in srgb, var(--mcsl-color-primary) 10%, var(--mcsl-bg-color-overlay));
+  border: 1px solid color-mix(in srgb, var(--mcsl-color-primary) 26%, var(--mcsl-border-color-base)) !important;
 }
 
 .sidebar__btn-collapsed {

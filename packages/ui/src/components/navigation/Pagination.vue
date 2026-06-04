@@ -108,9 +108,17 @@ function go(p: number) {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
+  gap: var(--mcsl-spacing-4xs);
 
   & > i {
     color: var(--mcsl-text-color-secondary);
+    font-size: var(--mcsl-font-size-sm);
+  }
+
+  :deep(.mcsl-button) {
+    min-width: 2.2rem;
+    border-radius: calc(var(--mcsl-border-radius-sm) - 1px) !important;
   }
 }
 </style>

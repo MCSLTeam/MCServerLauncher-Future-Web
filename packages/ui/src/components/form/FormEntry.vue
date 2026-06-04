@@ -135,7 +135,7 @@ provide("mcsl-form-field", {
 <style lang="scss" scoped>
 .mcsl-form-entry {
   & > .mcsl-message {
-    margin-top: var(--mcsl-spacing-2xs);
+    margin-top: var(--mcsl-spacing-4xs);
   }
 
   & > div {

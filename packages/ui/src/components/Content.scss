@@ -1,17 +1,17 @@
 $vars: (
   "spacing": (
     "small": var(--mcsl-spacing-4xs),
-    "medium": var(--mcsl-spacing-2xs),
-    "large": var(--mcsl-spacing-xs),
+    "medium": var(--mcsl-spacing-xs),
+    "large": var(--mcsl-spacing-sm),
   ),
   "border-radius": (
     "small": var(--mcsl-border-radius-xs),
-    "medium": var(--mcsl-border-radius-sm),
-    "large": var(--mcsl-border-radius-md),
+    "medium": var(--mcsl-border-radius-xs),
+    "large": var(--mcsl-border-radius-sm),
   ),
   "height": (
-    "small": 1.75rem,
-    "medium": 2.25rem,
-    "large": 2.75rem,
+    "small": 1.65rem,
+    "medium": 2.1rem,
+    "large": 2.55rem,
   ),
 );

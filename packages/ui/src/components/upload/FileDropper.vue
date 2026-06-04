@@ -164,30 +164,35 @@ onUnmounted(() => {
 }
 
 .mcsl-file-dropper {
-  min-height: 8rem;
-  border: 1.5px dashed var(--mcsl-border-color-base);
+  min-height: 10rem;
+  border: 1px dashed color-mix(in srgb, var(--mcsl-border-color-base) 86%, transparent);
+  border-radius: var(--mcsl-border-radius-md);
+  background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 96%, transparent);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-
-  &,
-  & *:not(.mcsl-file-dropper__subtitle) {
-    transition: 0.2s ease-in-out;
-  }
+  transition:
+    border-color 0.14s ease-out,
+    background-color 0.14s ease-out,
+    color 0.14s ease-out,
+    transform 0.14s ease-out;
 
   &:hover {
-    border-color: var(--mcsl-color-primary);
+    border-color: color-mix(in srgb, var(--mcsl-color-primary) 28%, var(--mcsl-border-color-base));
+    background: color-mix(in srgb, var(--mcsl-color-primary) 4%, var(--mcsl-bg-color-overlay));
   }
 
   &.mcsl-file-dropper__dragging {
     border-style: solid;
     border-color: var(--mcsl-color-primary);
-    background-color: #{utils.transparent(var(--mcsl-color-primary), 5%)};
+    background-color: #{utils.transparent(var(--mcsl-color-primary), 6%)};
+    transform: scale(0.995);
 
     & i {
-      animation: 1s ease-in-out infinite pulse;
+      transform: translateY(-2px);
+      color: var(--mcsl-color-primary);
     }
 
     & *:not(.mcsl-file-dropper__subtitle) {
@@ -201,15 +206,18 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  text-align: center;
 
   & > i {
-    font-size: var(--mcsl-font-size-8xl);
-    margin-bottom: var(--mcsl-spacing-xs);
+    font-size: calc(var(--mcsl-font-size-8xl) - 0.5rem);
+    margin-bottom: var(--mcsl-spacing-2xs);
+    transition: transform 0.14s ease-out, color 0.14s ease-out;
   }
 
   & > h3 {
-    color: var(--mcsl-text-color-regular);
+    color: var(--mcsl-text-color-primary);
     font-size: var(--mcsl-font-size-lg);
+    font-weight: 600;
   }
 }
 
@@ -217,7 +225,7 @@ onUnmounted(() => {
   color: var(--mcsl-text-color-regular);
   font-size: var(--mcsl-font-size-md);
   opacity: 0;
-  transition: 0.2s ease-in-out;
+  transition: opacity 0.14s ease-out;
 }
 
 .mcsl-file-dropper__subtitle-show {
@@ -230,6 +238,6 @@ onUnmounted(() => {
 }
 
 .mcsl-file-dropper__info {
-  margin-top: var(--mcsl-spacing-xs);
+  margin-top: var(--mcsl-spacing-sm);
 }
 </style>

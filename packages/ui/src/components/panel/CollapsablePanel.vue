@@ -96,7 +96,7 @@ defineExpose({
 
 <style lang="scss" scoped>
 .mcsl-collapsable-panel {
-  transition: 0.2s ease-in-out;
+  transition: background-color 0.14s ease-out, border-color 0.14s ease-out;
 
   & .mcsl-collapsable-panel__header {
     cursor: pointer;
@@ -106,7 +106,7 @@ defineExpose({
     flex-direction: row;
 
     & > i {
-      transition: 0.2s ease-in-out;
+      transition: transform 0.14s ease-out, color 0.14s ease-out;
     }
   }
 }
@@ -121,13 +121,14 @@ defineExpose({
 <style lang="scss">
 .mcsl-collapsable-panel {
   & > .mcsl-panel__header {
-    transition: 0.2s ease-in-out;
+    transition: padding-bottom 0.14s ease-out;
   }
 
   & > .mcsl-panel__body-wrapper {
     overflow: hidden;
-    max-height: 1000px;
-    transition: 0.8s ease-in-out;
+    max-height: 640px;
+    transition: max-height 0.18s ease-out, opacity 0.14s ease-out;
+    opacity: 1;
   }
 }
 
@@ -138,7 +139,8 @@ defineExpose({
 
   & > .mcsl-panel__body-wrapper {
     max-height: 0;
-    transition: 1s cubic-bezier(0, 1, 0, 1);
+    opacity: 0;
+    transition: max-height 0.18s ease-out, opacity 0.12s ease-out;
   }
 }
 

@@ -109,10 +109,10 @@ const onClick = computed(() =>
       '--mcsl-button__bg': 'var(--mcsl-bg-color-overlay)',
       '--mcsl-button__bg-hover': isSurface
         ? 'var(--mcsl-bg-color-dark)'
-        : new ColorData(props.color, 'default', 0.2).getCss(),
+        : new ColorData(props.color, 'default', 0.12).getCss(),
       '--mcsl-button__bg-active': isSurface
         ? 'var(--mcsl-bg-color-darker)'
-        : new ColorData(props.color, 'default', 0.25).getCss(),
+        : new ColorData(props.color, 'default', 0.18).getCss(),
       '--mcsl-button__bg-disabled': 'var(--mcsl-border-color-base)',
       // Border
       '--mcsl-button__border': isSurface
@@ -190,11 +190,15 @@ const onClick = computed(() =>
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: 0.2s ease-in-out;
+  transition:
+    background-color 0.14s ease-out,
+    border-color 0.14s ease-out,
+    color 0.14s ease-out,
+    opacity 0.14s ease-out;
 
   & > .mcsl-button__label,
   & > .mcsl-button__icon {
-    transition: 0.2s ease-in-out;
+    transition: color 0.14s ease-out, opacity 0.14s ease-out;
   }
 
   &:active {
@@ -231,12 +235,12 @@ const onClick = computed(() =>
   }
 
   &.mcsl-button__shadow-always {
-    box-shadow: var(--mcsl-box-shadow-base);
+    box-shadow: var(--mcsl-box-shadow-light);
   }
 
   &.mcsl-button__shadow-always:hover,
   &.mcsl-button__shadow-hover:hover {
-    box-shadow: var(--mcsl-button__box-shadow);
+    box-shadow: var(--mcsl-box-shadow-light);
   }
 
   &.mcsl-button__with-text {

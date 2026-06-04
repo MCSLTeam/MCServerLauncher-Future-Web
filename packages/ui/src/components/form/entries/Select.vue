@@ -165,10 +165,11 @@ function findLabel(value: any) {
 @each $size in utils.$sizes {
   .mcsl-size-#{$size}.mcsl-select__btn {
     $spacing: calc(utils.get-size-var("spacing", $size, $vars));
+    $height: utils.get-size-var("height", $size, $vars);
 
-    height: utils.get-size-var("height", $size, $vars);
-    padding: $spacing;
-    border-radius: utils.get-size-var("border-radius", $size, $vars);
+    height: $height;
+    padding: 0 calc($spacing * 1.2) 0 calc($spacing * 1.4);
+    border-radius: calc(utils.get-size-var("border-radius", $size, $vars) - 1px);
 
     &::placeholder {
       color: var(--mcsl-text-color-secondary);
@@ -184,18 +185,23 @@ function findLabel(value: any) {
 .mcsl-select__btn {
   width: 100%;
   margin: 0;
-  background: var(--mcsl-bg-color-overlay);
-  border: 1px solid var(--mcsl-border-color-base);
+  background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 96%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 90%, transparent);
   outline: 0 solid transparent;
-  outline-offset: -2px; // 覆盖 border
-  transition: 0.2s ease-in-out;
+  outline-offset: -2px;
+  transition:
+    background-color 0.14s ease-out,
+    border-color 0.14s ease-out,
+    outline-color 0.14s ease-out,
+    color 0.14s ease-out;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: var(--mcsl-spacing-2xs);
 
   & > i {
-    transition: 0.2s ease-in-out;
+    color: var(--mcsl-text-color-secondary);
+    transition: transform 0.14s ease-out, color 0.14s ease-out;
   }
 
   & > span {
@@ -205,24 +211,29 @@ function findLabel(value: any) {
     text-overflow: ellipsis;
     white-space: nowrap;
     text-align: left;
+    color: var(--mcsl-text-color-primary);
   }
 }
 
 .mcsl-select__btn:hover {
-  box-shadow: var(--mcsl-box-shadow-light);
-  border-color: var(--mcsl-border-color-dark);
+  border-color: color-mix(in srgb, var(--mcsl-border-color-dark) 92%, transparent);
+  background: color-mix(in srgb, var(--mcsl-bg-color-dark) 94%, transparent);
+
+  & > i {
+    color: var(--mcsl-text-color-regular);
+  }
 }
 
 .mcsl-select__btn:focus {
-  box-shadow: var(--mcsl-box-shadow-light);
   outline-color: var(--mcsl-select__btn-color-light);
   outline-width: 2px;
   outline-offset: -1px;
+  border-color: color-mix(in srgb, var(--mcsl-select__btn-color-light) 45%, var(--mcsl-border-color-base));
 }
 
 .mcsl-select__btn:hover:focus {
-  box-shadow: var(--mcsl-box-shadow-base);
   outline-color: var(--mcsl-select__btn-color);
+  border-color: color-mix(in srgb, var(--mcsl-select__btn-color) 55%, var(--mcsl-border-color-base));
 }
 
 .mcsl-select__btn:disabled {
@@ -230,6 +241,11 @@ function findLabel(value: any) {
   border-color: var(--mcsl-border-color-dark);
   background: var(--mcsl-border-color-base);
   box-shadow: none;
+
+  & > span,
+  & > i {
+    color: var(--mcsl-text-color-secondary);
+  }
 }
 
 .mcsl-select__btn[aria-invalid="true"] {
@@ -246,6 +262,6 @@ function findLabel(value: any) {
 }
 
 .mcsl-select__placeholder {
-  color: var(--mcsl-text-color-secondary);
+  color: var(--mcsl-text-color-secondary) !important;
 }
 </style>

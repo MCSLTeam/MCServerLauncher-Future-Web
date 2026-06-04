@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref, watchEffect } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { ColorData, type ColorType, getColorVar } from "../../utils/css.ts";
 import {
@@ -23,36 +23,55 @@ const props = withDefaults(
 );
 
 const activeTab = ref(0);
-const router = useRouter();
+let router: ReturnType<typeof useRouter> | undefined;
+try {
+  router = useRouter();
+} catch {
+  router = undefined;
+}
 
 const tabRefs = ref<{ [key: number]: HTMLElement }>({});
 const offsetLeft = ref(0);
 const offsetWidth = ref(0);
 const bgWidth = ref(0);
 
-watchEffect(updateBg);
-
 function updateBg() {
   const tabElement = tabRefs.value[activeTab.value];
   if (!tabElement) return;
   offsetLeft.value = tabElement.offsetLeft;
   offsetWidth.value = tabElement.offsetWidth;
-  bgWidth.value = tabElement.parentElement!.scrollWidth;
+  bgWidth.value = tabElement.parentElement?.scrollWidth ?? 0;
 }
 
 function switchTab(index: number) {
   activeTab.value = index;
   const info = props.tabs[index]!;
-  navigateTo(info, router);
+  if (router) {
+    navigateTo(info, router);
+  } else {
+    info.onClick?.();
+  }
 }
 
-watchEffect(() => {
-  const path = router.currentRoute.value.path;
+watch(activeTab, updateBg, { flush: "post" });
+watch(
+  () => props.tabs,
+  () => updateBg(),
+  { deep: true, flush: "post" },
+);
 
-  activeTab.value = props.tabs.findIndex(
-    (tab) => tab.link === path || tab.isSubpage?.(path),
+if (router) {
+  watch(
+    () => router!.currentRoute.value.path,
+    (path) => {
+      const found = props.tabs.findIndex(
+        (tab) => tab.link === path || tab.isSubpage?.(path),
+      );
+      activeTab.value = found >= 0 ? found : 0;
+    },
+    { immediate: true },
   );
-});
+}
 
 onMounted(() => {
   updateBg();
@@ -119,7 +138,8 @@ defineExpose({
     & > .mcsl-nav-tabs__btns {
       margin: $padding;
       & > button {
-        padding: $padding calc($padding * 2);
+        min-height: calc(utils.get-size-var("height", $size, $vars) - $padding);
+        padding: $padding calc($padding * 1.8);
       }
     }
 
@@ -139,15 +159,15 @@ defineExpose({
   width: fit-content;
   max-width: 100%;
   position: relative;
-  background: var(--mcsl-bg-color-overlay);
-  border-radius: var(--mcsl-border-radius-full);
-  border: 1px solid var(--mcsl-border-color-base);
-  overflow: auto;
+  background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 96%, transparent);
+  border-radius: calc(var(--mcsl-border-radius-full) - 2px);
+  border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 88%, transparent);
+  overflow: auto hidden;
 }
 
 .mcsl-nav-tabs__shadow-always,
 .mcsl-nav-tabs__shadow-hover:hover {
-  box-shadow: var(--mcsl-box-shadow-base);
+  box-shadow: var(--mcsl-box-shadow-light);
 }
 
 .mcsl-nav-tabs__btns {
@@ -165,32 +185,31 @@ defineExpose({
   justify-content: center;
   align-items: center;
   gap: var(--mcsl-spacing-4xs);
-  border-radius: var(--mcsl-border-radius-full);
+  border-radius: calc(var(--mcsl-border-radius-full) - 2px);
   background: transparent;
   cursor: pointer;
-  transition: 0.2s ease-in-out;
+  transition:
+    background-color 0.14s ease-out,
+    border-color 0.14s ease-out,
+    color 0.14s ease-out;
 
   &:not(.mcsl-nav-tabs__btn-active):hover {
-    border-color: var(--mcsl-border-color-base);
-    background: var(--mcsl-bg-color-dark);
+    border-color: color-mix(in srgb, var(--mcsl-border-color-base) 92%, transparent);
+    background: color-mix(in srgb, var(--mcsl-bg-color-dark) 92%, transparent);
   }
 
   &:not(.mcsl-nav-tabs__btn-active):active {
-    border-color: var(--mcsl-border-color-dark);
-    background: var(--mcsl-bg-color-darker);
-    transition: 0.1s ease-in-out;
+    border-color: color-mix(in srgb, var(--mcsl-border-color-dark) 92%, transparent);
+    background: color-mix(in srgb, var(--mcsl-bg-color-darker) 92%, transparent);
+    transition-duration: 0.08s;
   }
 
   & > i {
     font-size: var(--mcsl-font-size-sm);
-    transition: 0.2s ease-in-out;
+    transition: color 0.14s ease-out;
   }
 
   &.mcsl-nav-tabs__btn-active {
-    transition:
-      color 0.2s ease-in-out,
-      all 0.05s ease-in-out;
-
     &,
     & > i {
       color: var(--mcsl-nav-tabs__color);
@@ -220,9 +239,9 @@ defineExpose({
     background: var(--mcsl-nav-tabs__color-bg);
     width: calc(var(--mcsl-nav-tabs__bg-width) - 2px);
     height: calc(100% - 2px);
-    border: 1px solid var(--mcsl-nav-tabs__color);
+    border: 1px solid color-mix(in srgb, var(--mcsl-nav-tabs__color) 26%, var(--mcsl-border-color-base));
     border-radius: var(--mcsl-border-radius-full);
-    transition: 0.2s ease-out;
+    transition: transform 0.16s ease-out, width 0.16s ease-out;
   }
 }
 </style>

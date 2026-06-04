@@ -154,6 +154,10 @@ $vars: map.merge(
 
     .mcsl-menu__items {
       gap: calc($spacing / 2);
+
+      & > button {
+        min-height: calc(utils.get-size-var("height", $size, Panel.$vars) - 2px);
+      }
     }
   }
 }

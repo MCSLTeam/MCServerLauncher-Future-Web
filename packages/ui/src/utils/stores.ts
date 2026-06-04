@@ -134,7 +134,12 @@ export const useAppearance = defineStore("appearance", () => {
   }
 
   function load() {
-    changeTheme(themeStorage.value, "none");
+    const currentTheme = getActualTheme(themeStorage.value);
+    if (!document.documentElement.classList.contains(currentTheme)) {
+      changeTheme(themeStorage.value, "none");
+    } else {
+      prevActualTheme = currentTheme;
+    }
     setRendering(renderingStorage.value);
   }
 

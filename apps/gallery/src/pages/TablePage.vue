@@ -1,0 +1,5 @@
+<script setup lang="ts">
+import Panel from "@repo/ui/src/components/panel/Panel.vue";
+import Table from "@repo/ui/src/components/misc/Table.vue";
+</script>
+<template><div class="page-shell"><Panel class="doc-section" shadow="hover"><template #header><h2>Style Effects</h2></template><p class="note">Tables should be readable and structured first, decorative second.</p></Panel><Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><Table :columns="['Name', 'Status', 'Version']" :rows="[['Paper EU-1', 'Running', '1.21.1'], ['Fabric Dev', 'Stopped', '1.20.4']]" /></Panel><Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="note">columns, rows, and future expansion toward richer cell rendering.</p></Panel></div></template><style scoped lang="scss">.page-shell{display:grid;gap:18px}.note{color:var(--mcsl-text-color-regular);line-height:1.7}.doc-section :deep(.mcsl-panel__header h2){margin:0;font-weight:600}</style>

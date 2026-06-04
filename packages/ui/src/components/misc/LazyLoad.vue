@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import { throttle as throttleFunc } from "../../utils/utils.ts";
 
 defineOptions({
   inheritAttrs: false,
@@ -23,67 +22,55 @@ const props = withDefaults(
   },
 );
 
-const wrapper = ref();
+const wrapper = ref<HTMLElement>();
 const visible = ref(false);
+const direction = ref<"up" | "down">("down");
+let observer: IntersectionObserver | null = null;
+let lastY = 0;
 
-let direction = ref<"up" | "down">("down");
-
-const detectVisible = throttleFunc(() => {
+function fallbackDetectVisible() {
   if (!wrapper.value) {
     visible.value = false;
     return;
   }
+
   const rect = wrapper.value.getBoundingClientRect();
-  const pRect = mergeRect(
-    document.body.getBoundingClientRect(),
-    props.parent?.getBoundingClientRect(),
-  );
-
   visible.value =
-    rect.right > pRect.left &&
-    rect.left < pRect.right &&
-    rect.bottom > pRect.top &&
-    rect.top < pRect.bottom;
-}, props.throttle);
-
-function mergeRect(rect1: DOMRect, rect2?: DOMRect) {
-  if (!rect2) return rect1;
-  return {
-    left: Math.min(rect1.left, rect2.left),
-    top: Math.min(rect1.top, rect2.top),
-    right: Math.max(rect1.right, rect2.right),
-    bottom: Math.max(rect1.bottom, rect2.bottom),
-  };
-}
-
-const listenedElements: HTMLElement[] = [];
-const elementLastScrollTops: number[] = [];
-
-function onElementScroll(event: Event) {
-  const el = event.target as HTMLElement;
-  const lastScrollTop = elementLastScrollTops[listenedElements.indexOf(el)]!;
-  if (lastScrollTop < el.scrollTop) direction.value = "down";
-  else direction.value = "up";
-  elementLastScrollTops[listenedElements.indexOf(el)] = el.scrollTop;
-  detectVisible();
+    rect.right > 0 &&
+    rect.left < window.innerWidth &&
+    rect.bottom > 0 &&
+    rect.top < window.innerHeight;
 }
 
 onMounted(() => {
-  let el = wrapper.value;
-  while (true) {
-    el = el?.parentElement ?? undefined;
-    if (!el) break;
-    el.addEventListener("scroll", onElementScroll);
-    listenedElements.push(el);
-    elementLastScrollTops.push(el.scrollTop);
+  if (!wrapper.value) return;
+
+  if ("IntersectionObserver" in window) {
+    observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        direction.value = entry.boundingClientRect.y < lastY ? "down" : "up";
+        lastY = entry.boundingClientRect.y;
+        visible.value = entry.isIntersecting;
+      },
+      {
+        root: props.parent ?? null,
+        threshold: 0,
+      },
+    );
+    observer.observe(wrapper.value);
+  } else {
+    fallbackDetectVisible();
+    window.addEventListener("scroll", fallbackDetectVisible, { passive: true });
+    window.addEventListener("resize", fallbackDetectVisible);
   }
-  detectVisible();
 });
 
 onUnmounted(() => {
-  listenedElements.forEach((el) =>
-    el?.removeEventListener?.("scroll", onElementScroll),
-  );
+  observer?.disconnect();
+  window.removeEventListener("scroll", fallbackDetectVisible);
+  window.removeEventListener("resize", fallbackDetectVisible);
 });
 
 defineExpose({

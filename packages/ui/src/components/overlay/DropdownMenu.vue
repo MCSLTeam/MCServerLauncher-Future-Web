@@ -83,7 +83,7 @@ defineExpose({
       class="mcsl-dropdown-menu__menu"
       :style="{
         width: followWidth
-          ? `calc(${dropdownContentRef.triggererPos.width}px - var(--mcsl-spacing-xs))`
+          ? `max(calc(${dropdownContentRef.triggererPos.width}px - var(--mcsl-spacing-xs)), 12rem)`
           : undefined,
         maxHeight: `calc(${maxHeight}px - var(--mcsl-spacing-lg) - 2 * var(--mcsl-spacing-2xs))`,
       }"
