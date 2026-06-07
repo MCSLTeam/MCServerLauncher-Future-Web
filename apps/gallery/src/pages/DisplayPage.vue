@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Alert, Avatar, CopyableText, Empty, Panel, Result, Skeleton, Table, Tag } from "@repo/ui";
+import { Avatar, CopyableText, Empty, Message, Panel, Result, Skeleton, Table, Tag } from "@repo/ui";
 import GalleryDocPage from "../components/GalleryDocPage.vue";
 </script>
 
@@ -20,7 +20,7 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
       <Panel class="doc-section" shadow="hover">
             <template #header><h2>Live Demo</h2></template>
             <div class="doc-stack">
-              <Alert title="Heads up" color="warning">This is a lightweight alert surface for inline guidance.</Alert>
+        <Message title="Heads up" color="warning">This is a lightweight message surface for inline guidance.</Message>
               <Result title="Deployment completed" description="Use result states for larger success or failure summaries." status="success" />
               <Table :columns="['Name', 'Status', 'Version']" :rows="[['Paper EU-1', 'Running', '1.21.1'], ['Fabric Dev', 'Stopped', '1.20.4']]" />
               <Skeleton :lines="4" height="14px" />
@@ -29,7 +29,7 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
     </template>
 
     <template #api>
-      <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">Badge, Empty, Skeleton, CopyableText, Avatar, Tag, Alert, Result, Table, Divider, MeterGroup and similar display primitives should all share one spacing and corner system.</p></Panel>
+      <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">Badge, Empty, Skeleton, CopyableText, Avatar, Tag, Message, Result, Table, Divider, MeterGroup and similar display primitives should all share one spacing and corner system.</p></Panel>
     </template>
   </GalleryDocPage>
 </template>

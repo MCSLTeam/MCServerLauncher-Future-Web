@@ -13,8 +13,6 @@ export default createRouter({
     { path: "/components/slider", component: () => import("./pages/SliderPage.vue") },
     { path: "/components/radio", component: () => import("./pages/RadioPage.vue") },
     { path: "/components/toggle", component: () => import("./pages/TogglePage.vue") },
-    { path: "/components/info-bar", component: () => import("./pages/InfoBarPage.vue") },
-    { path: "/components/alert", component: () => import("./pages/AlertPage.vue") },
     { path: "/components/result", component: () => import("./pages/ResultPage.vue") },
     { path: "/components/empty", component: () => import("./pages/EmptyPage.vue") },
     { path: "/components/divider", component: () => import("./pages/DividerPage.vue") },
