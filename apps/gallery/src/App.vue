@@ -67,34 +67,26 @@ const sidebarPages = [
     <Background class="gallery-bg" />
 
     <main class="gallery-shell">
-      <section class="gallery-hero">
-        <div class="gallery-hero__content">
-          <p class="gallery-kicker">Design Review</p>
-          <h1>MCSL Future UI Gallery</h1>
-          <p class="gallery-subtitle">
-            Private UI component library for MCSL Future.
-          </p>
+      <header class="gallery-topbar">
+        <div class="gallery-brand">
+          <strong>MCSL UI</strong>
+          <span>Component Gallery</span>
         </div>
-        <Panel class="gallery-hero__controls" size="small" shadow="hover">
-          <template #header>
-            <h3>Preview Controls</h3>
-          </template>
-          <div class="gallery-controls">
-            <label class="gallery-toggle">
-              <input v-model="showDense" type="checkbox" />
-              <span>Dense spacing</span>
-            </label>
-            <label class="gallery-toggle">
-              <input v-model="showStrongAccent" type="checkbox" />
-              <span>Stronger accent surfaces</span>
-            </label>
-          </div>
-        </Panel>
-      </section>
+        <div class="gallery-controls">
+          <label class="gallery-toggle">
+            <input v-model="showDense" type="checkbox" />
+            <span>Dense</span>
+          </label>
+          <label class="gallery-toggle">
+            <input v-model="showStrongAccent" type="checkbox" />
+            <span>Accent</span>
+          </label>
+        </div>
+      </header>
 
       <section class="gallery-docs">
         <aside class="gallery-docs__sidebar">
-          <Panel size="small" shadow="hover">
+          <Panel size="small" shadow="hover" scrollable>
             <template #header>
               <h3>Components</h3>
             </template>
@@ -157,16 +149,16 @@ const sidebarPages = [
 :global(#app) {
   display: block !important;
   width: 100%;
-  height: auto !important;
+  height: 100% !important;
   min-height: 0 !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
+  overflow: hidden !important;
   align-items: stretch !important;
   justify-content: flex-start !important;
 }
 
 .gallery-page {
   position: relative;
+  min-height: 100vh;
   color: var(--mcsl-text-color-primary);
 }
 
@@ -179,51 +171,49 @@ const sidebarPages = [
 .gallery-shell {
   position: relative;
   z-index: 1;
-  width: min(1440px, calc(100vw - 20px));
+  width: min(1480px, calc(100vw - 20px));
   height: 100vh;
   margin: 0 auto;
-  padding: 20px 0 20px;
+  padding: 10px 0;
   box-sizing: border-box;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  gap: 20px;
+  gap: 10px;
 }
 
-.gallery-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
-  gap: 16px;
-  align-items: start;
+.gallery-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 88%, transparent);
+  border-radius: var(--mcsl-border-radius-sm);
+  background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 94%, transparent);
+  box-shadow: var(--mcsl-box-shadow-light);
+  backdrop-filter: blur(14px);
 }
 
-.gallery-kicker {
-  margin: 0 0 8px;
+.gallery-brand {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.gallery-brand strong {
+  font-size: var(--mcsl-font-size-lg);
+  font-weight: 700;
+}
+
+.gallery-brand span {
+  color: var(--mcsl-text-color-secondary);
   font-size: var(--mcsl-font-size-sm);
-  font-weight: var(--mcsl-font-weight-bolder);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--mcsl-color-primary);
-}
-
-.gallery-hero h1 {
-  margin: 0;
-  font-size: clamp(2.5rem, 4vw, 4.25rem);
-  line-height: 1.02;
-  font-weight: 620;
-  letter-spacing: -0.03em;
-}
-
-.gallery-subtitle {
-  margin: 18px 0 0;
-  max-width: 760px;
-  font-size: var(--mcsl-font-size-xl);
-  line-height: 1.65;
-  color: var(--mcsl-text-color-regular);
 }
 
 .gallery-controls {
-  display: grid;
-  gap: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .gallery-toggle {
@@ -231,13 +221,13 @@ const sidebarPages = [
   align-items: center;
   gap: 10px;
   color: var(--mcsl-text-color-regular);
+  font-size: var(--mcsl-font-size-sm);
 }
 
 .gallery-docs {
-  margin-top: 28px;
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
-  gap: 16px;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 10px;
   align-items: stretch;
   min-height: 0;
 }
@@ -248,36 +238,44 @@ const sidebarPages = [
   :deep(.mcsl-panel) {
     height: 100%;
   }
-
-  :deep(.mcsl-panel__body-wrapper) {
-    max-height: 100%;
-    overflow-y: auto;
-  }
 }
 
 .gallery-docs__content {
   display: grid;
-  gap: 18px;
+  gap: 12px;
   min-width: 0;
   min-height: 0;
   align-content: start;
   overflow-y: auto;
-  padding-right: 2px;
+  padding: 2px 2px 24px;
 }
 
 .gallery-breadcrumbs {
-  margin-bottom: 2px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 82%, transparent);
+  border-radius: var(--mcsl-border-radius-xs);
+  background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 92%, transparent);
+  backdrop-filter: blur(12px);
 }
 
 .gallery--dense .gallery-shell {
-  width: min(1220px, calc(100vw - 40px));
+  width: min(1320px, calc(100vw - 20px));
 }
 
-.gallery--strong-accent .gallery-kicker {
-  color: var(--mcsl-color-primary-dark);
+.gallery--strong-accent .gallery-topbar {
+  border-color: color-mix(in srgb, var(--mcsl-color-primary) 24%, var(--mcsl-border-color-base));
 }
 
 @media (max-width: 980px) {
+  :global(html),
+  :global(body),
+  :global(#app) {
+    overflow-y: auto !important;
+  }
+
   .gallery-shell {
     width: min(100vw - 12px, 100%);
     height: auto;
@@ -285,13 +283,29 @@ const sidebarPages = [
     padding: 16px 0 20px;
   }
 
-  .gallery-hero,
   .gallery-docs {
     grid-template-columns: 1fr;
   }
 
+  .gallery-topbar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+  }
+
   .gallery-docs__sidebar {
     min-height: auto;
+
+    :deep(.mcsl-panel) {
+      height: auto;
+      max-height: 280px;
+    }
+
+    :deep(.mcsl-panel__body-wrapper) {
+      max-height: 220px;
+      overflow-y: auto;
+    }
   }
 
   .gallery-docs__content {
