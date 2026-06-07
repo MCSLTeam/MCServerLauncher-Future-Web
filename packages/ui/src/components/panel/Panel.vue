@@ -43,9 +43,7 @@ onMounted(() => {
       [`mcsl-size-${size}`]: true,
       [`mcsl-panel__shadow-${shadow}`]: shadow !== 'never',
       'mcsl-panel__need-divider': !headerDivider && hasHeader,
-    }"
-    :style="{
-      overflow: scrollable ? 'auto' : 'hidden',
+      'mcsl-panel__scrollable': scrollable,
     }"
     class="mcsl-panel"
   >
@@ -61,8 +59,8 @@ onMounted(() => {
         <h2 ref="textHeader">{{ header }}</h2>
       </slot>
     </div>
+    <Divider v-if="hasHeader && headerDivider" />
     <div class="mcsl-panel__body-wrapper">
-      <Divider v-if="hasHeader && headerDivider" />
       <div :class="bodyClass" :style="bodyStyle" class="mcsl-panel__body">
         <slot />
       </div>
@@ -77,6 +75,7 @@ onMounted(() => {
 .mcsl-panel {
   border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 88%, transparent);
   background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 96%, transparent);
+  overflow: hidden;
 
   outline: 0 solid transparent;
   outline-offset: -2px; // 覆盖 border
@@ -104,7 +103,7 @@ onMounted(() => {
       box-shadow: utils.get-size-var("box-shadow", $size, $vars);
     }
 
-    & > .mcsl-panel__body-wrapper > .mcsl-divider {
+    & > .mcsl-divider {
       padding: calc($spacing / 1.5) 0;
     }
 
@@ -117,6 +116,16 @@ onMounted(() => {
 .mcsl-panel__header {
   & * {
     color: var(--mcsl-text-color-primary);
+  }
+}
+
+.mcsl-panel__scrollable {
+  display: flex;
+  flex-direction: column;
+
+  & > .mcsl-panel__body-wrapper {
+    min-height: 0;
+    overflow: auto;
   }
 }
 </style>
