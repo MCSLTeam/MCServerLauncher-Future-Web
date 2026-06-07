@@ -13,7 +13,7 @@ import Button from "../button/Button.vue";
 
 export type MessageProps = {
   color?: ColorType;
-  variant?: "text" | "outlined" | "default";
+  variant?: "text" | "outlined" | "default" | "soft";
   icon?: string;
   inAnim?: string;
   outAnim?: string;
@@ -26,7 +26,7 @@ export type MessageProps = {
 const props = withDefaults(defineProps<MessageProps>(), {
   size: "medium",
   color: "primary",
-  variant: "default",
+  variant: "soft",
   inAnim: "0.14s ease-out both fadeInUp",
   outAnim: "0.14s ease-out both fadeOut",
   shadow: false,
@@ -93,6 +93,9 @@ defineExpose({
       '--mcsl-message__border-color': isSurface
         ? 'var(--mcsl-border-color-base)'
         : new ColorData(color, 'light').getCss(),
+      '--mcsl-message__accent-color': isSurface
+        ? 'var(--mcsl-text-color-secondary)'
+        : getColorVar(color),
       '--mcsl-message__box-shadow': isSurface
         ? 'var(--mcsl-box-shadow-base)'
         : getShadow(color, 'base'),
@@ -146,10 +149,6 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
       padding: $spacing;
       width: calc(100% - 2 * $spacing);
 
-      & > div:not(.mcsl-message__close-btn) {
-        width: calc(100% - $btn-size - $original-spacing);
-      }
-
       & .mcsl-message__title {
         margin-bottom: calc($spacing / 2);
       }
@@ -169,6 +168,8 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
 .mcsl-message {
   width: 100%;
   transform: translate(0);
+  position: relative;
+  overflow: hidden;
   animation:
     var(--mcsl-message__anim-out),
     1s 0.2s cubic-bezier(0, 1, 0, 1) collapseOutVertical;
@@ -181,14 +182,15 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
 }
 
 .mcsl-message__content {
-  display: flex;
+  display: grid;
+  grid-template-columns: $btn-size minmax(0, 1fr) auto;
 
   .mcsl-message__with-title & {
-    --mcsl-message__icon-font-size: var(--mcsl-font-size-lg);
+    --mcsl-message__icon-font-size: var(--mcsl-font-size-md);
   }
 
   --mcsl-message__icon-font-size: var(--mcsl-font-size-md);
-  align-items: flex-start;
+  align-items: start;
 
   & > i {
     width: $btn-size;
@@ -197,6 +199,13 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
     justify-content: center;
     align-items: center;
     margin-top: 1px;
+    border-radius: var(--mcsl-border-radius-xs);
+    background: color-mix(in srgb, var(--mcsl-message__accent-color) 11%, transparent);
+    color: var(--mcsl-message__title-color);
+  }
+
+  & > div:not(.mcsl-message__close-btn) {
+    min-width: 0;
   }
 
   & .mcsl-message__buttons {
@@ -206,7 +215,9 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
 }
 
 .mcsl-message__close-btn {
-  position: absolute;
+  display: flex;
+  align-items: flex-start;
+  min-width: $btn-size;
 }
 
 .mcsl-message__variant-text {
@@ -222,6 +233,7 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
 .mcsl-message__variant-outlined {
   @extend .mcsl-message__variant-text;
   border: 1px solid var(--mcsl-message__border-color);
+  background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 88%, transparent);
 
   &.mcsl-message__shadowed {
     box-shadow: var(--mcsl-box-shadow-light);
@@ -233,8 +245,22 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
   background: color-mix(
     in srgb,
     var(--mcsl-message__bg-color),
-    transparent 94%
+    var(--mcsl-bg-color-overlay) 92%
   );
+}
+
+.mcsl-message__variant-soft {
+  @extend .mcsl-message__variant-default;
+
+  &::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 3px;
+    background: var(--mcsl-message__accent-color);
+    content: "";
+  }
 }
 </style>
 
