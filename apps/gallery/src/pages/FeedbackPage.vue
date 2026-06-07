@@ -24,9 +24,6 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
 </template>
 
 <style scoped lang="scss">
-.page-shell { display: grid; gap: 18px; }
-.doc-section :deep(.mcsl-panel__header h2), .doc-section :deep(.mcsl-panel__header h4) { margin: 0; font-weight: 600; }
 .status-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-.note { color: var(--mcsl-text-color-regular); line-height: 1.7; }
 @media (max-width: 980px) { .status-grid { grid-template-columns: 1fr; } }
 </style>

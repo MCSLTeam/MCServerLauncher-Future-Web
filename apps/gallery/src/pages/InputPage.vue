@@ -21,10 +21,3 @@ const port = ref(25565);
     </template>
   </GalleryDocPage>
 </template>
-
-<style scoped lang="scss">
-.page-shell { display: grid; gap: 18px; }
-.stack { display: grid; gap: 14px; }
-.note { color: var(--mcsl-text-color-regular); line-height: 1.7; }
-.doc-section :deep(.mcsl-panel__header h2) { margin: 0; font-weight: 600; }
-</style>

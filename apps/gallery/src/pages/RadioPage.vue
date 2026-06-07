@@ -13,14 +13,16 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
 
 <template>
   <GalleryDocPage>
-    <Panel class="doc-section" shadow="hover"><template #header><h2>Style Effects</h2></template><RadioGroup v-model="value" :options="options" /></Panel>
-    <Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><RadioGroup v-model="value" :options="options" /></Panel>
-    <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">RadioGroup should stay compact, readable, and visually aligned with checkbox and switch controls.</p></Panel>
-    </GalleryDocPage>
-</template>
+    <template #effects>
+      <Panel class="doc-section" shadow="hover"><template #header><h2>Style Effects</h2></template><RadioGroup v-model="value" :options="options" /></Panel>
+    </template>
 
-<style scoped lang="scss">
-.page-shell { display: grid; gap: 18px; }
-.note { color: var(--mcsl-text-color-regular); line-height: 1.7; }
-.doc-section :deep(.mcsl-panel__header h2) { margin: 0; font-weight: 600; }
-</style>
+    <template #demo>
+      <Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><RadioGroup v-model="value" :options="options" /></Panel>
+    </template>
+
+    <template #api>
+      <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">RadioGroup should stay compact, readable, and visually aligned with checkbox and switch controls.</p></Panel>
+    </template>
+  </GalleryDocPage>
+</template>
