@@ -31,35 +31,53 @@ withDefaults(
 <style scoped lang="scss">
 .mcsl-table-wrap {
   overflow: auto;
-  border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 90%, transparent);
   border-radius: var(--mcsl-border-radius-sm);
   background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 97%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--mcsl-bg-color-overlay) 78%, transparent);
 }
+
 .mcsl-table {
   width: 100%;
-  border-collapse: collapse;
+  min-width: max-content;
+  border-collapse: separate;
+  border-spacing: 0;
 }
-th, td {
+
+th,
+td {
   padding: 11px 14px;
   text-align: left;
+  vertical-align: middle;
+  border: 0 solid color-mix(in srgb, var(--mcsl-border-color-base) 84%, transparent);
 }
+
+th:not(:last-child),
+td:not(:last-child) {
+  border-right-width: 1px;
+}
+
 thead th {
   color: var(--mcsl-text-color-secondary);
   font-weight: 600;
   font-size: var(--mcsl-font-size-sm);
   background: color-mix(in srgb, var(--mcsl-bg-color-dark) 94%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 88%, transparent);
+  border-bottom-width: 1px;
 }
+
 tbody td {
   color: var(--mcsl-text-color-regular);
 }
+
 tbody tr {
   transition: background-color 0.12s ease-out;
 }
+
 tbody tr:hover {
   background: color-mix(in srgb, var(--mcsl-bg-color-dark) 94%, transparent);
 }
+
 tbody tr:not(:last-child) td {
-  border-bottom: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 84%, transparent);
+  border-bottom-width: 1px;
 }
 </style>
