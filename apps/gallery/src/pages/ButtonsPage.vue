@@ -86,17 +86,6 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
 </template>
 
 <style scoped lang="scss">
-.page-shell {
-  display: grid;
-  gap: 18px;
-}
-
-.doc-section :deep(.mcsl-panel__header h2) {
-  margin: 0;
-  font-size: var(--mcsl-font-size-2xl);
-  font-weight: 600;
-}
-
 .doc-header {
   display: flex;
   justify-content: space-between;

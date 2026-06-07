@@ -2,4 +2,34 @@
 import { Panel, Result } from "@repo/ui";
 import GalleryDocPage from "../components/GalleryDocPage.vue";
 </script>
-<template><div class="page-shell"><Panel class="doc-section" shadow="hover"><template #header><h2>Style Effects</h2></template><p class="doc-note">Result states are larger and more semantic than alerts or info bars.</p></Panel><Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><Result title="Deployment completed" description="The server image has been rebuilt and published." status="success" /></Panel><Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">title, description, status and additional action slots for large completion states.</p></Panel></div></template><style scoped lang="scss">.page-shell{display:grid;gap:18px}.note{color:var(--mcsl-text-color-regular);line-height:1.7}.doc-section :deep(.mcsl-panel__header h2){margin:0;font-weight:600}</style>
+
+<template>
+  <GalleryDocPage>
+    <template #effects>
+      <Panel class="doc-section" shadow="hover">
+        <template #header><h2>Style Effects</h2></template>
+        <p class="doc-note">Result states are larger and more semantic than alerts or info bars.</p>
+      </Panel>
+    </template>
+
+    <template #demo>
+      <Panel class="doc-section" shadow="hover">
+        <template #header><h2>Live Demo</h2></template>
+        <Result
+          title="Deployment completed"
+          description="The server image has been rebuilt and published."
+          status="success"
+        />
+      </Panel>
+    </template>
+
+    <template #api>
+      <Panel class="doc-section" shadow="hover">
+        <template #header><h2>API / Props</h2></template>
+        <p class="doc-note">
+          title, description, status and additional action slots for large completion states.
+        </p>
+      </Panel>
+    </template>
+  </GalleryDocPage>
+</template>
