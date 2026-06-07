@@ -10,7 +10,7 @@ withDefaults(
   }>(),
   {
     title: "",
-    color: "primary",
+    color: "help",
     closable: false,
   },
 );

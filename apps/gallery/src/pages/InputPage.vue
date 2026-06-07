@@ -1,9 +1,7 @@
 <script setup lang="ts">
+import { InputNumber, InputText, Panel, Textarea } from "@repo/ui";
 import { ref } from "vue";
-import Panel from "@repo/ui/src/components/panel/Panel.vue";
-import InputText from "@repo/ui/src/components/form/entries/InputText.vue";
-import Textarea from "@repo/ui/src/components/form/entries/Textarea.vue";
-import InputNumber from "@repo/ui/src/components/form/entries/InputNumber.vue";
+import GalleryDocPage from "../components/GalleryDocPage.vue";
 
 const name = ref('Future Paper EU-1');
 const note = ref('A calmer, denser settings field should still feel roomy enough to edit.');
@@ -11,11 +9,17 @@ const port = ref(25565);
 </script>
 
 <template>
-  <div class="page-shell">
-    <Panel class="doc-section" shadow="hover"><template #header><h2>Style Effects</h2></template><div class="stack"><InputText v-model="name" placeholder="Instance name" /><InputNumber v-model="port" /><Textarea v-model="note" placeholder="Notes" /></div></Panel>
-    <Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><div class="stack"><InputText v-model="name" clearable /><InputText v-model="name" password /><Textarea v-model="note" /></div></Panel>
-    <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="note">InputText, Textarea, InputNumber: density, placeholder tone, invalid state, and inner action affordances.</p></Panel>
-  </div>
+  <GalleryDocPage>
+    <template #effects>
+      <Panel class="doc-section" shadow="hover"><template #header><h2>Style Effects</h2></template><div class="doc-stack"><InputText v-model="name" placeholder="Instance name" /><InputNumber v-model="port" /><Textarea v-model="note" placeholder="Notes" /></div></Panel>
+    </template>
+    <template #demo>
+      <Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><div class="doc-stack"><InputText v-model="name" clearable /><InputText v-model="name" password /><Textarea v-model="note" /></div></Panel>
+    </template>
+    <template #api>
+      <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">InputText, Textarea, InputNumber: density, placeholder tone, invalid state, and inner action affordances.</p></Panel>
+    </template>
+  </GalleryDocPage>
 </template>
 
 <style scoped lang="scss">

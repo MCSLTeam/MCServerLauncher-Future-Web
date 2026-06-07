@@ -159,9 +159,9 @@ defineExpose({
   width: fit-content;
   max-width: 100%;
   position: relative;
-  background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 96%, transparent);
-  border-radius: calc(var(--mcsl-border-radius-full) - 2px);
-  border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 88%, transparent);
+  background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 98%, transparent);
+  border-radius: var(--mcsl-border-radius-sm);
+  border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 90%, transparent);
   overflow: auto hidden;
 }
 
@@ -185,7 +185,7 @@ defineExpose({
   justify-content: center;
   align-items: center;
   gap: var(--mcsl-spacing-4xs);
-  border-radius: calc(var(--mcsl-border-radius-full) - 2px);
+  border-radius: calc(var(--mcsl-border-radius-xs) + 1px);
   background: transparent;
   cursor: pointer;
   transition:
@@ -233,15 +233,15 @@ defineExpose({
   top: 0;
   left: 0;
   overflow: hidden;
-  border-radius: var(--mcsl-border-radius-full);
+  border-radius: var(--mcsl-border-radius-sm);
 
   & > div {
     background: var(--mcsl-nav-tabs__color-bg);
     width: calc(var(--mcsl-nav-tabs__bg-width) - 2px);
     height: calc(100% - 2px);
-    border: 1px solid color-mix(in srgb, var(--mcsl-nav-tabs__color) 26%, var(--mcsl-border-color-base));
-    border-radius: var(--mcsl-border-radius-full);
-    transition: transform 0.16s ease-out, width 0.16s ease-out;
+    border: 1px solid color-mix(in srgb, var(--mcsl-nav-tabs__color) 22%, var(--mcsl-border-color-base));
+    border-radius: calc(var(--mcsl-border-radius-xs) + 1px);
+    transition: transform 0.12s ease-out, width 0.12s ease-out;
   }
 }
 </style>

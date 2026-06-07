@@ -1,19 +1,18 @@
 <script setup lang="ts">
+import { Checkbox, Panel, Switch } from "@repo/ui";
 import { ref } from "vue";
-import Panel from "@repo/ui/src/components/panel/Panel.vue";
-import Checkbox from "@repo/ui/src/components/form/entries/Checkbox.vue";
-import Switch from "@repo/ui/src/components/form/entries/Switch.vue";
 
 const checked = ref(true);
 const enabled = ref(false);
+import GalleryDocPage from "../components/GalleryDocPage.vue";
 </script>
 
 <template>
-  <div class="page-shell">
-    <Panel class="doc-section" shadow="hover"><template #header><h2>Style Effects</h2></template><div class="stack"><Checkbox v-model="checked" /> <Switch v-model="enabled" /></div></Panel>
-    <Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><div class="stack"><Checkbox v-model="checked" /> <Switch v-model="enabled" /></div></Panel>
-    <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="note">Checkbox and Switch should share density, focus contrast, and calm hover feedback.</p></Panel>
-  </div>
+  <GalleryDocPage>
+    <Panel class="doc-section" shadow="hover"><template #header><h2>Style Effects</h2></template><div class="doc-stack"><Checkbox v-model="checked" /> <Switch v-model="enabled" /></div></Panel>
+    <Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><div class="doc-stack"><Checkbox v-model="checked" /> <Switch v-model="enabled" /></div></Panel>
+    <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">Checkbox and Switch should share density, focus contrast, and calm hover feedback.</p></Panel>
+    </GalleryDocPage>
 </template>
 
 <style scoped lang="scss">

@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import Background from "@repo/ui/src/components/misc/Background.vue";
-import Panel from "@repo/ui/src/components/panel/Panel.vue";
-import Button from "@repo/ui/src/components/button/Button.vue";
-import Breadcrumbs from "@repo/ui/src/components/navigation/Breadcrumbs.vue";
-import Sidebar from "@repo/ui/src/components/navigation/Sidebar.vue";
-import NotificationTemplate from "@repo/ui/src/components/overlay/notification/NotificationTemplate.vue";
-import NotificationOverlay from "@repo/ui/src/components/overlay/notification/NotificationOverlay.vue";
-import ContextmenuOverlay from "@repo/ui/src/components/overlay/ContextmenuOverlay.vue";
+import { Background } from "@repo/ui";
+import { Panel } from "@repo/ui";
+import { Button } from "@repo/ui";
+import { Breadcrumbs } from "@repo/ui";
+import { Sidebar } from "@repo/ui";
+import { NotificationTemplate } from "@repo/ui";
+import { NotificationOverlay } from "@repo/ui";
+import { ContextmenuOverlay } from "@repo/ui";
 
 const showDense = ref(false);
 const showStrongAccent = ref(false);
@@ -25,8 +25,10 @@ const breadcrumbs = [
 ];
 
 const sidebarPages = [
+  { label: "PageHeader", link: "/components/page-header" },
   { label: "Buttons", link: "/components/buttons" },
   { label: "Input", link: "/components/input" },
+  { label: "NumberBox", link: "/components/number-box" },
   { label: "Select", link: "/components/select" },
   { label: "Slider", link: "/components/slider" },
   { label: "Radio", link: "/components/radio" },
@@ -35,11 +37,15 @@ const sidebarPages = [
   { label: "Alert", link: "/components/alert" },
   { label: "Result", link: "/components/result" },
   { label: "Empty", link: "/components/empty" },
+  { label: "Divider", link: "/components/divider" },
+  { label: "CopyableText", link: "/components/copyable-text" },
   { label: "Skeleton", link: "/components/skeleton" },
   { label: "Breadcrumbs", link: "/components/breadcrumbs" },
   { label: "Sidebar", link: "/components/sidebar" },
   { label: "NavTabs", link: "/components/nav-tabs" },
   { label: "Dropdown", link: "/components/dropdown" },
+  { label: "Tooltip", link: "/components/tooltip" },
+  { label: "Popover", link: "/components/popover" },
   { label: "Modal", link: "/components/modal" },
   { label: "Contextmenu", link: "/components/contextmenu" },
   { label: "Progress", link: "/components/progress" },
@@ -171,15 +177,20 @@ const sidebarPages = [
 .gallery-shell {
   position: relative;
   z-index: 1;
-  width: min(1280px, calc(100vw - 48px));
+  width: min(1440px, calc(100vw - 20px));
+  height: 100vh;
   margin: 0 auto;
-  padding: 40px 0 64px;
+  padding: 20px 0 20px;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 20px;
 }
 
 .gallery-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 16px;
   align-items: start;
 }
 
@@ -223,21 +234,33 @@ const sidebarPages = [
 .gallery-docs {
   margin-top: 28px;
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
-  gap: 20px;
-  align-items: start;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+  min-height: 0;
 }
 
 .gallery-docs__sidebar {
-  position: sticky;
-  top: 24px;
+  min-height: 0;
+
+  :deep(.mcsl-panel) {
+    height: 100%;
+  }
+
+  :deep(.mcsl-panel__body-wrapper) {
+    max-height: 100%;
+    overflow-y: auto;
+  }
 }
 
 .gallery-docs__content {
   display: grid;
   gap: 18px;
   min-width: 0;
+  min-height: 0;
   align-content: start;
+  overflow-y: auto;
+  padding-right: 2px;
 }
 
 .gallery-breadcrumbs {
@@ -253,13 +276,24 @@ const sidebarPages = [
 }
 
 @media (max-width: 980px) {
+  .gallery-shell {
+    width: min(100vw - 12px, 100%);
+    height: auto;
+    min-height: 100vh;
+    padding: 16px 0 20px;
+  }
+
   .gallery-hero,
   .gallery-docs {
     grid-template-columns: 1fr;
   }
 
   .gallery-docs__sidebar {
-    position: static;
+    min-height: auto;
+  }
+
+  .gallery-docs__content {
+    overflow-y: visible;
   }
 }
 
