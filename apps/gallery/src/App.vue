@@ -25,6 +25,7 @@ const breadcrumbs = [
 ];
 
 const sidebarPages = [
+  { label: "Component Gaps", link: "/components/gaps" },
   { label: "PageHeader", link: "/components/page-header" },
   { label: "Buttons", link: "/components/buttons" },
   { label: "Input", link: "/components/input" },
@@ -44,6 +45,8 @@ const sidebarPages = [
   { label: "Sidebar", link: "/components/sidebar" },
   { label: "NavTabs", link: "/components/nav-tabs" },
   { label: "Dropdown", link: "/components/dropdown" },
+  { label: "Drawer", link: "/components/drawer" },
+  { label: "ConfirmDialog", link: "/components/confirm-dialog" },
   { label: "Tooltip", link: "/components/tooltip" },
   { label: "Popover", link: "/components/popover" },
   { label: "Modal", link: "/components/modal" },
@@ -55,6 +58,7 @@ const sidebarPages = [
   { label: "Tag", link: "/components/tag" },
   { label: "Table", link: "/components/table" },
   { label: "Message", link: "/components/message" },
+  { label: "Kbd", link: "/components/kbd" },
   { label: "Editor", link: "/components/editor" },
   { label: "Compositions", link: "/components/compositions" },
 ];
