@@ -183,12 +183,12 @@ $size: var(--mcsl-progress-bar__size);
 
       :not(.mcsl-progress-bar__status-loading) & {
         width: 100%;
-        animation: 0.2s ease-in-out both slideInLeft;
+        animation: 0.14s ease-out both slideInLeft;
       }
     }
 
     .mcsl-progress-bar__status-loading.mcsl-progress-bar__mode-indeterminate & {
-      animation: 2s ease-in-out infinite mcsl-progress-bar__indeterminate;
+      animation: 1.2s ease-out infinite mcsl-progress-bar__indeterminate;
     }
   }
 }
@@ -236,7 +236,7 @@ $size: var(--mcsl-progress-bar__size);
         stroke-linecap: round;
         stroke-dasharray: calc($circumference);
         stroke-dashoffset: calc($circumference * (1 - $progress-decimal));
-        transition: 0.2s ease-in-out;
+        transition: stroke-dashoffset 0.14s ease-out;
       }
     }
   }

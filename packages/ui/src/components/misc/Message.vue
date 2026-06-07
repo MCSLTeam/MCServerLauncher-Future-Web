@@ -188,6 +188,7 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
   }
 
   --mcsl-message__icon-font-size: var(--mcsl-font-size-md);
+  align-items: flex-start;
 
   & > i {
     width: $btn-size;
@@ -195,6 +196,7 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: 1px;
   }
 
   & .mcsl-message__buttons {

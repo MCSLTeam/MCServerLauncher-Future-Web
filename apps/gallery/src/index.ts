@@ -4,8 +4,7 @@ import { createI18n } from "vue-i18n";
 import FloatingVue from "floating-vue";
 import App from "./App.vue";
 import router from "./router";
-import { loadUi } from "@repo/ui/src/index";
-import { useLocale } from "@repo/ui/src/utils/stores";
+import { loadUi, useLocale } from "@repo/ui";
 
 (async () => {
   const app = createApp(App);

@@ -1,86 +1,88 @@
 <script setup lang="ts">
-import Panel from "@repo/ui/src/components/panel/Panel.vue";
-import Button from "@repo/ui/src/components/button/Button.vue";
-import ButtonGroup from "@repo/ui/src/components/button/ButtonGroup.vue";
-import SplitButton from "@repo/ui/src/components/button/SplitButton.vue";
-import Badge from "@repo/ui/src/components/misc/Badge.vue";
-import Card from "@repo/ui/src/components/panel/Card.vue";
+import { Badge, Button, ButtonGroup, Card, Panel, SplitButton } from "@repo/ui";
+import GalleryDocPage from "../components/GalleryDocPage.vue";
 </script>
 
 <template>
-  <div class="page-shell">
-    <Panel class="doc-section" shadow="hover">
-      <template #header>
-        <div class="doc-header">
-          <div>
-            <h2>Style Effects</h2>
-            <p>Refined states with quieter tint fills and more grounded spacing.</p>
+  <GalleryDocPage>
+    <template #effects>
+      <Panel class="doc-section" shadow="hover">
+        <template #header>
+          <div class="doc-header">
+            <div>
+              <h2>Style Effects</h2>
+              <p>Refined states with quieter tint fills and more grounded spacing.</p>
+            </div>
+            <Badge value="Buttons" color="help" />
           </div>
-          <Badge value="Buttons" color="help" />
-        </div>
-      </template>
-      <div class="button-stack">
-        <ButtonGroup>
-          <Button type="primary" color="primary">Primary</Button>
-          <Button>Default</Button>
-          <Button type="text">Text</Button>
-        </ButtonGroup>
-        <ButtonGroup>
-          <Button color="success">Success</Button>
-          <Button color="warning">Warning</Button>
-          <Button color="danger">Danger</Button>
-        </ButtonGroup>
-        <SplitButton
-          color="primary"
-          :dropdown-menu="[
-            { label: 'Duplicate style set', onClick: () => {} },
-            { label: 'Open implementation notes', onClick: () => {} },
-          ]"
-        >
-          Split Action
-        </SplitButton>
-      </div>
-    </Panel>
-
-    <Panel class="doc-section" shadow="hover">
-      <template #header>
-        <h2>Live Demo</h2>
-      </template>
-      <div class="button-stack">
-        <ButtonGroup>
-          <Button type="primary" color="primary">Primary</Button>
-          <Button type="default">Default</Button>
-          <Button type="dashed">Dashed</Button>
-        </ButtonGroup>
-        <Card title="Contained action set" description="Card surfaces should feel grounded and editorial, not inflated.">
+        </template>
+        <div class="button-stack">
           <ButtonGroup>
-            <Button type="primary" color="primary">Apply</Button>
-            <Button>Cancel</Button>
+            <Button type="primary" color="primary">Primary</Button>
+            <Button>Default</Button>
+            <Button type="text">Text</Button>
           </ButtonGroup>
-        </Card>
-      </div>
-    </Panel>
+          <ButtonGroup>
+            <Button color="success">Success</Button>
+            <Button color="warning">Warning</Button>
+            <Button color="danger">Danger</Button>
+          </ButtonGroup>
+          <SplitButton
+            color="primary"
+            :dropdown-menu="[
+              { label: 'Duplicate style set', onClick: () => {} },
+              { label: 'Open implementation notes', onClick: () => {} },
+            ]"
+          >
+            Split Action
+          </SplitButton>
+        </div>
+      </Panel>
+    </template>
 
-    <Panel class="doc-section" shadow="hover">
-      <template #header>
-        <h2>API / Props</h2>
-      </template>
-      <div class="api-table">
-        <div class="api-row">
-          <div class="api-cell api-cell--head">Component</div>
-          <div class="api-cell">Button / ButtonGroup / SplitButton</div>
+    <template #demo>
+      <Panel class="doc-section" shadow="hover">
+        <template #header>
+          <h2>Live Demo</h2>
+        </template>
+        <div class="button-stack">
+          <ButtonGroup>
+            <Button type="primary" color="primary">Primary</Button>
+            <Button type="default">Default</Button>
+            <Button type="dashed">Dashed</Button>
+          </ButtonGroup>
+          <Card title="Contained action set" description="Card surfaces should feel grounded and editorial, not inflated.">
+            <ButtonGroup>
+              <Button type="primary" color="primary">Apply</Button>
+              <Button>Cancel</Button>
+            </ButtonGroup>
+          </Card>
         </div>
-        <div class="api-row">
-          <div class="api-cell api-cell--head">Style effects</div>
-          <div class="api-cell">Smaller radii, tighter vertical rhythm, softer tint layering, quieter shadows.</div>
+      </Panel>
+    </template>
+
+    <template #api>
+      <Panel class="doc-section" shadow="hover">
+        <template #header>
+          <h2>API / Props</h2>
+        </template>
+        <div class="api-table">
+          <div class="api-row">
+            <div class="api-cell api-cell--head">Component</div>
+            <div class="api-cell">Button / ButtonGroup / SplitButton</div>
+          </div>
+          <div class="api-row">
+            <div class="api-cell api-cell--head">Style effects</div>
+            <div class="api-cell">Smaller radii, tighter vertical rhythm, softer tint layering, quieter shadows.</div>
+          </div>
+          <div class="api-row">
+            <div class="api-cell api-cell--head">Primary props</div>
+            <div class="api-cell">type, color, size, rounded, block, shadow, icon, dropdown-menu</div>
+          </div>
         </div>
-        <div class="api-row">
-          <div class="api-cell api-cell--head">Primary props</div>
-          <div class="api-cell">type, color, size, rounded, block, shadow, icon, dropdown-menu</div>
-        </div>
-      </div>
-    </Panel>
-  </div>
+      </Panel>
+    </template>
+  </GalleryDocPage>
 </template>
 
 <style scoped lang="scss">

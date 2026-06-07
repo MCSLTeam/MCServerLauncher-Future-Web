@@ -102,6 +102,7 @@ const menuInfo = computed(() => {
           :icon="button.icon"
           :icon-pos="button.iconPos"
           :type="button.type ?? 'text'"
+          align="left"
           @click="
             (e) => {
               button?.onClick?.(e);

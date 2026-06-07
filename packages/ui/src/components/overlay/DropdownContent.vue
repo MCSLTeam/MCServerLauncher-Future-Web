@@ -40,8 +40,9 @@ const inAnim = computed(() => {
 });
 
 function locateXVertical(openX: number, elemX: Ref<number>, posInfo: PosInfo) {
+  const triggererWidth = triggererEl.value.offsetWidth;
   elemX.value = clamp(
-    openX - posInfo.width / 2,
+    openX - triggererWidth / 2,
     0,
     triggererOffsetParent.value.offsetWidth - posInfo.width,
   );
