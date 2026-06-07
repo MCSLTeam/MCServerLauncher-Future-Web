@@ -124,7 +124,9 @@ onMounted(() => {
   flex-direction: column;
 
   & > .mcsl-panel__body-wrapper {
+    flex: 1 1 auto;
     min-height: 0;
+    max-height: 100%;
     overflow: auto;
   }
 }
