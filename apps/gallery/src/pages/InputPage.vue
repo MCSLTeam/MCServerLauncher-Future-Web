@@ -16,8 +16,5 @@ const port = ref(25565);
     <template #demo>
       <Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><div class="doc-stack"><InputText v-model="name" clearable /><InputText v-model="name" password /><Textarea v-model="note" /></div></Panel>
     </template>
-    <template #api>
-      <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">InputText, Textarea, InputNumber: density, placeholder tone, invalid state, and inner action affordances.</p></Panel>
-    </template>
   </GalleryDocPage>
 </template>

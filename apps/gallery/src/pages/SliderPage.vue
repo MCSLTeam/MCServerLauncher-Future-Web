@@ -15,9 +15,5 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
     <template #demo>
       <Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><Slider v-model="value" :min="0" :max="100" /></Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">min, max, step, disabled, and value binding.</p></Panel>
-    </template>
   </GalleryDocPage>
 </template>

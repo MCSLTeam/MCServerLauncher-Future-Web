@@ -17,9 +17,6 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
     <template #demo>
       <Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><div class="feedback-stack"><Empty title="No running instances" description="Use this state to explain the next meaningful action without adding too much decorative UI." /><Skeleton :lines="3" height="14px" /></div></Panel>
     </template>
-    <template #api>
-      <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">Status color, density, severity emphasis, and compact summary patterns.</p></Panel>
-    </template>
   </GalleryDocPage>
 </template>
 

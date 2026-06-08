@@ -33,6 +33,7 @@ const sidebarPages = [
   { label: "Select", link: "/components/select" },
   { label: "Slider", link: "/components/slider" },
   { label: "Radio", link: "/components/radio" },
+  { label: "Checkbox", link: "/components/checkbox" },
   { label: "Toggle", link: "/components/toggle" },
   { label: "Message", link: "/components/message" },
   { label: "Result", link: "/components/result" },

@@ -26,10 +26,6 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
             </div>
           </Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">Tooltip, Popover, DropdownMenu, Modal, Contextmenu, FloatingContent: placement, header, close behavior, and trigger slots.</p></Panel>
-    </template>
   </GalleryDocPage>
 </template>
 

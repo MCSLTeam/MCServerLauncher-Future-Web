@@ -27,10 +27,6 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
             </div>
           </Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">Badge, Empty, Skeleton, CopyableText, Avatar, Tag, Message, Result, Table, Divider, MeterGroup and similar display primitives should all share one spacing and corner system.</p></Panel>
-    </template>
   </GalleryDocPage>
 </template>
 

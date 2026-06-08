@@ -11,8 +11,5 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
     <template #demo>
       <Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><CopyableText text="mcsl-future-web" /></Panel>
     </template>
-    <template #api>
-      <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">text value and copy affordance behavior.</p></Panel>
-    </template>
   </GalleryDocPage>
 </template>

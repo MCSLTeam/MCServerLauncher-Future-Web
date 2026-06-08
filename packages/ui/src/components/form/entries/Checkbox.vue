@@ -130,19 +130,22 @@ function nextValue() {
 
 @each $size in utils.$sizes {
   .mcsl-size-#{$size}.mcsl-checkbox {
-    $size-num: calc(utils.get-size-var("spacing", $size, $vars) * 2);
-    gap: calc(utils.get-size-var("spacing", $size, $vars) * 0.65);
     font-size: utils.get-size-var("font-size", $size, $vars);
+    gap: calc(utils.get-size-var("spacing", $size, $vars) * 0.58);
 
     .mcsl-checkbox__box {
-      width: calc($size-num + 2px);
-      height: calc($size-num + 2px);
-      border-radius: utils.get-size-var("border-radius", $size, $vars);
+      width: var(--mcsl-checkbox__size-#{$size});
+      height: var(--mcsl-checkbox__size-#{$size});
+      border-radius: calc(utils.get-size-var("border-radius", $size, $vars) * 0.75);
     }
   }
 }
 
 .mcsl-checkbox {
+  --mcsl-checkbox__size-small: 14px;
+  --mcsl-checkbox__size-medium: 16px;
+  --mcsl-checkbox__size-large: 18px;
+
   display: inline-flex;
   align-items: center;
   cursor: pointer;
@@ -159,7 +162,7 @@ function nextValue() {
   }
 
   &:has(input:focus-visible) .mcsl-checkbox__box {
-    outline: 3px solid color-mix(in srgb, var(--mcsl-color-help) 42%, transparent);
+    outline: 2px solid color-mix(in srgb, var(--mcsl-color-help) 45%, transparent);
     outline-offset: 2px;
   }
 }
@@ -168,25 +171,22 @@ function nextValue() {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   flex: 0 0 auto;
   border: 1px solid var(--mcsl-border-color-base);
-  background:
-    linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--mcsl-bg-color-overlay) 100%, transparent),
-      color-mix(in srgb, var(--mcsl-bg-color-dark) 58%, transparent)
-    );
+  background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 98%, transparent);
   color: var(--mcsl-text-color-opposite);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--mcsl-bg-color-overlay) 72%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mcsl-bg-color-overlay) 45%, transparent);
   transition:
     border-color 0.14s ease-out,
     background-color 0.14s ease-out,
-    box-shadow 0.14s ease-out,
-    transform 0.14s ease-out;
+    box-shadow 0.14s ease-out;
 
   i {
+    font-size: 0.62em;
+    line-height: 1;
     opacity: 0;
-    transform: scale(0.72);
+    transform: scale(0.68);
     transition:
       opacity 0.12s ease-out,
       transform 0.12s ease-out;
@@ -194,22 +194,16 @@ function nextValue() {
 }
 
 .mcsl-checkbox:hover .mcsl-checkbox__box {
-  border-color: var(--mcsl-border-color-dark);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--mcsl-bg-color-overlay) 72%, transparent),
-    var(--mcsl-box-shadow-light);
+  border-color: color-mix(in srgb, var(--mcsl-checkbox__color) 42%, var(--mcsl-border-color-dark));
+  background: color-mix(in srgb, var(--mcsl-checkbox__color) 6%, var(--mcsl-bg-color-overlay));
 }
 
 .mcsl-checkbox__checked,
 .mcsl-checkbox__mixed {
   .mcsl-checkbox__box {
     border-color: var(--mcsl-checkbox__color);
-    background: linear-gradient(
-      to bottom,
-      var(--mcsl-checkbox__color),
-      var(--mcsl-checkbox__color-dark)
-    );
-    box-shadow: var(--mcsl-box-shadow-lighter);
+    background: var(--mcsl-checkbox__color);
+    box-shadow: none;
 
     i {
       opacity: 1;
@@ -219,7 +213,7 @@ function nextValue() {
 }
 
 .mcsl-checkbox__label {
-  line-height: 1.45;
+  line-height: 1.4;
 }
 
 .mcsl-checkbox__disabled {
@@ -227,8 +221,9 @@ function nextValue() {
   color: var(--mcsl-text-color-secondary);
 
   .mcsl-checkbox__box {
-    border-color: var(--mcsl-border-color-dark);
-    background: var(--mcsl-border-color-base);
+    border-color: var(--mcsl-border-color-base);
+    background: color-mix(in srgb, var(--mcsl-border-color-base) 70%, transparent);
+    color: var(--mcsl-text-color-secondary);
     box-shadow: none;
   }
 }

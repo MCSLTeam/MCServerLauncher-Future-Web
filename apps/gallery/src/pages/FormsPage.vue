@@ -51,15 +51,6 @@ const coreOptions = [
         </div>
       </Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover">
-        <template #header><h2>API / Props</h2></template>
-        <div class="api-note">
-          Form demos use real input and select primitives so label spacing, input height, border contrast, and focus rhythm stay unified with the library.
-        </div>
-      </Panel>
-    </template>
   </GalleryDocPage>
 </template>
 

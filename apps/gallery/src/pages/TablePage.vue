@@ -27,14 +27,5 @@ const rows = [
         <Table :columns="columns" :rows="rows" />
       </Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover">
-        <template #header><h2>API / Props</h2></template>
-        <p class="doc-note">
-          The current table API accepts column labels and primitive cell rows while leaving room for richer cell rendering later.
-        </p>
-      </Panel>
-    </template>
   </GalleryDocPage>
 </template>

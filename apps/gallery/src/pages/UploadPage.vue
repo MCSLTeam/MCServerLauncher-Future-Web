@@ -15,9 +15,5 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
     <template #demo>
       <Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><div class="doc-stack"><FileDropper v-model="files" :config="{ maxCount: 5 }" /><FileInfo v-model="files" /></div></Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">FileDropper, FileDropperOverlay, FileInfo: state visibility, file metadata summaries, drag affordances, and maxCount / accept constraints.</p></Panel>
-    </template>
   </GalleryDocPage>
 </template>

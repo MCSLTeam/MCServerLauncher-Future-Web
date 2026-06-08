@@ -15,9 +15,5 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
     <template #demo>
       <Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><Button @click="visible = true">Open Modal</Button><Modal v-model:visible="visible" header="Modal Preview"><p class="doc-note">A lighter modal surface with calmer overlay and tighter spacing.</p></Modal></Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">visible, header, maxWidth, closeOnEsc, closeOnClickOutside, autoClose, and slot-driven content layout.</p></Panel>
-    </template>
   </GalleryDocPage>
 </template>

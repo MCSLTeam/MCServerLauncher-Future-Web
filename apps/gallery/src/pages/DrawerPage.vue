@@ -33,12 +33,5 @@ const visible = ref(false);
         </Drawer>
       </Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover">
-        <template #header><h2>API / Props</h2></template>
-        <p class="doc-note">visible, title, placement, width, height, close behavior, header and footer slots.</p>
-      </Panel>
-    </template>
   </GalleryDocPage>
 </template>

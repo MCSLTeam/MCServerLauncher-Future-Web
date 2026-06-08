@@ -33,18 +33,6 @@ const rows = [
         <Table :columns="columns" :rows="rows" />
       </Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover">
-        <template #header><h2>Merge / Alias Decisions</h2></template>
-        <div class="gap-tags">
-          <Tag color="primary">alert + infobar -> message</Tag>
-          <Tag color="help">tabs -> NavTabs alias candidate</Tag>
-          <Tag color="success">separator -> Divider</Tag>
-          <Tag color="warning">number-field -> InputNumber</Tag>
-        </div>
-      </Panel>
-    </template>
   </GalleryDocPage>
 </template>
 

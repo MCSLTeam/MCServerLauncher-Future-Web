@@ -12,6 +12,7 @@ export default createRouter({
     { path: "/components/select", component: () => import("./pages/SelectPage.vue") },
     { path: "/components/slider", component: () => import("./pages/SliderPage.vue") },
     { path: "/components/radio", component: () => import("./pages/RadioPage.vue") },
+    { path: "/components/checkbox", component: () => import("./pages/CheckboxPage.vue") },
     { path: "/components/toggle", component: () => import("./pages/TogglePage.vue") },
     { path: "/components/result", component: () => import("./pages/ResultPage.vue") },
     { path: "/components/empty", component: () => import("./pages/EmptyPage.vue") },

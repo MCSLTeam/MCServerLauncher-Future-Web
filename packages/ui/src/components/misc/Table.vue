@@ -31,10 +31,12 @@ withDefaults(
 <style scoped lang="scss">
 .mcsl-table-wrap {
   overflow: auto;
-  border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 90%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 82%, transparent);
   border-radius: var(--mcsl-border-radius-sm);
-  background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 97%, transparent);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--mcsl-bg-color-overlay) 78%, transparent);
+  background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 98%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--mcsl-bg-color-overlay) 88%, transparent),
+    0 1px 2px color-mix(in srgb, var(--mcsl-text-color-primary) 5%, transparent);
 }
 
 .mcsl-table {
@@ -46,38 +48,55 @@ withDefaults(
 
 th,
 td {
-  padding: 11px 14px;
+  padding: 10px 14px;
   text-align: left;
   vertical-align: middle;
-  border: 0 solid color-mix(in srgb, var(--mcsl-border-color-base) 84%, transparent);
-}
-
-th:not(:last-child),
-td:not(:last-child) {
-  border-right-width: 1px;
+  border: 0;
+  white-space: nowrap;
 }
 
 thead th {
   color: var(--mcsl-text-color-secondary);
   font-weight: 600;
   font-size: var(--mcsl-font-size-sm);
-  background: color-mix(in srgb, var(--mcsl-bg-color-dark) 94%, transparent);
-  border-bottom-width: 1px;
+  letter-spacing: 0;
+  background: color-mix(in srgb, var(--mcsl-bg-color-dark) 80%, var(--mcsl-bg-color-overlay));
+  border-bottom: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 82%, transparent);
+}
+
+thead th:first-child {
+  border-top-left-radius: calc(var(--mcsl-border-radius-sm) - 1px);
+}
+
+thead th:last-child {
+  border-top-right-radius: calc(var(--mcsl-border-radius-sm) - 1px);
 }
 
 tbody td {
   color: var(--mcsl-text-color-regular);
+  font-size: var(--mcsl-font-size-sm);
+  font-variant-numeric: tabular-nums;
 }
 
 tbody tr {
-  transition: background-color 0.12s ease-out;
+  transition:
+    background-color 0.12s ease-out,
+    color 0.12s ease-out;
 }
 
 tbody tr:hover {
-  background: color-mix(in srgb, var(--mcsl-bg-color-dark) 94%, transparent);
+  background: color-mix(in srgb, var(--mcsl-color-primary) 5%, var(--mcsl-bg-color-overlay));
 }
 
 tbody tr:not(:last-child) td {
-  border-bottom-width: 1px;
+  border-bottom: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 70%, transparent);
+}
+
+tbody tr:last-child td:first-child {
+  border-bottom-left-radius: calc(var(--mcsl-border-radius-sm) - 1px);
+}
+
+tbody tr:last-child td:last-child {
+  border-bottom-right-radius: calc(var(--mcsl-border-radius-sm) - 1px);
 }
 </style>

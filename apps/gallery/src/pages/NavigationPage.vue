@@ -32,13 +32,6 @@ const pages = [{ label: "Overview" }, { label: "Instances" }, { label: "Settings
         </p>
       </Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover">
-        <template #header><h2>API / Props</h2></template>
-        <p class="doc-note">pages, collapsed, color, size, breadcrumbs list, active-state patterns.</p>
-      </Panel>
-    </template>
   </GalleryDocPage>
 </template>
 
