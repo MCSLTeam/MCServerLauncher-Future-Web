@@ -9,7 +9,6 @@ import {
   getShadow,
   getStatusIcon,
 } from "../../utils/css.ts";
-import Button from "../button/Button.vue";
 
 export type MessageProps = {
   color?: ColorType;
@@ -80,15 +79,17 @@ defineExpose({
       `mcsl-message__variant-${variant}`,
       ...(visible ? [`mcsl-message__visible`] : []),
       ...(title ? [`mcsl-message__with-title`] : []),
+      ...(actualIcon ? [`mcsl-message__show-icon`] : []),
+      ...(closeable || $slots['close-btn'] ? [`mcsl-message__closable`] : []),
       ...(shadow ? [`mcsl-message__shadowed`] : []),
     ]"
     :style="{
       '--mcsl-message__title-color': isSurface
         ? 'var(--mcsl-text-color-primary)'
-        : getColorVar(color),
+        : 'var(--mcsl-text-color-primary)',
       '--mcsl-message__text-color': isSurface
         ? 'var(--mcsl-text-color-regular)'
-        : getColorVar(color),
+        : 'var(--mcsl-text-color-regular)',
       '--mcsl-message__bg-color': getColorVar(color),
       '--mcsl-message__border-color': isSurface
         ? 'var(--mcsl-border-color-base)'
@@ -101,30 +102,34 @@ defineExpose({
         : getShadow(color, 'base'),
       '--mcsl-message__anim-in': inAnim + ' 0.2s',
       '--mcsl-message__anim-out': outAnim,
-      '--mcsl-message__spacing': variant == 'text' ? '0' : undefined,
+      '--mcsl-message__spacing':
+        variant == 'text' ? 'var(--mcsl-spacing-2xs)' : undefined,
     }"
     class="mcsl-message"
   >
     <slot name="contextmenu" />
     <div class="mcsl-message__content">
-      <i v-if="actualIcon" :class="actualIcon" />
-      <div>
+      <i v-if="actualIcon" :class="actualIcon" class="mcsl-message__icon" />
+      <div class="mcsl-message__body">
         <h4 v-if="title" class="mcsl-message__title">{{ title }}</h4>
-        <slot :close="close" :open="open" />
+        <div class="mcsl-message__text">
+          <slot :close="close" :open="open" />
+        </div>
         <div v-if="$slots.buttons" class="mcsl-message__buttons">
           <slot :close="close" :open="open" name="buttons" />
         </div>
       </div>
       <div class="mcsl-message__close-btn">
         <slot name="close-btn" :close="close">
-          <Button
+          <button
             v-if="closeable"
-            :color="color"
-            icon="fa fa-xmark"
-            rounded
-            type="text"
+            aria-label="Close message"
+            class="mcsl-message__close"
+            type="button"
             @click="close"
-          />
+          >
+            <i class="fa fa-xmark" />
+          </button>
         </slot>
       </div>
     </div>
@@ -136,6 +141,7 @@ defineExpose({
 @use "../Content" as *;
 
 $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
+$close-size: 20px;
 
 @each $size in utils.$sizes {
   .mcsl-size-#{$size}.mcsl-message {
@@ -145,17 +151,11 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
 
     & > .mcsl-message__content {
       $spacing: var(--mcsl-message__spacing);
-      gap: $original-spacing;
       padding: $spacing;
       width: calc(100% - 2 * $spacing);
 
       & .mcsl-message__title {
-        margin-bottom: calc($spacing / 2);
-      }
-
-      & > .mcsl-message__close-btn {
-        top: $spacing;
-        right: $spacing;
+        margin-bottom: 9px;
       }
 
       & .mcsl-message__buttons {
@@ -170,6 +170,14 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
   transform: translate(0);
   position: relative;
   overflow: hidden;
+  text-align: start;
+  word-break: break-word;
+  line-height: 1.6;
+  background: var(--mcsl-message__surface-color);
+  transition:
+    background-color 0.22s ease-out,
+    border-color 0.22s ease-out,
+    box-shadow 0.22s ease-out;
   animation:
     var(--mcsl-message__anim-out),
     1s 0.2s cubic-bezier(0, 1, 0, 1) collapseOutVertical;
@@ -182,58 +190,112 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
 }
 
 .mcsl-message__content {
-  display: grid;
-  grid-template-columns: $btn-size minmax(0, 1fr) auto;
+  position: relative;
 
   .mcsl-message__with-title & {
-    --mcsl-message__icon-font-size: var(--mcsl-font-size-md);
+    --mcsl-message__icon-font-size: 24px;
   }
 
-  --mcsl-message__icon-font-size: var(--mcsl-font-size-md);
-  align-items: start;
+  --mcsl-message__icon-font-size: 20px;
+}
 
-  & > i {
-    width: $btn-size;
-    height: $btn-size;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 1px;
-    border-radius: var(--mcsl-border-radius-xs);
-    background: color-mix(in srgb, var(--mcsl-message__accent-color) 11%, transparent);
-    color: var(--mcsl-message__title-color);
-  }
+.mcsl-message__show-icon .mcsl-message__content {
+  padding-left: calc(var(--mcsl-message__spacing) + $btn-size + 8px);
+}
 
-  & > div:not(.mcsl-message__close-btn) {
-    min-width: 0;
-  }
+.mcsl-message__closable .mcsl-message__content {
+  padding-right: calc(var(--mcsl-message__spacing) + $close-size + 12px);
+}
 
-  & .mcsl-message__buttons {
-    display: flex;
-    justify-content: flex-end;
-  }
+.mcsl-message__icon {
+  position: absolute;
+  top: calc(var(--mcsl-message__spacing) + 1px);
+  left: var(--mcsl-message__spacing);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: $btn-size;
+  height: $btn-size;
+  color: var(--mcsl-message__accent-color);
+  font-size: var(--mcsl-message__icon-font-size);
+  transition: color 0.22s ease-out;
+}
+
+.mcsl-message__body {
+  min-width: 0;
+}
+
+.mcsl-message__title {
+  margin: 0;
+  color: var(--mcsl-message__title-color);
+  font-size: var(--mcsl-font-size-md);
+  font-weight: 650;
+  line-height: 1.22;
+  transition: color 0.22s ease-out;
+}
+
+.mcsl-message__text {
+  color: var(--mcsl-message__text-color);
+  font-size: var(--mcsl-font-size-sm);
+  transition: color 0.22s ease-out;
+}
+
+.mcsl-message__buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--mcsl-spacing-xs);
 }
 
 .mcsl-message__close-btn {
+  position: absolute;
+  top: calc(var(--mcsl-message__spacing) + 1px);
+  right: var(--mcsl-message__spacing);
   display: flex;
   align-items: flex-start;
-  min-width: $btn-size;
+  min-width: $close-size;
+}
+
+.mcsl-message__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: $close-size;
+  height: $close-size;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--mcsl-border-radius-xs);
+  background: transparent;
+  color: var(--mcsl-text-color-secondary);
+  cursor: pointer;
+  outline: 0 solid transparent;
+  transition:
+    background-color 0.18s ease-out,
+    color 0.18s ease-out,
+    outline-color 0.18s ease-out;
+
+  &:hover {
+    background: color-mix(in srgb, var(--mcsl-message__accent-color) 12%, transparent);
+    color: var(--mcsl-message__accent-color);
+  }
+
+  &:active {
+    background: color-mix(in srgb, var(--mcsl-message__accent-color) 18%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--mcsl-message__accent-color) 42%, transparent);
+    outline-offset: 2px;
+  }
 }
 
 .mcsl-message__variant-text {
-  & .mcsl-message__title {
-    color: var(--mcsl-message__title-color);
-  }
-
-  & * {
-    color: var(--mcsl-message__text-color);
-  }
+  --mcsl-message__surface-color: transparent;
 }
 
 .mcsl-message__variant-outlined {
-  @extend .mcsl-message__variant-text;
+  --mcsl-message__surface-color: color-mix(in srgb, var(--mcsl-bg-color-overlay) 86%, transparent);
   border: 1px solid var(--mcsl-message__border-color);
-  background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 88%, transparent);
 
   &.mcsl-message__shadowed {
     box-shadow: var(--mcsl-box-shadow-light);
@@ -241,44 +303,20 @@ $btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
 }
 
 .mcsl-message__variant-default {
-  @extend .mcsl-message__variant-outlined;
-  background: color-mix(
+  --mcsl-message__surface-color: color-mix(
     in srgb,
-    var(--mcsl-message__bg-color),
-    var(--mcsl-bg-color-overlay) 92%
+    var(--mcsl-bg-color-overlay) 92%,
+    var(--mcsl-message__bg-color) 8%
   );
+  border: 1px solid var(--mcsl-message__border-color);
 }
 
 .mcsl-message__variant-soft {
-  @extend .mcsl-message__variant-default;
-
-  &::before {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 3px;
-    background: var(--mcsl-message__accent-color);
-    content: "";
-  }
-}
-</style>
-
-<style lang="scss">
-$btn-size: calc(var(--mcsl-message__icon-font-size) * 1.2);
-
-.mcsl-message__close-btn > .mcsl-button {
-  min-width: 0 !important;
-  width: $btn-size !important;
-  height: $btn-size !important;
-  padding: 0 !important;
-
-  & > i {
-    font-size: var(--mcsl-font-size-sm);
-  }
-
-  &:not(:hover):not(:active) {
-    background: transparent !important;
-  }
+  --mcsl-message__surface-color: color-mix(
+    in srgb,
+    var(--mcsl-bg-color-overlay) 92%,
+    var(--mcsl-message__bg-color) 8%
+  );
+  border: 1px solid transparent;
 }
 </style>
