@@ -16,9 +16,5 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
     <template #demo>
       <Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><div class="doc-stack"><Pagination v-model:page="page" :length="12" /><ItemsPagination v-model:page="paged" :item-per-page="20" :total="240" /></div></Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">page, length, itemPerPage, total, size, and button density.</p></Panel>
-    </template>
   </GalleryDocPage>
 </template>

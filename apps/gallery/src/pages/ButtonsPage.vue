@@ -60,28 +60,6 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
         </div>
       </Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover">
-        <template #header>
-          <h2>API / Props</h2>
-        </template>
-        <div class="api-table">
-          <div class="api-row">
-            <div class="api-cell api-cell--head">Component</div>
-            <div class="api-cell">Button / ButtonGroup / SplitButton</div>
-          </div>
-          <div class="api-row">
-            <div class="api-cell api-cell--head">Style effects</div>
-            <div class="api-cell">Smaller radii, tighter vertical rhythm, softer tint layering, quieter shadows.</div>
-          </div>
-          <div class="api-row">
-            <div class="api-cell api-cell--head">Primary props</div>
-            <div class="api-cell">type, color, size, rounded, block, shadow, icon, dropdown-menu</div>
-          </div>
-        </div>
-      </Panel>
-    </template>
   </GalleryDocPage>
 </template>
 
@@ -100,30 +78,5 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
 .button-stack {
   display: grid;
   gap: 16px;
-}
-
-.api-table {
-  display: grid;
-  border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 88%, transparent);
-  border-radius: var(--mcsl-border-radius-md);
-  overflow: hidden;
-}
-
-.api-row {
-  display: grid;
-  grid-template-columns: 200px minmax(0, 1fr);
-}
-
-.api-row:not(:last-child) {
-  border-bottom: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 88%, transparent);
-}
-
-.api-cell {
-  padding: 12px 14px;
-}
-
-.api-cell--head {
-  background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 96%, transparent);
-  color: var(--mcsl-text-color-secondary);
 }
 </style>

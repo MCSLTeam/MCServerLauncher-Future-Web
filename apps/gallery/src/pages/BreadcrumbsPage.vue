@@ -22,12 +22,5 @@ const crumbs = [{ label: "MCSL Future" }, { label: "Gallery" }, { label: "Breadc
         <Breadcrumbs :items="crumbs" />
       </Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover">
-        <template #header><h2>API / Props</h2></template>
-        <p class="doc-note">items, separator, icon separator and link activation behavior.</p>
-      </Panel>
-    </template>
   </GalleryDocPage>
 </template>

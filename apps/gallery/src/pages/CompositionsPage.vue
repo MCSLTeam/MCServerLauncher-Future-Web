@@ -39,15 +39,6 @@ const qualities = [
         </Card>
       </Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover">
-        <template #header><h2>API / Props</h2></template>
-        <p class="doc-note">
-          Compositions reuse exported library primitives for section shells, rails, chips, content widths, and layout conventions.
-        </p>
-      </Panel>
-    </template>
   </GalleryDocPage>
 </template>
 

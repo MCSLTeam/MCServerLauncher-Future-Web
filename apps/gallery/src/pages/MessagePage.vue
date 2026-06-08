@@ -33,11 +33,5 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
         </div>
       </Panel>
     </template>
-    <template #api>
-      <Panel class="doc-section" shadow="hover">
-        <template #header><h2>API / Props</h2></template>
-        <p class="doc-note">color, variant, icon, closeable, title, shadow, in/out animations, and slot-based buttons.</p>
-      </Panel>
-    </template>
   </GalleryDocPage>
 </template>

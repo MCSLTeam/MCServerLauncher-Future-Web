@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+import { Panel } from "@repo/ui";
+import GalleryApiTable from "./GalleryApiTable.vue";
+import { defaultGalleryApiDocs, galleryApiDocs } from "./galleryApiDocs";
+
 withDefaults(
   defineProps<{
     title?: string;
@@ -13,6 +19,9 @@ withDefaults(
     apiDescription: "",
   },
 );
+
+const route = useRoute();
+const apiItems = computed(() => galleryApiDocs[route.path] ?? defaultGalleryApiDocs);
 </script>
 
 <template>
@@ -26,7 +35,10 @@ withDefaults(
     </slot>
 
     <slot name="api">
-      <div class="doc-section__fallback">No API description.</div>
+      <Panel class="doc-section" shadow="hover">
+        <template #header><h2>API / Props</h2></template>
+        <GalleryApiTable :items="apiItems" />
+      </Panel>
     </slot>
   </div>
 </template>
@@ -85,5 +97,11 @@ withDefaults(
 :deep(.doc-api-cell--head) {
   background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 96%, transparent);
   color: var(--mcsl-text-color-secondary);
+}
+
+:deep(.api-table),
+:deep(.api-row),
+:deep(.api-cell) {
+  display: contents;
 }
 </style>

@@ -20,12 +20,5 @@ const tabs = [{ label: "Details" }, { label: "Metrics" }, { label: "History" }];
         <NavTabs :tabs="tabs" />
       </Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover">
-        <template #header><h2>API / Props</h2></template>
-        <p class="doc-note">tabs, color, size, shadow and route-aware activation.</p>
-      </Panel>
-    </template>
   </GalleryDocPage>
 </template>

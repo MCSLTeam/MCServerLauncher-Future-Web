@@ -20,9 +20,5 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
     <template #demo>
       <Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><RadioGroup v-model="value" :options="options" /></Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">RadioGroup should stay compact, readable, and visually aligned with checkbox and switch controls.</p></Panel>
-    </template>
   </GalleryDocPage>
 </template>

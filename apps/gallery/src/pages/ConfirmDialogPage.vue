@@ -30,12 +30,5 @@ const visible = ref(false);
         />
       </Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover">
-        <template #header><h2>API / Props</h2></template>
-        <p class="doc-note">visible, title, description, confirmText, cancelText, color, confirm and cancel events.</p>
-      </Panel>
-    </template>
   </GalleryDocPage>
 </template>

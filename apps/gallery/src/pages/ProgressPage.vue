@@ -12,9 +12,5 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
     <template #demo>
       <Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><div class="doc-stack"><ProgressBar variant="indeterminate" status="loading" /><Spinner type="spinner" label="Syncing" /></div></Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover"><template #header><h2>API / Props</h2></template><p class="doc-note">ProgressBar and Spinner should share sizing rhythm and use status colors with lower visual noise.</p></Panel>
-    </template>
   </GalleryDocPage>
 </template>

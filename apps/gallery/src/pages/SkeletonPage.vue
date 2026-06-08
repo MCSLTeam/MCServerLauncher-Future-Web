@@ -18,12 +18,5 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
         <Skeleton :lines="5" height="14px" />
       </Panel>
     </template>
-
-    <template #api>
-      <Panel class="doc-section" shadow="hover">
-        <template #header><h2>API / Props</h2></template>
-        <p class="doc-note">width, height, rounded, and number of lines.</p>
-      </Panel>
-    </template>
   </GalleryDocPage>
 </template>
