@@ -277,7 +277,7 @@ $close-size: 20px;
   margin: 0;
   padding: 0;
   border: 0;
-  border-radius: var(--mcsl-border-radius-xs);
+  border-radius: var(--mcsl-border-radius-sm);
   background: transparent;
   color: var(--mcsl-text-color-secondary);
   cursor: pointer;

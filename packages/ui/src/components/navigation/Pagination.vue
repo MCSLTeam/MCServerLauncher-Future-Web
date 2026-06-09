@@ -118,7 +118,7 @@ function go(p: number) {
 
   :deep(.mcsl-button) {
     min-width: 2.2rem;
-    border-radius: calc(var(--mcsl-border-radius-sm) - 1px) !important;
+    border-radius: var(--mcsl-border-radius-sm) !important;
   }
 }
 </style>

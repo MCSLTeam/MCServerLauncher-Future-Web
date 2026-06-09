@@ -86,7 +86,7 @@ function isChecked(value: any) {
   gap: 4px;
   padding: 4px;
   border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 88%, transparent);
-  border-radius: calc(var(--mcsl-border-radius-sm) + 2px);
+  border-radius: var(--mcsl-border-radius-sm);
   background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 96%, transparent);
 }
 
@@ -96,7 +96,7 @@ function isChecked(value: any) {
   justify-content: center;
   gap: 6px;
   border: 1px solid transparent;
-  border-radius: calc(var(--mcsl-border-radius-xs) + 1px);
+  border-radius: var(--mcsl-border-radius-sm);
   background: transparent;
   color: var(--mcsl-text-color-regular);
   cursor: pointer;
