@@ -19,5 +19,5 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
 </template>
 
 <style scoped lang="scss">
-.context-target { min-height: 140px; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--mcsl-border-color-base); border-radius: var(--mcsl-border-radius-md); color: var(--mcsl-text-color-secondary); }
+.context-target { min-height: 140px; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--mcsl-border-color-base); border-radius: var(--mcsl-border-radius-sm); color: var(--mcsl-text-color-secondary); }
 </style>

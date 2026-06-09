@@ -185,7 +185,7 @@ defineExpose({
   justify-content: center;
   align-items: center;
   gap: var(--mcsl-spacing-4xs);
-  border-radius: calc(var(--mcsl-border-radius-xs) + 1px);
+  border-radius: var(--mcsl-border-radius-sm);
   background: transparent;
   cursor: pointer;
   transition:
@@ -240,7 +240,7 @@ defineExpose({
     width: calc(var(--mcsl-nav-tabs__bg-width) - 2px);
     height: calc(100% - 2px);
     border: 1px solid color-mix(in srgb, var(--mcsl-nav-tabs__color) 22%, var(--mcsl-border-color-base));
-    border-radius: calc(var(--mcsl-border-radius-xs) + 1px);
+    border-radius: var(--mcsl-border-radius-sm);
     transition: transform 0.12s ease-out, width 0.12s ease-out;
   }
 }

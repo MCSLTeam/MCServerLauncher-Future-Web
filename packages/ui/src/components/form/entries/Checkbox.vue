@@ -136,7 +136,7 @@ function nextValue() {
     .mcsl-checkbox__box {
       width: var(--mcsl-checkbox__size-#{$size});
       height: var(--mcsl-checkbox__size-#{$size});
-      border-radius: calc(utils.get-size-var("border-radius", $size, $vars) * 0.75);
+      border-radius: var(--mcsl-border-radius-sm);
     }
   }
 }

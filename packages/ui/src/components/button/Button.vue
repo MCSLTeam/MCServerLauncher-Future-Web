@@ -211,8 +211,6 @@ const onClick = computed(() =>
   }
 
   &:active {
-    transform: translateY(1px);
-
     & > .mcsl-button__label,
     & > .mcsl-button__icon {
       transition-duration: 0.1s;

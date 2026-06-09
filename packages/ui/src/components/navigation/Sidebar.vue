@@ -75,7 +75,7 @@ function isActive(info: PageNavigationInfo) {
 
 .sidebar__btn {
   min-height: 2.4rem;
-  border-radius: calc(var(--mcsl-border-radius-sm) - 1px) !important;
+  border-radius: var(--mcsl-border-radius-sm) !important;
   border: 1px solid transparent !important;
   transition:
     background-color 0.14s ease-out,

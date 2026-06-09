@@ -258,7 +258,7 @@ const sidebarPages = [
   z-index: 2;
   padding: 10px 12px;
   border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 82%, transparent);
-  border-radius: var(--mcsl-border-radius-xs);
+  border-radius: var(--mcsl-border-radius-sm);
   background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 92%, transparent);
   backdrop-filter: blur(12px);
 }

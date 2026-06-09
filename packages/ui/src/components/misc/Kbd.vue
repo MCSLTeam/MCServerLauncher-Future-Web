@@ -25,7 +25,7 @@ withDefaults(
   padding: 0 0.48em;
   border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 92%, transparent);
   border-bottom-color: color-mix(in srgb, var(--mcsl-border-color-dark) 72%, transparent);
-  border-radius: var(--mcsl-border-radius-xs);
+  border-radius: var(--mcsl-border-radius-sm);
   background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 96%, var(--mcsl-bg-color-dark));
   box-shadow:
     inset 0 1px 0 color-mix(in srgb, var(--mcsl-bg-color-overlay) 82%, transparent),

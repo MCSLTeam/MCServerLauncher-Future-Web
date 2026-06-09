@@ -166,7 +166,7 @@ onUnmounted(() => {
 .mcsl-file-dropper {
   min-height: 10rem;
   border: 1px dashed color-mix(in srgb, var(--mcsl-border-color-base) 86%, transparent);
-  border-radius: var(--mcsl-border-radius-md);
+  border-radius: var(--mcsl-border-radius-sm);
   background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 96%, transparent);
   display: flex;
   flex-direction: column;

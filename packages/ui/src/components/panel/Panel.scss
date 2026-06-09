@@ -11,8 +11,8 @@ $vars: map.merge(
       "large": var(--mcsl-box-shadow-base),
     ),
     "border-radius": (
-      "small": var(--mcsl-border-radius-xs),
-      "medium": var(--mcsl-border-radius-xs),
+      "small": var(--mcsl-border-radius-sm),
+      "medium": var(--mcsl-border-radius-sm),
       "large": var(--mcsl-border-radius-sm),
     ),
     "spacing": (

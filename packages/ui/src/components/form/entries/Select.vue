@@ -169,7 +169,7 @@ function findLabel(value: any) {
 
     height: $height;
     padding: 0 calc($spacing * 1.2) 0 calc($spacing * 1.4);
-    border-radius: calc(utils.get-size-var("border-radius", $size, $vars) - 1px);
+    border-radius: utils.get-size-var("border-radius", $size, $vars);
 
     &::placeholder {
       color: var(--mcsl-text-color-secondary);

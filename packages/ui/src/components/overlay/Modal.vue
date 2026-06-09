@@ -231,7 +231,7 @@ onUnmounted(() => {
     align-items: center;
 
     & > button {
-      border-radius: var(--mcsl-border-radius-md);
+      border-radius: var(--mcsl-border-radius-sm);
     }
   }
 }
