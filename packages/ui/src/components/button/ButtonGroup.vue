@@ -11,6 +11,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  width: fit-content;
 }
 </style>
 
@@ -18,8 +19,13 @@
 .mcsl-button-group > .mcsl-button {
   margin: 0;
 
+  &:not(:first-child) {
+    margin-left: -1px;
+  }
+
+  &:hover,
   &:focus-visible {
-    z-index: 1; // 避免outline被遮挡
+    z-index: 1;
   }
 
   &:not(:first-child):not(:last-child) {
