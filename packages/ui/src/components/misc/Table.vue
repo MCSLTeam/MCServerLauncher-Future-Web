@@ -31,12 +31,9 @@ withDefaults(
 <style scoped lang="scss">
 .mcsl-table-wrap {
   overflow: auto;
-  border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 88%, transparent);
   border-radius: var(--mcsl-border-radius-sm);
   background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 98%, transparent);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--mcsl-bg-color-overlay) 88%, transparent),
-    0 1px 2px color-mix(in srgb, var(--mcsl-text-color-primary) 5%, transparent);
 }
 
 .mcsl-table {
@@ -48,11 +45,16 @@ withDefaults(
 
 th,
 td {
-  padding: 10px 14px;
+  padding: 11px 13px;
   text-align: left;
   vertical-align: middle;
   border: 0;
   white-space: nowrap;
+}
+
+th:not(:last-child),
+td:not(:last-child) {
+  border-right: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 62%, transparent);
 }
 
 thead th {
@@ -60,8 +62,8 @@ thead th {
   font-weight: 600;
   font-size: var(--mcsl-font-size-sm);
   letter-spacing: 0;
-  background: color-mix(in srgb, var(--mcsl-bg-color-dark) 80%, var(--mcsl-bg-color-overlay));
-  border-bottom: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 82%, transparent);
+  background: color-mix(in srgb, var(--mcsl-bg-color-dark) 94%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 84%, transparent);
 }
 
 thead th:first-child {
@@ -89,7 +91,7 @@ tbody tr:hover {
 }
 
 tbody tr:not(:last-child) td {
-  border-bottom: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 70%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 84%, transparent);
 }
 
 tbody tr:last-child td:first-child {
