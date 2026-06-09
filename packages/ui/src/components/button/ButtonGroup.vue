@@ -18,7 +18,8 @@
 </style>
 
 <style lang="scss">
-.mcsl-button-group > .mcsl-button {
+.mcsl-button-group > .mcsl-button,
+.mcsl-button-group > .mcsl-dropdown-content {
   flex: 0 0 auto;
   margin: 0;
   min-width: max-content;
@@ -35,19 +36,35 @@
   &:active {
     z-index: 3;
   }
+}
 
-  &:not(:first-child):not(:last-child) {
-    border-radius: 0;
-  }
+.mcsl-button-group > .mcsl-dropdown-content {
+  position: relative;
+}
 
-  &:first-child {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
+.mcsl-button-group > .mcsl-dropdown-content > .mcsl-dropdown-content__triggerer {
+  display: flex;
+}
 
-  &:last-child {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-  }
+.mcsl-button-group > .mcsl-button,
+.mcsl-button-group > .mcsl-dropdown-content > .mcsl-dropdown-content__triggerer > .mcsl-button {
+  min-width: max-content;
+}
+
+.mcsl-button-group > .mcsl-button:not(:first-child):not(:last-child),
+.mcsl-button-group > .mcsl-dropdown-content:not(:first-child):not(:last-child) > .mcsl-dropdown-content__triggerer > .mcsl-button {
+  border-radius: 0;
+}
+
+.mcsl-button-group > .mcsl-button:first-child,
+.mcsl-button-group > .mcsl-dropdown-content:first-child > .mcsl-dropdown-content__triggerer > .mcsl-button {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.mcsl-button-group > .mcsl-button:last-child,
+.mcsl-button-group > .mcsl-dropdown-content:last-child > .mcsl-dropdown-content__triggerer > .mcsl-button {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 </style>

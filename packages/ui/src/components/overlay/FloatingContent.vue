@@ -1,5 +1,12 @@
 <script lang="ts" setup>
-import { computed, nextTick, onUnmounted, type Ref, ref } from "vue";
+import {
+  computed,
+  nextTick,
+  onUnmounted,
+  type Ref,
+  ref,
+  useAttrs,
+} from "vue";
 import { animatedVisibilityExists } from "../../utils/utils.ts";
 import type { PosInfo } from "../../utils/utils.ts";
 
@@ -32,6 +39,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<(e: "close" | "open" | "locate") => void>();
+const attrs = useAttrs();
 
 const visible = ref(false);
 const { exist, status } = animatedVisibilityExists(visible, 200, {
@@ -45,6 +53,28 @@ const { exist, status } = animatedVisibilityExists(visible, 200, {
 const wrapperEl = ref();
 const top = ref<number>(0);
 const left = ref<number>(0);
+const floatingClass = computed(() => [
+  attrs.class,
+  {
+    'mcsl-floating-content__visible': visible.value,
+    'mcsl-floating-content__transition':
+      status.value == 'show' && props.transition,
+  },
+]);
+const floatingStyle = computed(() => [
+  attrs.style,
+  {
+    top: `${top.value}px`,
+    left: `${left.value}px`,
+    position: props.position,
+    animation:
+      status.value == 'in'
+        ? props.inAnim
+        : status.value == 'out'
+          ? props.outAnim
+          : undefined,
+  },
+]);
 
 function getPosInfo() {
   return {
@@ -124,17 +154,8 @@ defineExpose({
   <div
     v-if="exist"
     ref="wrapperEl"
-    :class="{
-      'mcsl-floating-content__visible': visible,
-      'mcsl-floating-content__transition': status == 'show' && transition,
-    }"
-    :style="{
-      top: `${top}px`,
-      left: `${left}px`,
-      position: position,
-      animation:
-        status == 'in' ? inAnim : status == 'out' ? outAnim : undefined,
-    }"
+    :class="floatingClass"
+    :style="floatingStyle"
     class="mcsl-floating-content"
   >
     <slot v-bind="$attrs" />
@@ -145,7 +166,7 @@ defineExpose({
 .mcsl-floating-content {
   top: -9999px;
   left: -9999px;
-  z-index: 2000;
+  z-index: 900;
 }
 
 .mcsl-floating-content__transition {
