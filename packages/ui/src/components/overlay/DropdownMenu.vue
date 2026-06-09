@@ -80,11 +80,19 @@ defineExpose({
       :size="size"
       shadow
       v-bind="$attrs"
-      class="mcsl-dropdown-menu__menu"
+      :class="[
+        'mcsl-dropdown-menu__menu',
+        {
+          'mcsl-dropdown-menu__menu-fit-content': !followWidth,
+        },
+      ]"
       :style="{
         width: followWidth
           ? `max(calc(${dropdownContentRef.triggererPos.width}px - var(--mcsl-spacing-xs)), 12rem)`
           : undefined,
+        maxWidth: followWidth
+          ? undefined
+          : 'calc(100vw - 2 * var(--mcsl-spacing-md))',
         maxHeight: `calc(${maxHeight}px - var(--mcsl-spacing-lg) - 2 * var(--mcsl-spacing-2xs))`,
       }"
       @click="
@@ -101,6 +109,35 @@ defineExpose({
 </template>
 
 <style lang="scss">
+.mcsl-dropdown-menu__menu {
+  box-sizing: border-box;
+}
+
+.mcsl-dropdown-menu__menu-fit-content {
+  min-width: 0 !important;
+  width: max-content;
+
+  &.mcsl-panel__scrollable > .mcsl-panel__body-wrapper {
+    width: max-content;
+    max-width: 100%;
+  }
+
+  &.mcsl-panel__scrollable > .mcsl-panel__body-wrapper > .mcsl-panel__body {
+    width: max-content;
+    max-width: 100%;
+  }
+
+  :is(.mcsl-menu__items, .mcsl-menu__group, .mcsl-divider) {
+    width: max-content;
+    max-width: 100%;
+  }
+
+  .mcsl-menu__items > .mcsl-button {
+    width: max-content;
+    min-width: 100%;
+  }
+}
+
 @keyframes mcsl-dropdown-menu__anim-top {
   from {
     scale: 1 0.5;

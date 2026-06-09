@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { McLoadingIcon, RippleIcon, SpinnerIcon } from "../../utils/icons";
 import { type Color, getColorVar } from "../../utils/css.ts";
 import type { Size } from "../../utils/utils.ts";
 
@@ -7,7 +6,6 @@ withDefaults(
   defineProps<{
     label?: string;
     labelPos?: "left" | "right" | "top" | "bottom";
-    type?: "mc" | "ripples" | "spinner";
     color?: Color;
     block?: boolean;
     size?: Size;
@@ -16,7 +14,6 @@ withDefaults(
     size: "medium",
     label: "",
     labelPos: "bottom",
-    type: "spinner",
     color: "text-color-regular",
     block: false,
   },
@@ -35,10 +32,15 @@ withDefaults(
     }"
     class="mcsl-spinner"
   >
-    <McLoadingIcon v-if="type == 'mc'" />
-    <RippleIcon v-else-if="type == 'ripples'" />
-    <SpinnerIcon v-else-if="type == 'spinner'" />
-    <p>{{ label }}</p>
+    <svg
+      aria-hidden="true"
+      class="mcsl-spinner__icon"
+      viewBox="0 0 24 24"
+    >
+      <circle class="mcsl-spinner__track" cx="12" cy="12" r="9" />
+      <circle class="mcsl-spinner__indicator" cx="12" cy="12" r="9" />
+    </svg>
+    <p v-if="label">{{ label }}</p>
   </div>
 </template>
 
@@ -66,31 +68,72 @@ $vars: (
 }
 
 .mcsl-spinner {
-  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: var(--mcsl-spacing-xs);
+  color: var(--mcsl-spinner__color);
 
-  &.mcsl-spinner__label.top {
+  &.mcsl-spinner__label-top {
     flex-direction: column-reverse;
   }
 
-  &.mcsl-spinner__label.bottom {
+  &.mcsl-spinner__label-bottom {
     flex-direction: column;
   }
 
-  &.mcsl-spinner__label.left {
+  &.mcsl-spinner__label-left {
     flex-direction: row-reverse;
   }
 
-  &.mcsl-spinner__label.right {
+  &.mcsl-spinner__label-right {
     flex-direction: row;
   }
+}
+
+.mcsl-spinner__icon {
+  flex: 0 0 auto;
+  color: var(--mcsl-spinner__color);
+  animation: mcsl-spinner__rotate 0.9s linear infinite;
+
+  & circle {
+    fill: none;
+    stroke-width: 2.25;
+  }
+}
+
+.mcsl-spinner__track {
+  stroke: color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.mcsl-spinner__indicator {
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-dasharray: 42 64;
+}
+
+.mcsl-spinner > p {
+  margin: 0;
+  color: var(--mcsl-text-color-secondary);
+  font-size: var(--mcsl-font-size-sm);
+  line-height: 1.4;
 }
 
 .mcsl-spinner__block {
   width: 100%;
   height: 100%;
   min-height: 6rem;
+}
+
+@keyframes mcsl-spinner__rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mcsl-spinner__icon {
+    animation-duration: 1.8s;
+  }
 }
 </style>

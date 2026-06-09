@@ -48,11 +48,18 @@ export const config: RsbuildConfig = {
     mountId: "app",
     tags: [
       {
+        tag: "style",
+        head: true,
+        append: false,
+        children:
+          "html,body,#app{width:100%;height:100%;margin:0;background:#f8fafc;color-scheme:light;}html.dark,html.dark body,html.dark #app{background:#09090b;color-scheme:dark;}html.light,html.light body,html.light #app{background:#f8fafc;color-scheme:light;}",
+      },
+      {
         tag: "script",
         head: true,
         append: false,
         children:
-          "(()=>{try{const t=localStorage.getItem('theme')||'system';const d=window.matchMedia('(prefers-color-scheme: dark)').matches;const isDark=t==='dark'||t==='\"dark\"'||((t==='system'||t==='\"system\"')&&d);document.documentElement.classList.add(isDark?'dark':'light')}catch(e){}})();",
+          "(()=>{try{const t=localStorage.getItem('theme')||'system';const d=window.matchMedia('(prefers-color-scheme: dark)').matches;const isDark=t==='dark'||t==='\"dark\"'||((t==='system'||t==='\"system\"')&&d);const c=isDark?'dark':'light';document.documentElement.classList.remove(isDark?'light':'dark');document.documentElement.classList.add(c);document.documentElement.style.colorScheme=c;}catch(e){}})();",
       },
       {
         tag: "link",

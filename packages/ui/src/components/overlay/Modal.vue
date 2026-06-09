@@ -56,7 +56,7 @@ const modalId = Date.now();
 const modalIndex = computed(
   () => modals.value.length - modals.value.indexOf(modalId) - 1,
 );
-const { exist } = animatedVisibilityExists(visible, 200, {
+const { exist } = animatedVisibilityExists(visible, { in: 180, out: 160 }, {
   beforeShow: () => {
     modals.value.push(modalId);
     emit("open");
@@ -135,49 +135,49 @@ onUnmounted(() => {
       :class="{
         'mcsl-modal__overlay-visible': visible,
       }"
-      :style="{
-        '--mcsl-modal__overlay-bg': getColorVar(color),
-      }"
+      :style="{ '--mcsl-modal__overlay-accent': getColorVar(color) }"
       class="mcsl-modal__overlay"
       @click="() => (closeOnClickOutside && closable ? close() : {})"
     />
-    <Panel
+    <div
       :class="{ 'mcsl-modal__container-visible': visible }"
-      :style="{
-        '--mcsl-modal__card-max-width': maxWidth,
-        transform: `scale(${1 - modalIndex * 0.05}) translateY(-${modalIndex * 1.25}rem)`,
-      }"
-      :header-divider="headerDivider"
-      :header-class="headerClass"
-      :header-style="headerStyle"
-      :body-class="bodyClass"
-      :body-style="bodyStyle"
-      :scrollable="scrollable"
-      class="mcsl-modal__card"
-      size="large"
-      v-bind="$attrs"
+      class="mcsl-modal__container"
+      :style="{ '--mcsl-modal__card-max-width': maxWidth }"
     >
-      <template #header>
-        <div class="mcsl-modal__header">
-          <slot :close="close" :open="open" :visible="visible" name="header">
-            <h2>{{ header }}</h2>
-          </slot>
-          <Button
-            v-if="closable && closeBtn"
-            type="text"
-            icon="fas fa-xmark"
-            @click="close"
-          />
-        </div>
-      </template>
-      <slot :close="close" :open="open" :visible="visible" />
-    </Panel>
+      <Panel
+        :style="{
+          transform: `scale(${1 - modalIndex * 0.05}) translateY(-${modalIndex * 1.25}rem)`,
+        }"
+        :header-divider="headerDivider"
+        :header-class="headerClass"
+        :header-style="headerStyle"
+        :body-class="bodyClass"
+        :body-style="bodyStyle"
+        :scrollable="scrollable"
+        class="mcsl-modal__card"
+        size="large"
+        v-bind="$attrs"
+      >
+        <template #header>
+          <div class="mcsl-modal__header">
+            <slot :close="close" :open="open" :visible="visible" name="header">
+              <h2>{{ header }}</h2>
+            </slot>
+            <Button
+              v-if="closable && closeBtn"
+              type="text"
+              icon="fas fa-xmark"
+              @click="close"
+            />
+          </div>
+        </template>
+        <slot :close="close" :open="open" :visible="visible" />
+      </Panel>
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-@use "../../assets/css/utils";
-
 .mcsl-modal {
   width: 100vw;
   height: 100vh;
@@ -192,38 +192,45 @@ onUnmounted(() => {
 
 .mcsl-modal__overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   opacity: 0;
   z-index: 1001;
-  background: linear-gradient(
-    to bottom,
-    utils.transparent(var(--mcsl-modal__overlay-bg), 5%),
-    utils.transparent(var(--mcsl-modal__overlay-bg), 10%)
-  );
-
-  animation: 0.14s ease-out both mcsl-modal__overlay-out;
+  background:
+    radial-gradient(
+      circle at 50% 28%,
+      color-mix(in srgb, var(--mcsl-modal__overlay-accent) 9%, transparent) 0%,
+      transparent 38%
+    ),
+    color-mix(in srgb, var(--mcsl-color-surface-950) 46%, transparent);
+  backdrop-filter: blur(4px) saturate(0.96);
+  animation: 0.14s cubic-bezier(0.4, 0, 1, 1) both mcsl-modal__overlay-out;
+  will-change: opacity;
 
   &.mcsl-modal__overlay-visible {
-    animation: 0.14s ease-out both mcsl-modal__overlay-in;
+    animation: 0.16s cubic-bezier(0.2, 0, 0, 1) both mcsl-modal__overlay-in;
   }
 }
 
-.mcsl-modal__card {
+.mcsl-modal__container {
   width: min(
     var(--mcsl-modal__card-max-width),
     calc(100% - 4 * var(--mcsl-spacing-xl))
   );
   max-height: calc(100% - 2 * var(--mcsl-spacing-xl));
-  border-radius: var(--mcsl-border-radius-sm);
   z-index: 1002;
-  animation: 0.16s ease-out both fadeOutDown;
+  transform-origin: center;
+  animation: 0.14s cubic-bezier(0.4, 0, 1, 1) both mcsl-modal__card-out;
+  will-change: opacity, transform;
 
   &.mcsl-modal__container-visible {
-    animation: 0.16s ease-out fadeInUp;
+    animation: 0.18s cubic-bezier(0.2, 0, 0, 1) both mcsl-modal__card-in;
   }
+}
+
+.mcsl-modal__card {
+  width: 100%;
+  max-height: inherit;
+  border-radius: var(--mcsl-border-radius-sm);
 
   & .mcsl-modal__header {
     display: flex;
@@ -251,6 +258,38 @@ onUnmounted(() => {
   }
   to {
     opacity: 0;
+  }
+}
+
+@keyframes mcsl-modal__card-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes mcsl-modal__card-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(3px) scale(0.99);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mcsl-modal__overlay,
+  .mcsl-modal__container {
+    animation: none !important;
+    transition: none !important;
   }
 }
 </style>

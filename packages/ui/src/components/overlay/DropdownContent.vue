@@ -19,7 +19,6 @@ const wrapperEl = ref();
 const triggererEl = ref();
 const floatingContentEl = ref();
 const opened = computed(() => floatingContentEl.value?.opened);
-const triggererOffsetParent = computed(() => triggererEl.value?.offsetParent);
 const isVertical = computed(
   () => props.defaultPos == "top" || props.defaultPos == "bottom",
 );
@@ -41,11 +40,11 @@ const inAnim = computed(() => {
 });
 
 function locateXVertical(openX: number, elemX: Ref<number>, posInfo: PosInfo) {
-  const triggererWidth = triggererEl.value.offsetWidth;
+  const triggererWidth = triggererEl.value.getBoundingClientRect().width;
   elemX.value = clamp(
     openX - triggererWidth / 2,
     0,
-    triggererOffsetParent.value.offsetWidth - posInfo.width,
+    innerWidth - posInfo.width,
   );
 }
 
@@ -95,7 +94,7 @@ function locateYHorizontal(
   elemY.value = clamp(
     openY - posInfo.height / 2,
     0,
-    triggererOffsetParent.value.offsetHeight - posInfo.height,
+    innerHeight - posInfo.height,
   );
 }
 
@@ -106,19 +105,31 @@ function locator(
   elemY: Ref<number>,
   posInfo: PosInfo,
 ) {
-  if (posInfo.width > triggererOffsetParent.value.offsetWidth) elemX.value = 0;
+  if (posInfo.width > innerWidth) elemX.value = 0;
   else if (isVertical.value) locateXVertical(openX, elemX, posInfo);
-  else locateXHorizontal(openX, elemX, posInfo, triggererEl.value.offsetWidth);
-  if (posInfo.height > triggererOffsetParent.value.offsetHeight)
+  else
+    locateXHorizontal(
+      openX,
+      elemX,
+      posInfo,
+      triggererEl.value.getBoundingClientRect().width,
+    );
+  if (posInfo.height > innerHeight)
     elemY.value = 0;
   else if (isVertical.value)
-    locateYVertical(openY, elemY, posInfo, triggererEl.value.offsetHeight);
+    locateYVertical(
+      openY,
+      elemY,
+      posInfo,
+      triggererEl.value.getBoundingClientRect().height,
+    );
   else locateYHorizontal(openY, elemY, posInfo);
 }
 
 function getOpenPos() {
-  const x = triggererEl.value.offsetLeft + triggererEl.value.offsetWidth / 2;
-  const y = triggererEl.value.offsetTop + triggererEl.value.offsetHeight / 2;
+  const rect = triggererEl.value.getBoundingClientRect();
+  const x = rect.left + rect.width / 2;
+  const y = rect.top + rect.height / 2;
   return { x, y };
 }
 
@@ -145,10 +156,12 @@ function toggle() {
 
 onMounted(() => {
   window.addEventListener("resize", relocate);
+  window.addEventListener("scroll", relocate, true);
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", relocate);
+  window.removeEventListener("scroll", relocate, true);
 });
 
 defineExpose({
@@ -175,19 +188,21 @@ defineExpose({
         name="triggerer"
       />
     </div>
-    <FloatingContent
-      ref="floatingContentEl"
-      :in-anim="`0.1s ease-in-out both ${inAnim}`"
-      :locator="locator"
-      :out-anim="`0.1s ease-in-out both reverse ${inAnim}`"
-      class="mcsl-dropdown-content__dropdown"
-      position="absolute"
-      @close="$emit('close')"
-      @open="$emit('open')"
-      @locate="$emit('locate')"
-    >
-      <slot name="default" />
-    </FloatingContent>
+    <Teleport to="body">
+      <FloatingContent
+        ref="floatingContentEl"
+        :in-anim="`0.1s ease-in-out both ${inAnim}`"
+        :locator="locator"
+        :out-anim="`0.1s ease-in-out both reverse ${inAnim}`"
+        class="mcsl-dropdown-content__dropdown"
+        position="fixed"
+        @close="$emit('close')"
+        @open="$emit('open')"
+        @locate="$emit('locate')"
+      >
+        <slot name="default" />
+      </FloatingContent>
+    </Teleport>
   </div>
 </template>
 
