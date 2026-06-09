@@ -126,8 +126,11 @@ onMounted(() => {
   & > .mcsl-panel__body-wrapper {
     flex: 1 1 auto;
     min-height: 0;
+    min-width: 0;
+    width: 100%;
     max-height: 100%;
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 }
 </style>

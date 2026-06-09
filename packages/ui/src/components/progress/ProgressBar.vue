@@ -168,8 +168,7 @@ $size: var(--mcsl-progress-bar__size);
     position: relative;
   }
 
-  & > div::before,
-  & > div::after {
+  & > div::before {
     content: "";
     display: block;
     height: 100%;
@@ -187,56 +186,45 @@ $size: var(--mcsl-progress-bar__size);
     .mcsl-progress-bar__mode-indeterminate & {
       position: absolute;
       inset: 0 auto 0 0;
-      transform: translate3d(-100%, 0, 0) scaleX(0.38);
+      width: 42%;
+      background:
+        linear-gradient(
+          90deg,
+          transparent 0%,
+          color-mix(in srgb, $stroke-color 60%, transparent) 16%,
+          $stroke-color 44%,
+          $stroke-color 56%,
+          color-mix(in srgb, $stroke-color 60%, transparent) 84%,
+          transparent 100%
+        );
+      transform: translate3d(-130%, 0, 0);
+      transform-origin: center;
+      transition: none;
 
       :not(.mcsl-progress-bar__status-loading) & {
         transform: scaleX(1);
         animation: none;
+        background: $stroke-color;
       }
     }
   }
 
-  & > div::after {
-    display: none;
-  }
-
   .mcsl-progress-bar__status-loading.mcsl-progress-bar__mode-indeterminate & > div::before {
-    animation: 1.45s cubic-bezier(0.4, 0, 0.2, 1) infinite mcsl-progress-bar__indeterminate-primary;
-  }
-
-  .mcsl-progress-bar__status-loading.mcsl-progress-bar__mode-indeterminate & > div::after {
-    display: block;
-    animation: 1.45s 0.22s cubic-bezier(0.4, 0, 0.2, 1) infinite mcsl-progress-bar__indeterminate-secondary;
+    animation: 1.8s linear infinite mcsl-progress-bar__indeterminate;
   }
 }
 
-@keyframes mcsl-progress-bar__indeterminate-primary {
+@keyframes mcsl-progress-bar__indeterminate {
   0% {
-    transform: translate3d(-95%, 0, 0) scaleX(0.32);
-  }
-  45% {
-    transform: translate3d(8%, 0, 0) scaleX(0.52);
+    transform: translate3d(-130%, 0, 0);
   }
   100% {
-    transform: translate3d(118%, 0, 0) scaleX(0.22);
-  }
-}
-
-@keyframes mcsl-progress-bar__indeterminate-secondary {
-  0% {
-    transform: translate3d(-125%, 0, 0) scaleX(0.24);
-  }
-  55% {
-    transform: translate3d(22%, 0, 0) scaleX(0.44);
-  }
-  100% {
-    transform: translate3d(126%, 0, 0) scaleX(0.2);
+    transform: translate3d(340%, 0, 0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mcsl-progress-bar__line-like > div::before,
-  .mcsl-progress-bar__line-like > div::after {
+  .mcsl-progress-bar__line-like > div::before {
     animation: none !important;
     transition: none !important;
   }

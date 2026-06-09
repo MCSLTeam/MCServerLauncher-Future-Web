@@ -37,14 +37,32 @@ withDefaults(
 }
 
 .mcsl-skeleton {
+  border: 1px solid var(--mcsl-skeleton__edge);
   background: linear-gradient(
     90deg,
-    color-mix(in srgb, var(--mcsl-bg-color-dark) 92%, transparent) 0%,
-    color-mix(in srgb, var(--mcsl-bg-color-overlay) 88%, transparent) 50%,
-    color-mix(in srgb, var(--mcsl-bg-color-dark) 92%, transparent) 100%
+    var(--mcsl-skeleton__base) 0%,
+    var(--mcsl-skeleton__base) 34%,
+    var(--mcsl-skeleton__highlight) 50%,
+    var(--mcsl-skeleton__base) 66%,
+    var(--mcsl-skeleton__base) 100%
   );
   background-size: 240% 100%;
+  box-shadow: inset 0 1px 0 var(--mcsl-skeleton__inner-edge);
   animation: mcsl-skeleton 2.2s ease-in-out infinite;
+}
+
+.light .mcsl-skeleton {
+  --mcsl-skeleton__base: color-mix(in srgb, var(--mcsl-border-color-base) 72%, var(--mcsl-bg-color-dark));
+  --mcsl-skeleton__highlight: color-mix(in srgb, var(--mcsl-bg-color-overlay) 72%, white);
+  --mcsl-skeleton__edge: color-mix(in srgb, var(--mcsl-border-color-dark) 46%, transparent);
+  --mcsl-skeleton__inner-edge: color-mix(in srgb, white 72%, transparent);
+}
+
+.dark .mcsl-skeleton {
+  --mcsl-skeleton__base: color-mix(in srgb, var(--mcsl-bg-color-dark) 72%, var(--mcsl-border-color-base));
+  --mcsl-skeleton__highlight: color-mix(in srgb, var(--mcsl-bg-color-overlay) 82%, white 10%);
+  --mcsl-skeleton__edge: color-mix(in srgb, var(--mcsl-border-color-base) 70%, transparent);
+  --mcsl-skeleton__inner-edge: color-mix(in srgb, white 5%, transparent);
 }
 
 .mcsl-skeleton__rounded {

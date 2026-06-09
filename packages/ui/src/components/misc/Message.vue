@@ -26,8 +26,8 @@ const props = withDefaults(defineProps<MessageProps>(), {
   size: "medium",
   color: "primary",
   variant: "soft",
-  inAnim: "0.14s ease-out both fadeInUp",
-  outAnim: "0.14s ease-out both fadeOut",
+  inAnim: "0.16s cubic-bezier(0.2, 0, 0, 1) both mcsl-message__content-in",
+  outAnim: "0.14s cubic-bezier(0.4, 0, 1, 1) both mcsl-message__content-out",
   shadow: false,
   closeable: false,
 });
@@ -40,7 +40,7 @@ const visible = defineModel<boolean>("visible", {
   default: true,
 });
 
-const { exist } = animatedVisibilityExists(visible, 500, {
+const { exist } = animatedVisibilityExists(visible, { in: 180, out: 160 }, {
   beforeShow() {
     emit("open");
   },
@@ -100,7 +100,7 @@ defineExpose({
       '--mcsl-message__box-shadow': isSurface
         ? 'var(--mcsl-box-shadow-base)'
         : getShadow(color, 'base'),
-      '--mcsl-message__anim-in': inAnim + ' 0.2s',
+      '--mcsl-message__anim-in': inAnim,
       '--mcsl-message__anim-out': outAnim,
       '--mcsl-message__spacing':
         variant == 'text' ? 'var(--mcsl-spacing-2xs)' : undefined,
@@ -171,22 +171,21 @@ $close-size: 20px;
   transform: translate(0);
   position: relative;
   overflow: hidden;
+  display: grid;
+  grid-template-rows: 0fr;
   text-align: start;
   word-break: break-word;
   line-height: 1.6;
   background: var(--mcsl-message__surface-color);
   transition:
+    grid-template-rows 0.16s cubic-bezier(0.4, 0, 1, 1),
     background-color 0.22s ease-out,
     border-color 0.22s ease-out,
     box-shadow 0.22s ease-out;
-  animation:
-    var(--mcsl-message__anim-out),
-    1s 0.2s cubic-bezier(0, 1, 0, 1) collapseOutVertical;
 
   &.mcsl-message__visible {
-    animation:
-      0.8s ease-in-out collapseInVertical,
-      var(--mcsl-message__anim-in);
+    grid-template-rows: 1fr;
+    transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
   }
 }
 
@@ -195,6 +194,13 @@ $close-size: 20px;
   grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   align-items: start;
+  min-height: 0;
+  overflow: hidden;
+  animation: var(--mcsl-message__anim-out);
+
+  .mcsl-message__visible & {
+    animation: var(--mcsl-message__anim-in);
+  }
 
   .mcsl-message__with-title & {
     --mcsl-message__icon-font-size: 24px;
@@ -331,5 +337,37 @@ $close-size: 20px;
     var(--mcsl-message__bg-color) 8%
   );
   border: 1px solid transparent;
+}
+
+@keyframes mcsl-message__content-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.995);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes mcsl-message__content-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-3px) scale(0.995);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mcsl-message,
+  .mcsl-message__content {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 </style>

@@ -22,7 +22,7 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
         <div class="progress-stack">
           <ProgressBar variant="indeterminate" status="loading" />
           <ProgressBar variant="circle" :progress="72" status="loading" />
-          <Spinner type="spinner" label="Syncing" />
+          <Spinner label="Syncing" />
         </div>
       </Panel>
     </template>
