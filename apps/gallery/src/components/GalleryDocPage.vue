@@ -104,4 +104,67 @@ const apiItems = computed(() => galleryApiDocs[route.path] ?? defaultGalleryApiD
 :deep(.api-cell) {
   display: contents;
 }
+
+@media (max-width: 720px) {
+  .page-shell {
+    gap: 12px;
+  }
+
+  :deep(.doc-section .mcsl-panel__header h2) {
+    font-size: var(--mcsl-font-size-lg);
+  }
+
+  :deep(.doc-stack) {
+    gap: 12px;
+  }
+
+  :deep(.doc-api-table) {
+    gap: 0;
+  }
+
+  :deep(.doc-api-row) {
+    grid-template-columns: 1fr;
+  }
+
+  :deep(.doc-api-cell) {
+    padding: 10px 12px;
+  }
+
+  :deep(.doc-api-cell--head) {
+    padding-bottom: 4px;
+    background: color-mix(in srgb, var(--mcsl-bg-color-dark) 94%, transparent);
+    font-size: var(--mcsl-font-size-xs);
+    font-weight: 650;
+  }
+
+  :deep(.doc-api-cell:not(.doc-api-cell--head)) {
+    padding-top: 6px;
+  }
+
+  :deep(.button-row),
+  :deep(.overlay-row),
+  :deep(.tag-row),
+  :deep(.avatar-row) {
+    gap: 8px;
+  }
+
+  :deep(.select-grid),
+  :deep(.number-grid),
+  :deep(.form-grid),
+  :deep(.state-grid),
+  :deep(.toggle-grid),
+  :deep(.display-grid),
+  :deep(.status-grid),
+  :deep(.result-grid),
+  :deep(.empty-grid),
+  :deep(.nav-grid),
+  :deep(.sidebar-grid) {
+    grid-template-columns: 1fr !important;
+  }
+
+  :deep(.field--full),
+  :deep(.display-grid__wide) {
+    grid-column: auto;
+  }
+}
 </style>
