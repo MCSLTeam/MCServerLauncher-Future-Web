@@ -1,44 +1,80 @@
 import { createRouter, createWebHistory } from "vue-router";
+import ComponentGapsPage from "./pages/ComponentGapsPage.vue";
+import PageHeaderPage from "./pages/PageHeaderPage.vue";
+import ButtonsPage from "./pages/ButtonsPage.vue";
+import InputPage from "./pages/InputPage.vue";
+import NumberBoxPage from "./pages/NumberBoxPage.vue";
+import SelectPage from "./pages/SelectPage.vue";
+import SliderPage from "./pages/SliderPage.vue";
+import RadioPage from "./pages/RadioPage.vue";
+import CheckboxPage from "./pages/CheckboxPage.vue";
+import TogglePage from "./pages/TogglePage.vue";
+import ResultPage from "./pages/ResultPage.vue";
+import EmptyPage from "./pages/EmptyPage.vue";
+import DividerPage from "./pages/DividerPage.vue";
+import CopyableTextPage from "./pages/CopyableTextPage.vue";
+import SkeletonPage from "./pages/SkeletonPage.vue";
+import NavigationPage from "./pages/NavigationPage.vue";
+import BreadcrumbsPage from "./pages/BreadcrumbsPage.vue";
+import SidebarPage from "./pages/SidebarPage.vue";
+import NavTabsPage from "./pages/NavTabsPage.vue";
+import DropdownPage from "./pages/DropdownPage.vue";
+import DrawerPage from "./pages/DrawerPage.vue";
+import ConfirmDialogPage from "./pages/ConfirmDialogPage.vue";
+import TooltipPage from "./pages/TooltipPage.vue";
+import PopoverPage from "./pages/PopoverPage.vue";
+import ModalPage from "./pages/ModalPage.vue";
+import ContextmenuPage from "./pages/ContextmenuPage.vue";
+import ProgressPage from "./pages/ProgressPage.vue";
+import PaginationPage from "./pages/PaginationPage.vue";
+import UploadPage from "./pages/UploadPage.vue";
+import AvatarPage from "./pages/AvatarPage.vue";
+import TagPage from "./pages/TagPage.vue";
+import TablePage from "./pages/TablePage.vue";
+import MessagePage from "./pages/MessagePage.vue";
+import KbdPage from "./pages/KbdPage.vue";
+import EditorPage from "./pages/EditorPage.vue";
+import CompositionsPage from "./pages/CompositionsPage.vue";
 
 export default createRouter({
   history: createWebHistory(),
   routes: [
     { path: "/", redirect: "/components/buttons" },
-    { path: "/components/gaps", component: () => import("./pages/ComponentGapsPage.vue") },
-    { path: "/components/page-header", component: () => import("./pages/PageHeaderPage.vue") },
-    { path: "/components/buttons", component: () => import("./pages/ButtonsPage.vue") },
-    { path: "/components/input", component: () => import("./pages/InputPage.vue") },
-    { path: "/components/number-box", component: () => import("./pages/NumberBoxPage.vue") },
-    { path: "/components/select", component: () => import("./pages/SelectPage.vue") },
-    { path: "/components/slider", component: () => import("./pages/SliderPage.vue") },
-    { path: "/components/radio", component: () => import("./pages/RadioPage.vue") },
-    { path: "/components/checkbox", component: () => import("./pages/CheckboxPage.vue") },
-    { path: "/components/toggle", component: () => import("./pages/TogglePage.vue") },
-    { path: "/components/result", component: () => import("./pages/ResultPage.vue") },
-    { path: "/components/empty", component: () => import("./pages/EmptyPage.vue") },
-    { path: "/components/divider", component: () => import("./pages/DividerPage.vue") },
-    { path: "/components/copyable-text", component: () => import("./pages/CopyableTextPage.vue") },
-    { path: "/components/skeleton", component: () => import("./pages/SkeletonPage.vue") },
-    { path: "/components/navigation", component: () => import("./pages/NavigationPage.vue") },
-    { path: "/components/breadcrumbs", component: () => import("./pages/BreadcrumbsPage.vue") },
-    { path: "/components/sidebar", component: () => import("./pages/SidebarPage.vue") },
-    { path: "/components/nav-tabs", component: () => import("./pages/NavTabsPage.vue") },
-    { path: "/components/dropdown", component: () => import("./pages/DropdownPage.vue") },
-    { path: "/components/drawer", component: () => import("./pages/DrawerPage.vue") },
-    { path: "/components/confirm-dialog", component: () => import("./pages/ConfirmDialogPage.vue") },
-    { path: "/components/tooltip", component: () => import("./pages/TooltipPage.vue") },
-    { path: "/components/popover", component: () => import("./pages/PopoverPage.vue") },
-    { path: "/components/modal", component: () => import("./pages/ModalPage.vue") },
-    { path: "/components/contextmenu", component: () => import("./pages/ContextmenuPage.vue") },
-    { path: "/components/progress", component: () => import("./pages/ProgressPage.vue") },
-    { path: "/components/pagination", component: () => import("./pages/PaginationPage.vue") },
-    { path: "/components/upload", component: () => import("./pages/UploadPage.vue") },
-    { path: "/components/avatar", component: () => import("./pages/AvatarPage.vue") },
-    { path: "/components/tag", component: () => import("./pages/TagPage.vue") },
-    { path: "/components/table", component: () => import("./pages/TablePage.vue") },
-    { path: "/components/message", component: () => import("./pages/MessagePage.vue") },
-    { path: "/components/kbd", component: () => import("./pages/KbdPage.vue") },
-    { path: "/components/editor", component: () => import("./pages/EditorPage.vue") },
-    { path: "/components/compositions", component: () => import("./pages/CompositionsPage.vue") },
+    { path: "/components/gaps", component: ComponentGapsPage },
+    { path: "/components/page-header", component: PageHeaderPage },
+    { path: "/components/buttons", component: ButtonsPage },
+    { path: "/components/input", component: InputPage },
+    { path: "/components/number-box", component: NumberBoxPage },
+    { path: "/components/select", component: SelectPage },
+    { path: "/components/slider", component: SliderPage },
+    { path: "/components/radio", component: RadioPage },
+    { path: "/components/checkbox", component: CheckboxPage },
+    { path: "/components/toggle", component: TogglePage },
+    { path: "/components/result", component: ResultPage },
+    { path: "/components/empty", component: EmptyPage },
+    { path: "/components/divider", component: DividerPage },
+    { path: "/components/copyable-text", component: CopyableTextPage },
+    { path: "/components/skeleton", component: SkeletonPage },
+    { path: "/components/navigation", component: NavigationPage },
+    { path: "/components/breadcrumbs", component: BreadcrumbsPage },
+    { path: "/components/sidebar", component: SidebarPage },
+    { path: "/components/nav-tabs", component: NavTabsPage },
+    { path: "/components/dropdown", component: DropdownPage },
+    { path: "/components/drawer", component: DrawerPage },
+    { path: "/components/confirm-dialog", component: ConfirmDialogPage },
+    { path: "/components/tooltip", component: TooltipPage },
+    { path: "/components/popover", component: PopoverPage },
+    { path: "/components/modal", component: ModalPage },
+    { path: "/components/contextmenu", component: ContextmenuPage },
+    { path: "/components/progress", component: ProgressPage },
+    { path: "/components/pagination", component: PaginationPage },
+    { path: "/components/upload", component: UploadPage },
+    { path: "/components/avatar", component: AvatarPage },
+    { path: "/components/tag", component: TagPage },
+    { path: "/components/table", component: TablePage },
+    { path: "/components/message", component: MessagePage },
+    { path: "/components/kbd", component: KbdPage },
+    { path: "/components/editor", component: EditorPage },
+    { path: "/components/compositions", component: CompositionsPage },
   ],
 });
