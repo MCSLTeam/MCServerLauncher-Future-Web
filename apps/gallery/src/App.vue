@@ -6,6 +6,7 @@ import { Panel } from "@repo/ui";
 import { Button } from "@repo/ui";
 import { Breadcrumbs } from "@repo/ui";
 import { Sidebar } from "@repo/ui";
+import { Switch } from "@repo/ui";
 import { NotificationTemplate } from "@repo/ui";
 import { NotificationOverlay } from "@repo/ui";
 import { ContextmenuOverlay } from "@repo/ui";
@@ -75,11 +76,11 @@ const sidebarPages = [
         </div>
         <div class="gallery-controls">
           <label class="gallery-toggle">
-            <input v-model="showDense" type="checkbox" />
+            <Switch v-model="showDense" size="small" />
             <span>Dense</span>
           </label>
           <label class="gallery-toggle">
-            <input v-model="showStrongAccent" type="checkbox" />
+            <Switch v-model="showStrongAccent" size="small" color="help" />
             <span>Accent</span>
           </label>
         </div>
@@ -220,7 +221,7 @@ const sidebarPages = [
 .gallery-toggle {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 7px;
   color: var(--mcsl-text-color-regular);
   font-size: var(--mcsl-font-size-sm);
 }
