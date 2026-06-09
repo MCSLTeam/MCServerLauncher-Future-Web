@@ -14,6 +14,8 @@ import EmptyPage from "./pages/EmptyPage.vue";
 import DividerPage from "./pages/DividerPage.vue";
 import CopyableTextPage from "./pages/CopyableTextPage.vue";
 import SkeletonPage from "./pages/SkeletonPage.vue";
+import DisplayPage from "./pages/DisplayPage.vue";
+import FeedbackPage from "./pages/FeedbackPage.vue";
 import NavigationPage from "./pages/NavigationPage.vue";
 import BreadcrumbsPage from "./pages/BreadcrumbsPage.vue";
 import SidebarPage from "./pages/SidebarPage.vue";
@@ -55,6 +57,8 @@ export default createRouter({
     { path: "/components/divider", component: DividerPage },
     { path: "/components/copyable-text", component: CopyableTextPage },
     { path: "/components/skeleton", component: SkeletonPage },
+    { path: "/components/display", component: DisplayPage },
+    { path: "/components/feedback", component: FeedbackPage },
     { path: "/components/navigation", component: NavigationPage },
     { path: "/components/breadcrumbs", component: BreadcrumbsPage },
     { path: "/components/sidebar", component: SidebarPage },

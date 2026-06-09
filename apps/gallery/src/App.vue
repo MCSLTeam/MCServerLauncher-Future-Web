@@ -42,6 +42,8 @@ const sidebarPages = [
   { label: "分割线", description: "Divider", link: "/components/divider" },
   { label: "可复制文本", description: "CopyableText", link: "/components/copyable-text" },
   { label: "骨架屏", description: "Skeleton", link: "/components/skeleton" },
+  { label: "展示", description: "Display", link: "/components/display" },
+  { label: "反馈", description: "Feedback", link: "/components/feedback" },
   { label: "面包屑", description: "Breadcrumbs", link: "/components/breadcrumbs" },
   { label: "侧边栏", description: "Sidebar", link: "/components/sidebar" },
   { label: "导航标签", description: "NavTabs", link: "/components/nav-tabs" },
