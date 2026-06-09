@@ -101,10 +101,6 @@ defineExpose({
 </template>
 
 <style lang="scss">
-.mcsl-dropdown-menu__menu {
-  margin-top: 2px;
-}
-
 @keyframes mcsl-dropdown-menu__anim-top {
   from {
     scale: 1 0.5;

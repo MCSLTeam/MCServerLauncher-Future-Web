@@ -133,13 +133,13 @@ defineExpose({
 
 @each $size in utils.$sizes {
   .mcsl-size-#{$size}.mcsl-nav-tabs {
-    $padding: utils.get-size-var("spacing", $size, $vars);
+    $padding: calc(utils.get-size-var("spacing", $size, $vars) * 0.55);
 
     & > .mcsl-nav-tabs__btns {
       margin: $padding;
       & > button {
-        min-height: calc(utils.get-size-var("height", $size, $vars) - $padding);
-        padding: $padding calc($padding * 1.8);
+        min-height: calc(utils.get-size-var("height", $size, $vars) * 0.72);
+        padding: 0 calc($padding * 1.8);
       }
     }
 
@@ -173,7 +173,7 @@ defineExpose({
 .mcsl-nav-tabs__btns {
   display: flex;
   align-items: center;
-  gap: var(--mcsl-spacing-4xs);
+  gap: 2px;
 }
 
 .mcsl-nav-tabs__btns > button {
@@ -187,6 +187,8 @@ defineExpose({
   gap: var(--mcsl-spacing-4xs);
   border-radius: var(--mcsl-border-radius-sm);
   background: transparent;
+  font-size: var(--mcsl-font-size-sm);
+  line-height: 1;
   cursor: pointer;
   transition:
     background-color 0.14s ease-out,
