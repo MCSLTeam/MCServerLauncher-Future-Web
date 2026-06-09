@@ -366,7 +366,7 @@ const sidebarGroups = [
     width: min(100vw - 12px, 100%);
     height: auto;
     min-height: 100vh;
-    padding: 16px 0 20px;
+    padding: 8px 0 16px;
   }
 
   .gallery-docs {
@@ -380,22 +380,109 @@ const sidebarGroups = [
     padding: 12px;
   }
 
+  .gallery-brand {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .gallery-controls {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .gallery-toggle {
+    min-height: 36px;
+    justify-content: center;
+    padding: 0 8px;
+    border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 74%, transparent);
+    border-radius: var(--mcsl-border-radius-sm);
+    background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 78%, transparent);
+  }
+
   .gallery-docs__sidebar {
     min-height: auto;
 
     :deep(.mcsl-panel) {
       height: auto;
-      max-height: 280px;
+      max-height: 204px;
     }
 
     :deep(.mcsl-panel__body-wrapper) {
-      max-height: 220px;
+      max-height: 148px;
       overflow-y: auto;
     }
   }
 
+  .gallery-sidebar-groups {
+    gap: 10px;
+  }
+
+  .gallery-sidebar-group {
+    gap: 6px;
+  }
+
+  .gallery-sidebar-group:not(:first-child) {
+    padding-top: 10px;
+  }
+
+  .gallery-sidebar-group h4 {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin: 0;
+    padding: 4px 6px;
+    border-radius: var(--mcsl-border-radius-sm);
+    background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 94%, transparent);
+  }
+
+  .gallery-sidebar-group :deep(.sidebar) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .gallery-sidebar-group :deep(.sidebar__btn) {
+    min-height: 2.2rem;
+  }
+
+  .gallery-sidebar-group :deep(.sidebar__label) {
+    gap: 4px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .gallery-sidebar-group :deep(.sidebar__label-desc) {
+    font-size: 0.78em;
+  }
+
   .gallery-docs__content {
     overflow-y: visible;
+    gap: 10px;
+    padding-bottom: 12px;
+  }
+}
+
+@media (max-width: 520px) {
+  .gallery-brand {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .gallery-sidebar-group :deep(.sidebar) {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 340px) {
+  .gallery-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-toggle {
+    justify-content: space-between;
   }
 }
 
