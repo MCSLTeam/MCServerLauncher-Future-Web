@@ -11,7 +11,7 @@ defineProps<{
 
 defineEmits<(e: "drop", files: File[]) => void>();
 
-const { exist } = animatedVisibilityExists(isDragging, 200);
+const { exist } = animatedVisibilityExists(isDragging, { in: 180, out: 140 });
 </script>
 
 <template>
@@ -66,10 +66,14 @@ const { exist } = animatedVisibilityExists(isDragging, 200);
   top: 0;
   left: 0;
   z-index: 20;
-  animation: 0.2s ease-in-out fadeIn;
+  animation:
+    var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-enter) both
+    mcsl-floating-in;
 
   &.mcsl-file-dropper-overlay__closing {
-    animation: 0.2s ease-in-out fadeOut;
+    animation:
+      var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-exit) both
+      mcsl-floating-out;
   }
 }
 </style>

@@ -26,8 +26,10 @@ const props = withDefaults(defineProps<MessageProps>(), {
   size: "medium",
   color: "primary",
   variant: "soft",
-  inAnim: "0.16s cubic-bezier(0.2, 0, 0, 1) both mcsl-message__content-in",
-  outAnim: "0.14s cubic-bezier(0.4, 0, 1, 1) both mcsl-message__content-out",
+  inAnim:
+    "var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-enter) both mcsl-message__content-in",
+  outAnim:
+    "var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-exit) both mcsl-message__content-out",
   shadow: false,
   closeable: false,
 });
@@ -40,7 +42,7 @@ const visible = defineModel<boolean>("visible", {
   default: true,
 });
 
-const { exist } = animatedVisibilityExists(visible, { in: 180, out: 160 }, {
+const { exist } = animatedVisibilityExists(visible, { in: 180, out: 140 }, {
   beforeShow() {
     emit("open");
   },
@@ -178,14 +180,14 @@ $close-size: 20px;
   line-height: 1.6;
   background: var(--mcsl-message__surface-color);
   transition:
-    grid-template-rows 0.16s cubic-bezier(0.4, 0, 1, 1),
-    background-color 0.22s ease-out,
-    border-color 0.22s ease-out,
-    box-shadow 0.22s ease-out;
+    grid-template-rows var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-exit),
+    background-color var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-standard),
+    border-color var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-standard),
+    box-shadow var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-standard);
 
   &.mcsl-message__visible {
     grid-template-rows: 1fr;
-    transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+    transition-timing-function: var(--mcsl-motion-ease-enter);
   }
 }
 
@@ -229,7 +231,7 @@ $close-size: 20px;
   height: $btn-size;
   color: var(--mcsl-message__accent-color);
   font-size: var(--mcsl-message__icon-font-size);
-  transition: color 0.22s ease-out;
+  transition: color var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-standard);
 }
 
 .mcsl-message__body {
@@ -247,13 +249,13 @@ $close-size: 20px;
   font-size: var(--mcsl-font-size-md);
   font-weight: 650;
   line-height: 1.22;
-  transition: color 0.22s ease-out;
+  transition: color var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-standard);
 }
 
 .mcsl-message__text {
   color: var(--mcsl-message__text-color);
   font-size: var(--mcsl-font-size-sm);
-  transition: color 0.22s ease-out;
+  transition: color var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-standard);
 }
 
 .mcsl-message__buttons {
@@ -289,9 +291,9 @@ $close-size: 20px;
   cursor: pointer;
   outline: 0 solid transparent;
   transition:
-    background-color 0.18s ease-out,
-    color 0.18s ease-out,
-    outline-color 0.18s ease-out;
+    background-color var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard),
+    color var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard),
+    outline-color var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
 
   &:hover {
     background: color-mix(in srgb, var(--mcsl-message__accent-color) 12%, transparent);

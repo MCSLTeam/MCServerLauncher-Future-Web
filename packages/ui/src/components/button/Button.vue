@@ -197,24 +197,24 @@ const onClick = computed(() =>
   line-height: 1;
   white-space: nowrap;
   transition:
-    background-color 0.14s ease-out,
-    border-color 0.14s ease-out,
-    color 0.14s ease-out,
-    opacity 0.14s ease-out,
-    box-shadow 0.14s ease-out;
+    background-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    border-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    opacity var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    box-shadow var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 
   & > .mcsl-button__label,
   & > .mcsl-button__icon {
-    transition: color 0.14s ease-out, opacity 0.14s ease-out;
+    transition: color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard), opacity var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
   }
 
   &:active {
     & > .mcsl-button__label,
     & > .mcsl-button__icon {
-      transition-duration: 0.1s;
+      transition-duration: var(--mcsl-motion-duration-instant);
     }
 
-    transition-duration: 0.1s;
+    transition-duration: var(--mcsl-motion-duration-instant);
   }
 
   &:disabled {

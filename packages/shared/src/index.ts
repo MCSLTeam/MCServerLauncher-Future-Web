@@ -41,7 +41,8 @@ export const commitHash = import.meta.env.COMMIT_HASH;
 
 export const windowButtonsExists = ref(false);
 export const windowButtonTransition = computed(
-  () => `0.2s ${windowButtonsExists.value ? "" : "0.5s"} ease-in-out`,
+  () =>
+    `var(--mcsl-motion-duration-base) ${windowButtonsExists.value ? "" : "var(--mcsl-motion-duration-slower)"} var(--mcsl-motion-ease-standard)`,
 );
 
 export const loading = ref(true);

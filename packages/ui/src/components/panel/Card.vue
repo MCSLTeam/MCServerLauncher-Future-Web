@@ -40,7 +40,7 @@ withDefaults(
 .mcsl-card {
   border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 88%, transparent);
   background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 96%, transparent);
-  transition: 0.2s ease-in-out;
+  transition: var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
 }
 
 @each $size in utils.$sizes {

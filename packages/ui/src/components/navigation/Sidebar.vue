@@ -78,9 +78,9 @@ function isActive(info: PageNavigationInfo) {
   border-radius: var(--mcsl-border-radius-sm) !important;
   border: 1px solid transparent !important;
   transition:
-    background-color 0.14s ease-out,
-    border-color 0.14s ease-out,
-    color 0.14s ease-out !important;
+    background-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    border-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard) !important;
 }
 
 .sidebar__btn:hover:not(.sidebar__btn-active):not(:disabled) {

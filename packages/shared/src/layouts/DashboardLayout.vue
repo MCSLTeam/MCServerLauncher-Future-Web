@@ -147,7 +147,7 @@ watch(sidebarCollapsedStorage, () => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  transition: 0.2s ease-in-out;
+  transition: var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
 
   .dashboard-layout__sidebar-collapsed > & {
     width: calc(
@@ -228,7 +228,7 @@ watch(sidebarCollapsedStorage, () => {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  transition: 0.2s ease-in-out;
+  transition: var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
 }
 
 .dashboard-layout__sidebar-blocker-visible {

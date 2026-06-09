@@ -135,13 +135,13 @@ if (formField) {
   outline: 0 solid transparent;
   outline-offset: -2px; // 覆盖 border
   resize: none;
-  transition: 0.2s ease-in-out;
+  transition: var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
 }
 
 .mcsl-textarea__resizeable {
   resize: both;
   transition:
-    0.2s ease-in-out,
+    var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard),
     height 0s,
     width 0s;
 }

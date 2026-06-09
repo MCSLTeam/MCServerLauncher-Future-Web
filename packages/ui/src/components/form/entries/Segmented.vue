@@ -101,9 +101,9 @@ function isChecked(value: any) {
   color: var(--mcsl-text-color-regular);
   cursor: pointer;
   transition:
-    background-color 0.14s ease-out,
-    border-color 0.14s ease-out,
-    color 0.14s ease-out;
+    background-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    border-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 }
 
 .mcsl-segmented > button:hover:not(:disabled):not(.mcsl-segmented__checked) {

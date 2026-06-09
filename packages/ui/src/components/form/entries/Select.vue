@@ -190,10 +190,10 @@ function findLabel(value: any) {
   outline: 0 solid transparent;
   outline-offset: -2px;
   transition:
-    background-color 0.14s ease-out,
-    border-color 0.14s ease-out,
-    outline-color 0.14s ease-out,
-    color 0.14s ease-out;
+    background-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    border-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    outline-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -201,7 +201,7 @@ function findLabel(value: any) {
 
   & > i {
     color: var(--mcsl-text-color-secondary);
-    transition: transform 0.14s ease-out, color 0.14s ease-out;
+    transition: transform var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard), color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
   }
 
   & > span {

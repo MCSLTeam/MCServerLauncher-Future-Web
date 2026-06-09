@@ -178,9 +178,9 @@ function nextValue() {
   color: var(--mcsl-text-color-opposite);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mcsl-bg-color-overlay) 45%, transparent);
   transition:
-    border-color 0.14s ease-out,
-    background-color 0.14s ease-out,
-    box-shadow 0.14s ease-out;
+    border-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    background-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    box-shadow var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 
   i {
     font-size: 0.62em;
@@ -188,8 +188,8 @@ function nextValue() {
     opacity: 0;
     transform: scale(0.68);
     transition:
-      opacity 0.12s ease-out,
-      transform 0.12s ease-out;
+      opacity var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+      transform var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
   }
 }
 

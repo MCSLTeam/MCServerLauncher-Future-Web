@@ -107,7 +107,7 @@ $collapsed-width: utils.get-size-var("height", "large", SmallerContent.$vars);
   flex-direction: column;
   overflow: hidden auto;
   z-index: 10;
-  transition: 0.2s ease-in-out;
+  transition: var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
 
   @media (max-width: 450px) {
     left: calc(0px - $width - 2 * $padding);

@@ -38,7 +38,9 @@ onMounted(() => {
   top: 0;
   left: 0;
   background: var(--mcsl-bg-color-main);
-  animation: 0.5s ease-in-out 2s both fadeOut;
+  animation:
+    var(--mcsl-motion-duration-slower) var(--mcsl-motion-ease-exit)
+    var(--mcsl-motion-delay-splash) both fadeOut;
 }
 
 .welcome-overlay__logo {
@@ -49,7 +51,9 @@ onMounted(() => {
 
   & > img {
     width: 7rem;
-    animation: 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.5s both zoomIn;
+    animation:
+      var(--mcsl-motion-duration-slower) var(--mcsl-motion-ease-emphasized)
+      var(--mcsl-motion-delay-base) both zoomIn;
   }
 
   & > div {
@@ -80,7 +84,10 @@ onMounted(() => {
       overflow: hidden;
       height: 100%;
       max-width: 0;
-      animation: 0.75s ease-in-out 0.95s both collapseInHorizontal;
+      animation:
+        calc(var(--mcsl-motion-duration-slower) * 2) var(--mcsl-motion-ease-enter)
+        calc(var(--mcsl-motion-delay-longer) - var(--mcsl-motion-duration-instant) / 2)
+        both collapseInHorizontal;
     }
   }
 
@@ -90,11 +97,15 @@ onMounted(() => {
       align-items: center;
 
       & > h1 {
-        animation: 0.5s ease-in-out 0.8s both fadeInUp;
+        animation:
+          var(--mcsl-motion-duration-slower) var(--mcsl-motion-ease-enter)
+          var(--mcsl-motion-delay-long) both fadeInUp;
       }
 
       & > h2 {
-        animation: 0.5s ease-in-out 1s both fadeInUp;
+        animation:
+          var(--mcsl-motion-duration-slower) var(--mcsl-motion-ease-enter)
+          var(--mcsl-motion-delay-longer) both fadeInUp;
       }
     }
   }

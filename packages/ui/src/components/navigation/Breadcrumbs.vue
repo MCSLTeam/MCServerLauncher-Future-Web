@@ -53,7 +53,7 @@ const actualSeperator = computed(() => props.seperator ?? "/");
     gap: var(--mcsl-spacing-4xs);
     text-decoration: none;
     color: var(--mcsl-text-color-secondary);
-    transition: color 0.14s ease-out;
+    transition: color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
   }
 
   & > a > i,

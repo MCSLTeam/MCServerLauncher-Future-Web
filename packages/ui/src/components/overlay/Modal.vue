@@ -56,7 +56,7 @@ const modalId = Date.now();
 const modalIndex = computed(
   () => modals.value.length - modals.value.indexOf(modalId) - 1,
 );
-const { exist } = animatedVisibilityExists(visible, { in: 180, out: 160 }, {
+const { exist } = animatedVisibilityExists(visible, { in: 180, out: 140 }, {
   beforeShow: () => {
     modals.value.push(modalId);
     emit("open");
@@ -203,11 +203,15 @@ onUnmounted(() => {
     ),
     color-mix(in srgb, var(--mcsl-color-surface-950) 46%, transparent);
   backdrop-filter: blur(4px) saturate(0.96);
-  animation: 0.14s cubic-bezier(0.4, 0, 1, 1) both mcsl-modal__overlay-out;
+  animation:
+    var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-exit) both
+    mcsl-modal__overlay-out;
   will-change: opacity;
 
   &.mcsl-modal__overlay-visible {
-    animation: 0.16s cubic-bezier(0.2, 0, 0, 1) both mcsl-modal__overlay-in;
+    animation:
+      var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-enter) both
+      mcsl-modal__overlay-in;
   }
 }
 
@@ -219,11 +223,15 @@ onUnmounted(() => {
   max-height: calc(100% - 2 * var(--mcsl-spacing-xl));
   z-index: 1002;
   transform-origin: center;
-  animation: 0.14s cubic-bezier(0.4, 0, 1, 1) both mcsl-modal__card-out;
+  animation:
+    var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-exit) both
+    mcsl-modal__card-out;
   will-change: opacity, transform;
 
   &.mcsl-modal__container-visible {
-    animation: 0.18s cubic-bezier(0.2, 0, 0, 1) both mcsl-modal__card-in;
+    animation:
+      var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-enter) both
+      mcsl-modal__card-in;
   }
 }
 

@@ -11,8 +11,10 @@ import Message from "../../misc/Message.vue";
       v-bind="{
         closeable: true,
         shadow: true,
-        inAnim: '0.2s ease-in-out both fadeInRight',
-        outAnim: '0.2s ease-in-out both fadeOut',
+        inAnim:
+          'var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-enter) both mcsl-notification-in',
+        outAnim:
+          'var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-exit) both mcsl-notification-out',
 
         ...item.template.props(item),
       }"
@@ -32,7 +34,7 @@ import Message from "../../misc/Message.vue";
   display: flex;
   flex-direction: column-reverse;
   gap: var(--mcsl-spacing-xs);
-  transition: 0.2s ease-in-out;
+  transition: var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
   z-index: 3000;
 
   @media (max-width: 20rem) {

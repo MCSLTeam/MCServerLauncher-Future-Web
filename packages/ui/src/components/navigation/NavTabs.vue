@@ -191,9 +191,9 @@ defineExpose({
   line-height: 1;
   cursor: pointer;
   transition:
-    background-color 0.14s ease-out,
-    border-color 0.14s ease-out,
-    color 0.14s ease-out;
+    background-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    border-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 
   &:not(.mcsl-nav-tabs__btn-active):hover {
     border-color: color-mix(in srgb, var(--mcsl-border-color-base) 92%, transparent);
@@ -203,12 +203,12 @@ defineExpose({
   &:not(.mcsl-nav-tabs__btn-active):active {
     border-color: color-mix(in srgb, var(--mcsl-border-color-dark) 92%, transparent);
     background: color-mix(in srgb, var(--mcsl-bg-color-darker) 92%, transparent);
-    transition-duration: 0.08s;
+    transition-duration: var(--mcsl-motion-duration-instant);
   }
 
   & > i {
     font-size: var(--mcsl-font-size-sm);
-    transition: color 0.14s ease-out;
+    transition: color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
   }
 
   &.mcsl-nav-tabs__btn-active {
@@ -243,7 +243,7 @@ defineExpose({
     height: calc(100% - 2px);
     border: 1px solid color-mix(in srgb, var(--mcsl-nav-tabs__color) 22%, var(--mcsl-border-color-base));
     border-radius: var(--mcsl-border-radius-sm);
-    transition: transform 0.12s ease-out, width 0.12s ease-out;
+    transition: transform var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard), width var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
   }
 }
 </style>
