@@ -14,6 +14,7 @@ export type PosInfo = {
 
 export type PageNavigationInfo = {
   label: string;
+  description?: string;
   link?: RouteLocationRaw | string;
   onClick?: () => void | Promise<void>;
   disabled?: boolean;
