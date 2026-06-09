@@ -52,10 +52,13 @@ function isActive(info: PageNavigationInfo) {
       align="left"
       :color="isActive(info) ? 'primary' : undefined"
       :size="size"
-      v-tooltip.right="collapsed ? info.label : undefined"
+      v-tooltip.right="collapsed ? [info.label, info.description].filter(Boolean).join(' ') : undefined"
       @click="router ? navigateTo(info, router) : info.onClick?.()"
     >
-      <template v-if="!collapsed">{{ info.label }}</template>
+      <span v-if="!collapsed" class="sidebar__label">
+        <span class="sidebar__label-main">{{ info.label }}</span>
+        <span v-if="info.description" class="sidebar__label-desc">{{ info.description }}</span>
+      </span>
     </Button>
   </div>
 </template>
@@ -93,4 +96,31 @@ function isActive(info: PageNavigationInfo) {
 .sidebar__btn-collapsed {
   font-size: var(--mcsl-font-size-lg);
 }
+
+.sidebar__label {
+  display: inline-flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.sidebar__label-main,
+.sidebar__label-desc {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar__label-main {
+  color: var(--mcsl-text-color-primary);
+  font-weight: 500;
+}
+
+.sidebar__label-desc {
+  color: var(--mcsl-text-color-secondary);
+  font-size: 0.88em;
+  font-weight: 400;
+}
+
 </style>
