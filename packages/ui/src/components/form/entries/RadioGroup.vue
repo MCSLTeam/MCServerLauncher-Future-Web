@@ -76,9 +76,9 @@ $vars: (
   cursor: pointer;
   outline: 0 solid transparent;
   transition:
-    border-color 0.14s ease-out,
-    background-color 0.14s ease-out,
-    box-shadow 0.14s ease-out;
+    border-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    background-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    box-shadow var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 }
 
 .mcsl-radio-group__radio::before {
@@ -90,8 +90,8 @@ $vars: (
   opacity: 0;
   transform: scale(0.55);
   transition:
-    opacity 0.14s ease-out,
-    transform 0.14s ease-out;
+    opacity var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    transform var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 }
 
 .mcsl-radio-group__item:hover .mcsl-radio-group__radio {

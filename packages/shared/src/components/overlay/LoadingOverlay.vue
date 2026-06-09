@@ -57,12 +57,16 @@ watch(loading, (newValue) => {
   background: var(--mcsl-bg-color-main);
 
   & > div {
-    animation: 0.5s ease-in-out 0.25s both fadeIn;
+    animation:
+      var(--mcsl-motion-duration-slower) var(--mcsl-motion-ease-enter)
+      var(--mcsl-motion-delay-short) both fadeIn;
   }
 }
 
 .loading-overlay__hidden {
-  animation: 0.5s ease-in-out both fadeOut;
+  animation:
+    var(--mcsl-motion-duration-slower) var(--mcsl-motion-ease-exit) both
+    fadeOut;
 }
 
 .loading-overlay__container {

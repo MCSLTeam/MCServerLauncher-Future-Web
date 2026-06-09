@@ -73,7 +73,7 @@ export const useAppearance = defineStore("appearance", () => {
         // 渐变动画
         style.innerHTML = `
           * {
-              transition: ease-in-out 0.5s !important;
+              transition: var(--mcsl-motion-duration-slower) var(--mcsl-motion-ease-standard) !important;
           }
           `;
         set();
@@ -116,8 +116,8 @@ export const useAppearance = defineStore("appearance", () => {
                     : [...clipPath].reverse(),
               },
               {
-                duration: 500,
-                easing: "ease-in-out",
+                duration: 360,
+                easing: "cubic-bezier(0.2, 0, 0, 1)",
                 pseudoElement:
                   currActualTheme == "dark"
                     ? "::view-transition-new(root)"
@@ -130,7 +130,7 @@ export const useAppearance = defineStore("appearance", () => {
     }
 
     // 移除过渡样式
-    setTimeout(() => style.remove(), 500);
+    setTimeout(() => style.remove(), 360);
   }
 
   function load() {

@@ -96,7 +96,7 @@ defineExpose({
 
 <style lang="scss" scoped>
 .mcsl-collapsable-panel {
-  transition: background-color 0.14s ease-out, border-color 0.14s ease-out;
+  transition: background-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard), border-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 
   & .mcsl-collapsable-panel__header {
     cursor: pointer;
@@ -106,7 +106,7 @@ defineExpose({
     flex-direction: row;
 
     & > i {
-      transition: transform 0.14s ease-out, color 0.14s ease-out;
+      transition: transform var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard), color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
     }
   }
 }
@@ -121,13 +121,13 @@ defineExpose({
 <style lang="scss">
 .mcsl-collapsable-panel {
   & > .mcsl-panel__header {
-    transition: padding-bottom 0.14s ease-out;
+    transition: padding-bottom var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
   }
 
   & > .mcsl-panel__body-wrapper {
     overflow: hidden;
     max-height: 640px;
-    transition: max-height 0.18s ease-out, opacity 0.14s ease-out;
+    transition: max-height var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard), opacity var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
     opacity: 1;
   }
 }
@@ -140,7 +140,7 @@ defineExpose({
   & > .mcsl-panel__body-wrapper {
     max-height: 0;
     opacity: 0;
-    transition: max-height 0.18s ease-out, opacity 0.12s ease-out;
+    transition: max-height var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard), opacity var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
   }
 }
 

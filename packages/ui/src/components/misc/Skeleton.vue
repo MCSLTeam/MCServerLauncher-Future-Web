@@ -48,7 +48,9 @@ withDefaults(
   );
   background-size: 240% 100%;
   box-shadow: inset 0 1px 0 var(--mcsl-skeleton__inner-edge);
-  animation: mcsl-skeleton 2.2s ease-in-out infinite;
+  animation:
+    mcsl-skeleton calc(var(--mcsl-motion-duration-loading) * 1.2)
+    var(--mcsl-motion-ease-standard) infinite;
 }
 
 .light .mcsl-skeleton {

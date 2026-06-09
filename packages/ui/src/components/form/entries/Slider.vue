@@ -107,9 +107,9 @@ function onInput(event: Event) {
   background: var(--mcsl-bg-color-overlay);
   box-shadow: 0 1px 2px color-mix(in srgb, var(--mcsl-text-color-primary) 14%, transparent);
   transition:
-    background-color 0.14s ease-out,
-    box-shadow 0.14s ease-out,
-    transform 0.14s ease-out;
+    background-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    box-shadow var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    transform var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 }
 
 .mcsl-slider__input::-moz-range-thumb {
@@ -120,9 +120,9 @@ function onInput(event: Event) {
   background: var(--mcsl-bg-color-overlay);
   box-shadow: 0 1px 2px color-mix(in srgb, var(--mcsl-text-color-primary) 14%, transparent);
   transition:
-    background-color 0.14s ease-out,
-    box-shadow 0.14s ease-out,
-    transform 0.14s ease-out;
+    background-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    box-shadow var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    transform var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 }
 
 .mcsl-slider__input:hover::-webkit-slider-thumb,

@@ -32,7 +32,8 @@ const t = useI18n().t;
     :props="
       (notif) => ({
         ...notif.settings.data,
-        inAnim: '0.2s cubic-bezier(0.18, 0.89, 0.32, 1.13) both fadeInRight',
+        inAnim:
+          'var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-enter) both mcsl-notification-in',
       })
     "
   >

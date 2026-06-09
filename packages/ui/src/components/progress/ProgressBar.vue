@@ -176,7 +176,9 @@ $size: var(--mcsl-progress-bar__size);
     border-radius: var(--mcsl-border-radius-full);
     background: $stroke-color;
     transform-origin: left center;
-    transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1);
+    transition:
+      transform var(--mcsl-motion-duration-slow)
+      var(--mcsl-motion-ease-standard);
     will-change: transform;
 
     .mcsl-progress-bar__mode-line & {
@@ -210,7 +212,9 @@ $size: var(--mcsl-progress-bar__size);
   }
 
   .mcsl-progress-bar__status-loading.mcsl-progress-bar__mode-indeterminate & > div::before {
-    animation: 1.8s linear infinite mcsl-progress-bar__indeterminate;
+    animation:
+      var(--mcsl-motion-duration-loading) var(--mcsl-motion-ease-linear) infinite
+      mcsl-progress-bar__indeterminate;
   }
 }
 
@@ -264,7 +268,9 @@ $size: var(--mcsl-progress-bar__size);
         stroke-linecap: round;
         stroke-dasharray: calc($circumference);
         stroke-dashoffset: calc($circumference * (1 - $progress-decimal));
-        transition: stroke-dashoffset 0.14s ease-out;
+        transition:
+          stroke-dashoffset var(--mcsl-motion-duration-fast)
+          var(--mcsl-motion-ease-standard);
       }
     }
   }

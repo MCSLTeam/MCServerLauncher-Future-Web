@@ -90,7 +90,7 @@ const actuallyVisible = computed(
   border-radius: var(--mcsl-border-radius-full);
   border: $border-width solid var(--mcsl-badge__border-color);
   scale: 0;
-  transition: 0.2s ease-in-out;
+  transition: var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
 
   .mcsl-badge__visible & {
     scale: 1;

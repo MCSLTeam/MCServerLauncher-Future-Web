@@ -160,7 +160,7 @@ defineExpose({
   padding: var(--mcsl-spacing-2xs);
   border-right: 1px solid var(--mcsl-border-color-base);
   background: var(--mcsl-bg-color-main);
-  transition: box-shadow 0.2s ease-in-out;
+  transition: box-shadow var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
 
   & > div {
     text-align: right;
@@ -222,11 +222,13 @@ defineExpose({
   z-index: 1;
   pointer-events: none;
   animation: none;
-  transition: 0.1s ease-out;
+  transition: var(--mcsl-motion-duration-instant) var(--mcsl-motion-ease-standard);
 }
 
 .mcsl-base-text-editor__caret-visible {
   opacity: 1;
-  animation: blink 1s 0.1s step-end infinite;
+  animation:
+    blink var(--mcsl-motion-duration-loading) step-end
+    var(--mcsl-motion-duration-instant) infinite;
 }
 </style>

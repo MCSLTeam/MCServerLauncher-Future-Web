@@ -174,10 +174,10 @@ onUnmounted(() => {
   align-items: center;
   cursor: pointer;
   transition:
-    border-color 0.14s ease-out,
-    background-color 0.14s ease-out,
-    color 0.14s ease-out,
-    transform 0.14s ease-out;
+    border-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    background-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    transform var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 
   &:hover {
     border-color: color-mix(in srgb, var(--mcsl-color-primary) 28%, var(--mcsl-border-color-base));
@@ -211,7 +211,7 @@ onUnmounted(() => {
   & > i {
     font-size: calc(var(--mcsl-font-size-8xl) - 0.5rem);
     margin-bottom: var(--mcsl-spacing-2xs);
-    transition: transform 0.14s ease-out, color 0.14s ease-out;
+    transition: transform var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard), color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
   }
 
   & > h3 {
@@ -225,7 +225,7 @@ onUnmounted(() => {
   color: var(--mcsl-text-color-regular);
   font-size: var(--mcsl-font-size-md);
   opacity: 0;
-  transition: opacity 0.14s ease-out;
+  transition: opacity var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 }
 
 .mcsl-file-dropper__subtitle-show {

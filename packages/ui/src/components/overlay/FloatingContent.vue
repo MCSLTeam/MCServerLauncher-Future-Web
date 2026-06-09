@@ -31,8 +31,10 @@ const props = withDefaults(
   }>(),
   {
     transition: false,
-    inAnim: "0.2s ease-in-out both fadeIn",
-    outAnim: "0.2s ease-in-out both fadeOut",
+    inAnim:
+      "var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-enter) both mcsl-floating-in",
+    outAnim:
+      "var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-exit) both mcsl-floating-out",
     closeOnClickOutside: true,
     position: "absolute",
   },
@@ -170,6 +172,6 @@ defineExpose({
 }
 
 .mcsl-floating-content__transition {
-  transition: 0.1s ease-in-out;
+  transition: var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 }
 </style>

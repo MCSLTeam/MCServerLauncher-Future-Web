@@ -137,7 +137,7 @@ $vars: map.merge(
   border-radius: var(--mcsl-border-radius-full);
   background: var(--mcsl-border-color-base);
   transform: translate(0);
-  transition: 0.2s ease-in-out;
+  transition: var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
 
   &::before {
     content: "";
@@ -147,7 +147,10 @@ $vars: map.merge(
     background: var(--mcsl-text-color-light);
     border-radius: var(--mcsl-border-radius-full);
     box-shadow: var(--mcsl-box-shadow-light);
-    transition: 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.38);
+    transition:
+      left var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-emphasized),
+      box-shadow var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+      background-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
   }
 
   &:focus-visible {

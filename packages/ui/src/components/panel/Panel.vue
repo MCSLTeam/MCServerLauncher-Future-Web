@@ -80,10 +80,10 @@ onMounted(() => {
   outline: 0 solid transparent;
   outline-offset: -2px; // 覆盖 border
   transition:
-    background-color 0.14s ease-out,
-    border-color 0.14s ease-out,
-    box-shadow 0.14s ease-out,
-    outline-color 0.14s ease-out;
+    background-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    border-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    box-shadow var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    outline-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 
   &:focus-visible {
     outline: 3px solid var(--mcsl-color-help);

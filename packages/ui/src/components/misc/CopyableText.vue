@@ -69,7 +69,7 @@ onUnmounted(() => {
   background: var(--mcsl-border-color-light);
   gap: var(--mcsl-spacing-4xs);
   cursor: pointer;
-  transition: 0.2s ease-in-out;
+  transition: var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
 
   &:hover {
     background: var(--mcsl-border-color-base);

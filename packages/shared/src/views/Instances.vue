@@ -535,7 +535,7 @@ function highlightText(text: string, searchText: string): string {
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
-      transition: 0.2s ease-in-out;
+      transition: var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
     }
 
     & > p {
@@ -581,7 +581,9 @@ function highlightText(text: string, searchText: string): string {
   height: 0.75rem;
   background: var(--instances__instance-status-color);
   border-radius: var(--mcsl-border-radius-full);
-  animation: instances__instance-status-ripple 1s ease-in-out infinite;
+  animation:
+    instances__instance-status-ripple var(--mcsl-motion-duration-loading)
+    var(--mcsl-motion-ease-standard) infinite;
 }
 
 @keyframes instances__instance-status-ripple {

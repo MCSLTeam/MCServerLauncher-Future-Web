@@ -79,7 +79,7 @@ const gridStyle = computed(() => ({
 }
 
 .mcsl-table__row:not(.mcsl-table__row--head) {
-  transition: background-color 0.12s ease-out;
+  transition: background-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 }
 
 .mcsl-table__row:not(.mcsl-table__row--head):hover {

@@ -29,15 +29,15 @@ const animation = computed(() => {
   if (status.value == "in") {
     anim = props.inAnim;
     if (props.collapse == "vertical")
-      anim += `, 0.5s ease-in-out both collapseInVertical`;
+      anim += `, var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-enter) both collapseInVertical`;
     if (props.collapse == "horizontal")
-      anim += `, 0.5s ease-in-out both collapseInHorizontal`;
+      anim += `, var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-enter) both collapseInHorizontal`;
   } else if (status.value == "out") {
     anim = props.outAnim;
     if (props.collapse == "vertical")
-      anim += `, 1s cubic-bezier(0, 1, 0, 1) both collapseOutVertical`;
+      anim += `, var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-exit) both collapseOutVertical`;
     if (props.collapse == "horizontal")
-      anim += `, 1s cubic-bezier(0, 1, 0, 1) both collapseOutHorizontal`;
+      anim += `, var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-exit) both collapseOutHorizontal`;
   }
   return anim;
 });

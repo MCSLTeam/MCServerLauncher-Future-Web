@@ -27,15 +27,30 @@ const floatingGap = 6;
 const inAnim = computed(() => {
   switch (animType.value) {
     case "top":
-      return "stretchInUp";
+      return "mcsl-floating-in-up";
     case "bottom":
-      return "stretchInDown";
+      return "mcsl-floating-in-down";
     case "left":
-      return "stretchInLeft";
+      return "mcsl-floating-in-left";
     case "right":
-      return "stretchInRight";
+      return "mcsl-floating-in-right";
     default:
-      return "fadeIn";
+      return "mcsl-floating-in";
+  }
+});
+
+const outAnim = computed(() => {
+  switch (animType.value) {
+    case "top":
+      return "mcsl-floating-out-up";
+    case "bottom":
+      return "mcsl-floating-out-down";
+    case "left":
+      return "mcsl-floating-out-left";
+    case "right":
+      return "mcsl-floating-out-right";
+    default:
+      return "mcsl-floating-out";
   }
 });
 
@@ -191,9 +206,9 @@ defineExpose({
     <Teleport to="body">
       <FloatingContent
         ref="floatingContentEl"
-        :in-anim="`0.1s ease-in-out both ${inAnim}`"
+        :in-anim="`var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-enter) both ${inAnim}`"
         :locator="locator"
-        :out-anim="`0.1s ease-in-out both reverse ${inAnim}`"
+        :out-anim="`var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-exit) both ${outAnim}`"
         class="mcsl-dropdown-content__dropdown"
         position="fixed"
         @close="$emit('close')"

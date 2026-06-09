@@ -191,12 +191,16 @@ onUnmounted(() => {
 
 .mcsl-drawer-fade-enter-active,
 .mcsl-drawer-fade-leave-active {
-  transition: opacity 0.16s ease-out;
+  transition: opacity var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
 }
 
 .mcsl-drawer-fade-enter-active .mcsl-drawer,
 .mcsl-drawer-fade-leave-active .mcsl-drawer {
-  transition: transform 0.18s ease-out;
+  transition: transform var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-enter);
+}
+
+.mcsl-drawer-fade-leave-active .mcsl-drawer {
+  transition-timing-function: var(--mcsl-motion-ease-exit);
 }
 
 .mcsl-drawer-fade-enter-from,

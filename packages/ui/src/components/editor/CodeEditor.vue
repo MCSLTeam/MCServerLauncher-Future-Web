@@ -116,7 +116,7 @@ function searchMatch(a: string, b: string) {
   justify-content: space-between;
   background: var(--mcsl-bg-color-main);
   border-top: 1px solid var(--mcsl-border-color-base);
-  transition: 0.2s ease-in-out;
+  transition: var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
   overflow: auto hidden;
 
   & > div {
@@ -143,7 +143,7 @@ function searchMatch(a: string, b: string) {
   outline: 0 solid transparent;
   outline-offset: -3px;
   padding: 0 var(--mcsl-spacing-2xs);
-  transition: 0.2s ease-in-out;
+  transition: var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
 
   &:hover {
     background: var(--mcsl-bg-color-dark);

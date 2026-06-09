@@ -94,7 +94,9 @@ $vars: (
 .mcsl-spinner__icon {
   flex: 0 0 auto;
   color: var(--mcsl-spinner__color);
-  animation: mcsl-spinner__rotate 0.9s linear infinite;
+  animation:
+    mcsl-spinner__rotate calc(var(--mcsl-motion-duration-loading) / 2)
+    var(--mcsl-motion-ease-linear) infinite;
 
   & circle {
     fill: none;
@@ -133,7 +135,7 @@ $vars: (
 
 @media (prefers-reduced-motion: reduce) {
   .mcsl-spinner__icon {
-    animation-duration: 1.8s;
+    animation-duration: var(--mcsl-motion-duration-loading);
   }
 }
 </style>

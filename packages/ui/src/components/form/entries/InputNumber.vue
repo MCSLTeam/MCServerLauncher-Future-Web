@@ -239,7 +239,7 @@ onUnmounted(() => {
   border: 1px solid var(--mcsl-border-color-base);
   outline: 0 solid transparent;
   outline-offset: -2px; // 覆盖 border
-  transition: 0.2s ease-in-out;
+  transition: var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
 
   &::-webkit-inner-spin-button, // webkit / chromium hide arrows
   &::-webkit-outer-spin-button {

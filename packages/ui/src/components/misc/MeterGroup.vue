@@ -133,7 +133,7 @@ $dark-color: color-mix(
     width: var(--mcsl-meter-group__width);
     height: 100%;
     background: $light-color;
-    transition: 0.2s ease-in-out;
+    transition: var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
 
     &:hover {
       background: $dark-color;
