@@ -14,6 +14,7 @@ withDefaults(
     placeholder?: string;
     password?: boolean;
     clearable?: boolean;
+    resizeable?: boolean;
   }>(),
   {
     size: "medium",
@@ -23,6 +24,7 @@ withDefaults(
     placeholder: "",
     password: false,
     clearable: false,
+    resizeable: false,
   },
 );
 
@@ -66,7 +68,13 @@ if (formField) {
 </script>
 
 <template>
-  <div class="mcsl-input mcsl-input-text" :class="[`mcsl-size-${size}`]">
+  <div
+    class="mcsl-input mcsl-input-text"
+    :class="[
+      `mcsl-size-${size}`,
+      { 'mcsl-input-text__resizeable': resizeable },
+    ]"
+  >
     <input
       v-model="model"
       :aria-invalid="
@@ -161,6 +169,15 @@ if (formField) {
 .mcsl-input-text {
   flex: 1;
   transform: translate(0);
+  min-width: 8rem;
+}
+
+.mcsl-input-text__resizeable {
+  flex: 0 0 auto;
+  width: min(100%, 18rem);
+  max-width: 100%;
+  overflow: auto hidden;
+  resize: horizontal;
 }
 
 .mcsl-input-text > input {

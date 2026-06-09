@@ -122,8 +122,8 @@ const onClick = computed(() =>
         ? 'color-mix(in srgb, var(--mcsl-border-color-dark) 68%, var(--mcsl-border-color-base))'
         : new ColorData(props.color, 'default', 0.62).getCss(),
       '--mcsl-button__border-active': isSurface
-        ? 'var(--mcsl-border-color-dark)'
-        : `var(--mcsl-color-${color})`,
+        ? 'color-mix(in srgb, var(--mcsl-border-color-dark) 72%, var(--mcsl-border-color-base))'
+        : new ColorData(props.color, 'default', 0.68).getCss(),
       '--mcsl-button__border-disabled': isSurface
         ? 'var(--mcsl-border-color-light)'
         : 'var(--mcsl-border-color-base)',
@@ -186,8 +186,7 @@ const onClick = computed(() =>
   position: relative;
   box-sizing: border-box;
   border: 1px solid transparent;
-  outline: 0 solid transparent;
-  outline-offset: 2px;
+  outline: none;
   width: fit-content;
   display: flex;
   align-items: center;
@@ -202,8 +201,7 @@ const onClick = computed(() =>
     border-color 0.14s ease-out,
     color 0.14s ease-out,
     opacity 0.14s ease-out,
-    box-shadow 0.14s ease-out,
-    transform 0.12s ease-out;
+    box-shadow 0.14s ease-out;
 
   & > .mcsl-button__label,
   & > .mcsl-button__icon {
@@ -221,7 +219,6 @@ const onClick = computed(() =>
 
   &:disabled {
     cursor: not-allowed;
-    transform: none;
     box-shadow: none !important;
   }
 
@@ -315,7 +312,9 @@ const onClick = computed(() =>
   }
 
   &:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--mcsl-color-help) 44%, transparent);
+    box-shadow:
+      var(--mcsl-button__focus-shadow, 0 0 0 3px color-mix(in srgb, var(--mcsl-color-help) 18%, transparent)),
+      var(--mcsl-button__type-shadow, 0 0 0 0 transparent);
   }
 }
 
@@ -350,7 +349,7 @@ const onClick = computed(() =>
   }
 
   &:active {
-    border-color: var(--mcsl-button__border-active);
+    border-color: var(--mcsl-button__border-hover);
     background: var(--mcsl-button__bg-active);
 
     & > .mcsl-button__label,
@@ -370,13 +369,16 @@ const onClick = computed(() =>
   }
 
   &:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--mcsl-color-help) 44%, transparent);
+    box-shadow:
+      var(--mcsl-button__focus-shadow, 0 0 0 3px color-mix(in srgb, var(--mcsl-color-help) 18%, transparent)),
+      var(--mcsl-button__type-shadow, 0 0 0 0 transparent);
   }
 }
 
 .mcsl-button__type-primary {
   border: 1px solid var(--mcsl-button__primary-bg);
   background: var(--mcsl-button__primary-bg);
+  --mcsl-button__type-shadow: 0 1px 2px color-mix(in srgb, var(--mcsl-button__primary-bg) 18%, transparent);
 
   & > .mcsl-button__label,
   & > .mcsl-button__icon {
@@ -390,22 +392,24 @@ const onClick = computed(() =>
   }
 
   &:hover {
-    border: 1px solid var(--mcsl-button__primary-bg-hover);
+    border-color: var(--mcsl-button__primary-bg-hover);
     background: var(--mcsl-button__primary-bg-hover);
   }
 
   &:active {
-    border: 1px solid var(--mcsl-button__primary-bg-active);
+    border-color: var(--mcsl-button__primary-bg-hover);
     background: var(--mcsl-button__primary-bg-active);
   }
 
   &:disabled {
-    border: 1px solid var(--mcsl-button__primary-bg-disabled);
+    border-color: var(--mcsl-button__primary-bg-disabled);
     background: var(--mcsl-button__primary-bg-disabled);
   }
 
   &:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--mcsl-color-help) 44%, transparent);
+    box-shadow:
+      var(--mcsl-button__focus-shadow, 0 0 0 3px color-mix(in srgb, var(--mcsl-color-help) 18%, transparent)),
+      var(--mcsl-button__type-shadow, 0 0 0 0 transparent);
   }
 }
 </style>
