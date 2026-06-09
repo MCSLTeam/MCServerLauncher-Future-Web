@@ -152,7 +152,8 @@ $close-size: 20px;
     & > .mcsl-message__content {
       $spacing: var(--mcsl-message__spacing);
       padding: $spacing;
-      width: calc(100% - 2 * $spacing);
+      box-sizing: border-box;
+      width: 100%;
 
       & .mcsl-message__title {
         margin-bottom: 9px;
@@ -190,7 +191,10 @@ $close-size: 20px;
 }
 
 .mcsl-message__content {
-  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
 
   .mcsl-message__with-title & {
     --mcsl-message__icon-font-size: 24px;
@@ -200,17 +204,18 @@ $close-size: 20px;
 }
 
 .mcsl-message__show-icon .mcsl-message__content {
-  padding-left: calc(var(--mcsl-message__spacing) + $btn-size + 8px);
+  grid-template-columns: $btn-size minmax(0, 1fr);
 }
 
 .mcsl-message__closable .mcsl-message__content {
-  padding-right: calc(var(--mcsl-message__spacing) + $close-size + 12px);
+  grid-template-columns: minmax(0, 1fr) $close-size;
+}
+
+.mcsl-message__show-icon.mcsl-message__closable .mcsl-message__content {
+  grid-template-columns: $btn-size minmax(0, 1fr) $close-size;
 }
 
 .mcsl-message__icon {
-  position: absolute;
-  top: calc(var(--mcsl-message__spacing) + 1px);
-  left: var(--mcsl-message__spacing);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -223,6 +228,11 @@ $close-size: 20px;
 
 .mcsl-message__body {
   min-width: 0;
+  grid-column: 1;
+}
+
+.mcsl-message__show-icon .mcsl-message__body {
+  grid-column: 2;
 }
 
 .mcsl-message__title {
@@ -247,12 +257,15 @@ $close-size: 20px;
 }
 
 .mcsl-message__close-btn {
-  position: absolute;
-  top: calc(var(--mcsl-message__spacing) + 1px);
-  right: var(--mcsl-message__spacing);
   display: flex;
   align-items: flex-start;
+  justify-content: flex-end;
   min-width: $close-size;
+  grid-column: 2;
+}
+
+.mcsl-message__show-icon.mcsl-message__closable .mcsl-message__close-btn {
+  grid-column: 3;
 }
 
 .mcsl-message__close {
