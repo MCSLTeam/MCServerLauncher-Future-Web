@@ -6,10 +6,40 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
 <template>
   <GalleryDocPage>
     <template #effects>
-      <Panel class="doc-section" shadow="hover"><template #header><h2>Style Effects</h2></template><p class="doc-note">Dividers should quietly separate structure without drawing attention.</p></Panel>
+      <Panel class="doc-section" shadow="hover">
+        <template #header><h2>Style Effects</h2></template>
+        <div class="divider-stack">
+          <Divider spacing="xs" />
+          <Divider spacing="sm" variant="dashed">Runtime</Divider>
+          <Divider spacing="sm" variant="dotted" text-pos="start">Advanced</Divider>
+        </div>
+      </Panel>
     </template>
+
     <template #demo>
-      <Panel class="doc-section" shadow="hover"><template #header><h2>Live Demo</h2></template><div class="doc-stack"><p>Section one</p><Divider spacing="md" /><p>Section two</p></div></Panel>
+      <Panel class="doc-section" shadow="hover">
+        <template #header><h2>Live Demo</h2></template>
+        <div class="divider-demo">
+          <p>Instance settings</p>
+          <Divider spacing="md">Network</Divider>
+          <p>Port, address, and proxy configuration</p>
+          <Divider spacing="md" text-pos="end">Danger Zone</Divider>
+          <p>Destructive operations stay visually separated.</p>
+        </div>
+      </Panel>
     </template>
   </GalleryDocPage>
 </template>
+
+<style scoped lang="scss">
+.divider-stack,
+.divider-demo {
+  display: grid;
+  gap: 6px;
+}
+
+p {
+  margin: 0;
+  color: var(--mcsl-text-color-regular);
+}
+</style>

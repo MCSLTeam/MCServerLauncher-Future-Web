@@ -4,15 +4,15 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
 
 const columns = ["Priority", "Naive / shadcn", "MCSL UI action"];
 const rows = [
-  ["High", "Drawer / Sheet", "Added Drawer for side detail panels"],
-  ["High", "AlertDialog / Popconfirm", "Added ConfirmDialog for destructive confirmations"],
-  ["Medium", "Kbd", "Added Kbd for shortcut and command palette docs"],
   ["High", "Calendar / DatePicker / TimePicker", "Backlog: scheduling and expiry flows"],
   ["High", "AutoComplete / Combobox", "Backlog: searchable typed selection"],
   ["High", "DataTable", "Backlog: sorting, filtering, selection, richer cells"],
   ["Medium", "Tree / TreeSelect", "Backlog: files, folders, permissions, resource trees"],
   ["Medium", "Accordion / Collapsible", "Existing local components need export/gallery polish"],
   ["Medium", "Steps / Stepper", "Backlog: instance creation and install flows"],
+  ["Done", "Drawer / Sheet", "Drawer covers side detail panels"],
+  ["Done", "AlertDialog / Popconfirm", "ConfirmDialog covers destructive confirmations"],
+  ["Done", "Kbd", "Kbd covers shortcut and command palette docs"],
 ];
 </script>
 
@@ -21,9 +21,11 @@ const rows = [
     <template #effects>
       <Panel class="doc-section" shadow="hover">
         <template #header><h2>Component Gap Scan</h2></template>
-        <p class="doc-note">
-          Compared local mcslui exports against sibling naive-ui and shadcn-vue component registries.
-        </p>
+        <div class="gap-tags">
+          <Tag color="danger">High</Tag>
+          <Tag color="warning">Medium</Tag>
+          <Tag color="success">Done</Tag>
+        </div>
       </Panel>
     </template>
 
