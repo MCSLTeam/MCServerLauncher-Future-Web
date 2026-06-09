@@ -7,6 +7,7 @@ import { Button } from "@repo/ui";
 import { Breadcrumbs } from "@repo/ui";
 import { Sidebar } from "@repo/ui";
 import { Switch } from "@repo/ui";
+import { useAppearance } from "@repo/ui";
 import { NotificationTemplate } from "@repo/ui";
 import { NotificationOverlay } from "@repo/ui";
 import { ContextmenuOverlay } from "@repo/ui";
@@ -14,55 +15,100 @@ import { ContextmenuOverlay } from "@repo/ui";
 const showDense = ref(false);
 const showStrongAccent = ref(false);
 const t = useI18n().t;
+const appearance = useAppearance();
 
 const pageClass = computed(() => ({
   "gallery--dense": showDense.value,
   "gallery--strong-accent": showStrongAccent.value,
 }));
 
+const darkTheme = computed({
+  get: () => appearance.actualTheme === "dark",
+  set: (value: boolean) => {
+    appearance.changeTheme(value ? "dark" : "light");
+  },
+});
+
 const breadcrumbs = [
   { label: "MCSL Future" },
   { label: "UI Gallery" },
 ];
 
-const sidebarPages = [
-  { label: "组件差距", description: "Component Gaps", link: "/components/gaps" },
-  { label: "页头", description: "PageHeader", link: "/components/page-header" },
-  { label: "按钮", description: "Buttons", link: "/components/buttons" },
-  { label: "输入框", description: "Input", link: "/components/input" },
-  { label: "数字输入", description: "NumberBox", link: "/components/number-box" },
-  { label: "选择器", description: "Select", link: "/components/select" },
-  { label: "滑块", description: "Slider", link: "/components/slider" },
-  { label: "单选框", description: "Radio", link: "/components/radio" },
-  { label: "复选框", description: "Checkbox", link: "/components/checkbox" },
-  { label: "开关", description: "Toggle", link: "/components/toggle" },
-  { label: "消息", description: "Message", link: "/components/message" },
-  { label: "结果", description: "Result", link: "/components/result" },
-  { label: "空状态", description: "Empty", link: "/components/empty" },
-  { label: "分割线", description: "Divider", link: "/components/divider" },
-  { label: "可复制文本", description: "CopyableText", link: "/components/copyable-text" },
-  { label: "骨架屏", description: "Skeleton", link: "/components/skeleton" },
-  { label: "展示", description: "Display", link: "/components/display" },
-  { label: "反馈", description: "Feedback", link: "/components/feedback" },
-  { label: "面包屑", description: "Breadcrumbs", link: "/components/breadcrumbs" },
-  { label: "侧边栏", description: "Sidebar", link: "/components/sidebar" },
-  { label: "导航标签", description: "NavTabs", link: "/components/nav-tabs" },
-  { label: "下拉菜单", description: "Dropdown", link: "/components/dropdown" },
-  { label: "抽屉", description: "Drawer", link: "/components/drawer" },
-  { label: "确认对话框", description: "ConfirmDialog", link: "/components/confirm-dialog" },
-  { label: "文字提示", description: "Tooltip", link: "/components/tooltip" },
-  { label: "气泡卡片", description: "Popover", link: "/components/popover" },
-  { label: "模态框", description: "Modal", link: "/components/modal" },
-  { label: "右键菜单", description: "Contextmenu", link: "/components/contextmenu" },
-  { label: "进度", description: "Progress", link: "/components/progress" },
-  { label: "分页", description: "Pagination", link: "/components/pagination" },
-  { label: "上传", description: "Upload", link: "/components/upload" },
-  { label: "头像", description: "Avatar", link: "/components/avatar" },
-  { label: "标签", description: "Tag", link: "/components/tag" },
-  { label: "表格", description: "Table", link: "/components/table" },
-  { label: "键盘键", description: "Kbd", link: "/components/kbd" },
-  { label: "编辑器", description: "Editor", link: "/components/editor" },
-  { label: "组合", description: "Compositions", link: "/components/compositions" },
+const sidebarGroups = [
+  {
+    label: "概览",
+    pages: [
+      { label: "组件差距", description: "Component Gaps", link: "/components/gaps" },
+      { label: "页头", description: "PageHeader", link: "/components/page-header" },
+      { label: "组合", description: "Compositions", link: "/components/compositions" },
+    ],
+  },
+  {
+    label: "通用",
+    pages: [
+      { label: "按钮", description: "Buttons", link: "/components/buttons" },
+      { label: "头像", description: "Avatar", link: "/components/avatar" },
+      { label: "标签", description: "Tag", link: "/components/tag" },
+      { label: "键盘键", description: "Kbd", link: "/components/kbd" },
+    ],
+  },
+  {
+    label: "表单",
+    pages: [
+      { label: "输入框", description: "Input", link: "/components/input" },
+      { label: "数字输入", description: "NumberBox", link: "/components/number-box" },
+      { label: "选择器", description: "Select", link: "/components/select" },
+      { label: "滑块", description: "Slider", link: "/components/slider" },
+      { label: "单选框", description: "Radio", link: "/components/radio" },
+      { label: "复选框", description: "Checkbox", link: "/components/checkbox" },
+      { label: "开关", description: "Toggle", link: "/components/toggle" },
+    ],
+  },
+  {
+    label: "展示",
+    pages: [
+      { label: "表格", description: "Table", link: "/components/table" },
+      { label: "分割线", description: "Divider", link: "/components/divider" },
+      { label: "可复制文本", description: "CopyableText", link: "/components/copyable-text" },
+      { label: "展示", description: "Display", link: "/components/display" },
+      { label: "编辑器", description: "Editor", link: "/components/editor" },
+    ],
+  },
+  {
+    label: "反馈",
+    pages: [
+      { label: "消息", description: "Message", link: "/components/message" },
+      { label: "结果", description: "Result", link: "/components/result" },
+      { label: "空状态", description: "Empty", link: "/components/empty" },
+      { label: "骨架屏", description: "Skeleton", link: "/components/skeleton" },
+      { label: "反馈", description: "Feedback", link: "/components/feedback" },
+      { label: "进度", description: "Progress", link: "/components/progress" },
+      { label: "上传", description: "Upload", link: "/components/upload" },
+    ],
+  },
+  {
+    label: "导航",
+    pages: [
+      { label: "面包屑", description: "Breadcrumbs", link: "/components/breadcrumbs" },
+      { label: "侧边栏", description: "Sidebar", link: "/components/sidebar" },
+      { label: "导航标签", description: "NavTabs", link: "/components/nav-tabs" },
+      { label: "分页", description: "Pagination", link: "/components/pagination" },
+      { label: "导航", description: "Navigation", link: "/components/navigation" },
+    ],
+  },
+  {
+    label: "浮层",
+    pages: [
+      { label: "下拉菜单", description: "Dropdown", link: "/components/dropdown" },
+      { label: "抽屉", description: "Drawer", link: "/components/drawer" },
+      { label: "确认对话框", description: "ConfirmDialog", link: "/components/confirm-dialog" },
+      { label: "文字提示", description: "Tooltip", link: "/components/tooltip" },
+      { label: "气泡卡片", description: "Popover", link: "/components/popover" },
+      { label: "模态框", description: "Modal", link: "/components/modal" },
+      { label: "右键菜单", description: "Contextmenu", link: "/components/contextmenu" },
+      { label: "浮层", description: "Overlays", link: "/components/overlays" },
+    ],
+  },
 ];
 </script>
 
@@ -85,6 +131,10 @@ const sidebarPages = [
             <Switch v-model="showStrongAccent" size="small" color="help" />
             <span>Accent</span>
           </label>
+          <label class="gallery-toggle">
+            <Switch v-model="darkTheme" size="small" color="primary" />
+            <span>{{ darkTheme ? "Dark" : "Light" }}</span>
+          </label>
         </div>
       </header>
 
@@ -94,7 +144,16 @@ const sidebarPages = [
             <template #header>
               <h3>Components</h3>
             </template>
-            <Sidebar :pages="sidebarPages" />
+            <div class="gallery-sidebar-groups">
+              <section
+                v-for="group in sidebarGroups"
+                :key="group.label"
+                class="gallery-sidebar-group"
+              >
+                <h4>{{ group.label }}</h4>
+                <Sidebar :pages="group.pages" />
+              </section>
+            </div>
           </Panel>
         </aside>
 
@@ -226,6 +285,29 @@ const sidebarPages = [
   gap: 7px;
   color: var(--mcsl-text-color-regular);
   font-size: var(--mcsl-font-size-sm);
+}
+
+.gallery-sidebar-groups {
+  display: grid;
+  gap: 14px;
+}
+
+.gallery-sidebar-group {
+  display: grid;
+  gap: 7px;
+}
+
+.gallery-sidebar-group h4 {
+  margin: 0 6px;
+  color: var(--mcsl-text-color-secondary);
+  font-size: var(--mcsl-font-size-xs);
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+.gallery-sidebar-group:not(:first-child) {
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 76%, transparent);
 }
 
 .gallery-docs {

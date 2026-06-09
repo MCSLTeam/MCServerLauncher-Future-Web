@@ -27,6 +27,7 @@ import TooltipPage from "./pages/TooltipPage.vue";
 import PopoverPage from "./pages/PopoverPage.vue";
 import ModalPage from "./pages/ModalPage.vue";
 import ContextmenuPage from "./pages/ContextmenuPage.vue";
+import OverlaysPage from "./pages/OverlaysPage.vue";
 import ProgressPage from "./pages/ProgressPage.vue";
 import PaginationPage from "./pages/PaginationPage.vue";
 import UploadPage from "./pages/UploadPage.vue";
@@ -70,6 +71,7 @@ export default createRouter({
     { path: "/components/popover", component: PopoverPage },
     { path: "/components/modal", component: ModalPage },
     { path: "/components/contextmenu", component: ContextmenuPage },
+    { path: "/components/overlays", component: OverlaysPage },
     { path: "/components/progress", component: ProgressPage },
     { path: "/components/pagination", component: PaginationPage },
     { path: "/components/upload", component: UploadPage },
