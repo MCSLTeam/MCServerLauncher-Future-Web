@@ -111,7 +111,7 @@ defineEmits<(e: "click", event: MouseEvent) => void>();
   align-items: center;
 
   & > .mcsl-button:focus-visible {
-    z-index: 1; // 避免outline被遮挡
+    z-index: 1;
   }
 }
 
@@ -123,5 +123,11 @@ defineEmits<(e: "click", event: MouseEvent) => void>();
 .mcsl-button.mcsl-split-button__btn2 {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
+  margin-left: -1px;
+
+  &:hover,
+  &:focus-visible {
+    z-index: 1;
+  }
 }
 </style>

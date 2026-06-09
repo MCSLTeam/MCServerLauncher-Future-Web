@@ -90,8 +90,8 @@ const onClick = computed(() =>
     :style="{
       // Shadow
       '--mcsl-button__box-shadow': isSurface
-        ? 'var(--mcsl-box-shadow-base)'
-        : getShadow(props.color, 'base'),
+        ? '0 1px 2px color-mix(in srgb, var(--mcsl-text-color-primary) 5%, transparent)'
+        : getShadow(props.color, 'light'),
       // Text
       '--mcsl-button__text-color': isSurface
         ? 'var(--mcsl-text-color-regular)'
@@ -106,21 +106,21 @@ const onClick = computed(() =>
         ? 'var(--mcsl-text-color-secondary)'
         : `var(--mcsl-color-${color}-light)`,
       // Bg
-      '--mcsl-button__bg': 'var(--mcsl-bg-color-overlay)',
+      '--mcsl-button__bg': 'color-mix(in srgb, var(--mcsl-bg-color-overlay) 98%, transparent)',
       '--mcsl-button__bg-hover': isSurface
-        ? 'var(--mcsl-bg-color-dark)'
-        : new ColorData(props.color, 'default', 0.12).getCss(),
+        ? 'color-mix(in srgb, var(--mcsl-bg-color-dark) 72%, var(--mcsl-bg-color-overlay))'
+        : new ColorData(props.color, 'default', 0.09).getCss(),
       '--mcsl-button__bg-active': isSurface
-        ? 'var(--mcsl-bg-color-darker)'
-        : new ColorData(props.color, 'default', 0.18).getCss(),
-      '--mcsl-button__bg-disabled': 'var(--mcsl-border-color-base)',
+        ? 'color-mix(in srgb, var(--mcsl-bg-color-darker) 64%, var(--mcsl-bg-color-overlay))'
+        : new ColorData(props.color, 'default', 0.15).getCss(),
+      '--mcsl-button__bg-disabled': 'color-mix(in srgb, var(--mcsl-bg-color-dark) 78%, transparent)',
       // Border
       '--mcsl-button__border': isSurface
-        ? 'var(--mcsl-border-color-base)'
-        : `var(--mcsl-color-${color}-lighter)`,
+        ? 'color-mix(in srgb, var(--mcsl-border-color-base) 88%, transparent)'
+        : new ColorData(props.color, 'default', 0.36).getCss(),
       '--mcsl-button__border-hover': isSurface
-        ? 'var(--mcsl-border-color-base)'
-        : `var(--mcsl-color-${color}-light)`,
+        ? 'color-mix(in srgb, var(--mcsl-border-color-dark) 68%, var(--mcsl-border-color-base))'
+        : new ColorData(props.color, 'default', 0.62).getCss(),
       '--mcsl-button__border-active': isSurface
         ? 'var(--mcsl-border-color-dark)'
         : `var(--mcsl-color-${color})`,
@@ -140,11 +140,11 @@ const onClick = computed(() =>
         : `var(--mcsl-color-${color})`,
       '--mcsl-button__primary-bg-hover': isSurface
         ? 'var(--mcsl-text-color-regular)'
-        : `var(--mcsl-color-${color}-600)`,
+        : `var(--mcsl-color-${color}-dark)`,
       '--mcsl-button__primary-bg-active': isSurface
         ? 'var(--mcsl-text-color-primary)'
-        : `var(--mcsl-color-${color}-700)`,
-      '--mcsl-button__primary-bg-disabled': 'var(--mcsl-bg-color-darker)',
+        : `var(--mcsl-color-${color}-darker)`,
+      '--mcsl-button__primary-bg-disabled': 'color-mix(in srgb, var(--mcsl-border-color-dark) 70%, transparent)',
     }"
     class="mcsl-button"
     :type="btnType"
@@ -166,23 +166,26 @@ const onClick = computed(() =>
 
 @each $size in utils.$sizes {
   .mcsl-size-#{$size}.mcsl-button {
-    border-radius: utils.get-size-var("border-radius", $size, $vars);
+    border-radius: var(--mcsl-border-radius-sm);
 
     $spacing: utils.get-size-var("spacing", $size, $vars);
     $size: utils.get-size-var("height", $size, $vars);
-    padding: $spacing;
+    padding: 0 calc($spacing * 1.6);
     min-width: $size;
     height: $size;
-    gap: calc($spacing / 2);
+    gap: calc($spacing * 0.72);
 
     &.mcsl-button__squared {
       width: $size;
+      padding: 0;
     }
   }
 }
 
 .mcsl-button {
-  border: none;
+  position: relative;
+  box-sizing: border-box;
+  border: 1px solid transparent;
   outline: 0 solid transparent;
   outline-offset: 2px;
   width: fit-content;
@@ -190,11 +193,17 @@ const onClick = computed(() =>
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  color: var(--mcsl-button__text-color);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
   transition:
     background-color 0.14s ease-out,
     border-color 0.14s ease-out,
     color 0.14s ease-out,
-    opacity 0.14s ease-out;
+    opacity 0.14s ease-out,
+    box-shadow 0.14s ease-out,
+    transform 0.12s ease-out;
 
   & > .mcsl-button__label,
   & > .mcsl-button__icon {
@@ -202,6 +211,8 @@ const onClick = computed(() =>
   }
 
   &:active {
+    transform: translateY(1px);
+
     & > .mcsl-button__label,
     & > .mcsl-button__icon {
       transition-duration: 0.1s;
@@ -212,6 +223,8 @@ const onClick = computed(() =>
 
   &:disabled {
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none !important;
   }
 
   &.mcsl-button__block {
@@ -235,12 +248,12 @@ const onClick = computed(() =>
   }
 
   &.mcsl-button__shadow-always {
-    box-shadow: var(--mcsl-box-shadow-light);
+    box-shadow: var(--mcsl-button__box-shadow);
   }
 
   &.mcsl-button__shadow-always:hover,
   &.mcsl-button__shadow-hover:hover {
-    box-shadow: var(--mcsl-box-shadow-light);
+    box-shadow: var(--mcsl-button__box-shadow);
   }
 
   &.mcsl-button__with-text {
@@ -262,9 +275,8 @@ const onClick = computed(() =>
 }
 
 .mcsl-button__type-text {
-  background: var(--mcsl-button__bg);
-
-  border: 1px var(--mcsl-button__border-type) transparent;
+  background: transparent;
+  border-color: transparent;
 
   & > .mcsl-button__label,
   & > .mcsl-button__icon {
@@ -272,7 +284,7 @@ const onClick = computed(() =>
   }
 
   &:hover {
-    border: 1px var(--mcsl-button__border-type) var(--mcsl-button__border-hover);
+    border-color: transparent;
 
     & > .mcsl-button__label,
     & > .mcsl-button__icon {
@@ -283,8 +295,7 @@ const onClick = computed(() =>
   }
 
   &:active {
-    border: 1px var(--mcsl-button__border-type)
-      var(--mcsl-button__border-active);
+    border-color: transparent;
 
     & > .mcsl-button__label,
     & > .mcsl-button__icon {
@@ -295,16 +306,18 @@ const onClick = computed(() =>
   }
 
   &:disabled {
+    border-color: transparent;
+
     & > .mcsl-button__label,
     & > .mcsl-button__icon {
       color: var(--mcsl-button__text-color-disabled);
     }
 
-    background: var(--mcsl-button__bg-disabled);
+    background: transparent;
   }
 
   &:focus-visible {
-    outline: 3px solid var(--mcsl-color-help);
+    outline: 2px solid color-mix(in srgb, var(--mcsl-color-help) 44%, transparent);
   }
 }
 
@@ -319,13 +332,47 @@ const onClick = computed(() =>
 
 .mcsl-button__type-default,
 .mcsl-button__type-dashed {
-  @extend .mcsl-button__type-text;
+  background: var(--mcsl-button__bg);
 
   border: 1px var(--mcsl-button__border-type) var(--mcsl-button__border);
 
+  & > .mcsl-button__label,
+  & > .mcsl-button__icon {
+    color: var(--mcsl-button__text-color);
+  }
+
+  &:hover {
+    border-color: var(--mcsl-button__border-hover);
+    background: var(--mcsl-button__bg-hover);
+
+    & > .mcsl-button__label,
+    & > .mcsl-button__icon {
+      color: var(--mcsl-button__text-color-hover);
+    }
+  }
+
+  &:active {
+    border-color: var(--mcsl-button__border-active);
+    background: var(--mcsl-button__bg-active);
+
+    & > .mcsl-button__label,
+    & > .mcsl-button__icon {
+      color: var(--mcsl-button__text-color-active);
+    }
+  }
+
   &:disabled {
-    border: 1px var(--mcsl-button__border-type)
-      var(--mcsl-button__border-disabled);
+    border-color: var(--mcsl-button__border-disabled);
+    background: var(--mcsl-button__bg-disabled);
+
+    & > .mcsl-button__label,
+    & > .mcsl-button__icon {
+      color: var(--mcsl-button__text-color-disabled);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--mcsl-color-help) 44%, transparent);
   }
 }
 
@@ -360,7 +407,7 @@ const onClick = computed(() =>
   }
 
   &:focus-visible {
-    outline: 3px solid var(--mcsl-color-help);
+    outline: 2px solid color-mix(in srgb, var(--mcsl-color-help) 44%, transparent);
   }
 }
 </style>
