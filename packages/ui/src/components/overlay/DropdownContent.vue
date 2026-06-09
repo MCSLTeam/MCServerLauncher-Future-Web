@@ -24,6 +24,7 @@ const isVertical = computed(
   () => props.defaultPos == "top" || props.defaultPos == "bottom",
 );
 const animType = ref<"top" | "bottom" | "left" | "right" | "fade">("fade");
+const floatingGap = 6;
 const inAnim = computed(() => {
   switch (animType.value) {
     case "top":
@@ -60,8 +61,8 @@ function locateYVertical(
   ]) {
     elemY.value =
       p == "top"
-        ? openY - triggererHeight / 2 - posInfo.height
-        : openY + triggererHeight / 2;
+        ? openY - triggererHeight / 2 - posInfo.height - floatingGap
+        : openY + triggererHeight / 2 + floatingGap;
     animType.value = p as "top" | "bottom";
     if (floatingContentEl.value.canFullyShow("y")) return;
   }
@@ -79,8 +80,8 @@ function locateXHorizontal(
   ]) {
     elemX.value =
       p == "left"
-        ? openX - triggererWidth / 2 - posInfo.width
-        : openX + triggererWidth / 2;
+        ? openX - triggererWidth / 2 - posInfo.width - floatingGap
+        : openX + triggererWidth / 2 + floatingGap;
     animType.value = p as "left" | "right";
     if (floatingContentEl.value.canFullyShow("x")) return;
   }

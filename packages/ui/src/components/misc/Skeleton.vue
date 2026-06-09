@@ -43,8 +43,8 @@ withDefaults(
     color-mix(in srgb, var(--mcsl-bg-color-overlay) 88%, transparent) 50%,
     color-mix(in srgb, var(--mcsl-bg-color-dark) 92%, transparent) 100%
   );
-  background-size: 200% 100%;
-  animation: mcsl-skeleton 1.2s ease-in-out infinite;
+  background-size: 240% 100%;
+  animation: mcsl-skeleton 2.2s ease-in-out infinite;
 }
 
 .mcsl-skeleton__rounded {
@@ -52,7 +52,7 @@ withDefaults(
 }
 
 @keyframes mcsl-skeleton {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% { background-position: 180% 0; }
+  100% { background-position: -180% 0; }
 }
 </style>
