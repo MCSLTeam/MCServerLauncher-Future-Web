@@ -35,6 +35,9 @@ const label = computed(() => format(props.progress, props.status));
 const icon = computed(() =>
   getStatusIcon(props.status, props.variant != "circle"),
 );
+const visualProgress = computed(() =>
+  props.status == "success" ? 100 : Math.min(100, Math.max(0, props.progress)),
+);
 </script>
 
 <template>
@@ -45,10 +48,8 @@ const icon = computed(() =>
       `mcsl-size-${size}`,
     ]"
     :style="{
-      '--mcsl-progress-bar__progress':
-        (status == 'success' ? 100 : progress) + '%',
-      '--mcsl-progress-bar__progress-decimal':
-        status == 'success' ? 1 : progress / 100,
+      '--mcsl-progress-bar__progress': visualProgress + '%',
+      '--mcsl-progress-bar__progress-decimal': visualProgress / 100,
     }"
     class="mcsl-progress-bar"
   >
@@ -164,41 +165,80 @@ $size: var(--mcsl-progress-bar__size);
     background: var(--mcsl-border-color-base);
     border-radius: var(--mcsl-border-radius-full);
     overflow: hidden;
+    position: relative;
   }
 
-  & > div::before {
+  & > div::before,
+  & > div::after {
     content: "";
     display: block;
     height: 100%;
+    width: 100%;
     border-radius: var(--mcsl-border-radius-full);
     background: $stroke-color;
-    transition: transform 0.14s ease-out, width 0.14s ease-out;
+    transform-origin: left center;
+    transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1);
+    will-change: transform;
 
     .mcsl-progress-bar__mode-line & {
-      width: $progress;
+      transform: scaleX($progress-decimal);
     }
 
     .mcsl-progress-bar__mode-indeterminate & {
-      width: 50%;
+      position: absolute;
+      inset: 0 auto 0 0;
+      transform: translate3d(-100%, 0, 0) scaleX(0.38);
 
       :not(.mcsl-progress-bar__status-loading) & {
-        width: 100%;
-        animation: 0.14s ease-out both slideInLeft;
+        transform: scaleX(1);
+        animation: none;
       }
     }
+  }
 
-    .mcsl-progress-bar__status-loading.mcsl-progress-bar__mode-indeterminate & {
-      animation: 1.2s ease-out infinite mcsl-progress-bar__indeterminate;
-    }
+  & > div::after {
+    display: none;
+  }
+
+  .mcsl-progress-bar__status-loading.mcsl-progress-bar__mode-indeterminate & > div::before {
+    animation: 1.45s cubic-bezier(0.4, 0, 0.2, 1) infinite mcsl-progress-bar__indeterminate-primary;
+  }
+
+  .mcsl-progress-bar__status-loading.mcsl-progress-bar__mode-indeterminate & > div::after {
+    display: block;
+    animation: 1.45s 0.22s cubic-bezier(0.4, 0, 0.2, 1) infinite mcsl-progress-bar__indeterminate-secondary;
   }
 }
 
-@keyframes mcsl-progress-bar__indeterminate {
+@keyframes mcsl-progress-bar__indeterminate-primary {
   0% {
-    transform: translateX(-100%);
+    transform: translate3d(-95%, 0, 0) scaleX(0.32);
+  }
+  45% {
+    transform: translate3d(8%, 0, 0) scaleX(0.52);
   }
   100% {
-    transform: translateX(200%);
+    transform: translate3d(118%, 0, 0) scaleX(0.22);
+  }
+}
+
+@keyframes mcsl-progress-bar__indeterminate-secondary {
+  0% {
+    transform: translate3d(-125%, 0, 0) scaleX(0.24);
+  }
+  55% {
+    transform: translate3d(22%, 0, 0) scaleX(0.44);
+  }
+  100% {
+    transform: translate3d(126%, 0, 0) scaleX(0.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mcsl-progress-bar__line-like > div::before,
+  .mcsl-progress-bar__line-like > div::after {
+    animation: none !important;
+    transition: none !important;
   }
 }
 

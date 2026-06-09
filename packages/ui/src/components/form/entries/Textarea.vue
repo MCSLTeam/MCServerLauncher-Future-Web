@@ -12,6 +12,7 @@ withDefaults(
     size?: Size;
     placeholder?: string;
     resizeable?: boolean;
+    resize?: "none" | "vertical" | "horizontal" | "both";
   }>(),
   {
     size: "medium",
@@ -20,6 +21,7 @@ withDefaults(
     disabled: false,
     placeholder: "",
     resizeable: false,
+    resize: "none",
   },
 );
 
@@ -70,6 +72,7 @@ if (formField) {
     :class="{
       [`mcsl-size-${size}`]: true,
       'mcsl-textarea__resizeable': resizeable,
+      [`mcsl-textarea__resize-${resize}`]: true,
     }"
     :disabled="disabled"
     :style="{
@@ -136,10 +139,23 @@ if (formField) {
 }
 
 .mcsl-textarea__resizeable {
-  resize: vertical;
+  resize: both;
   transition:
     0.2s ease-in-out,
-    height 0s;
+    height 0s,
+    width 0s;
+}
+
+.mcsl-textarea__resize-vertical {
+  resize: vertical;
+}
+
+.mcsl-textarea__resize-horizontal {
+  resize: horizontal;
+}
+
+.mcsl-textarea__resize-both {
+  resize: both;
 }
 
 .mcsl-textarea:hover {

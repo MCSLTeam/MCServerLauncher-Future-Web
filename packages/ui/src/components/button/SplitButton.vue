@@ -104,14 +104,21 @@ defineEmits<(e: "click", event: MouseEvent) => void>();
 
 <style lang="scss" scoped>
 .mcsl-split-button {
+  isolation: isolate;
   width: fit-content;
+  max-width: 100%;
   height: fit-content;
   display: flex;
   justify-content: center;
   align-items: center;
 
+  & > .mcsl-button {
+    flex: 0 0 auto;
+    min-width: max-content;
+  }
+
   & > .mcsl-button:focus-visible {
-    z-index: 1;
+    z-index: 2;
   }
 }
 
@@ -127,7 +134,11 @@ defineEmits<(e: "click", event: MouseEvent) => void>();
 
   &:hover,
   &:focus-visible {
-    z-index: 1;
+    z-index: 2;
+  }
+
+  &:active {
+    z-index: 3;
   }
 }
 </style>

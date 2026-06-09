@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Message, Panel } from "@repo/ui";
+import { Button, Message, Panel } from "@repo/ui";
 import GalleryDocPage from "../components/GalleryDocPage.vue";
 </script>
 
@@ -8,30 +8,52 @@ import GalleryDocPage from "../components/GalleryDocPage.vue";
     <template #effects>
       <Panel class="doc-section" shadow="hover">
         <template #header><h2>Style Effects</h2></template>
-        <p class="doc-note">
-          Message follows Naive UI alert borderless behavior: soft status background, no visible border by default,
-          clear icon/title/content hierarchy, and an optional bordered variant when the surface needs stronger separation.
-        </p>
+        <div class="message-grid">
+          <Message title="Instance ready" color="success" closeable>
+            Paper EU-1 is online and accepting console commands.
+          </Message>
+          <Message title="Version drift" color="warning" closeable>
+            Three plugins were built against an older server API.
+          </Message>
+          <Message title="Daemon rejected request" color="danger" closeable>
+            The selected instance is locked by another operation.
+          </Message>
+          <Message title="Queue updated" color="help" closeable>
+            Backup jobs will run after the current upload finishes.
+          </Message>
+        </div>
       </Panel>
     </template>
+
     <template #demo>
       <Panel class="doc-section" shadow="hover">
         <template #header><h2>Live Demo</h2></template>
-        <div class="doc-stack">
-          <Message title="Saved" color="success" closeable>
-            Configuration has been updated successfully.
+        <div class="message-grid">
+          <Message title="Borderless surface" color="primary">
+            Status messages use a quiet tinted background and keep the icon aligned to the text rhythm.
           </Message>
-          <Message title="Warning" color="warning">
-            One of the selected files will be skipped because it exceeds the accepted size.
+          <Message title="Outlined surface" color="danger" variant="outlined">
+            Use the outlined variant when the message sits on a dense or similarly tinted surface.
           </Message>
-          <Message title="Error" color="danger" variant="outlined">
-            The daemon rejected this request because the instance is currently locked.
+          <Message color="surface" icon="fas fa-terminal" variant="soft">
+            Console output paused while the daemon reconnects.
+            <template #buttons="{ close }">
+              <Button size="small" type="text" @click="close">Dismiss</Button>
+              <Button size="small" type="primary" color="primary">Reconnect</Button>
+            </template>
           </Message>
-          <Message color="help" variant="text" icon="fas fa-circle-info">
-            Text variant keeps the same icon and spacing model for dense inline guidance.
+          <Message color="help" icon="fas fa-circle-info" variant="text">
+            Inline messages keep the same spacing model without drawing a container.
           </Message>
         </div>
       </Panel>
     </template>
   </GalleryDocPage>
 </template>
+
+<style scoped lang="scss">
+.message-grid {
+  display: grid;
+  gap: 12px;
+}
+</style>

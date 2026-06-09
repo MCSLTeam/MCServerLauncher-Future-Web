@@ -1,5 +1,7 @@
 <script setup lang="ts">
-withDefaults(
+import { computed } from "vue";
+
+const props = withDefaults(
   defineProps<{
     min?: number;
     max?: number;
@@ -18,18 +20,32 @@ const model = defineModel<number>({
   required: false,
   default: 0,
 });
+
+const percentage = computed(() => {
+  const range = props.max - props.min;
+  if (range <= 0) return 0;
+
+  const value = Number(model.value);
+  return Math.min(100, Math.max(0, ((value - props.min) / range) * 100));
+});
+
+function onInput(event: Event) {
+  model.value = Number((event.currentTarget as HTMLInputElement).value);
+}
 </script>
 
 <template>
   <div class="mcsl-slider">
     <input
-      v-model="model"
       class="mcsl-slider__input"
       type="range"
+      :style="{ '--mcsl-slider__percent': `${percentage}%` }"
+      :value="model"
       :min="min"
       :max="max"
       :step="step"
       :disabled="disabled"
+      @input="onInput"
     />
     <span class="mcsl-slider__value">{{ model }}</span>
   </div>
@@ -46,6 +62,13 @@ const model = defineModel<number>({
 .mcsl-slider__input {
   --mcsl-slider__track: color-mix(in srgb, var(--mcsl-border-color-base) 78%, transparent);
   --mcsl-slider__fill: var(--mcsl-color-primary);
+  --mcsl-slider__track-bg: linear-gradient(
+    to right,
+    var(--mcsl-slider__fill) 0%,
+    var(--mcsl-slider__fill) var(--mcsl-slider__percent),
+    var(--mcsl-slider__track) var(--mcsl-slider__percent),
+    var(--mcsl-slider__track) 100%
+  );
 
   width: 100%;
   height: 18px;
@@ -59,13 +82,19 @@ const model = defineModel<number>({
 .mcsl-slider__input::-webkit-slider-runnable-track {
   height: 6px;
   border-radius: var(--mcsl-border-radius-full);
-  background: var(--mcsl-slider__track);
+  background: var(--mcsl-slider__track-bg);
 }
 
 .mcsl-slider__input::-moz-range-track {
   height: 6px;
   border-radius: var(--mcsl-border-radius-full);
   background: var(--mcsl-slider__track);
+}
+
+.mcsl-slider__input::-moz-range-progress {
+  height: 6px;
+  border-radius: var(--mcsl-border-radius-full);
+  background: var(--mcsl-slider__fill);
 }
 
 .mcsl-slider__input::-webkit-slider-thumb {
