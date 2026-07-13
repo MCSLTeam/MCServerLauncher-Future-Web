@@ -1,0 +1,748 @@
+"use client";
+
+/**
+ * 远程主机页 — 布局与交互对齐 WPF DaemonManagerPage + NewDaemonConnectionInput。
+ * 卡片上只有「更多 → 编辑 / 删除」；新建/编辑走对话框，不在侧栏常驻表单。
+ */
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import {
+  CheckCircle2,
+  CircleAlert,
+  Loader2,
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  RefreshCw,
+  Trash2,
+  Unplug,
+} from "lucide-react";
+
+import { Reveal } from "@/components/motion/reveal";
+import { ConsolePage } from "@/components/templates/console-surface";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { useT } from "@/features/i18n/locale-provider";
+import { useDaemon } from "@/features/nodes/daemon-provider";
+import {
+  buildResourceView,
+  loadAutoRefreshPreference,
+  normalizeRefreshInterval,
+  REFRESH_INTERVAL_OPTIONS,
+  saveAutoRefreshPreference,
+  type RefreshIntervalSeconds,
+} from "@/lib/daemon/system-info";
+import {
+  addNode,
+  getNodeToken,
+  listNodes,
+  nodeAddress,
+  removeNode,
+  updateNode,
+  type NodeInput,
+} from "@/lib/nodes-store";
+import type { NodeStatus, SavedNode } from "@/lib/types";
+import { cn } from "@/lib/utils";
+
+const emptyForm: NodeInput = {
+  name: "",
+  host: "",
+  port: "11451",
+  secure: false,
+  token: "",
+};
+
+/** OS 图标：对齐 WPF Windows/Darwin/Linux DrawingImage */
+function OsGlyph({ type }: { type: string | null }) {
+  if (type === "Windows") {
+    return (
+      <span
+        className="inline-flex size-5 items-center justify-center rounded-lg bg-[#0078D4] text-[10px] font-bold text-white"
+        title="Windows"
+      >
+        W
+      </span>
+    );
+  }
+  if (type === "Darwin") {
+    return (
+      <span
+        className="inline-flex size-5 items-center justify-center rounded-full bg-foreground text-[10px] font-bold text-background"
+        title="macOS"
+      >
+        ⌘
+      </span>
+    );
+  }
+  if (type === "Linux") {
+    return (
+      <span
+        className="inline-flex size-5 items-center justify-center rounded-full bg-[#FCC624] text-[10px] font-bold text-black"
+        title="Linux"
+      >
+        Lx
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex size-5 items-center justify-center rounded-lg bg-muted text-[10px] text-muted-foreground">
+      ?
+    </span>
+  );
+}
+
+function ResourceRow({
+  label,
+  value,
+  text,
+  title,
+}: {
+  label: string;
+  value: number;
+  text: string;
+  title?: string;
+}) {
+  return (
+    <div className="grid grid-cols-[3.6rem_7.25rem_minmax(0,1fr)] items-center gap-x-2 text-xs">
+      <span className="text-muted-foreground">{label}</span>
+      <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+        <div
+          className="h-full rounded-full bg-primary"
+          style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
+        />
+      </div>
+      <span
+        className="truncate text-right tabular-nums text-muted-foreground"
+        title={title ?? text}
+      >
+        {text}
+      </span>
+    </div>
+  );
+}
+
+export default function NodesPage() {
+  const t = useT();
+  const {
+    connections,
+    getStatus,
+    connectNode,
+    disconnectNode,
+    refreshDaemons,
+    testNode,
+    refreshing,
+  } = useDaemon();
+
+  const [nodes, setNodes] = useState<SavedNode[]>([]);
+  const [searchText, setSearchText] = useState("");
+  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(false);
+  const [refreshInterval, setRefreshInterval] =
+    useState<RefreshIntervalSeconds>(30);
+
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<NodeInput>(emptyForm);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  function refreshList() {
+    setNodes(listNodes());
+  }
+
+  useEffect(() => {
+    refreshList();
+    const pref = loadAutoRefreshPreference();
+    setAutoRefreshEnabled(pref.enabled);
+    setRefreshInterval(pref.seconds);
+  }, []);
+
+  useEffect(() => {
+    if (!autoRefreshEnabled) return;
+    const timer = window.setInterval(() => {
+      void refreshDaemons();
+    }, refreshInterval * 1000);
+    return () => window.clearInterval(timer);
+  }, [autoRefreshEnabled, refreshInterval, refreshDaemons]);
+
+  const resourceLabels = useMemo(
+    () => ({
+      notLoaded: t("shared.nodes.resource.not-loaded"),
+      loadFailed: t("shared.nodes.resource.load-failed"),
+      cpu: t("shared.nodes.resource.cpu"),
+      memory: t("shared.nodes.resource.memory"),
+      drive: t("shared.nodes.resource.drive"),
+    }),
+    [t],
+  );
+
+  const filteredNodes = useMemo(() => {
+    const q = searchText.trim().toLowerCase();
+    if (!q) return nodes;
+    return nodes.filter((node) => {
+      const status = getStatus(node.id);
+      const detail = connections[node.id];
+      const resource = buildResourceView(
+        detail?.systemInfo,
+        resourceLabels,
+        detail?.error ?? "",
+      );
+      const haystack = [
+        node.name,
+        node.host,
+        node.port,
+        nodeAddress(node),
+        status,
+        resource.systemType,
+        resource.systemVersion,
+        resource.daemonVersion,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [nodes, searchText, getStatus, connections, resourceLabels]);
+
+  function openAdd() {
+    setEditingId(null);
+    setForm(emptyForm);
+    setError(null);
+    setFormOpen(true);
+  }
+
+  function startEdit(node: SavedNode) {
+    setEditingId(node.id);
+    setForm({
+      name: node.name,
+      host: node.host,
+      port: node.port,
+      secure: node.secure,
+      token: getNodeToken(node.id) ?? "",
+    });
+    setError(null);
+    setFormOpen(true);
+  }
+
+  function closeForm() {
+    setFormOpen(false);
+    setEditingId(null);
+    setForm(emptyForm);
+    setError(null);
+    setSubmitting(false);
+  }
+
+  /** 对齐 WPF 连接状态文案：正常 / 异常 / 连接中 */
+  function connectionStatusUi(status: NodeStatus, hasError: boolean) {
+    if (status === "online") {
+      return {
+        label: t("shared.nodes.status.ok"),
+        icon: CheckCircle2,
+        className: "text-emerald-600 dark:text-emerald-400",
+        clickable: false,
+      };
+    }
+    if (status === "connecting" || status === "reconnecting") {
+      return {
+        label: t("shared.nodes.status.connecting"),
+        icon: Loader2,
+        className: "text-muted-foreground",
+        clickable: false,
+        spin: true,
+      };
+    }
+    if (hasError) {
+      return {
+        label: t("shared.nodes.status.error"),
+        icon: CircleAlert,
+        className: "text-destructive",
+        clickable: true,
+      };
+    }
+    return {
+      label: t("shared.nodes.status.connecting"),
+      icon: Unplug,
+      className: "text-muted-foreground",
+      clickable: false,
+    };
+  }
+
+  /**
+   * 对齐 WPF TryConnectNewDaemonAsync / EditDaemon：
+   * 先真实连接成功再落盘；失败不保留新配置。
+   */
+  async function onSubmit(event: FormEvent) {
+    event.preventDefault();
+    const host = form.host.trim();
+    const port = form.port.trim();
+    const token =
+      form.token?.trim() || (editingId ? (getNodeToken(editingId) ?? "") : "");
+    if (!host || !port || Number.isNaN(Number(port)) || !token) {
+      setError(t("ui.form.invalid.require"));
+      return;
+    }
+
+    setSubmitting(true);
+    setError(null);
+    try {
+      if (editingId) {
+        disconnectNode(editingId);
+        const probe = await testNode({
+          host,
+          port,
+          secure: form.secure,
+          token,
+        });
+        if (!probe.ok) {
+          setError(probe.message ?? t("shared.nodes.connect.failed"));
+          await connectNode(editingId);
+          return;
+        }
+        updateNode(editingId, {
+          ...form,
+          host,
+          port,
+          name: form.name.trim(),
+          token,
+        });
+        refreshList();
+        const result = await connectNode(editingId, { force: true });
+        if (!result.ok) {
+          setError(result.message ?? t("shared.nodes.connect.failed"));
+          return;
+        }
+        closeForm();
+        return;
+      }
+
+      const probe = await testNode({
+        host,
+        port,
+        secure: form.secure,
+        token,
+      });
+      if (!probe.ok) {
+        setError(probe.message ?? t("shared.nodes.connect.failed"));
+        return;
+      }
+
+      const node = addNode({
+        ...form,
+        host,
+        port,
+        name: form.name.trim() || t("shared.nodes.title"),
+        token,
+      });
+      refreshList();
+      const result = await connectNode(node.id, { force: true });
+      if (!result.ok) {
+        disconnectNode(node.id);
+        removeNode(node.id);
+        refreshList();
+        setError(result.message ?? t("shared.nodes.connect.failed"));
+        return;
+      }
+      closeForm();
+    } finally {
+      setSubmitting(false);
+      refreshList();
+    }
+  }
+
+  function onDelete(id: string, name: string) {
+    if (
+      !window.confirm(
+        t("shared.nodes.delete.confirm", {
+          name: name || t("shared.nodes.title"),
+        }),
+      )
+    ) {
+      return;
+    }
+    disconnectNode(id);
+    removeNode(id);
+    if (editingId === id) closeForm();
+    refreshList();
+  }
+
+  return (
+    <ConsolePage className="gap-3">
+      {/* 标题区：对齐 TitleTextBlock + MinititleTextBlock */}
+      <Reveal>
+        <div className="space-y-2">
+          <h2 className="text-[1.75rem] font-semibold leading-none tracking-tight">
+            {t("shared.nodes.title")}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {t("shared.nodes.tip")}
+          </p>
+        </div>
+      </Reveal>
+
+      {/* 工具栏：右对齐 — 自动刷新 / 间隔 / 搜索 / 刷新 / 新建连接 */}
+      <Reveal delay={0.02}>
+        <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-2.5">
+          <div className="flex items-center gap-2">
+            <Switch
+              id="daemon-auto-refresh"
+              checked={autoRefreshEnabled}
+              onCheckedChange={(enabled) => {
+                setAutoRefreshEnabled(enabled);
+                saveAutoRefreshPreference(enabled, refreshInterval);
+              }}
+            />
+            <Label
+              htmlFor="daemon-auto-refresh"
+              className="cursor-pointer text-sm font-normal whitespace-nowrap"
+            >
+              {autoRefreshEnabled
+                ? t("shared.nodes.auto-refresh.on")
+                : t("shared.nodes.auto-refresh.off")}
+            </Label>
+          </div>
+
+          <Select
+            value={String(refreshInterval)}
+            onValueChange={(v) => {
+              const seconds = normalizeRefreshInterval(Number(v));
+              setRefreshInterval(seconds);
+              saveAutoRefreshPreference(autoRefreshEnabled, seconds);
+            }}
+            disabled={!autoRefreshEnabled}
+          >
+            <SelectTrigger className="h-9 w-[5.5rem]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {REFRESH_INTERVAL_OPTIONS.map((sec) => (
+                <SelectItem key={sec} value={String(sec)}>
+                  {sec}s
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Input
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder={t("shared.nodes.search")}
+            className="h-9 w-[13.75rem] max-w-full"
+          />
+
+          <Button
+            type="button"
+            variant="outline"
+            className="h-9"
+            disabled={refreshing}
+            onClick={() => void refreshDaemons()}
+          >
+            <RefreshCw
+              className={cn("size-4", refreshing && "animate-spin")}
+              aria-hidden
+            />
+            {t("shared.nodes.refresh")}
+          </Button>
+
+          <Button type="button" className="h-9" onClick={openAdd}>
+            <Plus className="size-4" aria-hidden />
+            {t("shared.nodes.connect.new")}
+          </Button>
+        </div>
+      </Reveal>
+
+      {/* 卡片网格：对齐 WrapPanel MinWidth=390 */}
+      <Reveal delay={0.04}>
+        {filteredNodes.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+            <p className="text-base font-medium tracking-tight">
+              {nodes.length === 0
+                ? t("shared.nodes.list.empty.title")
+                : t("shared.nodes.search.empty")}
+            </p>
+            <p className="max-w-sm text-sm leading-6 text-muted-foreground">
+              {nodes.length === 0
+                ? t("shared.nodes.list.empty.desc")
+                : t("shared.nodes.search.empty.desc")}
+            </p>
+            {nodes.length === 0 ? (
+              <Button type="button" className="mt-1" onClick={openAdd}>
+                <Plus className="size-4" aria-hidden />
+                {t("shared.nodes.connect.new")}
+              </Button>
+            ) : null}
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {filteredNodes.map((node) => {
+              const status = getStatus(node.id);
+              const detail = connections[node.id];
+              const resource = buildResourceView(
+                detail?.systemInfo,
+                resourceLabels,
+                detail?.error ?? "",
+              );
+              const displayName = node.name.trim() || t("shared.nodes.title");
+              const statusUi = connectionStatusUi(
+                status,
+                Boolean(detail?.error),
+              );
+              const StatusIcon = statusUi.icon;
+
+              return (
+                <article
+                  key={node.id}
+                  className="flex min-h-[13.5rem] min-w-[min(100%,24.375rem)] flex-1 basis-[24.375rem] flex-col rounded-xl border bg-card px-4 py-3.5 shadow-sm"
+                >
+                  {/* 行0：OS + 友好名 */}
+                  <div className="mb-1 flex items-center gap-2.5">
+                    <OsGlyph type={resource.systemType} />
+                    <h3 className="truncate text-[1.05rem] font-semibold leading-tight">
+                      {displayName}
+                    </h3>
+                  </div>
+
+                  {/* 行1：远端地址 / 链接状态 / 操作系统 / 节点版本 */}
+                  <div className="mt-1 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-sm">
+                    <span className="text-muted-foreground">
+                      {t("shared.nodes.card.uri")}
+                    </span>
+                    <span className="truncate" title={nodeAddress(node)}>
+                      {nodeAddress(node)}
+                    </span>
+
+                    <span className="text-muted-foreground">
+                      {t("shared.nodes.card.status")}
+                    </span>
+                    <button
+                      type="button"
+                      disabled={!statusUi.clickable}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 text-left",
+                        statusUi.className,
+                        statusUi.clickable && "hover:underline",
+                      )}
+                      title={detail?.error ?? undefined}
+                      onClick={() => {
+                        if (detail?.error) window.alert(detail.error);
+                      }}
+                    >
+                      <StatusIcon
+                        className={cn(
+                          "size-3.5 shrink-0",
+                          "spin" in statusUi && statusUi.spin && "animate-spin",
+                        )}
+                        aria-hidden
+                      />
+                      {statusUi.label}
+                    </button>
+
+                    <span className="text-muted-foreground">
+                      {t("shared.nodes.card.system")}
+                    </span>
+                    <span className="truncate" title={resource.systemVersion}>
+                      {resource.systemVersion}
+                    </span>
+
+                    <span className="text-muted-foreground">
+                      {t("shared.nodes.card.daemon")}
+                    </span>
+                    <span className="truncate" title={resource.daemonVersion}>
+                      {resource.daemonVersion}
+                    </span>
+                  </div>
+
+                  {/* 行2：CPU / 内存 / 磁盘 — 对齐 ProgressBar 布局 */}
+                  <div className="mt-3 space-y-1.5">
+                    <ResourceRow
+                      label={t("shared.nodes.resource.cpu")}
+                      value={resource.cpuUsage}
+                      text={resource.cpuUsageText}
+                    />
+                    <ResourceRow
+                      label={t("shared.nodes.resource.memory")}
+                      value={resource.memoryUsage}
+                      text={resource.memoryUsageText}
+                    />
+                    <ResourceRow
+                      label={t("shared.nodes.resource.drive")}
+                      value={resource.driveUsage}
+                      text={resource.driveUsageText}
+                      title={resource.driveUsageTooltip}
+                    />
+                  </div>
+
+                  {/* 行3：仅「更多」下拉 — 编辑 / 删除（WPF 无卡片连接/断开按钮） */}
+                  <div className="mt-auto flex justify-end pt-3">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button type="button" variant="outline" size="sm">
+                          <MoreHorizontal className="size-4" aria-hidden />
+                          {t("ui.common.more")}
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => startEdit(node)}>
+                          <Pencil className="size-4" aria-hidden />
+                          {t("ui.common.edit")}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          variant="destructive"
+                          onClick={() => onDelete(node.id, displayName)}
+                        >
+                          <Trash2 className="size-4" aria-hidden />
+                          {t("ui.common.delete")}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </Reveal>
+
+      {/* 新建/编辑连接对话框 — 对齐 NewDaemonConnectionInput ContentDialog */}
+      <Dialog
+        open={formOpen}
+        onOpenChange={(open) => {
+          if (!open && !submitting) closeForm();
+        }}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              {editingId
+                ? t("shared.nodes.form.edit")
+                : t("shared.nodes.connect.new")}
+            </DialogTitle>
+            <DialogDescription>{t("shared.nodes.form.desc")}</DialogDescription>
+          </DialogHeader>
+
+          <form className="space-y-4" onSubmit={(e) => void onSubmit(e)}>
+            {/* URL 行：ws/wss + host + : + port */}
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">URL</Label>
+              <div className="grid grid-cols-[5.5rem_minmax(0,1fr)_auto_5rem] items-center gap-1.5">
+                <Select
+                  value={form.secure ? "wss" : "ws"}
+                  onValueChange={(v) =>
+                    setForm((f) => ({ ...f, secure: v === "wss" }))
+                  }
+                >
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ws">ws://</SelectItem>
+                    <SelectItem value="wss">wss://</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Input
+                  className="h-9"
+                  placeholder={t("shared.nodes.connect.host.placeholder")}
+                  value={form.host}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, host: e.target.value }))
+                  }
+                  autoComplete="off"
+                />
+                <span className="px-0.5 text-muted-foreground">:</span>
+                <Input
+                  className="h-9"
+                  placeholder={t("shared.nodes.connect.port.label")}
+                  value={form.port}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, port: e.target.value }))
+                  }
+                  autoComplete="off"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">
+                {t("shared.nodes.token.label")}
+              </Label>
+              <Input
+                className="h-9"
+                type="password"
+                placeholder={t("shared.nodes.token.label")}
+                value={form.token ?? ""}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, token: e.target.value }))
+                }
+                autoComplete="off"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">
+                {t("shared.nodes.connect.name.label")}
+              </Label>
+              <Input
+                className="h-9"
+                placeholder={t("shared.nodes.connect.name.label")}
+                value={form.name}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, name: e.target.value }))
+                }
+                autoComplete="off"
+              />
+            </div>
+
+            {error ? (
+              <p className="text-sm text-destructive" role="alert">
+                {error}
+              </p>
+            ) : null}
+
+            <DialogFooter className="gap-2 sm:gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={submitting}
+                onClick={closeForm}
+              >
+                {t("ui.common.cancel")}
+              </Button>
+              <Button type="submit" disabled={submitting}>
+                {submitting ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" aria-hidden />
+                    {t("shared.nodes.status.connecting")}
+                  </>
+                ) : editingId ? (
+                  t("ui.common.edit")
+                ) : (
+                  t("shared.nodes.connect.new")
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </ConsolePage>
+  );
+}

@@ -1,3 +1,10 @@
-import vueConfig from "@repo/configs/eslint/vue.js";
+import next from "eslint-config-next";
 
-export default vueConfig;
+export default [
+  ...next,
+  {
+    rules: {
+      "react-hooks/set-state-in-effect": "off",
+    },
+  },
+];

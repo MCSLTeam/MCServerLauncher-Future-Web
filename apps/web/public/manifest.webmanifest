@@ -1,0 +1,17 @@
+{
+  "name": "MCServerLauncher Future",
+  "short_name": "MCSL Future",
+  "description": "MCServerLauncher Future · Tauri / Web",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5fbfa",
+  "theme_color": "#081316",
+  "icons": [
+    {
+      "src": "/brand/mcsl.png",
+      "sizes": "832x832",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
