@@ -8,14 +8,10 @@
         "minHeight": 500,
         "minWidth": 400,
         "resizable": true,
-        "title": "MCSL Future Tauri",
+        "title": "MCServerLauncher Future",
         "visible": true,
-        "titleBarStyle": "Overlay",
-        "hiddenTitle": true,
-        "trafficLightPosition": {
-          "x": 25,
-          "y": 34
-        }
+        "decorations": true,
+        "transparent": false
       }
     ]
   }

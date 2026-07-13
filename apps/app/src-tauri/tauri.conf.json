@@ -1,27 +1,28 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "MCSL Future",
+  "productName": "MCServerLauncher Future",
   "version": "0.1.0",
   "identifier": "cn.com.mcsl.future.tauri",
   "build": {
-    "beforeDevCommand": "pnpm frontend:dev",
-    "devUrl": "http://localhost:3001/",
-    "beforeBuildCommand": "pnpm frontend:build",
-    "frontendDist": "../dist"
+    "beforeDevCommand": "pnpm --dir ../web frontend:dev",
+    "devUrl": "http://localhost:3000/",
+    "beforeBuildCommand": "pnpm --dir ../web frontend:build",
+    "frontendDist": "../../web/dist"
   },
   "app": {
+    "withGlobalTauri": true,
     "windows": [
       {
         "fullscreen": false,
-        "height": 700,
-        "width": 1100,
+        "height": 800,
+        "width": 1280,
         "minHeight": 500,
         "minWidth": 400,
         "resizable": true,
-        "title": "MCSL Future Tauri",
+        "title": "MCServerLauncher Future",
         "visible": true,
-        "decorations": false,
-        "transparent": true
+        "decorations": true,
+        "transparent": false
       }
     ],
     "security": {
