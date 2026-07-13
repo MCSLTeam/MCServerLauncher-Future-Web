@@ -37,42 +37,49 @@ withDefaults(
 }
 
 .mcsl-skeleton {
-  border: 1px solid var(--mcsl-skeleton__edge);
-  background: linear-gradient(
-    90deg,
-    var(--mcsl-skeleton__base) 0%,
-    var(--mcsl-skeleton__base) 34%,
-    var(--mcsl-skeleton__highlight) 50%,
-    var(--mcsl-skeleton__base) 66%,
-    var(--mcsl-skeleton__base) 100%
-  );
-  background-size: 240% 100%;
-  box-shadow: inset 0 1px 0 var(--mcsl-skeleton__inner-edge);
-  animation:
-    mcsl-skeleton calc(var(--mcsl-motion-duration-loading) * 1.2)
-    var(--mcsl-motion-ease-standard) infinite;
+  background-color: var(--mcsl-skeleton__color-start);
+  animation: mcsl-skeleton-loading
+    calc(var(--mcsl-motion-duration-loading) * 1.12)
+    var(--mcsl-motion-ease-loading) infinite;
+  transition:
+    background-color var(--mcsl-motion-duration-base)
+      var(--mcsl-motion-ease-standard),
+    border-radius var(--mcsl-motion-duration-base)
+      var(--mcsl-motion-ease-standard);
 }
 
 .light .mcsl-skeleton {
-  --mcsl-skeleton__base: color-mix(in srgb, var(--mcsl-border-color-base) 72%, var(--mcsl-bg-color-dark));
-  --mcsl-skeleton__highlight: color-mix(in srgb, var(--mcsl-bg-color-overlay) 72%, white);
-  --mcsl-skeleton__edge: color-mix(in srgb, var(--mcsl-border-color-dark) 46%, transparent);
-  --mcsl-skeleton__inner-edge: color-mix(in srgb, white 72%, transparent);
+  --mcsl-skeleton__color-start: #eee;
+  --mcsl-skeleton__color-end: #ddd;
 }
 
 .dark .mcsl-skeleton {
-  --mcsl-skeleton__base: color-mix(in srgb, var(--mcsl-bg-color-dark) 72%, var(--mcsl-border-color-base));
-  --mcsl-skeleton__highlight: color-mix(in srgb, var(--mcsl-bg-color-overlay) 82%, white 10%);
-  --mcsl-skeleton__edge: color-mix(in srgb, var(--mcsl-border-color-base) 70%, transparent);
-  --mcsl-skeleton__inner-edge: color-mix(in srgb, white 5%, transparent);
+  --mcsl-skeleton__color-start: rgb(255 255 255 / 12%);
+  --mcsl-skeleton__color-end: rgb(255 255 255 / 18%);
 }
 
 .mcsl-skeleton__rounded {
   border-radius: var(--mcsl-border-radius-sm);
 }
 
-@keyframes mcsl-skeleton {
-  0% { background-position: 180% 0; }
-  100% { background-position: -180% 0; }
+@keyframes mcsl-skeleton-loading {
+  0% {
+    background-color: var(--mcsl-skeleton__color-start);
+  }
+
+  40% {
+    background-color: var(--mcsl-skeleton__color-end);
+  }
+
+  80%,
+  100% {
+    background-color: var(--mcsl-skeleton__color-start);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mcsl-skeleton {
+    animation: none;
+  }
 }
 </style>

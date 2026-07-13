@@ -104,6 +104,10 @@ export const useAppearance = defineStore("appearance", () => {
             Math.max(mouseY, innerHeight - mouseY),
           );
           viewTransition.ready.then(() => {
+            const easing =
+              getComputedStyle(document.documentElement)
+                .getPropertyValue("--mcsl-motion-ease-standard")
+                .trim() || "cubic-bezier(0.2, 0, 0, 1)";
             const clipPath = [
               `circle(0px at ${mouseX}px ${mouseY}px)`,
               `circle(${endRadius}px at ${mouseX}px ${mouseY}px)`,
@@ -117,7 +121,7 @@ export const useAppearance = defineStore("appearance", () => {
               },
               {
                 duration: 360,
-                easing: "cubic-bezier(0.2, 0, 0, 1)",
+                easing,
                 pseudoElement:
                   currActualTheme == "dark"
                     ? "::view-transition-new(root)"

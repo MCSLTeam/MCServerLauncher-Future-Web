@@ -7,12 +7,14 @@
 @use "utils";
 
 :root {
-  --mcsl-font-family-sans: "MiSans VF", "PingFang SC", Inter, -apple-system, BlinkMacSystemFont,
-  Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans,
-  Helvetica Neue, sans-serif;
-  --mcsl-font-family-minecraft: Minecraft, GNU Unifont, var(--mcsl-font-family-sans);
-  --mcsl-font-family-mono: JetBrains Mono, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
-  Liberation Mono, monospace;
+  --mcsl-font-family-sans:
+    "PingFang SC", Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen,
+    Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  --mcsl-font-family-minecraft:
+    Minecraft, GNU Unifont, var(--mcsl-font-family-sans);
+  --mcsl-font-family-mono:
+    JetBrains Mono, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
+    Liberation Mono, monospace;
   --mcsl-motion-duration-instant: 90ms;
   --mcsl-motion-duration-fast: 140ms;
   --mcsl-motion-duration-base: 180ms;
@@ -28,15 +30,19 @@
   --mcsl-motion-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
   --mcsl-motion-ease-exit: cubic-bezier(0.4, 0, 1, 1);
   --mcsl-motion-ease-emphasized: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --mcsl-motion-ease-loading: cubic-bezier(0.36, 0, 0.64, 1);
   --mcsl-motion-ease-linear: linear;
 
+  background: var(--mcsl-bg-color-main, #ffffff);
   font-family: var(--mcsl-font-family-sans);
 
   &.light {
+    background: var(--mcsl-bg-color-main);
     color-scheme: light;
   }
 
   &.dark {
+    background: var(--mcsl-bg-color-main);
     color-scheme: dark;
   }
 }
@@ -57,7 +63,7 @@ body,
 
 body,
 #app {
-  background: var(--mcsl-bg-color-main);
+  background: var(--mcsl-bg-color-main, #ffffff);
 }
 
 .app:not(.macos) #app {
@@ -78,6 +84,7 @@ body,
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
+  background: var(--mcsl-bg-color-main);
   mix-blend-mode: normal;
 }
 
@@ -121,14 +128,18 @@ html.dark::view-transition-new(root) {
 
 .collapse-enter-active {
   animation:
-    var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-enter) both collapseInVertical,
-    var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-enter) both collapseInHorizontal;
+    var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-enter) both
+      collapseInVertical,
+    var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-enter) both
+      collapseInHorizontal;
 }
 
 .collapse-leave-active {
   animation:
-    var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-exit) both collapseOutVertical,
-    var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-exit) both collapseOutHorizontal;
+    var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-exit) both
+      collapseOutVertical,
+    var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-exit) both
+      collapseOutHorizontal;
 }
 
 .collapse-enter-active,
@@ -143,11 +154,13 @@ html.dark::view-transition-new(root) {
 }
 
 .collapse-vertical-enter-active {
-  animation: var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-enter) both collapseInVertical;
+  animation: var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-enter) both
+    collapseInVertical;
 }
 
 .collapse-vertical-leave-active {
-  animation: var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-exit) both collapseOutVertical;
+  animation: var(--mcsl-motion-duration-slow) var(--mcsl-motion-ease-exit) both
+    collapseOutVertical;
 }
 
 .collapse-vertical-enter-active,
@@ -642,12 +655,14 @@ td {
 /* 字体 */
 @font-face {
   font-family: "Minecraft";
-  src: url("https://www.minecraft.net/etc.clientlibs/minecraftnet/clientlibs/clientlib-site/resources/fonts/Minecraft-Seven_v2.woff2") format("woff");
+  src: url("https://www.minecraft.net/etc.clientlibs/minecraftnet/clientlibs/clientlib-site/resources/fonts/Minecraft-Seven_v2.woff2")
+    format("woff");
 }
 
 @font-face {
   font-family: "GNU Unifont";
-  src: url("https://www.unifoundry.com/pub/unifont/unifont-17.0.03/font-builds/unifont-17.0.03.otf") format("opentype");
+  src: url("https://www.unifoundry.com/pub/unifont/unifont-17.0.03/font-builds/unifont-17.0.03.otf")
+    format("opentype");
 }
 
 /* Floating Vue  */

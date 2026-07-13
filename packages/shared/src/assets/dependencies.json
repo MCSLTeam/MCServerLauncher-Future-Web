@@ -153,16 +153,6 @@
       ]
     },
     {
-      "name": "MiSans",
-      "desc": "Global Free Commercial-Use Fonts.",
-      "links": [
-        {
-          "icon": "fa fa-globe",
-          "url": "https://hyperos.mi.com/font/"
-        }
-      ]
-    },
-    {
       "name": "NBT Parser (By MCSLTeam)",
       "desc": "Minecraft NBT (NamedBinary Tags) parser for Node.js.",
       "links": [
