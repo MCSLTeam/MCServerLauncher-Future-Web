@@ -33,9 +33,9 @@ withDefaults(
 
 h1 {
   margin: 0;
-  font-size: clamp(2rem, 3vw, 3rem);
+  font-size: clamp(1.25rem, 1.55vw, 1.78rem);
   font-weight: 620;
-  line-height: 1.04;
+  line-height: 1.18;
 }
 
 p {

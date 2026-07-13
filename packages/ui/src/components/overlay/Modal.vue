@@ -56,21 +56,25 @@ const modalId = Date.now();
 const modalIndex = computed(
   () => modals.value.length - modals.value.indexOf(modalId) - 1,
 );
-const { exist } = animatedVisibilityExists(visible, { in: 180, out: 140 }, {
-  beforeShow: () => {
-    modals.value.push(modalId);
-    emit("open");
-    setTimeout(() => {
-      if (modalRef.value) document.body.appendChild(modalRef.value);
-    });
+const { exist } = animatedVisibilityExists(
+  visible,
+  { in: 180, out: 140 },
+  {
+    beforeShow: () => {
+      modals.value.push(modalId);
+      emit("open");
+      setTimeout(() => {
+        if (modalRef.value) document.body.appendChild(modalRef.value);
+      });
+    },
+    afterShow: () => emit("opened"),
+    beforeHide: () => {
+      emit("close");
+      modals.value = modals.value.filter((id) => id != modalId);
+    },
+    afterHide: () => emit("closed"),
   },
-  afterShow: () => emit("opened"),
-  beforeHide: () => {
-    emit("close");
-    modals.value = modals.value.filter((id) => id != modalId);
-  },
-  afterHide: () => emit("closed"),
-});
+);
 
 const focusTrap = ref<ReturnType<typeof createFocusTrap> | null>(null);
 const modalRef = ref<HTMLElement | null>(null);
@@ -142,7 +146,10 @@ onUnmounted(() => {
     <div
       :class="{ 'mcsl-modal__container-visible': visible }"
       class="mcsl-modal__container"
-      :style="{ '--mcsl-modal__card-max-width': maxWidth }"
+      :style="{
+        '--mcsl-modal__card-max-width': maxWidth,
+        '--mcsl-modal__overlay-accent': getColorVar(color),
+      }"
     >
       <Panel
         :style="{
@@ -195,27 +202,24 @@ onUnmounted(() => {
   inset: 0;
   opacity: 0;
   z-index: 1001;
-  background:
-    radial-gradient(
-      circle at 50% 28%,
-      color-mix(in srgb, var(--mcsl-modal__overlay-accent) 9%, transparent) 0%,
-      transparent 38%
-    ),
-    color-mix(in srgb, var(--mcsl-color-surface-950) 46%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--mcsl-color-surface-950) 46%,
+    transparent
+  );
   backdrop-filter: blur(4px) saturate(0.96);
-  animation:
-    var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-exit) both
+  animation: var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-exit) both
     mcsl-modal__overlay-out;
   will-change: opacity;
 
   &.mcsl-modal__overlay-visible {
-    animation:
-      var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-enter) both
-      mcsl-modal__overlay-in;
+    animation: var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-enter)
+      both mcsl-modal__overlay-in;
   }
 }
 
 .mcsl-modal__container {
+  position: relative;
   width: min(
     var(--mcsl-modal__card-max-width),
     calc(100% - 4 * var(--mcsl-spacing-xl))
@@ -223,15 +227,37 @@ onUnmounted(() => {
   max-height: calc(100% - 2 * var(--mcsl-spacing-xl));
   z-index: 1002;
   transform-origin: center;
-  animation:
-    var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-exit) both
+  animation: var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-exit) both
     mcsl-modal__card-out;
   will-change: opacity, transform;
 
+  &::before {
+    content: "";
+    position: absolute;
+    right: 10%;
+    bottom: -3.5rem;
+    left: 10%;
+    height: 7rem;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse at 50% 50%,
+      color-mix(in srgb, var(--mcsl-modal__overlay-accent) 16%, transparent) 0%,
+      transparent 68%
+    );
+    filter: blur(18px);
+    opacity: 0;
+    transition: opacity var(--mcsl-motion-duration-base)
+      var(--mcsl-motion-ease-standard);
+  }
+
   &.mcsl-modal__container-visible {
-    animation:
-      var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-enter) both
-      mcsl-modal__card-in;
+    animation: var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-enter)
+      both mcsl-modal__card-in;
+
+    &::before {
+      opacity: 1;
+    }
   }
 }
 

@@ -1,11 +1,13 @@
 <script lang="ts" setup>
-import { inject, ref, watch } from "vue";
+import { computed, inject, ref, watch } from "vue";
 import type { FormFieldData } from "../FormEntry.vue";
 import { ColorData, type ColorType, getColorVar } from "../../../utils/css.ts";
 import type { Size } from "../../../utils/utils.ts";
 import Button from "../../button/Button.vue";
 
-withDefaults(
+type ResizeMode = "none" | "vertical" | "horizontal" | "both";
+
+const props = withDefaults(
   defineProps<{
     color?: ColorType;
     invalid?: boolean;
@@ -15,6 +17,10 @@ withDefaults(
     password?: boolean;
     clearable?: boolean;
     resizeable?: boolean;
+    resizable?: boolean;
+    resizeX?: boolean;
+    resizeY?: boolean;
+    resize?: ResizeMode;
   }>(),
   {
     size: "medium",
@@ -25,6 +31,10 @@ withDefaults(
     password: false,
     clearable: false,
     resizeable: false,
+    resizable: false,
+    resizeX: false,
+    resizeY: false,
+    resize: "none",
   },
 );
 
@@ -40,6 +50,21 @@ const model = defineModel<string>({
 });
 
 const showPassword = ref(false);
+const showClearButton = computed(
+  () => props.clearable && model.value.length > 0,
+);
+const showPasswordButton = computed(() => !props.clearable && props.password);
+const resizeMode = computed<ResizeMode>(() => {
+  if (props.resize !== "none") return props.resize;
+
+  const x = props.resizeX || props.resizeable || props.resizable;
+  const y = props.resizeY;
+
+  if (x && y) return "both";
+  if (x) return "horizontal";
+  if (y) return "vertical";
+  return "none";
+});
 
 const formField = inject("mcsl-form-field", undefined) as
   | FormFieldData
@@ -71,28 +96,28 @@ if (formField) {
   <div
     class="mcsl-input mcsl-input-text"
     :class="[
-      `mcsl-size-${size}`,
-      { 'mcsl-input-text__resizeable': resizeable },
+      `mcsl-size-${props.size}`,
+      `mcsl-input-text__resize-${resizeMode}`,
     ]"
   >
     <input
       v-model="model"
       :aria-invalid="
-        invalid || formField?.field?.error?.value ? 'true' : undefined
+        props.invalid || formField?.field?.error?.value ? 'true' : undefined
       "
       :id="formField?.id"
-      :disabled="disabled"
+      :disabled="props.disabled"
       :style="{
         '--mcsl-input-text__color-light': getColorVar(
-          new ColorData(color, 'light'),
+          new ColorData(props.color, 'light'),
         ),
-        '--mcsl-input-text__color': getColorVar(color),
+        '--mcsl-input-text__color': getColorVar(props.color),
         '--mcsl-input-text__color-dark': getColorVar(
-          new ColorData(color, 'dark'),
+          new ColorData(props.color, 'dark'),
         ),
       }"
-      :placeholder="placeholder"
-      :type="password && !showPassword ? 'password' : 'text'"
+      :placeholder="props.placeholder"
+      :type="props.password && !showPassword ? 'password' : 'text'"
       @blur="
         $emit('blur', $event);
         formField?.onBlur($event);
@@ -113,7 +138,7 @@ if (formField) {
         formField?.onFocus($event);
       "
     />
-    <div v-if="clearable">
+    <div v-if="showClearButton">
       <Button
         type="text"
         rounded
@@ -122,7 +147,7 @@ if (formField) {
         @click="model = ''"
       />
     </div>
-    <div v-else-if="password">
+    <div v-else-if="showPasswordButton">
       <Button
         type="text"
         rounded
@@ -145,8 +170,8 @@ if (formField) {
     $height: utils.get-size-var("height", $size, $vars);
 
     & > input {
-      width: calc(100% - 2 * $spacing - 2px); // 减去border宽度
-      height: calc($height - 2 * $spacing - 2px);
+      width: 100%;
+      height: $height;
       padding: $spacing;
       border-radius: utils.get-size-var("border-radius", $size, $vars);
     }
@@ -163,6 +188,20 @@ if (formField) {
         }
       }
     }
+
+    &.mcsl-input-text__resize-vertical,
+    &.mcsl-input-text__resize-both {
+      height: $height;
+      min-height: $height;
+
+      & > input {
+        height: 100%;
+      }
+
+      & > div {
+        height: 100%;
+      }
+    }
   }
 }
 
@@ -172,25 +211,56 @@ if (formField) {
   min-width: 8rem;
 }
 
-.mcsl-input-text__resizeable {
+.mcsl-input-text__resize-horizontal,
+.mcsl-input-text__resize-both {
   flex: 0 0 auto;
   width: min(100%, 18rem);
   max-width: 100%;
+  min-width: 8rem;
+}
+
+.mcsl-input-text__resize-vertical,
+.mcsl-input-text__resize-both {
+  flex: 0 0 auto;
+}
+
+.mcsl-input-text__resize-horizontal,
+.mcsl-input-text__resize-vertical,
+.mcsl-input-text__resize-both {
+  transition: none;
+}
+
+.mcsl-input-text__resize-horizontal {
   overflow: auto hidden;
   resize: horizontal;
 }
 
+.mcsl-input-text__resize-vertical {
+  overflow: hidden auto;
+  resize: vertical;
+}
+
+.mcsl-input-text__resize-both {
+  overflow: auto;
+  resize: both;
+}
+
 .mcsl-input-text > input {
+  box-sizing: border-box;
   margin: 0;
   background: var(--mcsl-bg-color-overlay);
   border: 1px solid var(--mcsl-border-color-base);
   outline: 0 solid transparent;
   outline-offset: -2px; // 覆盖 border
   transition:
-    background-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
-    border-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
-    outline-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
-    color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
+    background-color var(--mcsl-motion-duration-fast)
+      var(--mcsl-motion-ease-standard),
+    border-color var(--mcsl-motion-duration-fast)
+      var(--mcsl-motion-ease-standard),
+    outline-color var(--mcsl-motion-duration-fast)
+      var(--mcsl-motion-ease-standard),
+    color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    box-shadow var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 
   &::placeholder {
     color: var(--mcsl-text-color-secondary);

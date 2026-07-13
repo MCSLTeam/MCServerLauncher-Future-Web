@@ -45,7 +45,10 @@ function fallbackDetectVisible() {
 onMounted(() => {
   if (!wrapper.value) return;
 
-  if ("IntersectionObserver" in window) {
+  const supportsIntersectionObserver =
+    typeof window.IntersectionObserver !== "undefined";
+
+  if (supportsIntersectionObserver) {
     observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];

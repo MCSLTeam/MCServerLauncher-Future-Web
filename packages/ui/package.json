@@ -13,26 +13,12 @@
     "fix": "eslint --fix; prettier --write --list-different .",
     "test": "vue-tsc --noEmit"
   },
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@repo/configs": "workspace:*",
-    "@repo/locales": "workspace:*",
-    "@types/lodash": "^4.17.23",
-    "@types/markdown-it": "^14.1.2",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.5",
-    "prettier": "^3.8.1",
-    "sass": "^1.97.3",
-    "typescript": "^5.9.3"
-  },
   "dependencies": {
     "@vueuse/core": "^14.2.1",
     "animate.css": "^4.1.1",
     "dayjs": "^1.11.19",
     "floating-vue": "^5.2.2",
     "focus-trap": "^8.0.0",
-    "highlight.js": "^11.11.1",
-    "highlightjs-snbt": "^0.1.4",
     "lodash": "^4.17.23",
     "markdown-it": "^14.1.1",
     "mime": "^4.1.0",
@@ -44,5 +30,23 @@
     "vue-tsc": "^3.2.4",
     "xss": "^1.0.15",
     "yup": "^1.7.1"
+  },
+  "peerDependencies": {
+    "highlight.js": "^11.11.1",
+    "highlightjs-snbt": "^0.1.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@repo/configs": "workspace:*",
+    "@repo/locales": "workspace:*",
+    "@types/lodash": "^4.17.23",
+    "@types/markdown-it": "^14.1.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "highlight.js": "^11.11.1",
+    "highlightjs-snbt": "^0.1.4",
+    "prettier": "^3.8.1",
+    "sass": "^1.97.3",
+    "typescript": "^5.9.3"
   }
 }

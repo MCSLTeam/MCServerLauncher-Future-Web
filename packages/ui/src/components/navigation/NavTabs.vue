@@ -161,7 +161,8 @@ defineExpose({
   position: relative;
   background: color-mix(in srgb, var(--mcsl-bg-color-overlay) 98%, transparent);
   border-radius: var(--mcsl-border-radius-sm);
-  border: 1px solid color-mix(in srgb, var(--mcsl-border-color-base) 90%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--mcsl-border-color-base) 90%, transparent);
   overflow: auto hidden;
 }
 
@@ -191,24 +192,39 @@ defineExpose({
   line-height: 1;
   cursor: pointer;
   transition:
-    background-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
-    border-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    background-color var(--mcsl-motion-duration-fast)
+      var(--mcsl-motion-ease-standard),
+    border-color var(--mcsl-motion-duration-fast)
+      var(--mcsl-motion-ease-standard),
     color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 
   &:not(.mcsl-nav-tabs__btn-active):hover {
-    border-color: color-mix(in srgb, var(--mcsl-border-color-base) 92%, transparent);
+    border-color: color-mix(
+      in srgb,
+      var(--mcsl-border-color-base) 92%,
+      transparent
+    );
     background: color-mix(in srgb, var(--mcsl-bg-color-dark) 92%, transparent);
   }
 
   &:not(.mcsl-nav-tabs__btn-active):active {
-    border-color: color-mix(in srgb, var(--mcsl-border-color-dark) 92%, transparent);
-    background: color-mix(in srgb, var(--mcsl-bg-color-darker) 92%, transparent);
+    border-color: color-mix(
+      in srgb,
+      var(--mcsl-border-color-dark) 92%,
+      transparent
+    );
+    background: color-mix(
+      in srgb,
+      var(--mcsl-bg-color-darker) 92%,
+      transparent
+    );
     transition-duration: var(--mcsl-motion-duration-instant);
   }
 
   & > i {
     font-size: var(--mcsl-font-size-sm);
-    transition: color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
+    transition: color var(--mcsl-motion-duration-fast)
+      var(--mcsl-motion-ease-standard);
   }
 
   &.mcsl-nav-tabs__btn-active {
@@ -241,9 +257,16 @@ defineExpose({
     background: var(--mcsl-nav-tabs__color-bg);
     width: calc(var(--mcsl-nav-tabs__bg-width) - 2px);
     height: calc(100% - 2px);
-    border: 1px solid color-mix(in srgb, var(--mcsl-nav-tabs__color) 22%, var(--mcsl-border-color-base));
+    border: 1px solid
+      color-mix(
+        in srgb,
+        var(--mcsl-nav-tabs__color) 22%,
+        var(--mcsl-border-color-base)
+      );
     border-radius: var(--mcsl-border-radius-sm);
-    transition: transform var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard), width var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
+    transition:
+      transform var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-enter),
+      width var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-enter);
   }
 }
 </style>

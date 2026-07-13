@@ -176,8 +176,7 @@ $size: var(--mcsl-progress-bar__size);
     border-radius: var(--mcsl-border-radius-full);
     background: $stroke-color;
     transform-origin: left center;
-    transition:
-      transform var(--mcsl-motion-duration-slow)
+    transition: transform var(--mcsl-motion-duration-slow)
       var(--mcsl-motion-ease-standard);
     will-change: transform;
 
@@ -189,16 +188,15 @@ $size: var(--mcsl-progress-bar__size);
       position: absolute;
       inset: 0 auto 0 0;
       width: 42%;
-      background:
-        linear-gradient(
-          90deg,
-          transparent 0%,
-          color-mix(in srgb, $stroke-color 60%, transparent) 16%,
-          $stroke-color 44%,
-          $stroke-color 56%,
-          color-mix(in srgb, $stroke-color 60%, transparent) 84%,
-          transparent 100%
-        );
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        color-mix(in srgb, $stroke-color 60%, transparent) 16%,
+        $stroke-color 44%,
+        $stroke-color 56%,
+        color-mix(in srgb, $stroke-color 60%, transparent) 84%,
+        transparent 100%
+      );
       transform: translate3d(-130%, 0, 0);
       transform-origin: center;
       transition: none;
@@ -211,10 +209,11 @@ $size: var(--mcsl-progress-bar__size);
     }
   }
 
-  .mcsl-progress-bar__status-loading.mcsl-progress-bar__mode-indeterminate & > div::before {
-    animation:
-      var(--mcsl-motion-duration-loading) var(--mcsl-motion-ease-linear) infinite
-      mcsl-progress-bar__indeterminate;
+  .mcsl-progress-bar__status-loading.mcsl-progress-bar__mode-indeterminate
+    &
+    > div::before {
+    animation: var(--mcsl-motion-duration-loading)
+      var(--mcsl-motion-ease-loading) infinite mcsl-progress-bar__indeterminate;
   }
 }
 
@@ -268,8 +267,7 @@ $size: var(--mcsl-progress-bar__size);
         stroke-linecap: round;
         stroke-dasharray: calc($circumference);
         stroke-dashoffset: calc($circumference * (1 - $progress-decimal));
-        transition:
-          stroke-dashoffset var(--mcsl-motion-duration-fast)
+        transition: stroke-dashoffset var(--mcsl-motion-duration-fast)
           var(--mcsl-motion-ease-standard);
       }
     }

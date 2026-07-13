@@ -61,13 +61,6 @@ export const config: RsbuildConfig = {
         children:
           "(()=>{try{const t=localStorage.getItem('theme')||'system';const d=window.matchMedia('(prefers-color-scheme: dark)').matches;const isDark=t==='dark'||t==='\"dark\"'||((t==='system'||t==='\"system\"')&&d);const c=isDark?'dark':'light';document.documentElement.classList.remove(isDark?'light':'dark');document.documentElement.classList.add(c);document.documentElement.style.colorScheme=c;}catch(e){}})();",
       },
-      {
-        tag: "link",
-        attrs: {
-          rel: "stylesheet",
-          href: "https://cdn-font.hyperos.mi.com/font/css?family=MiSans_VF:VF:Latin,Chinese_Simplify,Chinese_Traditional_TW&display=swap",
-        },
-      },
     ],
   },
 };

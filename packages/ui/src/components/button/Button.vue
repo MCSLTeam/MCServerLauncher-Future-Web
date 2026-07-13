@@ -49,6 +49,13 @@ const props = withDefaults(
 
 const emit = defineEmits<(e: "click", event: MouseEvent) => void>();
 
+let router: ReturnType<typeof useRouter> | undefined;
+try {
+  router = useRouter();
+} catch {
+  router = undefined;
+}
+
 const icon = computed(() => (props.loading ? props.loadingIcon : props.icon));
 const iconPos = computed(() =>
   props.loading && props.loadingIconPos != "same"
@@ -57,22 +64,25 @@ const iconPos = computed(() =>
 );
 const isSurface = computed(() => props.color == "surface");
 
-const onClick = computed(() =>
-  props.link
-    ? (event: MouseEvent) => {
-        emit("click", event);
-        if (props.routerLink) {
-          useRouter().push(props.link!);
-        } else {
-          window.open(
-            props.link!,
-            props.linkTarget,
-            "noopener norefferrer nofollow ugc",
-          );
-        }
-      }
-    : (event: MouseEvent) => emit("click", event),
-);
+function onClick(event: MouseEvent) {
+  emit("click", event);
+  if (!props.link) return;
+
+  if (props.routerLink) {
+    if (router) {
+      router.push(props.link);
+    } else {
+      window.location.assign(props.link);
+    }
+    return;
+  }
+
+  window.open(
+    props.link,
+    props.linkTarget,
+    "noopener norefferrer nofollow ugc",
+  );
+}
 </script>
 
 <template>
@@ -106,14 +116,16 @@ const onClick = computed(() =>
         ? 'var(--mcsl-text-color-secondary)'
         : `var(--mcsl-color-${color}-light)`,
       // Bg
-      '--mcsl-button__bg': 'color-mix(in srgb, var(--mcsl-bg-color-overlay) 98%, transparent)',
+      '--mcsl-button__bg':
+        'color-mix(in srgb, var(--mcsl-bg-color-overlay) 98%, transparent)',
       '--mcsl-button__bg-hover': isSurface
         ? 'color-mix(in srgb, var(--mcsl-bg-color-dark) 72%, var(--mcsl-bg-color-overlay))'
         : new ColorData(props.color, 'default', 0.09).getCss(),
       '--mcsl-button__bg-active': isSurface
         ? 'color-mix(in srgb, var(--mcsl-bg-color-darker) 64%, var(--mcsl-bg-color-overlay))'
         : new ColorData(props.color, 'default', 0.15).getCss(),
-      '--mcsl-button__bg-disabled': 'color-mix(in srgb, var(--mcsl-bg-color-dark) 78%, transparent)',
+      '--mcsl-button__bg-disabled':
+        'color-mix(in srgb, var(--mcsl-bg-color-dark) 78%, transparent)',
       // Border
       '--mcsl-button__border': isSurface
         ? 'color-mix(in srgb, var(--mcsl-border-color-base) 88%, transparent)'
@@ -144,7 +156,8 @@ const onClick = computed(() =>
       '--mcsl-button__primary-bg-active': isSurface
         ? 'var(--mcsl-text-color-primary)'
         : `var(--mcsl-color-${color}-darker)`,
-      '--mcsl-button__primary-bg-disabled': 'color-mix(in srgb, var(--mcsl-border-color-dark) 70%, transparent)',
+      '--mcsl-button__primary-bg-disabled':
+        'color-mix(in srgb, var(--mcsl-border-color-dark) 70%, transparent)',
     }"
     class="mcsl-button"
     :type="btnType"
@@ -197,15 +210,19 @@ const onClick = computed(() =>
   line-height: 1;
   white-space: nowrap;
   transition:
-    background-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
-    border-color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    background-color var(--mcsl-motion-duration-fast)
+      var(--mcsl-motion-ease-standard),
+    border-color var(--mcsl-motion-duration-fast)
+      var(--mcsl-motion-ease-standard),
     color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
     opacity var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
     box-shadow var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 
   & > .mcsl-button__label,
   & > .mcsl-button__icon {
-    transition: color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard), opacity var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
+    transition:
+      color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+      opacity var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
   }
 
   &:active {
@@ -313,7 +330,10 @@ const onClick = computed(() =>
 
   &:focus-visible {
     box-shadow:
-      var(--mcsl-button__focus-shadow, 0 0 0 3px color-mix(in srgb, var(--mcsl-color-help) 18%, transparent)),
+      var(
+        --mcsl-button__focus-shadow,
+        0 0 0 3px color-mix(in srgb, var(--mcsl-color-help) 18%, transparent)
+      ),
       var(--mcsl-button__type-shadow, 0 0 0 0 transparent);
   }
 }
@@ -370,7 +390,10 @@ const onClick = computed(() =>
 
   &:focus-visible {
     box-shadow:
-      var(--mcsl-button__focus-shadow, 0 0 0 3px color-mix(in srgb, var(--mcsl-color-help) 18%, transparent)),
+      var(
+        --mcsl-button__focus-shadow,
+        0 0 0 3px color-mix(in srgb, var(--mcsl-color-help) 18%, transparent)
+      ),
       var(--mcsl-button__type-shadow, 0 0 0 0 transparent);
   }
 }
@@ -378,7 +401,8 @@ const onClick = computed(() =>
 .mcsl-button__type-primary {
   border: 1px solid var(--mcsl-button__primary-bg);
   background: var(--mcsl-button__primary-bg);
-  --mcsl-button__type-shadow: 0 1px 2px color-mix(in srgb, var(--mcsl-button__primary-bg) 18%, transparent);
+  --mcsl-button__type-shadow: 0 1px 2px
+    color-mix(in srgb, var(--mcsl-button__primary-bg) 18%, transparent);
 
   & > .mcsl-button__label,
   & > .mcsl-button__icon {
@@ -408,7 +432,10 @@ const onClick = computed(() =>
 
   &:focus-visible {
     box-shadow:
-      var(--mcsl-button__focus-shadow, 0 0 0 3px color-mix(in srgb, var(--mcsl-color-help) 18%, transparent)),
+      var(
+        --mcsl-button__focus-shadow,
+        0 0 0 3px color-mix(in srgb, var(--mcsl-color-help) 18%, transparent)
+      ),
       var(--mcsl-button__type-shadow, 0 0 0 0 transparent);
   }
 }

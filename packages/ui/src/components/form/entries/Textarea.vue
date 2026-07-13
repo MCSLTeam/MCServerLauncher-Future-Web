@@ -1,10 +1,12 @@
 <script lang="ts" setup>
-import { inject, watch } from "vue";
+import { computed, inject, watch } from "vue";
 import type { FormFieldData } from "../FormEntry.vue";
 import { ColorData, type ColorType, getColorVar } from "../../../utils/css.ts";
 import type { Size } from "../../../utils/utils.ts";
 
-withDefaults(
+type ResizeMode = "none" | "vertical" | "horizontal" | "both";
+
+const props = withDefaults(
   defineProps<{
     color?: ColorType;
     invalid?: boolean;
@@ -12,7 +14,10 @@ withDefaults(
     size?: Size;
     placeholder?: string;
     resizeable?: boolean;
-    resize?: "none" | "vertical" | "horizontal" | "both";
+    resizable?: boolean;
+    resizeX?: boolean;
+    resizeY?: boolean;
+    resize?: ResizeMode;
   }>(),
   {
     size: "medium",
@@ -21,6 +26,9 @@ withDefaults(
     disabled: false,
     placeholder: "",
     resizeable: false,
+    resizable: false,
+    resizeX: false,
+    resizeY: false,
     resize: "none",
   },
 );
@@ -36,6 +44,18 @@ const model = defineModel<string>({
   default: "",
 });
 
+const resizeMode = computed<ResizeMode>(() => {
+  if (props.resize !== "none") return props.resize;
+
+  const x = props.resizeX || props.resizeable || props.resizable;
+  const y = props.resizeY || props.resizeable || props.resizable;
+
+  if (x && y) return "both";
+  if (x) return "horizontal";
+  if (y) return "vertical";
+  return "none";
+});
+
 const formField = inject("mcsl-form-field", undefined) as
   | FormFieldData
   | undefined;
@@ -43,10 +63,10 @@ const formField = inject("mcsl-form-field", undefined) as
 if (formField) {
   if (typeof formField.field.data.value != "string") {
     console.error(
-      "[MCSL-UI] The type of the value for a <InputText> component is not string.",
+      "[MCSL-UI] The type of the value for a <Textarea> component is not string.",
     );
     throw new Error(
-      "The type of the value for a <InputText> component is not string.",
+      "The type of the value for a <Textarea> component is not string.",
     );
   }
 
@@ -66,23 +86,25 @@ if (formField) {
   <textarea
     v-model="model"
     :aria-invalid="
-      invalid || formField?.field?.error?.value ? 'true' : undefined
+      props.invalid || formField?.field?.error?.value ? 'true' : undefined
     "
     :id="formField?.id"
     :class="{
-      [`mcsl-size-${size}`]: true,
-      'mcsl-textarea__resizeable': resizeable,
-      [`mcsl-textarea__resize-${resize}`]: true,
+      [`mcsl-size-${props.size}`]: true,
+      [`mcsl-textarea__resize-${resizeMode}`]: true,
     }"
-    :disabled="disabled"
+    :disabled="props.disabled"
     :style="{
       '--mcsl-textarea__color-light': getColorVar(
-        new ColorData(color, 'light'),
+        new ColorData(props.color, 'light'),
       ),
-      '--mcsl-textarea__color': getColorVar(color),
-      '--mcsl-textarea__color-dark': new ColorData(color, 'dark').getCss(),
+      '--mcsl-textarea__color': getColorVar(props.color),
+      '--mcsl-textarea__color-dark': new ColorData(
+        props.color,
+        'dark',
+      ).getCss(),
     }"
-    :placeholder="placeholder"
+    :placeholder="props.placeholder"
     class="mcsl-textarea"
     @blur="
       $emit('blur', $event);
@@ -135,26 +157,32 @@ if (formField) {
   outline: 0 solid transparent;
   outline-offset: -2px; // 覆盖 border
   resize: none;
-  transition: var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard);
-}
-
-.mcsl-textarea__resizeable {
-  resize: both;
   transition:
-    var(--mcsl-motion-duration-base) var(--mcsl-motion-ease-standard),
-    height 0s,
-    width 0s;
+    background-color var(--mcsl-motion-duration-fast)
+      var(--mcsl-motion-ease-standard),
+    border-color var(--mcsl-motion-duration-fast)
+      var(--mcsl-motion-ease-standard),
+    outline-color var(--mcsl-motion-duration-fast)
+      var(--mcsl-motion-ease-standard),
+    color var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard),
+    box-shadow var(--mcsl-motion-duration-fast) var(--mcsl-motion-ease-standard);
 }
 
 .mcsl-textarea__resize-vertical {
+  flex: 0 0 auto;
+  overflow: hidden auto;
   resize: vertical;
 }
 
 .mcsl-textarea__resize-horizontal {
+  flex: 0 0 auto;
+  overflow: auto hidden;
   resize: horizontal;
 }
 
 .mcsl-textarea__resize-both {
+  flex: 0 0 auto;
+  overflow: auto;
   resize: both;
 }
 
