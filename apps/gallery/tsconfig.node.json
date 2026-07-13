@@ -1,7 +1,0 @@
-{
-  "extends": "@repo/configs/ts/base.json",
-  "include": ["rsbuild.config.ts"],
-  "compilerOptions": {
-    "composite": true
-  }
-}
