@@ -52,15 +52,11 @@ pnpm shared:lint          # Lint shared package
 ```
 MCServerLauncher-Future-Web/
 ├── apps/
-│   ├── web/                 # Web Panel (Vue 3 + Rust Actix-web)
+│   ├── web/                 # Web Panel (Next.js + shadcn/ui + Rust Actix-web)
+│   │   ├── app/             # Next.js App Router frontend
+│   │   ├── components/      # React / shadcn/ui components
 │   │   ├── src/             # Rust backend source
-│   │   │   ├── main.rs      # Entry point
-│   │   │   ├── api.rs       # API routes
-│   │   │   ├── user.rs      # User management
-│   │   │   ├── token.rs     # Token/auth handling
-│   │   │   ├── config.rs    # Configuration
-│   │   │   └── utils.rs     # Utilities
-│   │   ├── frontend/        # Vue 3 frontend (RsBuild)
+│   │   ├── dist/            # Static export for release embed
 │   │   ├── Cargo.toml       # Rust dependencies
 │   │   ├── package.json     # Frontend dependencies
 │   │   └── Dockerfile       # Docker build config
@@ -107,17 +103,21 @@ MCServerLauncher-Future-Web/
 
 ## Technology Stack
 
-### Frontend (Both Apps)
+### Frontend
 
-- **Framework**: Vue 3.5+ with Composition API
+**Web panel (`apps/web`)**:
+
+- **Framework**: Next.js 16 (App Router) + React 19
+- **UI**: shadcn/ui + Tailwind CSS v4 + framer-motion（对齐 ME Frp v6）
 - **Language**: TypeScript 5.9+
-- **Build Tool**: RsBuild 1.7+
-- **State Management**: Pinia 3.0+
-- **Routing**: Vue Router 5.0+
-- **i18n**: Vue I18n 11.2+
-- **HTTP Client**: Axios 1.13+
-- **Utilities**: VueUse 14.2+, Day.js 1.11+
-- **Validation**: Yup 1.7+
+- **Build**: `next build` static export → `dist/` (embedded by Rust in release)
+
+**Tauri app (`apps/app`)**:
+
+- **Framework**: Tauri 2.10+
+- **Frontend**: shared Next.js console from `apps/web`
+- **Development URL**: `http://localhost:3000/`
+- **Release frontend**: `apps/web/dist`
 
 ### Backend
 
@@ -140,7 +140,7 @@ MCServerLauncher-Future-Web/
 ### Build & Development
 
 - **Monorepo**: Turborepo 2.8+
-- **Package Manager**: Bun 1.3+ (migrated from pnpm)
+- **Package Manager**: pnpm 11+
 - **Linting**: ESLint 10.0+, Prettier 3.8+
 - **Type Checking**: vue-tsc 3.2+, TypeScript 6.0+
 
@@ -157,19 +157,18 @@ MCServerLauncher-Future-Web/
 - `config.rs`: Configuration loading and management
 - `utils.rs`: Utility functions
 
-**Frontend (Vue 3)**:
+**Frontend (Next.js + shadcn/ui)**:
 
-- Built with RsBuild
-- Shares components from `@repo/shared` and `@repo/ui`
-- Uses `@repo/configs` for build configuration
+- App Router under `apps/web/app`
+- UI via shadcn/ui (`components/ui`) + Tailwind v4（not HeroUI / `@repo/ui`）
+- Static export to `dist/` for Actix release embedding
 
 ### Tauri App (`apps/app`)
 
-**Frontend (Vue 3)**:
+**Frontend**:
 
-- `App.vue`: Root component
-- `index.ts`: Application entry point with Tauri integration
-- `components/`: App-specific components
+- Uses the same Next.js console as the Web panel
+- No separate Vue/RsBuild frontend is retained
 
 **Backend (Rust)**:
 
@@ -301,6 +300,11 @@ The `turbo.json` file defines:
 - Run `pnpm test` to verify type checking
 - Follow monorepo structure: place code in appropriate app or package
 - Update locale submodule when adding new translation keys
+
+## Daemon & Tauri (current)
+
+- Web console talks to MCSL Daemon via browser WebSocket (`apps/web/lib/daemon`, `features/nodes/daemon-provider.tsx`).
+- Tauri desktop shell hosts the same Next.js console (`devUrl` :3000 / `frontendDist` web dist), not dual Vue business UI.
 
 ## Recent Development Activity
 
