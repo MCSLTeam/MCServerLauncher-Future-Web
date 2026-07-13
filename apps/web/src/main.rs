@@ -6,9 +6,9 @@ mod utils;
 
 #[cfg(not(debug_assertions))]
 use actix_web::HttpResponse;
-use actix_web::{middleware::Logger, web, App, HttpServer};
+use actix_web::{App, HttpServer, middleware::Logger, web};
 #[cfg(not(debug_assertions))]
-use include_dir::{include_dir, Dir};
+use include_dir::{Dir, include_dir};
 use log::{error, info};
 use std::fs;
 use std::path::Path;
@@ -41,7 +41,7 @@ async fn main() -> std::io::Result<()> {
     token::load_tokens()?;
 
     tokio::spawn(async {
-        use tokio::time::{interval, Duration};
+        use tokio::time::{Duration, interval};
 
         let mut interval = interval(Duration::from_secs(3600));
 
@@ -78,7 +78,8 @@ async fn main() -> std::io::Result<()> {
                 .service(api::api_session_get_all)
                 .service(api::api_session_delete_self)
                 .service(api::api_session_delete_id)
-                .service(api::api_session_delete_username),
+                .service(api::api_session_delete_username)
+                .service(api::api_resource_provider),
         );
 
         #[cfg(not(debug_assertions))]

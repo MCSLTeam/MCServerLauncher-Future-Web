@@ -1,15 +1,110 @@
 use crate::token::{
-    create_session, delete_token, delete_token_by_id, delete_token_by_username, get_session_info_by_id,
-    get_session_infos, get_tokens_by_user, get_user_by_token, update_token_info,
-    SessionInfo,
+    SessionInfo, create_session, delete_token, delete_token_by_id, delete_token_by_username,
+    get_session_info_by_id, get_session_infos, get_tokens_by_user, get_user_by_token,
+    update_token_info,
 };
 use crate::user::{
-    add_user, delete_user, get_users, is_user_empty, update_user, verify_password, User, UserInput,
-    UserOutput,
+    User, UserInput, UserOutput, add_user, delete_user, get_users, is_user_empty, update_user,
+    verify_password,
 };
-use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse, Responder};
+use actix_web::{HttpRequest, HttpResponse, Responder, delete, get, post, put, web};
 use serde::{Deserialize, Serialize};
 use std::net::IpAddr;
+
+#[derive(Deserialize)]
+pub struct ResourceProviderRequest {
+    provider: String,
+    path: String,
+    query: Option<Vec<(String, String)>>,
+}
+
+/// 只允许 WPF 内置的五个下载源，禁止将此接口变成开放代理。
+#[post("/resource/provider")]
+pub async fn api_resource_provider(
+    body: web::Json<ResourceProviderRequest>,
+) -> impl Responder {
+    let base = match body.provider.as_str() {
+        "FastMirror" => "https://download.fastmirror.net/api/v3",
+        "PolarsMirror" => "https://mirror.polars.cc/api/query/minecraft",
+        "RainYun" => "https://mirrors.rainyun.com/api/fs",
+        "MSLAPI" => "https://api.mslmc.cn/v3",
+        "MCSLSync" => "https://sync.mcsl.com.cn/api",
+        _ => {
+            return HttpResponse::BadRequest().json(FailedResponse {
+                status: "failed",
+                err: "invalid-provider",
+            });
+        }
+    };
+
+    if body.path.contains("..") || body.path.contains('\0') {
+        return HttpResponse::BadRequest().json(FailedResponse {
+            status: "failed",
+            err: "invalid-path",
+        });
+    }
+
+    let suffix = body.path.trim_start_matches('/');
+    let mut url = match reqwest::Url::parse(&format!("{base}/{suffix}")) {
+        Ok(url) => url,
+        Err(_) => {
+            return HttpResponse::BadRequest().json(FailedResponse {
+                status: "failed",
+                err: "invalid-path",
+            });
+        }
+    };
+    if let Some(query) = &body.query {
+        url.query_pairs_mut().extend_pairs(query);
+    }
+
+    let response = match reqwest::Client::new()
+        .get(url)
+        .header(reqwest::header::ACCEPT, "application/json")
+        .header(
+            reqwest::header::USER_AGENT,
+            "MCServerLauncher-Future-Web/0.1",
+        )
+        .send()
+        .await
+    {
+        Ok(response) => response,
+        Err(_) => {
+            return HttpResponse::BadGateway().json(FailedResponse {
+                status: "failed",
+                err: "provider-unavailable",
+            });
+        }
+    };
+
+    let status = response.status();
+    let bytes = match response.bytes().await {
+        Ok(bytes) => bytes,
+        Err(_) => {
+            return HttpResponse::BadGateway().json(FailedResponse {
+                status: "failed",
+                err: "provider-unavailable",
+            });
+        }
+    };
+    if !status.is_success() {
+        return HttpResponse::BadGateway().json(FailedResponse {
+            status: "failed",
+            err: "provider-unavailable",
+        });
+    }
+
+    match serde_json::from_slice::<serde_json::Value>(&bytes) {
+        Ok(data) => HttpResponse::Ok().json(SuccessResponse {
+            status: "success",
+            data,
+        }),
+        Err(_) => HttpResponse::BadGateway().json(FailedResponse {
+            status: "failed",
+            err: "invalid-provider-response",
+        }),
+    }
+}
 
 #[derive(Serialize)]
 pub struct SuccessResponse<T> {
@@ -95,7 +190,7 @@ fn verify_user_permission(
     permission: String,
 ) -> Result<User, HttpResponse> {
     let user = get_user_from_headers(http_request)?;
-    if user.verify_permission(&permission).unwrap_or(false) {
+    if !user.verify_permission(&permission).unwrap_or(false) {
         return Err(HttpResponse::Forbidden().json(FailedResponse {
             status: "failed",
             err: "permission-denied",

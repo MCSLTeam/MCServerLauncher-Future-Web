@@ -1,0 +1,89 @@
+"use client";
+
+import Link from "next/link";
+import { useSyncExternalStore } from "react";
+
+import { BrandLogo } from "@/components/brand/brand-logo";
+import { cn } from "@/lib/utils";
+
+type BrandMarkProps = {
+  href?: string;
+  className?: string;
+  /** 仅图标，用于极窄区域 */
+  iconOnly?: boolean;
+  /** logo 尺寸 */
+  logoSize?: number;
+  priority?: boolean;
+};
+
+function detectPlatformSubtitle() {
+  if (typeof window === "undefined") return "Web (浏览器)";
+  const w = window as Window & {
+    __TAURI__?: unknown;
+    __TAURI_INTERNALS__?: unknown;
+    isTauri?: boolean;
+  };
+  const isTauri = Boolean(
+    w.__TAURI_INTERNALS__ ||
+    w.__TAURI__ ||
+    w.isTauri ||
+    window.location.protocol === "tauri:" ||
+    window.location.hostname === "tauri.localhost",
+  );
+  return isTauri ? "Tauri (跨平台)" : "Web (浏览器)";
+}
+
+const emptySubscribe = () => () => {};
+
+/** 对齐 WPF 标题栏：MCServerLauncher Future + 平台副标题 */
+export function BrandMark({
+  href = "/dashboard/",
+  className,
+  iconOnly = false,
+  logoSize = 28,
+  priority = false,
+}: BrandMarkProps) {
+  const subtitle = useSyncExternalStore(
+    emptySubscribe,
+    detectPlatformSubtitle,
+    () => "Web (浏览器)",
+  );
+
+  const content = (
+    <>
+      <BrandLogo
+        alt="MCServerLauncher Future"
+        priority={priority}
+        size={logoSize}
+      />
+      {iconOnly ? null : (
+        <span className="min-w-0 leading-tight">
+          <span className="flex flex-wrap items-baseline gap-x-1 text-[13px] font-medium tracking-tight">
+            <span className="text-sidebar-foreground">MCSL</span>
+            <span className="font-semibold text-primary">Future</span>
+          </span>
+          <span className="mt-0.5 block text-[10px] font-medium text-muted-foreground opacity-80">
+            {subtitle}
+          </span>
+        </span>
+      )}
+    </>
+  );
+
+  return (
+    <Link
+      href={href}
+      aria-label={`MCServerLauncher Future · ${subtitle}`}
+      className={cn(
+        "inline-flex min-w-0 items-center gap-2 outline-none focus-visible:ring-3 focus-visible:ring-sidebar-ring/30",
+        className,
+      )}
+    >
+      {content}
+    </Link>
+  );
+}
+
+export function brandWindowTitle() {
+  return "MCServerLauncher Future";
+}
