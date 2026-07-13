@@ -19,9 +19,6 @@
     "web:dev:frontend": "turbo run web#frontend:dev",
     "web:dev:backend": "turbo run web#backend:dev",
     "web:fix": "turbo run fix --filter=mcsl-future-web",
-    "gallery:dev": "turbo run gallery#dev",
-    "gallery:build": "turbo run gallery#build",
-    "gallery:lint": "turbo run gallery#lint",
     "web:lint": "turbo run web#lint",
     "ui:lint": "turbo run ui#lint",
     "shared:lint": "turbo run shared#lint",
@@ -42,5 +39,10 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp"
+    ]
+  }
 }

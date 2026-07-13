@@ -54,3 +54,8 @@ yarn-error.log*
 # Cargo
 /target
 .claude
+
+# Next.js (apps/web)
+**/.next/
+**/out/
+*.tsbuildinfo
