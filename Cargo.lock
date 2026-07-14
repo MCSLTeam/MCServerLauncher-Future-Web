@@ -2514,6 +2514,8 @@ checksum = "2532096657941c2fea9c289d370a250971c689d4f143798ff67113ec042024a5"
 name = "mcsl_future_tauri"
 version = "0.1.0"
 dependencies = [
+ "mcsl_resource_provider",
+ "serde_json",
  "tauri",
  "tauri-build",
  "tauri-plugin-notification",
@@ -2532,14 +2534,23 @@ dependencies = [
  "include_dir",
  "lazy_static",
  "log",
+ "mcsl_resource_provider",
  "mime_guess",
  "rand 0.10.0",
  "regex",
- "reqwest",
  "serde",
  "serde_json",
  "sha2",
  "tokio",
+]
+
+[[package]]
+name = "mcsl_resource_provider"
+version = "0.1.0"
+dependencies = [
+ "reqwest",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

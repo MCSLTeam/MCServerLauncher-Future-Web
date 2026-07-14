@@ -2,6 +2,7 @@
 resolver = '2'
 members = [
     "apps/app/src-tauri",
-    "apps/web"
+    "apps/web",
+    "packages/resource-provider"
 ]
 
