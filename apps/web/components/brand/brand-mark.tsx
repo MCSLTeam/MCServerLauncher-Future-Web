@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSyncExternalStore } from "react";
 
 import { BrandLogo } from "@/components/brand/brand-logo";
+import { isTauriRuntime } from "@/lib/tauri-runtime";
 import { cn } from "@/lib/utils";
 
 type BrandMarkProps = {
@@ -17,20 +18,7 @@ type BrandMarkProps = {
 };
 
 function detectPlatformSubtitle() {
-  if (typeof window === "undefined") return "Web (浏览器)";
-  const w = window as Window & {
-    __TAURI__?: unknown;
-    __TAURI_INTERNALS__?: unknown;
-    isTauri?: boolean;
-  };
-  const isTauri = Boolean(
-    w.__TAURI_INTERNALS__ ||
-    w.__TAURI__ ||
-    w.isTauri ||
-    window.location.protocol === "tauri:" ||
-    window.location.hostname === "tauri.localhost",
-  );
-  return isTauri ? "Tauri (跨平台)" : "Web (浏览器)";
+  return isTauriRuntime() ? "Tauri (跨平台)" : "Web (浏览器)";
 }
 
 const emptySubscribe = () => () => {};

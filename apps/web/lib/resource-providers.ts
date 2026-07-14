@@ -1,6 +1,7 @@
 import { publicApi } from "@/lib/api";
 import { sortMinecraftVersions } from "@/lib/minecraft-version";
 import { loadSettings } from "@/lib/settings-store";
+import { invokeTauri, isTauriRuntime } from "@/lib/tauri-runtime";
 
 export type ResourceProviderId =
   | "FastMirror"
@@ -88,13 +89,23 @@ async function getJson(url: string): Promise<unknown> {
       parsed.pathname.startsWith(candidate.prefix),
   );
   if (!mapping) throw new Error("Unsupported resource provider");
+  const request = {
+    provider: mapping.provider,
+    path: parsed.pathname.slice(mapping.prefix.length),
+    query: [...parsed.searchParams.entries()],
+  };
+  if (isTauriRuntime()) {
+    try {
+      return await invokeTauri<unknown>("resource_provider", { request });
+    } catch (error) {
+      throw new Error(
+        typeof error === "string" ? error : "Provider unavailable",
+      );
+    }
+  }
   const result = await publicApi<unknown>("resource/provider", {
     method: "POST",
-    body: {
-      provider: mapping.provider,
-      path: parsed.pathname.slice(mapping.prefix.length),
-      query: [...parsed.searchParams.entries()],
-    },
+    body: request,
   });
   if (!result.ok) throw new Error(result.message ?? "Provider unavailable");
   return result.data;
