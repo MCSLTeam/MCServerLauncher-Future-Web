@@ -32,6 +32,7 @@ import {
 import { PreferencesMenu } from "@/features/preferences/preferences-menu";
 import { UserMenu } from "@/features/console/components/user-menu";
 import { useT } from "@/features/i18n/locale-provider";
+import { useIsTauriRuntime } from "@/lib/tauri-runtime";
 import { cn } from "@/lib/utils";
 
 type ConsoleShellProps = {
@@ -144,6 +145,7 @@ function getActiveNavKey(pathname: string): NavKey | null {
 export function ConsoleShell({ children }: ConsoleShellProps) {
   const pathname = usePathname();
   const t = useT();
+  const isTauri = useIsTauriRuntime();
   const [collapsed, setCollapsed] = useState(false);
   const [sidebarTooltip, setSidebarTooltip] = useState<TooltipState>(null);
 
@@ -153,8 +155,11 @@ export function ConsoleShell({ children }: ConsoleShellProps) {
     [t],
   );
   const footerItems = useMemo(
-    () => FOOTER_NAV.map((item) => ({ ...item, label: t(item.labelKey) })),
-    [t],
+    () =>
+      FOOTER_NAV.filter(
+        (item) => !isTauri || (item.key !== "account" && item.key !== "users"),
+      ).map((item) => ({ ...item, label: t(item.labelKey) })),
+    [isTauri, t],
   );
   const visibleMainItems = useMemo(
     () =>
@@ -338,7 +343,7 @@ export function ConsoleShell({ children }: ConsoleShellProps) {
 
               <div className="flex min-w-0 shrink-0 items-center justify-end gap-2">
                 <PreferencesMenu />
-                <UserMenu />
+                {isTauri ? null : <UserMenu />}
               </div>
             </div>
           </header>

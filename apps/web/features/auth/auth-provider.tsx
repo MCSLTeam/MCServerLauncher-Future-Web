@@ -13,7 +13,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { authApi, publicApi, setUnauthorizedHandler } from "@/lib/api";
 import { clearToken, readToken, writeToken } from "@/lib/auth-storage";
-import { TEMP_DISABLE_ROUTE_GUARDS } from "@/lib/dev-flags";
+import { isTauriRuntime } from "@/lib/tauri-runtime";
 import type { SessionInfo, UserInfo } from "@/lib/types";
 
 type AuthContextValue = {
@@ -57,6 +57,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<UserInfo | null>(null);
 
+  useEffect(() => {
+    if (
+      isTauriRuntime() &&
+      (pathname?.startsWith("/login") ||
+        pathname?.startsWith("/register") ||
+        pathname?.startsWith("/account") ||
+        pathname?.startsWith("/users") ||
+        pathname?.startsWith("/welcome"))
+    ) {
+      router.replace("/dashboard/");
+    }
+  }, [pathname, router]);
+
   const refreshUser = useCallback(async () => {
     const current = readToken();
     if (!current) {
@@ -81,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUnauthorizedHandler(() => {
       setToken(null);
       setUser(null);
-      if (TEMP_DISABLE_ROUTE_GUARDS) return;
+      if (isTauriRuntime()) return;
       if (
         !pathname?.startsWith("/login") &&
         !pathname?.startsWith("/register") &&
@@ -97,6 +110,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
     void (async () => {
+      if (isTauriRuntime()) {
+        setReady(true);
+        return;
+      }
       const existing = readToken();
       setToken(existing);
       if (existing) {
@@ -158,6 +175,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const listSessions = useCallback(async () => {
+    if (isTauriRuntime()) return [];
     const result = await authApi<SessionInfo[]>("/api/session/self");
     if (!result.ok) return null;
     return result.data ?? [];

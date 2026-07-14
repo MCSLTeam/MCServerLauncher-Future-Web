@@ -6,14 +6,15 @@ import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/features/auth/auth-provider";
 import { resolveUnauthedDestination } from "@/lib/auth-routing";
-import { TEMP_DISABLE_ROUTE_GUARDS } from "@/lib/dev-flags";
+import { useIsTauriRuntime } from "@/lib/tauri-runtime";
 
 export function RequireAuth({ children }: { children: ReactNode }) {
   const { ready, token, user, refreshUser } = useAuth();
   const router = useRouter();
+  const isTauri = useIsTauriRuntime();
 
   useEffect(() => {
-    if (TEMP_DISABLE_ROUTE_GUARDS) return;
+    if (isTauri) return;
     if (!ready) return;
     if (!token) {
       void resolveUnauthedDestination().then((dest) => {
@@ -30,9 +31,9 @@ export function RequireAuth({ children }: { children: ReactNode }) {
         }
       });
     }
-  }, [ready, token, user, refreshUser, router]);
+  }, [ready, token, user, refreshUser, router, isTauri]);
 
-  if (TEMP_DISABLE_ROUTE_GUARDS) {
+  if (isTauri) {
     return children;
   }
 
