@@ -6,14 +6,15 @@ import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/features/auth/auth-provider";
 import { resolveUnauthedDestination } from "@/lib/auth-routing";
-import { TEMP_DISABLE_ROUTE_GUARDS } from "@/lib/dev-flags";
+import { useIsTauriRuntime } from "@/lib/tauri-runtime";
 
 export default function HomePage() {
   const router = useRouter();
   const { ready, token } = useAuth();
+  const isTauri = useIsTauriRuntime();
 
   useEffect(() => {
-    if (TEMP_DISABLE_ROUTE_GUARDS) {
+    if (isTauri) {
       router.replace("/dashboard/");
       return;
     }
@@ -25,7 +26,7 @@ export default function HomePage() {
     void resolveUnauthedDestination().then((dest) => {
       router.replace(dest);
     });
-  }, [ready, token, router]);
+  }, [ready, token, router, isTauri]);
 
   return (
     <div className="flex min-h-dvh items-center justify-center p-6">
