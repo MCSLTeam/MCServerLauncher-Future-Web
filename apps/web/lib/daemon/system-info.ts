@@ -1,4 +1,8 @@
 import type { DaemonSystemInfo } from "@/lib/daemon/types";
+import {
+  loadAutoRefreshPreference as loadAutoRefreshFromPrefs,
+  saveAutoRefreshPreference as saveAutoRefreshToPrefs,
+} from "@/lib/settings-store";
 
 /** 与 WPF DaemonCardModel 资源展示对齐的派生视图 */
 export type DaemonResourceView = {
@@ -76,34 +80,147 @@ function pickMem(info: DaemonSystemInfo) {
   };
 }
 
-function pickDrives(info: DaemonSystemInfo) {
-  const drivesRaw = Array.isArray(info.drives)
-    ? info.drives
-    : info.drive
-      ? [info.drive]
-      : [];
-  return drivesRaw.map((drive) => ({
+type DriveView = {
+  name: string;
+  driveFormat: string;
+  total: number;
+  free: number;
+};
+
+function mapDrive(drive: {
+  name?: string;
+  drive_format?: string;
+  driveFormat?: string;
+  total?: number;
+  free?: number;
+} | null | undefined): DriveView {
+  return {
     name: String(drive?.name ?? ""),
     driveFormat: String(drive?.drive_format ?? drive?.driveFormat ?? ""),
     total: asNumber(drive?.total),
     free: asNumber(drive?.free),
-  }));
+  };
+}
+
+/** 列表盘符：按 total+name 去重，避免 macOS 多挂载点把同一物理盘加多次 */
+function pickDrives(info: DaemonSystemInfo): DriveView[] {
+  const raw = Array.isArray(info.drives)
+    ? info.drives
+    : info.drive
+      ? [info.drive]
+      : [];
+  const mapped = raw.map((d) => mapDrive(d)).filter((d) => d.total > 0);
+  const seen = new Set<string>();
+  const unique: DriveView[] = [];
+  for (const drive of mapped) {
+    const key = `${drive.total}:${drive.free}:${drive.name}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(drive);
+  }
+  return unique;
+}
+
+/**
+ * 主磁盘条：优先 Daemon 根卷 `drive`（GetDiskInfo），
+ * 不再把 drives[] 全部相加（macOS 多卷会虚高）。
+ */
+function pickPrimaryDrive(info: DaemonSystemInfo): DriveView | null {
+  if (info.drive && asNumber(info.drive.total) > 0) {
+    return mapDrive(info.drive);
+  }
+  const drives = pickDrives(info);
+  if (drives.length === 0) return null;
+  const prefer = drives.find(
+    (d) =>
+      d.name === "/" ||
+      /^[a-z]:\\?$/i.test(d.name.trim()) ||
+      d.name.toLowerCase().includes("system"),
+  );
+  return prefer ?? drives[0] ?? null;
+}
+
+function friendlyOsName(raw: string, systemType: DaemonResourceView["systemType"]) {
+  const name = raw.trim();
+  if (!name) {
+    if (systemType === "Darwin") return "macOS";
+    if (systemType === "Windows") return "Windows";
+    if (systemType === "Linux") return "Linux";
+    return "";
+  }
+  if (/^unix\b/i.test(name) && systemType === "Darwin") {
+    return name.replace(/^unix/i, "macOS");
+  }
+  if (/^unix\b/i.test(name) && systemType === "Linux") {
+    return name.replace(/^unix/i, "Linux");
+  }
+  return name;
 }
 
 export function inferSystemType(
   info: DaemonSystemInfo | null | undefined,
 ): DaemonResourceView["systemType"] {
   if (!info) return null;
-  const osName = pickOs(info).name;
-  const cpuVendor = pickCpu(info).vendor;
-  if (osName.includes("Windows NT") || /windows/i.test(osName))
+  const os = pickOs(info);
+  const cpu = pickCpu(info);
+  const osName = os.name.toLowerCase();
+  const arch = os.arch.toLowerCase();
+  const cpuVendor = cpu.vendor.toLowerCase();
+  const cpuName = cpu.name.toLowerCase();
+  const primary = info.drive
+    ? mapDrive(info.drive)
+    : (pickDrives(info)[0] ?? null);
+  const format = (primary?.driveFormat ?? "").toLowerCase();
+
+  if (
+    osName.includes("windows nt") ||
+    osName.includes("windows") ||
+    osName.includes("win32") ||
+    osName.includes("microsoft")
+  ) {
     return "Windows";
-  if (osName.includes("Unix") || /darwin|mac|linux/i.test(osName)) {
-    if (cpuVendor.includes("Apple") || /darwin|mac/i.test(osName)) {
+  }
+
+  // 明确 macOS / Darwin
+  if (
+    osName.includes("darwin") ||
+    osName.includes("mac os") ||
+    osName.includes("macos") ||
+    osName.includes("os x") ||
+    osName.includes("osx") ||
+    cpuVendor.includes("apple") ||
+    cpuName.includes("apple") ||
+    /\bm[1-4](\s|pro|max|ultra|$)/i.test(cpu.name) ||
+    format === "apfs" ||
+    format.includes("hfs")
+  ) {
+    return "Darwin";
+  }
+
+  // 明确 Linux
+  if (
+    osName.includes("linux") ||
+    osName.includes("ubuntu") ||
+    osName.includes("debian") ||
+    osName.includes("fedora") ||
+    osName.includes("centos") ||
+    osName.includes("arch") ||
+    format.includes("ext") ||
+    format.includes("xfs") ||
+    format.includes("btrfs")
+  ) {
+    return "Linux";
+  }
+
+  // .NET 在 Unix 上常返回 "Unix …"：无 Apple/APFS 线索时按 Linux 处理
+  if (osName.includes("unix")) {
+    // arm64 + 无 Linux 文件系统线索时，多数桌面场景是 Apple Silicon macOS
+    if (arch.includes("arm64") || arch.includes("aarch64")) {
       return "Darwin";
     }
     return "Linux";
   }
+
   return null;
 }
 
@@ -139,20 +256,23 @@ export function buildResourceView(
   const cpu = pickCpu(info);
   const mem = pickMem(info);
   const drives = pickDrives(info);
+  const primaryDrive = pickPrimaryDrive(info);
+  const systemType = inferSystemType(info);
   const cpuUsage = clampPercentage(cpu.usage);
   const memoryUsage = calculateUsagePercentage(mem.total, mem.free);
   const usedMemoryKb = mem.total > mem.free ? mem.total - mem.free : 0;
-  const totalDrive = drives.reduce((sum, d) => sum + d.total, 0);
-  const freeDrive = drives.reduce((sum, d) => sum + d.free, 0);
+  const totalDrive = primaryDrive?.total ?? 0;
+  const freeDrive = primaryDrive?.free ?? 0;
   const usedDrive = totalDrive > freeDrive ? totalDrive - freeDrive : 0;
   const driveUsage = calculateUsagePercentage(totalDrive, freeDrive);
   const daemonVersion =
     String(info.daemon_version ?? info.daemonVersion ?? "").trim() ||
     labels.loadFailed;
+  const osLabel = friendlyOsName(os.name, systemType);
 
   return {
-    systemType: inferSystemType(info),
-    systemVersion: `${os.name} (${os.arch})`.trim(),
+    systemType,
+    systemVersion: `${osLabel}${os.arch ? ` (${os.arch})` : ""}`.trim(),
     daemonVersion,
     cpuUsage,
     memoryUsage,
@@ -160,7 +280,7 @@ export function buildResourceView(
     cpuUsageText: `${cpuUsage.toFixed(2)}% (${cpu.coreCount}C / ${cpu.threadCount}T)`,
     memoryUsageText: `${memoryUsage.toFixed(2)}% (${formatSize(usedMemoryKb * 1024)} / ${formatSize(mem.total * 1024)})`,
     driveUsageText: `${driveUsage.toFixed(2)}% (${formatSize(usedDrive)} / ${formatSize(totalDrive)})`,
-    driveUsageTooltip: drives
+    driveUsageTooltip: (drives.length > 0 ? drives : primaryDrive ? [primaryDrive] : [])
       .map((d) => {
         const used = d.total > d.free ? d.total - d.free : 0;
         const pct = calculateUsagePercentage(d.total, d.free).toFixed(2);
@@ -188,35 +308,24 @@ export function normalizeRefreshInterval(
   return REFRESH_INTERVAL_OPTIONS[REFRESH_INTERVAL_OPTIONS.length - 1];
 }
 
-const AUTO_REFRESH_KEY = "mcsl-web-daemon-auto-refresh";
-
+/** 自动刷新偏好存后端 preferences；签名保持兼容 */
 export function loadAutoRefreshPreference(): {
   enabled: boolean;
   seconds: RefreshIntervalSeconds;
 } {
-  if (typeof window === "undefined") {
-    return { enabled: false, seconds: 30 };
-  }
-  try {
-    const raw = window.localStorage.getItem(AUTO_REFRESH_KEY);
-    if (!raw) return { enabled: false, seconds: 30 };
-    const parsed = JSON.parse(raw) as { enabled?: boolean; seconds?: number };
-    const seconds = normalizeRefreshInterval(Number(parsed.seconds ?? 30));
-    return {
-      enabled: Boolean(parsed.enabled) && seconds > 0,
-      seconds,
-    };
-  } catch {
-    return { enabled: false, seconds: 30 };
-  }
+  const pref = loadAutoRefreshFromPrefs();
+  return {
+    enabled: Boolean(pref.enabled),
+    seconds: normalizeRefreshInterval(Number(pref.seconds ?? 30)),
+  };
 }
 
 export function saveAutoRefreshPreference(
   enabled: boolean,
   seconds: RefreshIntervalSeconds,
 ) {
-  window.localStorage.setItem(
-    AUTO_REFRESH_KEY,
-    JSON.stringify({ enabled, seconds: normalizeRefreshInterval(seconds) }),
-  );
+  void saveAutoRefreshToPrefs({
+    enabled,
+    seconds: normalizeRefreshInterval(seconds),
+  });
 }
