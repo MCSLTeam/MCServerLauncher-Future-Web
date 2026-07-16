@@ -9,7 +9,7 @@
     "backend:dev": "cargo run",
     "monaco:sync": "node ./scripts/sync-monaco.mjs",
     "frontend:dev": "node ./scripts/sync-monaco.mjs && next dev --port 3000",
-    "frontend:build": "node ./scripts/sync-monaco.mjs && NEXT_EXPORT=1 next build && node ./scripts/sync-dist.mjs",
+    "frontend:build": "node ./scripts/sync-monaco.mjs && node ./scripts/next-export-build.mjs && node ./scripts/sync-dist.mjs",
     "frontend:preview": "next start --port 3000",
     "lint": "eslint .; prettier --check .; cargo lint",
     "fix": "eslint --fix; prettier --write --list-different .; cargo fix",
