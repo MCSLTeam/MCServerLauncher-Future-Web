@@ -54,15 +54,19 @@ import {
   saveAutoRefreshPreference,
   type RefreshIntervalSeconds,
 } from "@/lib/daemon/system-info";
+import { useAuth } from "@/features/auth/auth-provider";
 import {
   addNode,
-  getNodeToken,
+  getNodeTokenAsync,
+  hydrateNodes,
   listNodes,
   nodeAddress,
   removeNode,
   updateNode,
   type NodeInput,
+  type NodeVisibilityMode,
 } from "@/lib/nodes-store";
+import { canManageNodes } from "@/lib/permission";
 import type { NodeStatus, SavedNode } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -72,6 +76,8 @@ const emptyForm: NodeInput = {
   port: "11451",
   secure: false,
   token: "",
+  visibility: "all",
+  visibleTo: [],
 };
 
 /** OS 图标：对齐 WPF Windows/Darwin/Linux DrawingImage */
@@ -154,6 +160,8 @@ export default function NodesPage() {
     testNode,
     refreshing,
   } = useDaemon();
+  const { user } = useAuth();
+  const manageNodes = canManageNodes(user?.permissions);
 
   const [nodes, setNodes] = useState<SavedNode[]>([]);
   const [searchText, setSearchText] = useState("");
@@ -166,16 +174,23 @@ export default function NodesPage() {
   const [form, setForm] = useState<NodeInput>(emptyForm);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
-  function refreshList() {
+  async function refreshList() {
+    await hydrateNodes();
     setNodes(listNodes());
   }
 
   useEffect(() => {
-    refreshList();
-    const pref = loadAutoRefreshPreference();
-    setAutoRefreshEnabled(pref.enabled);
-    setRefreshInterval(pref.seconds);
+    void refreshList().then(() => {
+      const pref = loadAutoRefreshPreference();
+      setAutoRefreshEnabled(pref.enabled);
+      setRefreshInterval(pref.seconds);
+    });
   }, []);
 
   useEffect(() => {
@@ -232,14 +247,17 @@ export default function NodesPage() {
     setFormOpen(true);
   }
 
-  function startEdit(node: SavedNode) {
+  async function startEdit(node: SavedNode) {
     setEditingId(node.id);
+    const token = (await getNodeTokenAsync(node.id)) ?? "";
     setForm({
       name: node.name,
       host: node.host,
       port: node.port,
       secure: node.secure,
-      token: getNodeToken(node.id) ?? "",
+      token,
+      visibility: node.visibility ?? "all",
+      visibleTo: node.visibleTo ?? [],
     });
     setError(null);
     setFormOpen(true);
@@ -297,7 +315,8 @@ export default function NodesPage() {
     const host = form.host.trim();
     const port = form.port.trim();
     const token =
-      form.token?.trim() || (editingId ? (getNodeToken(editingId) ?? "") : "");
+      form.token?.trim() ||
+      (editingId ? ((await getNodeTokenAsync(editingId)) ?? "") : "");
     if (!host || !port || Number.isNaN(Number(port)) || !token) {
       setError(t("ui.form.invalid.require"));
       return;
@@ -319,14 +338,18 @@ export default function NodesPage() {
           await connectNode(editingId);
           return;
         }
-        updateNode(editingId, {
+        const updated = await updateNode(editingId, {
           ...form,
           host,
           port,
           name: form.name.trim(),
           token,
         });
-        refreshList();
+        if (!updated) {
+          setError(t("shared.nodes.connect.failed"));
+          return;
+        }
+        await refreshList();
         const result = await connectNode(editingId, { force: true });
         if (!result.ok) {
           setError(result.message ?? t("shared.nodes.connect.failed"));
@@ -347,58 +370,80 @@ export default function NodesPage() {
         return;
       }
 
-      const node = addNode({
+      const node = await addNode({
         ...form,
         host,
         port,
         name: form.name.trim() || t("shared.nodes.title"),
         token,
       });
-      refreshList();
+      if (!node) {
+        setError(t("shared.nodes.connect.failed"));
+        return;
+      }
+      await refreshList();
       const result = await connectNode(node.id, { force: true });
       if (!result.ok) {
         disconnectNode(node.id);
-        removeNode(node.id);
-        refreshList();
+        await removeNode(node.id);
+        await refreshList();
         setError(result.message ?? t("shared.nodes.connect.failed"));
         return;
       }
       closeForm();
     } finally {
       setSubmitting(false);
-      refreshList();
+      await refreshList();
     }
   }
 
-  function onDelete(id: string, name: string) {
-    if (
-      !window.confirm(
-        t("shared.nodes.delete.confirm", {
+  function requestDelete(id: string, name: string) {
+    setStatusMessage(null);
+    setDeleteTarget({
+      id,
+      name: name.trim() || t("shared.nodes.title"),
+    });
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+    const { id, name } = deleteTarget;
+    try {
+      disconnectNode(id, { purge: true });
+      const ok = await removeNode(id);
+      if (!ok) {
+        setStatusMessage(t("shared.nodes.connect.failed"));
+        return;
+      }
+      if (editingId === id) closeForm();
+      setDeleteTarget(null);
+      await refreshList();
+      setStatusMessage(
+        t("shared.nodes.delete.success", {
           name: name || t("shared.nodes.title"),
         }),
-      )
-    ) {
-      return;
+      );
+    } catch (error) {
+      setStatusMessage(
+        error instanceof Error
+          ? error.message
+          : t("shared.nodes.connect.failed"),
+      );
     }
-    disconnectNode(id);
-    removeNode(id);
-    if (editingId === id) closeForm();
-    refreshList();
   }
 
   return (
     <ConsolePage className="gap-3">
-      {/* 标题区：对齐 TitleTextBlock + MinititleTextBlock */}
+      {/* tip 保留；章节标题由 topbar 提供 */}
       <Reveal>
-        <div className="space-y-2">
-          <h2 className="text-[1.75rem] font-semibold leading-none tracking-tight">
-            {t("shared.nodes.title")}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            {t("shared.nodes.tip")}
-          </p>
-        </div>
+        <p className="text-sm text-muted-foreground">
+          {t("shared.nodes.tip")}
+        </p>
       </Reveal>
+
+      {statusMessage ? (
+        <p className="text-sm text-emerald-600 dark:text-emerald-400">{statusMessage}</p>
+      ) : null}
 
       {/* 工具栏：右对齐 — 自动刷新 / 间隔 / 搜索 / 刷新 / 新建连接 */}
       <Reveal delay={0.02}>
@@ -446,7 +491,7 @@ export default function NodesPage() {
           <Input
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            placeholder={t("shared.nodes.search")}
+            placeholder={t("shared.nodes.search.placeholder")}
             className="h-9 w-[13.75rem] max-w-full"
           />
 
@@ -464,7 +509,7 @@ export default function NodesPage() {
             {t("shared.nodes.refresh")}
           </Button>
 
-          <Button type="button" className="h-9" onClick={openAdd}>
+          <Button type="button" className="h-9" onClick={openAdd} disabled={!manageNodes}>
             <Plus className="size-4" aria-hidden />
             {t("shared.nodes.connect.new")}
           </Button>
@@ -478,7 +523,7 @@ export default function NodesPage() {
             <p className="text-base font-medium tracking-tight">
               {nodes.length === 0
                 ? t("shared.nodes.list.empty.title")
-                : t("shared.nodes.search.empty")}
+                : t("shared.nodes.search.empty.title")}
             </p>
             <p className="max-w-sm text-sm leading-6 text-muted-foreground">
               {nodes.length === 0
@@ -486,7 +531,7 @@ export default function NodesPage() {
                 : t("shared.nodes.search.empty.desc")}
             </p>
             {nodes.length === 0 ? (
-              <Button type="button" className="mt-1" onClick={openAdd}>
+              <Button type="button" className="mt-1" onClick={openAdd} disabled={!manageNodes}>
                 <Plus className="size-4" aria-hidden />
                 {t("shared.nodes.connect.new")}
               </Button>
@@ -608,7 +653,7 @@ export default function NodesPage() {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           variant="destructive"
-                          onClick={() => onDelete(node.id, displayName)}
+                          onClick={() => requestDelete(node.id, displayName)}
                         >
                           <Trash2 className="size-4" aria-hidden />
                           {t("ui.common.delete")}
@@ -624,7 +669,38 @@ export default function NodesPage() {
       </Reveal>
 
       {/* 新建/编辑连接对话框 — 对齐 NewDaemonConnectionInput ContentDialog */}
-      <Dialog
+            <Dialog
+        open={Boolean(deleteTarget)}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("ui.common.delete")}</DialogTitle>
+            <DialogDescription>
+              {t("shared.nodes.delete.confirm", {
+                name: deleteTarget?.name || t("shared.nodes.title"),
+              })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeleteTarget(null)}
+            >
+              {t("ui.common.cancel")}
+            </Button>
+            <Button type="button" variant="destructive" onClick={confirmDelete}>
+              <Trash2 className="size-4" aria-hidden />
+              {t("ui.common.delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+<Dialog
         open={formOpen}
         onOpenChange={(open) => {
           if (!open && !submitting) closeForm();
@@ -711,6 +787,50 @@ export default function NodesPage() {
                 autoComplete="off"
               />
             </div>
+
+
+            {manageNodes ? (
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">
+                  可见性
+                </Label>
+                <Select
+                  value={form.visibility ?? "all"}
+                  onValueChange={(v) =>
+                    setForm((f) => ({
+                      ...f,
+                      visibility: v as NodeVisibilityMode,
+                    }))
+                  }
+                >
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">所有用户</SelectItem>
+                    <SelectItem value="selected">指定用户</SelectItem>
+                    <SelectItem value="admins">仅管理员</SelectItem>
+                  </SelectContent>
+                </Select>
+                {form.visibility === "selected" ? (
+                  <Input
+                    className="h-9"
+                    placeholder="用户名，逗号分隔"
+                    value={(form.visibleTo ?? []).join(",")}
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        visibleTo: e.target.value
+                          .split(",")
+                          .map((s) => s.trim())
+                          .filter(Boolean),
+                      }))
+                    }
+                    autoComplete="off"
+                  />
+                ) : null}
+              </div>
+            ) : null}
 
             {error ? (
               <p className="text-sm text-destructive" role="alert">

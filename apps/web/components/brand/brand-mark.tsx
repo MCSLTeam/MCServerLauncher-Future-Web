@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSyncExternalStore } from "react";
 
 import { BrandLogo } from "@/components/brand/brand-logo";
+import { tKey } from "@/lib/i18n/translate";
 import { isTauriRuntime } from "@/lib/tauri-runtime";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +19,9 @@ type BrandMarkProps = {
 };
 
 function detectPlatformSubtitle() {
-  return isTauriRuntime() ? "Tauri (跨平台)" : "Web (浏览器)";
+  return isTauriRuntime()
+    ? tKey("shared.brand.platform.tauri")
+    : tKey("shared.brand.platform.web");
 }
 
 const emptySubscribe = () => () => {};
@@ -34,7 +37,7 @@ export function BrandMark({
   const subtitle = useSyncExternalStore(
     emptySubscribe,
     detectPlatformSubtitle,
-    () => "Web (浏览器)",
+    () => tKey("shared.brand.platform.web"),
   );
 
   const content = (

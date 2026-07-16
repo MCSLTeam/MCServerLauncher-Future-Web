@@ -225,7 +225,7 @@ export default function UsersPage() {
                   {!allowCreate ? (
                     <EmptyContent>
                       <p className="text-sm text-muted-foreground">
-                        {t("web.users.create.denied")}
+                        {t("web.users.create.denied.title")}
                       </p>
                     </EmptyContent>
                   ) : null}
@@ -309,7 +309,7 @@ export default function UsersPage() {
             {!allowCreate ? (
               <Empty>
                 <EmptyHeader>
-                  <EmptyTitle>{t("web.users.create.denied")}</EmptyTitle>
+                  <EmptyTitle>{t("web.users.create.denied.title")}</EmptyTitle>
                   <EmptyDescription>
                     {t("web.users.create.denied.desc")}
                   </EmptyDescription>

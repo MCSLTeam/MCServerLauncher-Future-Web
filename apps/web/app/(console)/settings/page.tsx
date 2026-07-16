@@ -71,8 +71,8 @@ export default function SettingsPage() {
     setSaved(false);
   }
 
-  function onSave() {
-    saveSettings(draft);
+  async function onSave() {
+    await saveSettings(draft);
     setSettings(draft);
     setSaved(true);
   }
@@ -173,7 +173,7 @@ export default function SettingsPage() {
                   </SelectItem>
                   {locales.map((code) => (
                     <SelectItem key={code} value={code}>
-                      {code}
+                      {t(`shared.locale.${code}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -233,7 +233,7 @@ export default function SettingsPage() {
           <TabsContent value="download" className="space-y-4">
             <ConsolePanel>
               <ConsolePanelHeader
-                title={t("shared.settings.download.source")}
+                title={t("shared.settings.download.source.label")}
                 description={t("shared.settings.download.source.desc")}
               />
               <RadioGroup
@@ -266,7 +266,7 @@ export default function SettingsPage() {
 
             <ConsolePanel>
               <ConsolePanelHeader
-                title={t("shared.settings.download.threads")}
+                title={t("shared.settings.download.threads.label")}
                 description={t("shared.settings.download.threads.desc")}
               />
               <Input
@@ -287,7 +287,7 @@ export default function SettingsPage() {
 
             <ConsolePanel>
               <ConsolePanelHeader
-                title={t("shared.settings.download.failure")}
+                title={t("shared.settings.download.failure.label")}
                 description={t("shared.settings.download.failure.desc")}
               />
               <Select

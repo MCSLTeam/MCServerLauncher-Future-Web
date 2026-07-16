@@ -20,16 +20,6 @@ import { cn } from "@/lib/utils";
 
 const THEME_MODES = ["system", "light", "dark"] as const satisfies ThemeMode[];
 
-const LANGUAGE_LABELS: Record<LocalePreference, string> = {
-  system: "System",
-  "zh-CN": "简体中文",
-  "zh-TW": "繁體中文（台灣）",
-  "zh-HK": "繁體中文（香港）",
-  "zh-MEME": "梗体中文",
-  "en-US": "English",
-  "ja-JP": "日本語",
-  "ru-RU": "Русский",
-};
 
 export function PreferencesMenu() {
   const t = useT();
@@ -87,7 +77,7 @@ export function PreferencesMenu() {
               >
                 {item === "system"
                   ? t("shared.settings.general.locale.system")
-                  : (LANGUAGE_LABELS[item] ?? item)}
+                  : t(`shared.locale.${item}`)}
               </motion.span>
             </DropdownMenuRadioItem>
           ))}
