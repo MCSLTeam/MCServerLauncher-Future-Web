@@ -792,7 +792,7 @@ export default function NodesPage() {
             {manageNodes ? (
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground">
-                  可见性
+                  {t("shared.nodes.visibility.label")}
                 </Label>
                 <Select
                   value={form.visibility ?? "all"}
@@ -807,15 +807,23 @@ export default function NodesPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">所有用户</SelectItem>
-                    <SelectItem value="selected">指定用户</SelectItem>
-                    <SelectItem value="admins">仅管理员</SelectItem>
+                    <SelectItem value="all">
+                      {t("shared.nodes.visibility.all")}
+                    </SelectItem>
+                    <SelectItem value="selected">
+                      {t("shared.nodes.visibility.selected")}
+                    </SelectItem>
+                    <SelectItem value="admins">
+                      {t("shared.nodes.visibility.admins")}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 {form.visibility === "selected" ? (
                   <Input
                     className="h-9"
-                    placeholder="用户名，逗号分隔"
+                    placeholder={t(
+                      "shared.nodes.visibility.usernames-placeholder",
+                    )}
                     value={(form.visibleTo ?? []).join(",")}
                     onChange={(e) =>
                       setForm((f) => ({
