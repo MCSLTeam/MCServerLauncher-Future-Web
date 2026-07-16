@@ -5,23 +5,40 @@ on:
       - main
     paths:
       - .github/workflows/build-web.yml
-      - 'apps/web/**'
-      - 'packages/shared/**'
-      - 'packages/ui/**'
-      - 'packages/configs/**'
+      - "apps/web/**"
+      - "packages/shared/**"
+      - "packages/ui/**"
+      - "packages/configs/**"
+      - "packages/locales/**"
+      - "packages/resource-provider/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "Cargo.toml"
+      - "Cargo.lock"
   pull_request:
     branches:
       - main
     paths:
       - .github/workflows/build-web.yml
-      - 'apps/web/**'
-      - 'packages/shared/**'
-      - 'packages/ui/**'
-      - 'packages/configs/**'
+      - "apps/web/**"
+      - "packages/shared/**"
+      - "packages/ui/**"
+      - "packages/configs/**"
+      - "packages/locales/**"
+      - "packages/resource-provider/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "Cargo.toml"
+      - "Cargo.lock"
   workflow_dispatch:
 
 permissions:
   contents: read
+
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
   build:
@@ -52,44 +69,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
-          submodules: 'true'
+          submodules: recursive
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10.17.0
-          run_install: false
+        # version comes from package.json "packageManager"
 
       - name: Setup node
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
-          cache: "pnpm"
+          cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: ${{ matrix.platform }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ matrix.platform }}-pnpm-
-
-      - name: Cache Cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ matrix.platform == 'windows-latest' && '~\\AppData\\Local\\Cargo\\bin' || '~/.cargo/bin/' }}
-            ${{ matrix.platform == 'windows-latest' && '~\\AppData\\Local\\Cargo\\registry\\index' || '~/.cargo/registry/index/' }}
-            ${{ matrix.platform == 'windows-latest' && '~\\AppData\\Local\\Cargo\\registry\\cache' || '~/.cargo/registry/cache/' }}
-            ${{ matrix.platform == 'windows-latest' && '~\\AppData\\Local\\Cargo\\git\\db' || '~/.cargo/git/db/' }}
-            target
-          key: ${{ matrix.platform }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ matrix.platform }}-cargo-
-
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -97,20 +88,36 @@ jobs:
           toolchain: stable
           target: ${{ matrix.target }}
 
-      - name: Build
-        env:
-          IS_ACTION_BUILD: true
-        run: |
-          cd apps/web
-          pnpm frontend:build
-          cargo build --release --target ${{ matrix.target }}
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target
+          key: ${{ runner.os }}-${{ matrix.target }}-cargo-web-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.target }}-cargo-web-
+            ${{ runner.os }}-cargo-web-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build frontend
+        run: pnpm --dir apps/web frontend:build
+
+      - name: Build backend
+        run: cargo build --release --manifest-path apps/web/Cargo.toml --target ${{ matrix.target }}
 
       - name: Strip Binary (macos & ubuntu only)
         if: matrix.platform == 'macos-latest' || matrix.platform == 'ubuntu-latest'
-        run: strip target/${{ matrix.target }}/release/mcsl_future_web
+        run: strip "target/${{ matrix.target }}/release/mcsl_future_web"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v5
         with:
           name: MCSL-Future-Web-${{ matrix.targetName }}
           path: target/${{ matrix.target }}/release/mcsl_future_web${{ matrix.platform == 'windows-latest' && '.exe' || '' }}
+          if-no-files-found: error

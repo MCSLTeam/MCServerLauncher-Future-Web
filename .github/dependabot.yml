@@ -1,36 +1,24 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
+# Dependabot version updates for the pnpm monorepo and GitHub Actions.
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
 version: 2
 updates:
-  # App
-  - package-ecosystem: 'npm'
-    directory: '/apps/app'
+  # Root workspace lockfile (apps/* + packages/*)
+  - package-ecosystem: npm
+    directory: /
     schedule:
-      interval: 'weekly'
+      interval: weekly
+    open-pull-requests-limit: 10
 
-  # Web
-  - package-ecosystem: 'npm'
-    directory: '/apps/web'
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
     schedule:
-      interval: 'weekly'
+      interval: monthly
 
-  # Shared
-  - package-ecosystem: 'npm'
-    directory: '/package/shared'
+  # Rust workspace
+  - package-ecosystem: cargo
+    directory: /
     schedule:
-      interval: 'weekly'
-
-  # UI
-  - package-ecosystem: 'npm'
-    directory: '/package/ui'
-    schedule:
-      interval: 'weekly'
-
-  # Configs
-  - package-ecosystem: 'npm'
-    directory: '/package/configs'
-    schedule:
-      interval: 'monthly'
+      interval: weekly
+    open-pull-requests-limit: 5
