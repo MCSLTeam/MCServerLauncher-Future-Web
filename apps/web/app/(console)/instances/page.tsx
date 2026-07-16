@@ -48,9 +48,16 @@ import {
   saveAutoRefreshPreference,
   type RefreshIntervalSeconds,
 } from "@/lib/daemon/system-info";
+import { formatInstanceTypeLabel } from "@/features/console/event-types";
 import type { DaemonLiveInstance } from "@/lib/daemon/types";
 import { listNodes, nodeAddress } from "@/lib/nodes-store";
 import type { SavedNode } from "@/lib/types";
+import {
+  buildInstanceConsoleWindowTitle,
+  instanceDetailPath,
+  openInstanceConsole,
+} from "@/lib/tauri-windows";
+import { useIsTauriRuntime } from "@/lib/tauri-runtime";
 import { cn } from "@/lib/utils";
 
 type StatusFilter = "all" | "running" | "stopped" | "crashed";
@@ -105,6 +112,7 @@ function statusColor(status: string) {
 
 export default function InstancesPage() {
   const t = useT();
+  const isTauri = useIsTauriRuntime();
   const {
     instances,
     connections,
@@ -151,6 +159,7 @@ export default function InstancesPage() {
       return [
         instance.name,
         instance.type,
+        formatInstanceTypeLabel(instance.type),
         instance.gameVersion,
         instance.status,
         localizedStatus,
@@ -201,14 +210,9 @@ export default function InstancesPage() {
   return (
     <ConsolePage className="gap-0">
       <Reveal>
-        <div>
-          <h2 className="text-[1.75rem] font-semibold leading-none tracking-tight">
-            {t("shared.instances.title")}
-          </h2>
-          <p className="mt-2.5 text-sm text-muted-foreground">
-            {t("shared.instances.tip")}
-          </p>
-        </div>
+        <p className="text-sm text-muted-foreground">
+          {t("shared.instances.tip")}
+        </p>
       </Reveal>
 
       {nodes.length > 0 ? (
@@ -296,7 +300,7 @@ export default function InstancesPage() {
             <Input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder={t("shared.nodes.search")}
+              placeholder={t("shared.nodes.search.placeholder")}
               className="h-8 w-[13.75rem] min-w-[7.5rem] max-w-[25rem]"
             />
             <Button
@@ -395,7 +399,9 @@ export default function InstancesPage() {
                       <span className="text-muted-foreground">
                         {t("shared.instances.type-label")}
                       </span>
-                      <span>{item.type}</span>
+                      <span title={item.type}>
+                        {formatInstanceTypeLabel(item.type)}
+                      </span>
                       <span className="text-muted-foreground">
                         {t("shared.instances.version-label")}
                       </span>
@@ -416,13 +422,38 @@ export default function InstancesPage() {
                     </div>
 
                     <div className="mt-auto flex justify-end gap-2 px-5 pb-5 pt-2.5">
-                      <Button asChild size="sm">
-                        <Link
-                          href={`/instances/detail/?id=${encodeURIComponent(item.id)}&node=${encodeURIComponent(item.nodeId)}`}
-                        >
-                          <Eye className="size-4" />
-                          {t("shared.instances.open")}
-                        </Link>
+                      <Button
+                        size="sm"
+                        type="button"
+                        onClick={() => {
+                          void (async () => {
+                            if (isTauri) {
+                              try {
+                                const result = await openInstanceConsole({
+                                  instanceId: item.id,
+                                  nodeId: item.nodeId,
+                                  title: buildInstanceConsoleWindowTitle(
+                                    t,
+                                    item.name,
+                                    item.nodeName ||
+                                      selectedNode?.name ||
+                                      item.nodeId,
+                                  ),
+                                });
+                                if (result.openedAsWindow) return;
+                              } catch {
+                                // fall through to in-app route
+                              }
+                            }
+                            window.location.href = instanceDetailPath(
+                              item.id,
+                              item.nodeId,
+                            );
+                          })();
+                        }}
+                      >
+                        <Eye className="size-4" />
+                        {t("shared.instances.open")}
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

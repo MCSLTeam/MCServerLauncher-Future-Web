@@ -17,17 +17,27 @@ export function ConsolePage({
   );
 }
 
+/**
+ * 页面顶栏内容区。
+ * 全局导航标题由 ConsoleShell topbar 负责；此处默认不重复渲染 title，
+ * 仅在传入 title 且与顶栏语义不同（如实例名）时使用。
+ */
 export function ConsolePageHeader({
   title,
   subtitle,
   action,
   className,
+  showTitle = false,
 }: {
-  title: string;
+  title?: string;
   subtitle?: string;
   action?: ReactNode;
   className?: string;
+  /** 与 topbar 重复的章节名请保持 false；仅二级上下文标题用 true */
+  showTitle?: boolean;
 }) {
+  const hasText = Boolean((showTitle && title) || subtitle);
+  if (!hasText && !action) return null;
   return (
     <header
       className={cn(
@@ -35,14 +45,20 @@ export function ConsolePageHeader({
         className,
       )}
     >
-      <div className="flex min-w-0 flex-col gap-2">
-        <h2 className="text-2xl font-semibold tracking-normal">{title}</h2>
-        {subtitle ? (
-          <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-            {subtitle}
-          </p>
-        ) : null}
-      </div>
+      {hasText ? (
+        <div className="flex min-w-0 flex-col gap-2">
+          {showTitle && title ? (
+            <h2 className="text-2xl font-semibold tracking-normal">{title}</h2>
+          ) : null}
+          {subtitle ? (
+            <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+              {subtitle}
+            </p>
+          ) : null}
+        </div>
+      ) : (
+        <div className="min-w-0 flex-1" />
+      )}
       {action ? (
         <div className="flex shrink-0 flex-wrap gap-2">{action}</div>
       ) : null}

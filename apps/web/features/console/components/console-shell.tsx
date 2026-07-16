@@ -18,7 +18,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { BrandMark } from "@/components/brand/brand-mark";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { PreferencesMenu } from "@/features/preferences/preferences-menu";
 import { UserMenu } from "@/features/console/components/user-menu";
+import { DownloadHistoryFlyout } from "@/features/downloads/download-history-flyout";
 import { useT } from "@/features/i18n/locale-provider";
 import { useIsTauriRuntime } from "@/lib/tauri-runtime";
 import { cn } from "@/lib/utils";
@@ -146,8 +147,18 @@ export function ConsoleShell({ children }: ConsoleShellProps) {
   const pathname = usePathname();
   const t = useT();
   const isTauri = useIsTauriRuntime();
+  const [windowMode, setWindowMode] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [sidebarTooltip, setSidebarTooltip] = useState<TooltipState>(null);
+
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      setWindowMode(params.get("view") === "window");
+    } catch {
+      setWindowMode(false);
+    }
+  }, [pathname]);
 
   const activeKey = getActiveNavKey(pathname);
   const mainItems = useMemo(
@@ -182,6 +193,20 @@ export function ConsoleShell({ children }: ConsoleShellProps) {
     return t("shared.dashboard.title");
   }, [allItems, activeKey, pathname, t]);
 
+  // Tauri 实例控制台子窗口：对齐 WPF 独立窗，隐藏主壳导航
+  if (windowMode) {
+    return (
+      <div className="flex h-dvh flex-col overflow-hidden bg-background text-foreground">
+        <main
+          id="main-content"
+          className="flex min-h-0 flex-1 flex-col overflow-hidden p-4 sm:p-5"
+        >
+          {children}
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="h-dvh overflow-hidden bg-background text-foreground">
       <a
@@ -194,20 +219,20 @@ export function ConsoleShell({ children }: ConsoleShellProps) {
       <div
         className={cn(
           "h-dvh transition-[padding-left] duration-200 ease-out lg:pl-58",
-          collapsed && "lg:pl-12",
+          collapsed && "lg:pl-14",
         )}
       >
         <motion.aside
-          animate={{ width: collapsed ? "3rem" : "14.5rem" }}
+          animate={{ width: collapsed ? "3.5rem" : "14.5rem" }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          className="fixed inset-y-0 left-0 z-40 hidden overflow-hidden border-r bg-sidebar text-sidebar-foreground lg:flex lg:flex-col"
+          className="fixed inset-y-0 left-0 z-40 hidden overflow-x-hidden overflow-y-hidden border-r bg-sidebar text-sidebar-foreground lg:flex lg:flex-col"
         >
           <div
             className={cn(
               "flex h-12 items-center border-b transition-[padding] duration-200 ease-out",
               collapsed ? "justify-center" : "justify-between",
             )}
-            style={{ paddingInline: collapsed ? "0.625rem" : "1rem" }}
+            style={{ paddingInline: collapsed ? "0.5rem" : "1rem" }}
           >
             {collapsed ? null : (
               <BrandMark priority className="min-w-0 flex-1" />
@@ -238,7 +263,7 @@ export function ConsoleShell({ children }: ConsoleShellProps) {
           <nav
             className={cn(
               "mcsl-scrollbar flex flex-1 flex-col overflow-x-hidden overflow-y-auto py-3 transition-[padding,gap] duration-200 ease-out",
-              collapsed ? "gap-1 px-2" : "gap-3 pl-3 pr-1",
+              collapsed ? "items-center gap-1 px-0" : "gap-3 pl-3 pr-1",
             )}
             aria-label="nav"
           >
@@ -277,7 +302,7 @@ export function ConsoleShell({ children }: ConsoleShellProps) {
               exit={{ opacity: 0, x: -4 }}
               transition={{ duration: 0.12, ease: "easeOut" }}
               aria-hidden="true"
-              className="pointer-events-none fixed left-14 z-50 whitespace-nowrap rounded-xl bg-popover px-2.5 py-1.5 text-xs font-medium text-popover-foreground shadow-lg ring-1 ring-foreground/10"
+              className="pointer-events-none fixed left-16 z-50 whitespace-nowrap rounded-xl bg-popover px-2.5 py-1.5 text-xs font-medium text-popover-foreground shadow-lg ring-1 ring-foreground/10"
               style={{ top: sidebarTooltip.top }}
             >
               {sidebarTooltip.label}
@@ -289,7 +314,7 @@ export function ConsoleShell({ children }: ConsoleShellProps) {
           <header
             className={cn(
               "fixed left-0 right-0 top-0 z-30 border-b bg-background/95 backdrop-blur transition-[left] duration-200 ease-out lg:left-58",
-              collapsed && "lg:left-12",
+              collapsed && "lg:left-14",
             )}
           >
             <div className="flex h-12 items-center justify-between gap-3 px-4 sm:px-5 lg:px-6">
@@ -342,6 +367,7 @@ export function ConsoleShell({ children }: ConsoleShellProps) {
               </div>
 
               <div className="flex min-w-0 shrink-0 items-center justify-end gap-2">
+                <DownloadHistoryFlyout />
                 <PreferencesMenu />
                 {isTauri ? null : <UserMenu />}
               </div>
@@ -350,11 +376,11 @@ export function ConsoleShell({ children }: ConsoleShellProps) {
 
           <main
             id="main-content"
-            className="mcsl-scrollbar h-dvh overflow-y-auto overflow-x-hidden px-4 pb-4 pt-18 sm:px-5 lg:px-6"
+            className="flex h-dvh flex-col overflow-hidden px-4 pb-4 pt-18 sm:px-5 lg:px-6"
           >
             <section
               aria-label="content"
-              className="min-h-[calc(100dvh-5.5rem)]"
+              className="flex min-h-0 flex-1 flex-col overflow-hidden"
             >
               {children}
             </section>
@@ -401,7 +427,7 @@ function NavItemLink({
             variant: active ? "secondary" : "ghost",
             size: "icon",
           }),
-          "size-8 rounded-xl text-sidebar-foreground focus-visible:ring-sidebar-ring/30 [&_svg:not([class*='size-'])]:size-3.5",
+          "mx-auto size-8 shrink-0 rounded-xl text-sidebar-foreground focus-visible:ring-sidebar-ring/30 [&_svg:not([class*='size-'])]:size-3.5",
           active && "bg-sidebar-primary text-sidebar-primary-foreground",
         )}
         onPointerEnter={(event) => showTooltip(event.currentTarget)}
