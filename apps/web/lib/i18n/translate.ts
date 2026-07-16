@@ -161,6 +161,26 @@ const SOFT_DEFAULTS: Record<string, SoftDefault> = {
     zh: "连接信息仅保存在当前浏览器，不会上传到面板服务器。",
     en: "Connection details stay in this browser.",
   },
+  "shared.nodes.visibility.label": {
+    zh: "可见范围",
+    en: "Visibility",
+  },
+  "shared.nodes.visibility.all": {
+    zh: "所有用户",
+    en: "All users",
+  },
+  "shared.nodes.visibility.selected": {
+    zh: "指定用户",
+    en: "Selected users",
+  },
+  "shared.nodes.visibility.admins": {
+    zh: "仅管理员",
+    en: "Admins only",
+  },
+  "shared.nodes.visibility.usernames-placeholder": {
+    zh: "用户名，逗号分隔",
+    en: "Usernames, comma-separated",
+  },
   "shared.nodes.status.offline": { zh: "离线", en: "Offline" },
   "shared.nodes.status.online": { zh: "在线", en: "Online" },
   "shared.nodes.status.connecting": { zh: "连接中", en: "Connecting",
@@ -1231,6 +1251,56 @@ const SOFT_DEFAULTS: Record<string, SoftDefault> = {
   "shared.instance.files.download-multi-done": { zh: "已下载 {count} 个文件", en: "Downloaded {count} files" },
   "shared.instance.events.rulesets": { zh: "规则集", en: "Rulesets" },
   "shared.instance.events.add-ruleset": { zh: "添加规则集", en: "Add ruleset" },
+  "shared.instance.events.condition.any": { zh: "任一", en: "Any" },
+  "shared.instance.events.condition.all": { zh: "全部", en: "All" },
+  "shared.instance.events.trigger.console-output": {
+    zh: "控制台输出",
+    en: "Console output",
+  },
+  "shared.instance.events.action.send-notification": {
+    zh: "发送通知",
+    en: "Send notification",
+  },
+  "shared.instance.events.trigger.schedule": { zh: "定时", en: "Schedule" },
+  "shared.instance.events.trigger.instance-status": {
+    zh: "实例状态",
+    en: "Instance status",
+  },
+  "shared.instance.events.ruleset.always-true": {
+    zh: "始终为真",
+    en: "Always true",
+  },
+  "shared.instance.events.ruleset.always-false": {
+    zh: "始终为假",
+    en: "Always false",
+  },
+  "shared.instance.events.ruleset.instance-status": {
+    zh: "实例状态",
+    en: "Instance status",
+  },
+  "shared.instance.events.mode.sequential": {
+    zh: "顺序",
+    en: "Sequential",
+  },
+  "shared.instance.events.mode.parallel": {
+    zh: "并行",
+    en: "Parallel",
+  },
+  "shared.instance.events.action.send-command": {
+    zh: "发送命令",
+    en: "Send command",
+  },
+  "shared.instance.events.action.change-status": {
+    zh: "变更实例状态",
+    en: "Change instance status",
+  },
+  "shared.instance.events.status.running": { zh: "运行中", en: "Running" },
+  "shared.instance.events.status.stopped": { zh: "已停止", en: "Stopped" },
+  "shared.instance.events.status.crashed": { zh: "已崩溃", en: "Crashed" },
+  "shared.instance.events.action.start": { zh: "启动", en: "Start" },
+  "shared.instance.events.action.stop": { zh: "关闭", en: "Stop" },
+  "shared.instance.events.action.restart": { zh: "重启", en: "Restart" },
+  "shared.instance.events.action.kill": { zh: "强制关闭", en: "Kill" },
   "shared.instance.settings.scan-java": { zh: "扫描 Java", en: "Scan Java" },
   "shared.instance.settings.java-scan-failed": { zh: "扫描 Java 失败", en: "Failed to scan Java runtimes" },
   "shared.instance.settings.java-count": { zh: "已找到 {count} 个 Java 运行时", en: "Found {count} Java runtime(s)" },
@@ -1243,6 +1313,9 @@ const SOFT_DEFAULTS: Record<string, SoftDefault> = {
   "shared.instance.settings.name-required": { zh: "实例名称不能为空", en: "Instance name is required" },
   "ui.common.clear": { zh: "清除", en: "Clear" },
   "shared.instance.files.download": { zh: "下载", en: "Download" },
+  "shared.instance.files.mkdir": { zh: "新建文件夹", en: "New folder" },
+  "shared.instance.files.rename": { zh: "重命名", en: "Rename" },
+  "shared.instance.files.upload": { zh: "上传", en: "Upload" },
   "shared.instance.files.download-failed": {
     zh: "从守护进程下载文件失败。",
     en: "Failed to download file from daemon.",
@@ -1438,6 +1511,26 @@ const SOFT_DEFAULTS: Record<string, SoftDefault> = {
   "shared.resource-center.provider.error": {
     zh: "下载源加载失败",
     en: "Failed to load provider",
+  },
+  "shared.resource-center.provider.fastmirror": {
+    zh: "无极镜像",
+    en: "FastMirror",
+  },
+  "shared.resource-center.provider.polars": {
+    zh: "极星云镜像",
+    en: "Polars Mirror",
+  },
+  "shared.resource-center.provider.rainyun": {
+    zh: "雨云镜像站",
+    en: "RainYun Mirror",
+  },
+  "shared.resource-center.provider.mslapi": {
+    zh: "MSL",
+    en: "MSL",
+  },
+  "shared.resource-center.provider.mcslsync": {
+    zh: "MCSL-Sync 同步镜像",
+    en: "MCSL-Sync",
   },
   "shared.settings.download.source.label": { zh: "下载源", en: "Download source" },
   "shared.settings.download.source.desc": {
