@@ -8,7 +8,9 @@ use crate::user::{
     verify_password,
 };
 use actix_web::{HttpRequest, HttpResponse, Responder, delete, get, post, put, web};
-use mcsl_resource_provider::{ProviderError, ProviderRequest, fetch_json};
+use mcsl_resource_provider::{
+    DownloadRequest, ProviderError, ProviderRequest, fetch_download_bytes, fetch_json,
+};
 use serde::{Deserialize, Serialize};
 use std::net::IpAddr;
 
@@ -26,6 +28,37 @@ pub async fn api_resource_provider(body: web::Json<ProviderRequest>) -> impl Res
                 err: error.code(),
             })
         }
+        Err(error) => HttpResponse::BadGateway().json(FailedResponse {
+            status: "failed",
+            err: error.code(),
+        }),
+    }
+}
+
+/// 同源下载代理：仅白名单镜像主机，避免浏览器 CORS 拦截。
+#[post("/resource/download")]
+pub async fn api_resource_download(body: web::Json<DownloadRequest>) -> impl Responder {
+    match fetch_download_bytes(&body.url).await {
+        Ok((bytes, content_type)) => {
+            let mut builder = HttpResponse::Ok();
+            builder.insert_header((
+                actix_web::http::header::CONTENT_TYPE,
+                content_type.unwrap_or_else(|| "application/octet-stream".to_owned()),
+            ));
+            builder.insert_header((
+                actix_web::http::header::CONTENT_DISPOSITION,
+                "attachment",
+            ));
+            builder.body(bytes)
+        }
+        Err(
+            error @ (ProviderError::InvalidProvider
+            | ProviderError::InvalidPath
+            | ProviderError::InvalidDownloadUrl),
+        ) => HttpResponse::BadRequest().json(FailedResponse {
+            status: "failed",
+            err: error.code(),
+        }),
         Err(error) => HttpResponse::BadGateway().json(FailedResponse {
             status: "failed",
             err: error.code(),
@@ -505,6 +538,168 @@ pub async fn api_session_delete_username(
         Ok(()) => HttpResponse::Ok().json(SuccessResponse {
             status: "success",
             data: (),
+        }),
+        Err(res) => res,
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Shared daemon nodes (global) + per-user preferences
+// ---------------------------------------------------------------------------
+
+#[get("/nodes")]
+pub async fn api_nodes_list(http_request: HttpRequest) -> impl Responder {
+    let user = match get_user_from_headers(&http_request) {
+        Ok(user) => user,
+        Err(res) => return res,
+    };
+    match crate::nodes::list_visible_nodes(&user) {
+        Ok(nodes) => HttpResponse::Ok().json(SuccessResponse {
+            status: "success",
+            data: nodes,
+        }),
+        Err(res) => res,
+    }
+}
+
+#[get("/nodes/{id}/token")]
+pub async fn api_nodes_get_token(
+    id: web::Path<String>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    let user = match get_user_from_headers(&http_request) {
+        Ok(user) => user,
+        Err(res) => return res,
+    };
+    match crate::nodes::get_node_token_for_user(&user, &id) {
+        Ok(token) => HttpResponse::Ok().json(SuccessResponse {
+            status: "success",
+            data: serde_json::json!({ "token": token }),
+        }),
+        Err(res) => res,
+    }
+}
+
+#[post("/nodes")]
+pub async fn api_nodes_create(
+    data: web::Json<crate::nodes::NodeInput>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    let user = match get_user_from_headers(&http_request) {
+        Ok(user) => user,
+        Err(res) => return res,
+    };
+    match crate::nodes::create_node(&user, data.into_inner()) {
+        Ok(node) => HttpResponse::Ok().json(SuccessResponse {
+            status: "success",
+            data: node,
+        }),
+        Err(res) => res,
+    }
+}
+
+#[put("/nodes/{id}")]
+pub async fn api_nodes_update(
+    id: web::Path<String>,
+    data: web::Json<crate::nodes::NodeInput>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    let user = match get_user_from_headers(&http_request) {
+        Ok(user) => user,
+        Err(res) => return res,
+    };
+    match crate::nodes::update_node(&user, &id, data.into_inner()) {
+        Ok(node) => HttpResponse::Ok().json(SuccessResponse {
+            status: "success",
+            data: node,
+        }),
+        Err(res) => res,
+    }
+}
+
+#[put("/nodes/{id}/visibility")]
+pub async fn api_nodes_set_visibility(
+    id: web::Path<String>,
+    data: web::Json<crate::nodes::VisibilityInput>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    let user = match get_user_from_headers(&http_request) {
+        Ok(user) => user,
+        Err(res) => return res,
+    };
+    match crate::nodes::set_visibility(&user, &id, data.into_inner()) {
+        Ok(node) => HttpResponse::Ok().json(SuccessResponse {
+            status: "success",
+            data: node,
+        }),
+        Err(res) => res,
+    }
+}
+
+#[delete("/nodes/{id}")]
+pub async fn api_nodes_delete(
+    id: web::Path<String>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    let user = match get_user_from_headers(&http_request) {
+        Ok(user) => user,
+        Err(res) => return res,
+    };
+    match crate::nodes::delete_node(&user, &id) {
+        Ok(()) => HttpResponse::Ok().json(SuccessResponse {
+            status: "success",
+            data: (),
+        }),
+        Err(res) => res,
+    }
+}
+
+#[post("/nodes/import")]
+pub async fn api_nodes_import(
+    data: web::Json<crate::nodes::ImportNodesInput>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    let user = match get_user_from_headers(&http_request) {
+        Ok(user) => user,
+        Err(res) => return res,
+    };
+    match crate::nodes::import_nodes(&user, data.into_inner()) {
+        Ok(nodes) => HttpResponse::Ok().json(SuccessResponse {
+            status: "success",
+            data: nodes,
+        }),
+        Err(res) => res,
+    }
+}
+
+#[get("/preferences")]
+pub async fn api_preferences_get(http_request: HttpRequest) -> impl Responder {
+    let user = match get_user_from_headers(&http_request) {
+        Ok(user) => user,
+        Err(res) => return res,
+    };
+    match crate::preferences::get_preferences(&user.username) {
+        Ok(prefs) => HttpResponse::Ok().json(SuccessResponse {
+            status: "success",
+            data: prefs,
+        }),
+        Err(res) => res,
+    }
+}
+
+#[put("/preferences")]
+pub async fn api_preferences_put(
+    data: web::Json<crate::preferences::UserPreferences>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    let user = match get_user_from_headers(&http_request) {
+        Ok(user) => user,
+        Err(res) => return res,
+    };
+    match crate::preferences::set_preferences(&user.username, data.into_inner()) {
+        Ok(prefs) => HttpResponse::Ok().json(SuccessResponse {
+            status: "success",
+            data: prefs,
         }),
         Err(res) => res,
     }

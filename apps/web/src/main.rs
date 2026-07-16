@@ -1,5 +1,7 @@
 mod api;
 mod config;
+mod nodes;
+mod preferences;
 mod token;
 mod user;
 mod utils;
@@ -39,6 +41,8 @@ async fn main() -> std::io::Result<()> {
     config::ensure_config()?;
     user::load_users()?;
     token::load_tokens()?;
+    nodes::load_nodes()?;
+    preferences::load_preferences()?;
 
     tokio::spawn(async {
         use tokio::time::{Duration, interval};
@@ -79,7 +83,17 @@ async fn main() -> std::io::Result<()> {
                 .service(api::api_session_delete_self)
                 .service(api::api_session_delete_id)
                 .service(api::api_session_delete_username)
-                .service(api::api_resource_provider),
+                .service(api::api_resource_provider)
+                .service(api::api_resource_download)
+                .service(api::api_nodes_list)
+                .service(api::api_nodes_get_token)
+                .service(api::api_nodes_create)
+                .service(api::api_nodes_update)
+                .service(api::api_nodes_set_visibility)
+                .service(api::api_nodes_delete)
+                .service(api::api_nodes_import)
+                .service(api::api_preferences_get)
+                .service(api::api_preferences_put),
         );
 
         #[cfg(not(debug_assertions))]
@@ -117,20 +131,17 @@ async fn serve_static_files(path: web::Path<String>) -> HttpResponse {
                 .content_type(mime_type.as_ref())
                 .body(content)
         }
-        None => {
-            // Vue Router的History模式路由，返回index.html
-            match STATIC_DIR.get_file("index.html") {
-                Some(index_file) => HttpResponse::Ok()
-                    .content_type("text/html")
-                    .body(index_file.contents()),
-                None => {
-                    error!(
-                        "Static file '{}' not found and index.html not available",
-                        path
-                    );
-                    HttpResponse::NotFound().into()
-                }
+        None => match STATIC_DIR.get_file("index.html") {
+            Some(index_file) => HttpResponse::Ok()
+                .content_type("text/html")
+                .body(index_file.contents()),
+            None => {
+                error!(
+                    "Static file '{}' not found and index.html not available",
+                    path
+                );
+                HttpResponse::NotFound().into()
             }
-        }
+        },
     }
 }
