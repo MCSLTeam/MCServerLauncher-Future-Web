@@ -17,7 +17,10 @@ export type SessionInfo = {
 export type NodeType = "mcsl-daemon";
 export type NodeStatus = "online" | "offline" | "connecting" | "reconnecting";
 
-/** 用户保存的守护进程节点（本地配置，连接由客户端发起） */
+/** 节点可见性：全局共享，管理员配置谁能看见 */
+export type NodeVisibilityMode = "all" | "selected" | "admins";
+
+/** 共享守护进程节点（后端持久化；浏览器仅缓存连接态） */
 export type SavedNode = {
   id: string;
   name: string;
@@ -27,6 +30,10 @@ export type SavedNode = {
   secure: boolean;
   /** 连接令牌，列表中不展示明文 */
   hasToken: boolean;
+  /** 可见性（管理员可配置） */
+  visibility?: NodeVisibilityMode;
+  /** visibility=selected 时的可见用户名 */
+  visibleTo?: string[];
   createdAt: number;
   updatedAt: number;
 };
