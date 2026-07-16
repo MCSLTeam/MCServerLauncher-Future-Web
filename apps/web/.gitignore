@@ -28,3 +28,6 @@ dist-ssr
 
 # MCSL
 mcsl-web
+
+# Monaco AMD assets copied by scripts/sync-monaco.mjs
+/public/monaco/
