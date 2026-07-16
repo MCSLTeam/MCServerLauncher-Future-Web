@@ -1,4 +1,8 @@
 import type { InstanceStatus, NodeStatus } from "@/lib/types";
+import type {
+  InstanceFactorySettingPayload,
+  JavaInfo,
+} from "@/lib/create/types";
 
 export type DaemonActionResponse<T = unknown> = {
   status: "ok" | "error" | string;
@@ -6,6 +10,32 @@ export type DaemonActionResponse<T = unknown> = {
   data: T | null;
   message: string;
   id: string;
+};
+
+export type { InstanceFactorySettingPayload, JavaInfo };
+
+export type DaemonJavaListResult = {
+  java_list?: JavaInfo[];
+  javaList?: JavaInfo[];
+  JavaList?: JavaInfo[];
+  list?: JavaInfo[];
+};
+
+export type DaemonFileUploadRequestResult = {
+  file_id?: string;
+  fileId?: string;
+};
+
+export type DaemonAddInstanceResult = {
+  config?: DaemonInstanceConfig;
+};
+
+export type DaemonBinaryUploadResponse = {
+  file_id?: string;
+  fileId?: string;
+  done?: boolean;
+  received?: number;
+  error?: string;
 };
 
 /** 对齐 Common.ProtoType.Status.SystemInfo（snake_case 线协议） */
@@ -52,6 +82,8 @@ export type DaemonInstanceConfig = {
   target_type?: string;
   uuid?: string;
   mc_version?: string;
+  java_path?: string;
+  arguments?: string[];
   [key: string]: unknown;
 };
 

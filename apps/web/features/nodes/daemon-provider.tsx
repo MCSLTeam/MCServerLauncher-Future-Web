@@ -11,17 +11,28 @@ import {
   type ReactNode,
 } from "react";
 
-import { DaemonClient } from "@/lib/daemon/client";
+import { DaemonClient, type UploadProgress } from "@/lib/daemon/client";
 import {
   mapDaemonStatus,
   type DaemonConnectionState,
+  type DaemonInstanceConfig,
   type DaemonInstanceReport,
   type DaemonLiveInstance,
   type DaemonSystemInfo,
+  type InstanceFactorySettingPayload,
+  type JavaInfo,
   httpInfoUrl,
 } from "@/lib/daemon/types";
-import { getNode, getNodeToken, listNodes } from "@/lib/nodes-store";
+import {
+  getNode,
+  getNodeTokenAsync,
+  hydrateNodes,
+  listNodes,
+  refreshNodes,
+} from "@/lib/nodes-store";
+import { hydrateSettings } from "@/lib/settings-store";
 import type { NodeStatus, SavedNode } from "@/lib/types";
+import { tKey } from "@/lib/i18n/translate";
 
 type ConnectOptions = {
   /** 强制重建连接（对齐 WPF AutoRefresh / Refresh） */
@@ -45,7 +56,7 @@ type DaemonContextValue = {
     nodeId: string,
     options?: ConnectOptions,
   ) => Promise<{ ok: boolean; message?: string; info?: DaemonSystemInfo }>;
-  disconnectNode: (nodeId: string) => void;
+  disconnectNode: (nodeId: string, options?: { purge?: boolean }) => void;
   /** 并发上限 4，对齐 WPF CreateAllDaemonWsAsync */
   connectAll: (options?: ConnectOptions) => Promise<void>;
   /** 对齐 RefreshAsync：按配置重连并刷新系统信息 */
@@ -87,6 +98,42 @@ type DaemonContextValue = {
     nodeId: string,
     instanceId: string,
   ) => Promise<{ ok: boolean; logs?: string[]; message?: string }>;
+  /**
+   * 订阅 instance_log 实时推送。cleanup 会 unsubscribe + 移除监听。
+   * 对齐 WPF InstanceDataManager.SubscribeEvent(InstanceLog)。
+   */
+  subscribeInstanceLog: (
+    nodeId: string,
+    instanceId: string,
+    onLog: (line: string) => void,
+  ) => Promise<{ ok: boolean; unsubscribe?: () => void; message?: string }>;
+  /** 刷新单个实例 report（对齐 WPF 2s get_instance_report） */
+  refreshInstanceReport: (
+    nodeId: string,
+    instanceId: string,
+  ) => Promise<{ ok: boolean; message?: string }>;
+  /** 在已连接节点上执行任意 DaemonClient 操作 */
+  runWithClient: <T,>(
+    nodeId: string,
+    run: (client: DaemonClient) => Promise<T>,
+  ) => Promise<{ ok: true; data: T } | { ok: false; message?: string }>;
+  getJavaList: (
+    nodeId: string,
+  ) => Promise<{ ok: boolean; javaList?: JavaInfo[]; message?: string }>;
+  addInstance: (
+    nodeId: string,
+    setting: InstanceFactorySettingPayload,
+  ) => Promise<{
+    ok: boolean;
+    config?: DaemonInstanceConfig;
+    message?: string;
+  }>;
+  uploadFile: (
+    nodeId: string,
+    file: File | Blob,
+    dst: string,
+    onProgress?: (progress: UploadProgress) => void,
+  ) => Promise<{ ok: boolean; path?: string; message?: string }>;
 };
 
 const DaemonContext = createContext<DaemonContextValue | null>(null);
@@ -143,12 +190,7 @@ function reportToLive(
 }
 
 function initialConnections(): Record<string, DaemonConnectionState> {
-  if (typeof window === "undefined") return {};
-  const next: Record<string, DaemonConnectionState> = {};
-  for (const node of listNodes()) {
-    next[node.id] = emptyState(node.id);
-  }
-  return next;
+  return {};
 }
 
 /** 并发池，对齐 WPF min(ProcessorCount, 4) */
@@ -192,11 +234,22 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
   );
 
   const disconnectNode = useCallback(
-    (nodeId: string) => {
+    (nodeId: string, options?: { purge?: boolean }) => {
       const client = clientsRef.current.get(nodeId);
       if (client) {
         client.close();
         clientsRef.current.delete(nodeId);
+      }
+      setInstances((prev) => prev.filter((item) => item.nodeId !== nodeId));
+      if (options?.purge) {
+        // 删除节点：彻底移出连接表，避免残留 offline 条目影响列表
+        setConnections((prev) => {
+          if (!(nodeId in prev)) return prev;
+          const next = { ...prev };
+          delete next[nodeId];
+          return next;
+        });
+        return;
       }
       setNodeState(nodeId, {
         status: "offline",
@@ -204,7 +257,6 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
         systemInfo: null,
         lastPongAt: null,
       });
-      setInstances((prev) => prev.filter((item) => item.nodeId !== nodeId));
     },
     [setNodeState],
   );
@@ -239,7 +291,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
             clientsRef.current.delete(nodeId);
             setNodeState(nodeId, {
               status: "offline",
-              error: "连接已断开",
+              error: tKey("shared.daemon.error.disconnected"),
             });
           }
         },
@@ -257,16 +309,16 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
     async (nodeId: string, options?: ConnectOptions) => {
       const node = getNode(nodeId);
       if (!node) {
-        return { ok: false, message: "节点不存在" };
+        return { ok: false, message: tKey("shared.daemon.error.node-missing") };
       }
-      const token = getNodeToken(nodeId);
+      const token = await getNodeTokenAsync(nodeId);
       if (!token) {
         setNodeState(nodeId, {
           status: "offline",
-          error: "缺少访问令牌",
+          error: tKey("shared.daemon.error.token-missing"),
           systemInfo: null,
         });
-        return { ok: false, message: "缺少访问令牌" };
+        return { ok: false, message: tKey("shared.daemon.error.token-missing") };
       }
 
       const credentials: Credentials = {
@@ -282,7 +334,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
           await existing.ping();
           const systemInfo = extractSystemInfo(await existing.getSystemInfo());
           if (!systemInfo) {
-            throw new Error("无法获取系统信息");
+            throw new Error(tKey("shared.daemon.error.system-info"));
           }
           setNodeState(nodeId, {
             status: "online",
@@ -317,7 +369,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
         await client.ping();
         const systemInfo = extractSystemInfo(await client.getSystemInfo());
         if (!systemInfo) {
-          throw new Error("无法获取系统信息");
+          throw new Error(tKey("shared.daemon.error.system-info"));
         }
         setNodeState(nodeId, {
           status: "online",
@@ -334,7 +386,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         client.close();
         clientsRef.current.delete(nodeId);
-        const message = error instanceof Error ? error.message : "连接失败";
+        const message = error instanceof Error ? error.message : tKey("shared.daemon.error.connect-failed");
         setNodeState(nodeId, {
           status: "offline",
           error: message,
@@ -373,6 +425,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
   const refreshDaemons = useCallback(async () => {
     setRefreshing(true);
     try {
+      await refreshNodes();
       await connectAll({ force: true });
     } finally {
       setRefreshing(false);
@@ -397,7 +450,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
           } catch (error) {
             setNodeState(nodeId, {
               status: "offline",
-              error: error instanceof Error ? error.message : "刷新失败",
+              error: error instanceof Error ? error.message : tKey("shared.daemon.error.refresh-failed"),
             });
           }
         }),
@@ -435,14 +488,14 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       const systemInfo = extractSystemInfo(await client.getSystemInfo());
       client.close();
       if (!systemInfo) {
-        return { ok: false, message: "无法获取系统信息" };
+        return { ok: false, message: tKey("shared.daemon.error.system-info") };
       }
       return { ok: true, info: systemInfo };
     } catch (error) {
       client.close();
       return {
         ok: false,
-        message: error instanceof Error ? error.message : "连接失败",
+        message: error instanceof Error ? error.message : tKey("shared.daemon.error.connect-failed"),
       };
     }
   }, []);
@@ -459,7 +512,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       }
       const ready = clientsRef.current.get(nodeId);
       if (!ready?.ready) {
-        return { ok: false, message: "节点未连接" };
+        return { ok: false, message: tKey("shared.daemon.error.not-connected") };
       }
       try {
         await run(ready);
@@ -467,7 +520,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         return {
           ok: false,
-          message: error instanceof Error ? error.message : "操作失败",
+          message: error instanceof Error ? error.message : tKey("shared.daemon.error.operation-failed"),
         };
       }
     },
@@ -541,7 +594,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       }
       const ready = clientsRef.current.get(nodeId);
       if (!ready?.ready) {
-        return { ok: false, message: "节点未连接" };
+        return { ok: false, message: tKey("shared.daemon.error.not-connected") };
       }
       try {
         const data = await ready.getInstanceLogHistory(instanceId);
@@ -554,11 +607,160 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         return {
           ok: false,
-          message: error instanceof Error ? error.message : "读取日志失败",
+          message: error instanceof Error ? error.message : tKey("shared.daemon.error.read-logs-failed"),
         };
       }
     },
     [connectNode],
+  );
+
+  const subscribeInstanceLog = useCallback(
+    async (
+      nodeId: string,
+      instanceId: string,
+      onLog: (line: string) => void,
+    ) => {
+      const client = clientsRef.current.get(nodeId);
+      if (!client?.ready) {
+        const connected = await connectNode(nodeId);
+        if (!connected.ok) {
+          return { ok: false as const, message: connected.message };
+        }
+      }
+      const ready = clientsRef.current.get(nodeId);
+      if (!ready?.ready) {
+        return {
+          ok: false as const,
+          message: tKey("shared.daemon.error.not-connected"),
+        };
+      }
+      try {
+        const unsubscribe = await ready.subscribeInstanceLog(instanceId, onLog);
+        return { ok: true as const, unsubscribe };
+      } catch (error) {
+        return {
+          ok: false as const,
+          message:
+            error instanceof Error
+              ? error.message
+              : tKey("shared.daemon.error.operation-failed"),
+        };
+      }
+    },
+    [connectNode],
+  );
+
+  const refreshInstanceReport = useCallback(
+    async (nodeId: string, instanceId: string) => {
+      const node = getNode(nodeId);
+      const client = clientsRef.current.get(nodeId);
+      if (!client?.ready || !node) {
+        return {
+          ok: false as const,
+          message: tKey("shared.daemon.error.not-connected"),
+        };
+      }
+      try {
+        const data = await client.getInstanceReport(instanceId);
+        const report =
+          data && typeof data === "object" && "report" in (data as object)
+            ? ((data as { report?: DaemonInstanceReport }).report ??
+              (data as DaemonInstanceReport))
+            : (data as DaemonInstanceReport);
+        if (!report || typeof report !== "object") {
+          return {
+            ok: false as const,
+            message: tKey("shared.daemon.error.operation-failed"),
+          };
+        }
+        const live = reportToLive(node, instanceId, report);
+        setInstances((prev) => {
+          const others = prev.filter(
+            (item) => !(item.nodeId === nodeId && item.id === instanceId),
+          );
+          return [...others, live].sort((a, b) =>
+            a.name.localeCompare(b.name, "zh-CN"),
+          );
+        });
+        return { ok: true as const };
+      } catch (error) {
+        return {
+          ok: false as const,
+          message:
+            error instanceof Error
+              ? error.message
+              : tKey("shared.daemon.error.operation-failed"),
+        };
+      }
+    },
+    [],
+  );
+
+  const runWithClient = useCallback(
+    async <T,>(
+      nodeId: string,
+      run: (client: DaemonClient) => Promise<T>,
+    ): Promise<{ ok: true; data: T } | { ok: false; message?: string }> => {
+      const client = clientsRef.current.get(nodeId);
+      if (!client?.ready) {
+        const connected = await connectNode(nodeId);
+        if (!connected.ok) return { ok: false, message: connected.message };
+      }
+      const ready = clientsRef.current.get(nodeId);
+      if (!ready?.ready) {
+        return { ok: false, message: tKey("shared.daemon.error.not-connected") };
+      }
+      try {
+        const data = await run(ready);
+        return { ok: true, data };
+      } catch (error) {
+        return {
+          ok: false,
+          message: error instanceof Error ? error.message : tKey("shared.daemon.error.operation-failed"),
+        };
+      }
+    },
+    [connectNode],
+  );
+
+  const getJavaList = useCallback(
+    async (nodeId: string) => {
+      const result = await runWithClient(nodeId, (client) =>
+        client.getJavaList(),
+      );
+      if (!result.ok) return { ok: false, message: result.message };
+      return { ok: true, javaList: result.data };
+    },
+    [runWithClient],
+  );
+
+  const addInstance = useCallback(
+    async (nodeId: string, setting: InstanceFactorySettingPayload) => {
+      const result = await runWithClient(nodeId, async (client) => {
+        const config = await client.addInstance(setting);
+        await refreshNodeInstances(nodeId);
+        return config;
+      });
+      if (!result.ok) return { ok: false, message: result.message };
+      return { ok: true, config: result.data };
+    },
+    [refreshNodeInstances, runWithClient],
+  );
+
+  const uploadFile = useCallback(
+    async (
+      nodeId: string,
+      file: File | Blob,
+      dst: string,
+      onProgress?: (progress: UploadProgress) => void,
+    ) => {
+      const result = await runWithClient(nodeId, (client) =>
+        client.uploadFile(file, dst, { onProgress }),
+      );
+      if (!result.ok) return { ok: false, message: result.message };
+      return { ok: true, path: result.data };
+    },
+    [runWithClient],
   );
 
   const getStatus = useCallback(
@@ -566,11 +768,19 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
     [connections],
   );
 
-  // 启动时自动连接全部（对齐 Initializer.CreateAllDaemonWsAsync）
+  // 启动：从后端 hydrate 节点与偏好后连接全部
   useEffect(() => {
     const clients = clientsRef.current;
-    const task = window.setTimeout(() => void connectAll(), 0);
+    let cancelled = false;
+    const task = window.setTimeout(() => {
+      void (async () => {
+        await Promise.all([hydrateNodes(), hydrateSettings()]);
+        if (cancelled) return;
+        await connectAll();
+      })();
+    }, 0);
     return () => {
+      cancelled = true;
       window.clearTimeout(task);
       for (const [id, client] of clients) {
         client.close();
@@ -599,6 +809,12 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       removeInstance,
       sendCommand,
       getLogs,
+      subscribeInstanceLog,
+      refreshInstanceReport,
+      runWithClient,
+      getJavaList,
+      addInstance,
+      uploadFile,
     }),
     [
       connections,
@@ -618,6 +834,12 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       removeInstance,
       sendCommand,
       getLogs,
+      subscribeInstanceLog,
+      refreshInstanceReport,
+      runWithClient,
+      getJavaList,
+      addInstance,
+      uploadFile,
     ],
   );
 
