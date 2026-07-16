@@ -195,7 +195,7 @@ export default function ResourceCenterPage() {
           <div className="min-w-0">
             <p className="truncate text-sm text-muted-foreground">
               {t("shared.resource-center.wpf-tip", {
-                provider: provider.displayName,
+                provider: t(provider.displayNameKey),
               })}
             </p>
           </div>

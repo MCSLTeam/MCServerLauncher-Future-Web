@@ -257,7 +257,7 @@ export default function SettingsPage() {
                       htmlFor={`download-source-${provider.id}`}
                       className="font-normal"
                     >
-                      {provider.displayName}
+                      {t(provider.displayNameKey)}
                     </FieldLabel>
                   </Field>
                 ))}
