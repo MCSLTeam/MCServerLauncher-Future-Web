@@ -14,6 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DownloadDestinationDialog } from "@/features/downloads/download-destination-dialog";
+import { useDownloads } from "@/features/downloads/download-provider";
+import type { DownloadDestination } from "@/lib/downloads/manager";
 import { useT } from "@/features/i18n/locale-provider";
 import {
   loadResourceProviderId,
@@ -25,15 +28,11 @@ import {
 import { formatMinecraftVersion } from "@/lib/minecraft-version";
 import { cn } from "@/lib/utils";
 
-function tagName(tag?: string) {
-  const values: Record<string, string> = {
-    proxy: "代理",
-    vanilla: "原版",
-    pure: "纯净",
-    mod: "模组",
-    bedrock: "基岩",
-  };
-  return tag ? (values[tag] ?? tag) : "";
+function tagName(tag: string | undefined, t: (key: string) => string) {
+  if (!tag) return "";
+  const key = `shared.resource-center.tag.${tag}`;
+  const label = t(key);
+  return label === key ? tag : label;
 }
 
 function formatSize(bytes?: number) {
@@ -43,6 +42,7 @@ function formatSize(bytes?: number) {
 
 export default function ResourceCenterPage() {
   const t = useT();
+  const downloads = useDownloads();
   const [providerId] = useState<ResourceProviderId>(loadResourceProviderId);
   const [cores, setCores] = useState<ResourceCore[]>([]);
   const [currentCoreId, setCurrentCoreId] = useState("");
@@ -52,6 +52,9 @@ export default function ResourceCenterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<string | null>(null);
+  const [pendingFile, setPendingFile] = useState<ResourceFile | null>(null);
+  const [destOpen, setDestOpen] = useState(false);
+  const [pendingUrl, setPendingUrl] = useState<string | null>(null);
 
   const provider = useMemo(
     () =>
@@ -143,12 +146,16 @@ export default function ResourceCenterPage() {
   }, [refresh]);
 
   async function downloadFile(file: ResourceFile) {
-    if (!currentCore) return;
-    setDownloading(file.id);
+    setDownloading(file.name);
     setError(null);
     try {
+      if (!currentCore) {
+        throw new Error(t("shared.resource-center.provider.error"));
+      }
       const target = await provider.resolveDownload(currentCore, file);
-      window.location.assign(target.url);
+      setPendingFile(file);
+      setPendingUrl(target.url);
+      setDestOpen(true);
     } catch (reason) {
       setError(
         reason instanceof Error
@@ -160,15 +167,33 @@ export default function ResourceCenterPage() {
     }
   }
 
+  async function onConfirmDestinations(destinations: DownloadDestination[]) {
+    if (!pendingFile || !pendingUrl) return;
+    setDownloading(pendingFile.name);
+    setError(null);
+    try {
+      await downloads.startDownload(pendingUrl, pendingFile.name, {
+        destinations,
+      });
+    } catch (reason) {
+      setError(
+        reason instanceof Error
+          ? reason.message
+          : t("shared.resource-center.provider.error"),
+      );
+    } finally {
+      setDownloading(null);
+      setPendingFile(null);
+      setPendingUrl(null);
+    }
+  }
+
   return (
     <ConsolePage className="gap-0">
       <Reveal>
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <h2 className="text-[1.75rem] font-semibold leading-none tracking-tight">
-              {t("shared.resource-center.wpf-title")}
-            </h2>
-            <p className="mt-5 truncate text-sm text-muted-foreground">
+            <p className="truncate text-sm text-muted-foreground">
               {t("shared.resource-center.wpf-tip", {
                 provider: provider.displayName,
               })}
@@ -231,7 +256,7 @@ export default function ResourceCenterPage() {
                     <span className="block truncate">{core.name}</span>
                     {core.tag ? (
                       <span className="mt-0.5 block text-xs opacity-75">
-                        {tagName(core.tag)}
+                        {tagName(core.tag, t)}
                       </span>
                     ) : null}
                   </span>
@@ -368,6 +393,20 @@ export default function ResourceCenterPage() {
           </section>
         </div>
       </Reveal>
+      <DownloadDestinationDialog
+        open={destOpen}
+        fileName={pendingFile?.name ?? ""}
+        onOpenChange={(open) => {
+          setDestOpen(open);
+          if (!open) {
+            setPendingFile(null);
+            setPendingUrl(null);
+          }
+        }}
+        onConfirm={(destinations) => {
+          void onConfirmDestinations(destinations);
+        }}
+      />
     </ConsolePage>
   );
 }
