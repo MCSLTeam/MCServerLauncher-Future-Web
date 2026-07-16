@@ -32,7 +32,8 @@ export type ResourceFile = {
 
 export type ResourceProvider = {
   id: ResourceProviderId;
-  displayName: string;
+  /** i18n key for provider display name */
+  displayNameKey: string;
   sidebarWidth: "narrow" | "wide";
   listCores: () => Promise<ResourceCore[]>;
   listVersions?: (core: ResourceCore) => Promise<string[]>;
@@ -142,7 +143,7 @@ function prettyMslName(raw: string) {
 
 const fastMirror: ResourceProvider = {
   id: "FastMirror",
-  displayName: "无极镜像",
+  displayNameKey: "shared.resource-center.provider.fastmirror",
   sidebarWidth: "wide",
   async listCores() {
     const root = record(
@@ -190,7 +191,7 @@ const fastMirror: ResourceProvider = {
 
 const polarsMirror: ResourceProvider = {
   id: "PolarsMirror",
-  displayName: "极星云镜像",
+  displayNameKey: "shared.resource-center.provider.polars",
   sidebarWidth: "narrow",
   async listCores() {
     const root = await getJson(
@@ -233,7 +234,7 @@ async function rainList(path: string) {
 
 const rainYun: ResourceProvider = {
   id: "RainYun",
-  displayName: "雨云镜像站",
+  displayNameKey: "shared.resource-center.provider.rainyun",
   sidebarWidth: "narrow",
   async listCores() {
     return (await rainList("服务端合集"))
@@ -268,7 +269,7 @@ const rainYun: ResourceProvider = {
 
 const mslApi: ResourceProvider = {
   id: "MSLAPI",
-  displayName: "MSL",
+  displayNameKey: "shared.resource-center.provider.mslapi",
   sidebarWidth: "narrow",
   async listCores() {
     const root = record(
@@ -317,7 +318,7 @@ const mslApi: ResourceProvider = {
 
 const mcslSync: ResourceProvider = {
   id: "MCSLSync",
-  displayName: "MCSL-Sync 同步镜像",
+  displayNameKey: "shared.resource-center.provider.mcslsync",
   sidebarWidth: "narrow",
   async listCores() {
     const root = record(await getJson("https://sync.mcsl.com.cn/api/core"));
