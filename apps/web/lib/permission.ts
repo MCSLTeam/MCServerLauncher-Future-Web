@@ -47,6 +47,11 @@ export function canChangeUserInfo(
   return hasPermission(permissions, `mcsl.web.user.${username}.info.change`);
 }
 
+/** 管理共享节点与可见性（admin `*` 或 mcsl.web.node.manage） */
+export function canManageNodes(permissions: string[] | undefined | null) {
+  return hasPermission(permissions, "mcsl.web.node.manage");
+}
+
 /** 新建用户时的权限预设（给最终用户看的选项，不是内部代号） */
 export const PERMISSION_PRESETS = [
   {
