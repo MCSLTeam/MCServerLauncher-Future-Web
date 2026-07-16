@@ -15,6 +15,7 @@ import { authApi, publicApi, setUnauthorizedHandler } from "@/lib/api";
 import { clearToken, readToken, writeToken } from "@/lib/auth-storage";
 import { isTauriRuntime } from "@/lib/tauri-runtime";
 import type { SessionInfo, UserInfo } from "@/lib/types";
+import { tKey } from "@/lib/i18n/translate";
 
 type AuthContextValue = {
   ready: boolean;
@@ -131,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: { username, password, remember },
       });
       if (!result.ok || !result.data) {
-        return { ok: false as const, message: result.message ?? "登录失败" };
+        return { ok: false as const, message: result.message ?? tKey("web.auth.login-failed") };
       }
       writeToken(result.data, remember);
       setToken(result.data);
@@ -147,7 +148,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       body: { username, password },
     });
     if (!result.ok) {
-      return { ok: false as const, message: result.message ?? "注册失败" };
+      return { ok: false as const, message: result.message ?? tKey("web.auth.register-failed") };
     }
     // 公开注册仅创建首个管理员；成功后需自行登录（与 Vue 一致）
     return { ok: true as const };

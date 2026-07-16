@@ -23,10 +23,12 @@ import { useAuth } from "@/features/auth/auth-provider";
 import { useT } from "@/features/i18n/locale-provider";
 import { useDaemon } from "@/features/nodes/daemon-provider";
 import { listNodes } from "@/lib/nodes-store";
+import { useIsTauriRuntime } from "@/lib/tauri-runtime";
 import { formatDateTime } from "@/lib/validation";
 
 export default function DashboardPage() {
   const t = useT();
+  const isTauri = useIsTauriRuntime();
   const { user, listSessions } = useAuth();
   const { instances, getStatus } = useDaemon();
   const [sessionCount, setSessionCount] = useState<number | null>(null);
@@ -34,10 +36,11 @@ export default function DashboardPage() {
 
   useEffect(() => {
     queueMicrotask(() => setNodeCount(listNodes().length));
+    if (isTauri) return;
     void listSessions().then((sessions) => {
       setSessionCount(sessions?.length ?? 0);
     });
-  }, [listSessions]);
+  }, [isTauri, listSessions]);
 
   const onlineNodes = listNodes().filter(
     (n) => getStatus(n.id) === "online",
@@ -45,11 +48,14 @@ export default function DashboardPage() {
 
   return (
     <ConsolePage>
-      {/* 对齐 WPF HomePage：主标题 + Tip */}
       <Reveal>
         <ConsolePageHeader
           title={t("shared.dashboard.title")}
-          subtitle={t("shared.dashboard.subtitle")}
+          subtitle={
+            isTauri
+              ? t("shared.dashboard.subtitle.tauri")
+              : t("shared.dashboard.subtitle.default")
+          }
           action={
             <Button asChild>
               <Link href={nodeCount > 0 ? "/create/" : "/nodes/"}>
@@ -62,14 +68,13 @@ export default function DashboardPage() {
         />
       </Reveal>
 
-      {/* 公告区：对齐 HomePage NoticeBorder */}
       <Reveal delay={0.03}>
         <ConsolePanel>
           <ConsolePanelHeader title={t("shared.home.announcement.title")} />
           <p className="text-sm leading-6 text-muted-foreground">
             {t("shared.home.announcement.body")}
           </p>
-          {user?.username ? (
+          {!isTauri && user?.username ? (
             <p className="mt-3 text-sm">
               {t("shared.welcome.welcome")} {user.username}
             </p>
@@ -78,18 +83,30 @@ export default function DashboardPage() {
       </Reveal>
 
       <Reveal delay={0.05}>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <ConsoleMetric
-            label={t("web.user-center.user-info.username")}
-            value={user?.username ?? "—"}
-            hint={
-              user?.created_at ? formatDateTime(user.created_at) : undefined
-            }
-          />
-          <ConsoleMetric
-            label={t("web.user-center.sessions.title")}
-            value={sessionCount === null ? undefined : sessionCount}
-          />
+        <div
+          className={
+            isTauri
+              ? "grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+              : "grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+          }
+        >
+          {isTauri ? null : (
+            <>
+              <ConsoleMetric
+                label={t("web.user-center.user-info.username")}
+                value={user?.username ?? "—"}
+                hint={
+                  user?.created_at
+                    ? formatDateTime(user.created_at)
+                    : undefined
+                }
+              />
+              <ConsoleMetric
+                label={t("web.user-center.sessions.title")}
+                value={sessionCount === null ? undefined : sessionCount}
+              />
+            </>
+          )}
           <ConsoleMetric label={t("shared.nodes.title")} value={nodeCount} />
           <ConsoleMetric
             label={t("shared.instances.title")}
@@ -104,6 +121,17 @@ export default function DashboardPage() {
                   })
             }
           />
+          {isTauri ? (
+            <ConsoleMetric
+              label={t("shared.nodes.status.online")}
+              value={onlineNodes}
+              hint={t("shared.instances.summary", {
+                instances: instances.length,
+                online: onlineNodes,
+                total: nodeCount,
+              })}
+            />
+          ) : null}
         </div>
       </Reveal>
 
@@ -112,7 +140,11 @@ export default function DashboardPage() {
           <ConsolePanel>
             <ConsolePanelHeader
               title={t("shared.dashboard.title")}
-              description={t("shared.dashboard.subtitle")}
+              description={
+                isTauri
+                  ? t("shared.dashboard.subtitle.tauri")
+                  : t("shared.dashboard.subtitle.default")
+              }
             />
             <ol className="list-decimal space-y-2 pl-5 text-sm leading-6 text-muted-foreground">
               <li>{t("shared.nodes.subtitle")}</li>
@@ -166,18 +198,16 @@ export default function DashboardPage() {
             ) : (
               <ul className="space-y-2 text-sm">
                 {instances.slice(0, 6).map((item) => (
-                  <li
-                    key={`${item.nodeId}:${item.id}`}
-                    className="flex items-center justify-between gap-2 rounded-xl border px-3 py-2"
-                  >
-                    <span className="truncate font-medium">{item.name}</span>
-                    <Button asChild size="sm" variant="ghost">
-                      <Link
-                        href={`/instances/detail/?id=${encodeURIComponent(item.id)}&node=${encodeURIComponent(item.nodeId)}`}
-                      >
-                        {t("shared.instances.open")}
-                      </Link>
-                    </Button>
+                  <li key={`${item.nodeId}:${item.id}`}>
+                    <Link
+                      className="text-primary underline-offset-4 hover:underline"
+                      href={`/instances/detail/?id=${encodeURIComponent(item.id)}&node=${encodeURIComponent(item.nodeId)}`}
+                    >
+                      {item.name}
+                    </Link>
+                    <span className="ml-2 text-muted-foreground">
+                      {item.nodeName} · {item.status}
+                    </span>
                   </li>
                 ))}
               </ul>
