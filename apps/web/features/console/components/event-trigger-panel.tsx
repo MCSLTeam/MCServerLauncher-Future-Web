@@ -361,8 +361,12 @@ function EventRuleEditorInner({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Any">Any</SelectItem>
-                  <SelectItem value="All">All</SelectItem>
+                  <SelectItem value="Any">
+                      {t("shared.instance.events.condition.any")}
+                    </SelectItem>
+                    <SelectItem value="All">
+                      {t("shared.instance.events.condition.all")}
+                    </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -399,11 +403,13 @@ function EventRuleEditorInner({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="ConsoleOutput">
-                        ConsoleOutput
+                        {t("shared.instance.events.trigger.console-output")}
                       </SelectItem>
-                      <SelectItem value="Schedule">Schedule</SelectItem>
+                      <SelectItem value="Schedule">
+                        {t("shared.instance.events.trigger.schedule")}
+                      </SelectItem>
                       <SelectItem value="InstanceStatus">
-                        InstanceStatus
+                        {t("shared.instance.events.trigger.instance-status")}
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -474,9 +480,15 @@ function EventRuleEditorInner({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Running">Running</SelectItem>
-                      <SelectItem value="Stopped">Stopped</SelectItem>
-                      <SelectItem value="Crashed">Crashed</SelectItem>
+                      <SelectItem value="Running">
+                        {t("shared.instance.events.status.running")}
+                      </SelectItem>
+                      <SelectItem value="Stopped">
+                        {t("shared.instance.events.status.stopped")}
+                      </SelectItem>
+                      <SelectItem value="Crashed">
+                        {t("shared.instance.events.status.crashed")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 ) : null}
@@ -542,10 +554,14 @@ function EventRuleEditorInner({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="AlwaysTrue">AlwaysTrue</SelectItem>
-                      <SelectItem value="AlwaysFalse">AlwaysFalse</SelectItem>
+                      <SelectItem value="AlwaysTrue">
+                        {t("shared.instance.events.ruleset.always-true")}
+                      </SelectItem>
+                      <SelectItem value="AlwaysFalse">
+                        {t("shared.instance.events.ruleset.always-false")}
+                      </SelectItem>
                       <SelectItem value="InstanceStatus">
-                        InstanceStatus
+                        {t("shared.instance.events.ruleset.instance-status")}
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -578,9 +594,15 @@ function EventRuleEditorInner({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Running">Running</SelectItem>
-                      <SelectItem value="Stopped">Stopped</SelectItem>
-                      <SelectItem value="Crashed">Crashed</SelectItem>
+                      <SelectItem value="Running">
+                        {t("shared.instance.events.status.running")}
+                      </SelectItem>
+                      <SelectItem value="Stopped">
+                        {t("shared.instance.events.status.stopped")}
+                      </SelectItem>
+                      <SelectItem value="Crashed">
+                        {t("shared.instance.events.status.crashed")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 ) : null}
@@ -624,8 +646,12 @@ function EventRuleEditorInner({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Sequential">Sequential</SelectItem>
-                  <SelectItem value="Parallel">Parallel</SelectItem>
+                  <SelectItem value="Sequential">
+                    {t("shared.instance.events.mode.sequential")}
+                  </SelectItem>
+                  <SelectItem value="Parallel">
+                    {t("shared.instance.events.mode.parallel")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -662,12 +688,14 @@ function EventRuleEditorInner({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="SendCommand">SendCommand</SelectItem>
+                      <SelectItem value="SendCommand">
+                        {t("shared.instance.events.action.send-command")}
+                      </SelectItem>
                       <SelectItem value="ChangeInstanceStatus">
-                        ChangeInstanceStatus
+                        {t("shared.instance.events.action.change-status")}
                       </SelectItem>
                       <SelectItem value="SendNotification">
-                        SendNotification
+                        {t("shared.instance.events.action.send-notification")}
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -708,10 +736,18 @@ function EventRuleEditorInner({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Start">Start</SelectItem>
-                      <SelectItem value="Stop">Stop</SelectItem>
-                      <SelectItem value="Restart">Restart</SelectItem>
-                      <SelectItem value="Kill">Kill</SelectItem>
+                      <SelectItem value="Start">
+                        {t("shared.instance.events.action.start")}
+                      </SelectItem>
+                      <SelectItem value="Stop">
+                        {t("shared.instance.events.action.stop")}
+                      </SelectItem>
+                      <SelectItem value="Restart">
+                        {t("shared.instance.events.action.restart")}
+                      </SelectItem>
+                      <SelectItem value="Kill">
+                        {t("shared.instance.events.action.kill")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 ) : null}
