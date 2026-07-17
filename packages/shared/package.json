@@ -20,7 +20,7 @@
     "eslint-plugin-prettier": "^5.5.5",
     "prettier": "^3.8.1",
     "rsbuild-plugin-svg": "^0.0.2",
-    "sass": "^1.97.3",
+    "sass": "^1.101.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {
