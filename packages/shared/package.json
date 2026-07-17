@@ -35,7 +35,7 @@
     "floating-vue": "^5.2.2",
     "jszip": "^3.10.1",
     "nbt-parser": "^1.0.2",
-    "pinia": "^3.0.4",
+    "pinia": "^4.0.2",
     "pinyin-pro": "^3.28.0",
     "vue": "^3.5.28",
     "vue-chartjs": "^5.3.3",
