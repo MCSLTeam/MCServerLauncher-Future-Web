@@ -18,7 +18,7 @@
     "animate.css": "^4.1.1",
     "dayjs": "^1.11.19",
     "floating-vue": "^5.2.2",
-    "focus-trap": "^8.0.0",
+    "focus-trap": "^8.2.2",
     "lodash": "^4.17.23",
     "markdown-it": "^14.1.1",
     "mime": "^4.1.0",
