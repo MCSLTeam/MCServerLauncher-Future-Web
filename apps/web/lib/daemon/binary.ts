@@ -1,73 +1,134 @@
-/** .NET Guid.TryWriteBytes 混合端序布局 */
-export function guidToBytes(uuid: string): Uint8Array {
+/** MCSL Future Protocol V2 binary frames (32-byte header + payload). */
+
+export const BINARY_FRAME_HEADER_SIZE = 32;
+export const BINARY_FRAME_VERSION = 1;
+export const BINARY_FRAME_KIND_UPLOAD = 1;
+export const BINARY_FRAME_KIND_DOWNLOAD = 2;
+export const DEFAULT_MAX_CHUNK_SIZE = 1024 * 1024;
+
+export type BinaryFrameKind =
+  | typeof BINARY_FRAME_KIND_UPLOAD
+  | typeof BINARY_FRAME_KIND_DOWNLOAD;
+
+export type BinaryFrameHeader = {
+  version: number;
+  kind: BinaryFrameKind;
+  sessionId: string;
+  offset: number;
+  payloadLength: number;
+};
+
+/** RFC 4122 UUID string → 16 big-endian bytes (matches .NET Guid bigEndian:true). */
+export function guidToBytesBigEndian(uuid: string): Uint8Array {
   const hex = uuid.replace(/-/g, "").toLowerCase();
-  if (hex.length !== 32) {
+  if (hex.length !== 32 || !/^[0-9a-f]+$/.test(hex)) {
     throw new Error(`Invalid UUID: ${uuid}`);
   }
   const bytes = new Uint8Array(16);
-  // Data1 LE
-  bytes[0] = Number.parseInt(hex.slice(6, 8), 16);
-  bytes[1] = Number.parseInt(hex.slice(4, 6), 16);
-  bytes[2] = Number.parseInt(hex.slice(2, 4), 16);
-  bytes[3] = Number.parseInt(hex.slice(0, 2), 16);
-  // Data2 LE
-  bytes[4] = Number.parseInt(hex.slice(10, 12), 16);
-  bytes[5] = Number.parseInt(hex.slice(8, 10), 16);
-  // Data3 LE
-  bytes[6] = Number.parseInt(hex.slice(14, 16), 16);
-  bytes[7] = Number.parseInt(hex.slice(12, 14), 16);
-  // Data4 BE
-  for (let i = 0; i < 8; i += 1) {
-    bytes[8 + i] = Number.parseInt(hex.slice(16 + i * 2, 18 + i * 2), 16);
+  for (let i = 0; i < 16; i += 1) {
+    bytes[i] = Number.parseInt(hex.slice(i * 2, i * 2 + 2), 16);
   }
   return bytes;
 }
 
-export function bytesToGuid(bytes: Uint8Array): string {
+export function bytesToGuidBigEndian(bytes: Uint8Array): string {
   if (bytes.length < 16) throw new Error("GUID bytes too short");
   const h = (n: number) => n.toString(16).padStart(2, "0");
-  const data1 = [bytes[3], bytes[2], bytes[1], bytes[0]].map(h).join("");
-  const data2 = [bytes[5], bytes[4]].map(h).join("");
-  const data3 = [bytes[7], bytes[6]].map(h).join("");
-  const data4a = [bytes[8], bytes[9]].map(h).join("");
-  const data4b = Array.from(bytes.slice(10, 16)).map(h).join("");
-  return `${data1}-${data2}-${data3}-${data4a}-${data4b}`;
+  const parts = Array.from(bytes.subarray(0, 16)).map(h).join("");
+  return `${parts.slice(0, 8)}-${parts.slice(8, 12)}-${parts.slice(12, 16)}-${parts.slice(16, 20)}-${parts.slice(20, 32)}`;
 }
 
-export async function sha1Hex(data: ArrayBuffer | ArrayBufferView): Promise<string> {
+export async function sha256Hex(
+  data: ArrayBuffer | ArrayBufferView,
+): Promise<string> {
   const buffer =
     data instanceof ArrayBuffer
       ? data
       : data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
-  const digest = await crypto.subtle.digest("SHA-1", buffer as ArrayBuffer);
+  const digest = await crypto.subtle.digest("SHA-256", buffer as ArrayBuffer);
   return Array.from(new Uint8Array(digest))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 }
 
-export async function sha1Bytes(
-  data: ArrayBuffer | ArrayBufferView,
-): Promise<Uint8Array> {
-  const buffer =
-    data instanceof ArrayBuffer
-      ? data
-      : data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
-  return new Uint8Array(await crypto.subtle.digest("SHA-1", buffer as ArrayBuffer));
+export function buildBinaryFrame(
+  kind: BinaryFrameKind,
+  sessionId: string,
+  offset: number,
+  payload: Uint8Array,
+  maximumChunkSize = DEFAULT_MAX_CHUNK_SIZE,
+): Uint8Array {
+  if (offset < 0) throw new Error("Binary frame offset cannot be negative");
+  if (payload.byteLength > maximumChunkSize) {
+    throw new Error(
+      `Binary frame payload exceeds maximum chunk size ${maximumChunkSize}`,
+    );
+  }
+  const frame = new Uint8Array(BINARY_FRAME_HEADER_SIZE + payload.byteLength);
+  frame[0] = BINARY_FRAME_VERSION;
+  frame[1] = kind;
+  frame[2] = 0;
+  frame[3] = 0;
+  frame.set(guidToBytesBigEndian(sessionId), 4);
+  const view = new DataView(frame.buffer);
+  view.setBigInt64(20, BigInt(offset), true);
+  view.setUint32(28, payload.byteLength, true);
+  frame.set(payload, BINARY_FRAME_HEADER_SIZE);
+  return frame;
 }
 
-/** 构造二进制上传帧: [16 Guid][8 offset LE][20 SHA1][data] */
-export function buildBinaryUploadFrame(
-  fileId: string,
-  offset: number,
-  chunk: Uint8Array,
-  checksum: Uint8Array,
-): Uint8Array {
-  const payload = new Uint8Array(16 + 8 + 20 + chunk.byteLength);
-  payload.set(guidToBytes(fileId), 0);
-  const view = new DataView(payload.buffer);
-  // BitConverter little-endian
-  view.setBigInt64(16, BigInt(offset), true);
-  payload.set(checksum, 24);
-  payload.set(chunk, 44);
-  return payload;
+export function tryReadBinaryFrame(
+  frame: ArrayBuffer | ArrayBufferView,
+  maximumChunkSize = DEFAULT_MAX_CHUNK_SIZE,
+):
+  | { ok: true; header: BinaryFrameHeader; payload: Uint8Array }
+  | { ok: false; error: string } {
+  const bytes =
+    frame instanceof ArrayBuffer
+      ? new Uint8Array(frame)
+      : new Uint8Array(frame.buffer, frame.byteOffset, frame.byteLength);
+
+  if (bytes.byteLength < BINARY_FRAME_HEADER_SIZE) {
+    return { ok: false, error: "frame_too_short" };
+  }
+  if (bytes[0] !== BINARY_FRAME_VERSION) {
+    return { ok: false, error: "unsupported_version" };
+  }
+  const kind = bytes[1] as BinaryFrameKind;
+  if (kind !== BINARY_FRAME_KIND_UPLOAD && kind !== BINARY_FRAME_KIND_DOWNLOAD) {
+    return { ok: false, error: "unknown_kind" };
+  }
+  if (bytes[2] !== 0 || bytes[3] !== 0) {
+    return { ok: false, error: "reserved_not_zero" };
+  }
+
+  const sessionId = bytesToGuidBigEndian(bytes.subarray(4, 20));
+  if (sessionId === "00000000-0000-0000-0000-000000000000") {
+    return { ok: false, error: "empty_session_id" };
+  }
+
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const offset = Number(view.getBigInt64(20, true));
+  if (offset < 0) return { ok: false, error: "negative_offset" };
+
+  const payloadLength = view.getUint32(28, true);
+  const actualPayloadLength = bytes.byteLength - BINARY_FRAME_HEADER_SIZE;
+  if (payloadLength !== actualPayloadLength) {
+    return { ok: false, error: "payload_length_mismatch" };
+  }
+  if (payloadLength > maximumChunkSize) {
+    return { ok: false, error: "payload_too_large" };
+  }
+
+  return {
+    ok: true,
+    header: {
+      version: BINARY_FRAME_VERSION,
+      kind,
+      sessionId,
+      offset,
+      payloadLength,
+    },
+    payload: bytes.subarray(BINARY_FRAME_HEADER_SIZE),
+  };
 }

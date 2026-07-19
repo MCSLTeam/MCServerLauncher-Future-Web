@@ -95,7 +95,7 @@ export function summarizeDestinations(destinations: DownloadDestination[]) {
 /**
  * 资源下载管理器（对齐 WPF DownloadManager + 多目的地）。
  * - local：Tauri Save 对话框 / 浏览器 File System Access / a[download]
- * - daemon：经同源代理取文件 → file_upload_* 推到各节点 caches/downloads/
+ * - daemon：经同源代理取文件 → mcsl.file.upload.* 推到各节点 caches/downloads/
  */
 class DownloadManager {
   private tasks: DownloadTask[] = [];
