@@ -66,14 +66,20 @@ function normalizeRule(item: unknown): EventRule {
     id: String(r.id ?? r.Id ?? newId()),
     name: String(r.name ?? r.Name ?? ""),
     description: String(r.description ?? r.Description ?? ""),
-    isEnabled: Boolean(r.isEnabled ?? r.IsEnabled ?? true),
+    isEnabled: Boolean(r.is_enabled ?? r.isEnabled ?? r.IsEnabled ?? true),
     triggerCondition:
-      String(r.triggerCondition ?? r.TriggerCondition ?? "Any") === "All"
+      String(
+        r.trigger_condition ?? r.triggerCondition ?? r.TriggerCondition ?? "Any",
+      ) === "All"
         ? "All"
         : "Any",
     actionExecutionMode:
-      String(r.actionExecutionMode ?? r.ActionExecutionMode ?? "Sequential") ===
-      "Parallel"
+      String(
+        r.action_execution_mode ??
+          r.actionExecutionMode ??
+          r.ActionExecutionMode ??
+          "Sequential",
+      ) === "Parallel"
         ? "Parallel"
         : "Sequential",
     triggers: normalizeTriggers(r.triggers ?? r.Triggers),
@@ -92,21 +98,25 @@ function normalizeTriggers(raw: unknown): EventTrigger[] {
       return {
         id,
         type: "Schedule" as const,
-        cronExpression: String(t.cronExpression ?? t.CronExpression ?? ""),
+        cronExpression: String(
+          t.cron_expression ?? t.cronExpression ?? t.CronExpression ?? "",
+        ),
       };
     }
     if (type === "InstanceStatus") {
       return {
         id,
         type: "InstanceStatus" as const,
-        targetStatus: String(t.targetStatus ?? t.TargetStatus ?? "Running"),
+        targetStatus: String(
+          t.target_status ?? t.targetStatus ?? t.TargetStatus ?? "Running",
+        ),
       };
     }
     return {
       id,
       type: "ConsoleOutput" as const,
       pattern: String(t.pattern ?? t.Pattern ?? ""),
-      isRegex: Boolean(t.isRegex ?? t.IsRegex ?? false),
+      isRegex: Boolean(t.is_regex ?? t.isRegex ?? t.IsRegex ?? false),
     };
   });
 }
@@ -124,7 +134,9 @@ function normalizeRulesets(raw: unknown): EventRuleset[] {
       return {
         id,
         type: "InstanceStatus" as const,
-        targetStatus: String(t.targetStatus ?? t.TargetStatus ?? "Running"),
+        targetStatus: String(
+          t.target_status ?? t.targetStatus ?? t.TargetStatus ?? "Running",
+        ),
       };
     }
     return { id, type: "AlwaysTrue" as const };
@@ -161,35 +173,38 @@ function normalizeActions(raw: unknown): EventAction[] {
   });
 }
 
-/** Wire shape for daemon STJ (PascalCase-friendly fields, type discriminators) */
+/**
+ * Wire shape for Protocol V2 STJ (SnakeCaseLower property names).
+ * Discriminator `type` values stay PascalCase strings as in Contracts.
+ */
 export function toWireRules(rules: EventRule[]): unknown[] {
   return rules.map((rule) => ({
     id: rule.id,
     name: rule.name,
     description: rule.description,
-    isEnabled: rule.isEnabled,
-    triggerCondition: rule.triggerCondition,
-    actionExecutionMode: rule.actionExecutionMode,
+    is_enabled: rule.isEnabled,
+    trigger_condition: rule.triggerCondition,
+    action_execution_mode: rule.actionExecutionMode,
     triggers: rule.triggers.map((trigger) => {
       if (trigger.type === "ConsoleOutput") {
         return {
           id: trigger.id,
           type: "ConsoleOutput",
           pattern: trigger.pattern,
-          isRegex: trigger.isRegex,
+          is_regex: trigger.isRegex,
         };
       }
       if (trigger.type === "Schedule") {
         return {
           id: trigger.id,
           type: "Schedule",
-          cronExpression: trigger.cronExpression,
+          cron_expression: trigger.cronExpression,
         };
       }
       return {
         id: trigger.id,
         type: "InstanceStatus",
-        targetStatus: trigger.targetStatus,
+        target_status: trigger.targetStatus,
       };
     }),
     rulesets: rule.rulesets.map((rs) => {
@@ -197,7 +212,7 @@ export function toWireRules(rules: EventRule[]): unknown[] {
         return {
           id: rs.id,
           type: "InstanceStatus",
-          targetStatus: rs.targetStatus,
+          target_status: rs.targetStatus,
         };
       }
       return { id: rs.id, type: rs.type };
