@@ -65,6 +65,28 @@ export function formatUnixSeconds(seconds?: number): string {
   }
 }
 
+/**
+ * Daemon file meta times are ISO-8601 DateTimeOffset strings.
+ * WPF converts to Unix seconds client-side; web previously used Number(iso) → NaN.
+ */
+export function parseDaemonTimestamp(value: unknown): number | undefined {
+  if (value == null) return undefined;
+  if (typeof value === "number" && Number.isFinite(value) && value > 0) {
+    // Heuristic: ms since epoch vs seconds.
+    return value > 1e12 ? Math.floor(value / 1000) : Math.floor(value);
+  }
+  const text = String(value).trim();
+  if (!text) return undefined;
+  if (/^\d+(\.\d+)?$/.test(text)) {
+    const numeric = Number(text);
+    if (!Number.isFinite(numeric) || numeric <= 0) return undefined;
+    return numeric > 1e12 ? Math.floor(numeric / 1000) : Math.floor(numeric);
+  }
+  const ms = Date.parse(text);
+  if (!Number.isFinite(ms) || ms <= 0) return undefined;
+  return Math.floor(ms / 1000);
+}
+
 export function playerDisplayName(player: unknown): string {
   if (player == null) return "—";
   if (typeof player === "string") return player;

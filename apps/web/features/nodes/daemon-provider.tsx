@@ -51,7 +51,7 @@ type DaemonContextValue = {
   instances: DaemonLiveInstance[];
   refreshing: boolean;
   getStatus: (nodeId: string) => NodeStatus;
-  /** 连接已保存节点；成功条件与 WPF 一致：WS + get_system_info */
+  /** 连接已保存节点；成功条件与 WPF 一致：WS + mcsl.system.info.get */
   connectNode: (
     nodeId: string,
     options?: ConnectOptions,
@@ -64,7 +64,7 @@ type DaemonContextValue = {
   refreshInstances: () => Promise<void>;
   /**
    * 对齐添加前探测：不落盘。
-   * 先可选 HTTP /info，再 WS ping + get_system_info。
+   * 先可选 HTTP /info，再 WS ping + mcsl.system.info.get。
    */
   testNode: (
     input: Credentials,
@@ -99,7 +99,7 @@ type DaemonContextValue = {
     instanceId: string,
   ) => Promise<{ ok: boolean; logs?: string[]; message?: string }>;
   /**
-   * 订阅 instance_log 实时推送。cleanup 会 unsubscribe + 移除监听。
+   * 订阅 mcsl.event.instance.log 实时推送。cleanup 会 unsubscribe + 移除监听。
    * 对齐 WPF InstanceDataManager.SubscribeEvent(InstanceLog)。
    */
   subscribeInstanceLog: (
@@ -107,7 +107,7 @@ type DaemonContextValue = {
     instanceId: string,
     onLog: (line: string) => void,
   ) => Promise<{ ok: boolean; unsubscribe?: () => void; message?: string }>;
-  /** 刷新单个实例 report（对齐 WPF 2s get_instance_report） */
+  /** 刷新单个实例 report（对齐 WPF 2s mcsl.instance.report.get） */
   refreshInstanceReport: (
     nodeId: string,
     instanceId: string,
@@ -174,7 +174,9 @@ function reportToLive(
   report: DaemonInstanceReport,
 ): DaemonLiveInstance {
   const config = report.config ?? {};
-  const uuid = String(config.uuid ?? id);
+  const uuid = String(config.instance_id ?? config.uuid ?? id);
+  const version = config.version ?? config.mc_version;
+  const perf = report.performance_counter ?? {};
   return {
     id: uuid,
     nodeId: node.id,
@@ -182,9 +184,9 @@ function reportToLive(
     name: String(config.name ?? uuid),
     status: mapDaemonStatus(report.status),
     type: String(config.instance_type ?? "universal"),
-    gameVersion: config.mc_version ? String(config.mc_version) : undefined,
-    cpu: report.performance_counter?.cpu,
-    memory: report.performance_counter?.memory,
+    gameVersion: version ? String(version) : undefined,
+    cpu: perf.cpu,
+    memory: perf.memory_bytes ?? perf.memoryBytes ?? perf.memory,
     raw: report,
   };
 }
@@ -303,7 +305,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
 
   /**
    * 对齐 ConnectDaemonInternalAsync：
-   * 打开连接 → get_system_info 成功才算 ok。
+   * 打开连接 → mcsl.system.info.get 成功才算 ok。
    */
   const connectNode = useCallback(
     async (nodeId: string, options?: ConnectOptions) => {

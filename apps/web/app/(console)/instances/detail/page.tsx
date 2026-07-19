@@ -62,6 +62,7 @@ import {
 } from "@/features/console/event-types";
 import {
   appendLogLines,
+  parseDaemonTimestamp,
   playerDisplayName,
 } from "@/features/console/log-utils";
 import {
@@ -423,9 +424,9 @@ function InstanceDetailInner() {
           return {
             name: String(item.name ?? item.Name ?? ""),
             kind: "dir" as const,
-            modified: Number(
-              meta.last_write_time ?? meta.LastWriteTime ?? 0,
-            ) || undefined,
+            modified: parseDaemonTimestamp(
+              meta.last_write_time ?? meta.LastWriteTime,
+            ),
           };
         }),
         ...files.map((item) => {
@@ -437,9 +438,9 @@ function InstanceDetailInner() {
             name: String(item.name ?? item.Name ?? ""),
             kind: "file" as const,
             size: Number(meta.size ?? meta.Size ?? 0) || undefined,
-            modified: Number(
-              meta.last_write_time ?? meta.LastWriteTime ?? 0,
-            ) || undefined,
+            modified: parseDaemonTimestamp(
+              meta.last_write_time ?? meta.LastWriteTime,
+            ),
           };
         }),
       ].filter((item) => item.name);
@@ -489,7 +490,7 @@ function InstanceDetailInner() {
         ? (fallback.arguments as string[])
         : [];
       setSettingsArgs(fbArgs);
-      setSettingsVersion(String(fallback.mc_version ?? ""));
+      setSettingsVersion(String(fallback.version ?? fallback.mc_version ?? ""));
       setSettingsType(normalizeInstanceType(String(fallback.instance_type ?? instance?.type ?? "universal")));
       setSettingsTarget(String(fallback.target ?? ""));
       setSettingsForceRerun(false);
@@ -498,7 +499,7 @@ function InstanceDetailInner() {
           name: String(fallback.name ?? instance?.name ?? ""),
           java: String(fallback.java_path ?? ""),
           args: fbArgs,
-          version: String(fallback.mc_version ?? ""),
+          version: String(fallback.version ?? fallback.mc_version ?? ""),
           type: normalizeInstanceType(String(fallback.instance_type ?? instance?.type ?? "universal")),
           force: false,
         }),
@@ -519,7 +520,7 @@ function InstanceDetailInner() {
     const args = Array.isArray(argsRaw) ? argsRaw.map(String) : [];
     setSettingsArgs(args);
     setSettingsVersion(
-      String(config.mc_version ?? config.version ?? config.Version ?? ""),
+      String(config.version ?? config.Version ?? config.mc_version ?? ""),
     );
     const nextType = normalizeInstanceType(
       String(
@@ -546,7 +547,7 @@ function InstanceDetailInner() {
         name: String(config.name ?? instance?.name ?? ""),
         java: String(config.java_path ?? config.JavaPath ?? ""),
         args,
-        version: String(config.mc_version ?? config.version ?? config.Version ?? ""),
+        version: String(config.version ?? config.Version ?? config.mc_version ?? ""),
         type: nextType,
         force: false,
       }),
