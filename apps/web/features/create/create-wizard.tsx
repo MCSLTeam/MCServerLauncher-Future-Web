@@ -82,7 +82,7 @@ import {
   tryValidateLoaderVersion,
   tryValidateLocalJarFile,
 } from "@/lib/create/validation";
-import { listNodes, nodeAddress } from "@/lib/nodes-store";
+import { hydrateNodes, listNodes, nodeAddress } from "@/lib/nodes-store";
 import type { SavedNode } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -150,7 +150,13 @@ export function CreateWizard() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    queueMicrotask(() => setNodes(listNodes()));
+    let cancelled = false;
+    void hydrateNodes().then((items) => {
+      if (!cancelled) setNodes(items);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const selectedNode = useMemo(

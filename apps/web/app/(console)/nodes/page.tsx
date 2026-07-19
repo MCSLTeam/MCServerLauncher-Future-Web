@@ -73,7 +73,8 @@ import { cn } from "@/lib/utils";
 const emptyForm: NodeInput = {
   name: "",
   host: "",
-  port: "11451",
+  // 默认指向 MCSL Future Daemon（Web API 自己是 11451）
+  port: "11452",
   secure: false,
   token: "",
   visibility: "all",

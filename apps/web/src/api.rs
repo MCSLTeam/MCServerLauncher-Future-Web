@@ -204,6 +204,47 @@ pub async fn api_account_login(
     }
 }
 
+fn is_loopback_ip(ip: &str) -> bool {
+    ip == "127.0.0.1"
+        || ip == "::1"
+        || ip == "localhost"
+        || ip == "unknown"
+        || ip.starts_with("127.")
+        || ip.starts_with(":ffff:127.")
+}
+
+/// Tauri / 本机桌面启动时用：仅本机可拿会话，跳过登录页但保留节点 API 权限。
+#[post("/account/desktop-session")]
+pub async fn api_account_desktop_session(http_request: HttpRequest) -> impl Responder {
+    let ip = get_client_ip(&http_request);
+    if !is_loopback_ip(&ip) {
+        return HttpResponse::Forbidden().json(FailedResponse {
+            status: "failed",
+            err: "permission-denied",
+        });
+    }
+
+    let username = match crate::user::ensure_desktop_admin_username() {
+        Ok(username) => username,
+        Err(res) => return res,
+    };
+
+    let user_agent = http_request
+        .headers()
+        .get("User-Agent")
+        .and_then(|value| value.to_str().ok())
+        .unwrap_or("mcsl-desktop")
+        .to_string();
+
+    match create_session(&username, true, ip, user_agent) {
+        Ok(token) => HttpResponse::Ok().json(SuccessResponse {
+            status: "success",
+            data: token,
+        }),
+        Err(res) => res,
+    }
+}
+
 #[get("/account/should-register")]
 pub async fn api_account_should_register() -> impl Responder {
     let is_user_empty = match is_user_empty() {

@@ -1,6 +1,9 @@
 use crate::api::FailedResponse;
 use crate::token::delete_token_by_username;
-use crate::utils::{acquire_read_lock, acquire_write_lock, current_time, permission_match, sha256};
+use crate::utils::{
+    acquire_read_lock, acquire_write_lock, current_time, generate_random_string, permission_match,
+    sha256,
+};
 use crate::MAIN_DIR_NAME;
 use actix_web::HttpResponse;
 use log::{error, info};
@@ -171,6 +174,41 @@ pub fn is_user_empty() -> Result<bool, HttpResponse> {
         .as_ref()
         .expect("Users cache not initialized")
         .is_empty())
+}
+
+/// 供桌面端本地会话：优先返回具备 `*` 或 node.manage 的用户名。
+pub fn find_local_admin_username() -> Result<Option<String>, HttpResponse> {
+    let users = get_users()?;
+    if users.is_empty() {
+        return Ok(None);
+    }
+    for user in &users {
+        if user.verify_permission("*").unwrap_or(false)
+            || user
+                .verify_permission(crate::nodes::PERM_NODE_MANAGE)
+                .unwrap_or(false)
+        {
+            return Ok(Some(user.username.clone()));
+        }
+    }
+    Ok(Some(users[0].username.clone()))
+}
+
+/// 确保存在可管理节点的本地用户；没有用户时创建 `desktop` 管理员。
+pub fn ensure_desktop_admin_username() -> Result<String, HttpResponse> {
+    if let Some(username) = find_local_admin_username()? {
+        return Ok(username);
+    }
+    add_user(UserInput {
+        username: "desktop".to_string(),
+        password: generate_random_desktop_password(),
+        permissions: vec!["*".to_string()],
+    })?;
+    Ok("desktop".to_string())
+}
+
+fn generate_random_desktop_password() -> String {
+    generate_random_string(32)
 }
 
 pub fn get_users() -> Result<Vec<User>, HttpResponse> {
