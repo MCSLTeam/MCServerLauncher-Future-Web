@@ -1,41 +1,59 @@
 import {
-  buildBinaryUploadFrame,
-  sha1Bytes,
-  sha1Hex,
+  BINARY_FRAME_KIND_DOWNLOAD,
+  BINARY_FRAME_KIND_UPLOAD,
+  buildBinaryFrame,
+  sha256Hex,
+  tryReadBinaryFrame,
 } from "@/lib/daemon/binary";
+import { toDaemonPath } from "@/features/console/virtual-path";
 import { tKey } from "@/lib/i18n/translate";
 import {
-  type DaemonActionResponse,
   type DaemonAddInstanceResult,
-  type DaemonBinaryUploadResponse,
-  type DaemonFileUploadRequestResult,
+  type DaemonDownloadReadResult,
+  type DaemonDownloadSession,
   type DaemonInstanceConfig,
   type DaemonInstanceReport,
   type DaemonJavaListResult,
   type DaemonSystemInfo,
+  type DaemonUploadSession,
   type InstanceFactorySettingPayload,
   type JavaInfo,
+  type JsonRpcErrorObject,
+  V2_EVENTS,
+  V2_METHODS,
+  V2_UPLOAD_ACK_METHOD,
   wsUrl,
 } from "@/lib/daemon/types";
 
-type Pending = {
-  resolve: (value: DaemonActionResponse) => void;
+type PendingRpc = {
+  resolve: (value: unknown) => void;
   reject: (error: Error) => void;
   timer: ReturnType<typeof setTimeout>;
 };
 
-type PendingBinary = {
-  resolve: (value: { done: boolean; received: number }) => void;
+type PendingUploadAck = {
+  resolve: () => void;
   reject: (error: Error) => void;
   timer: ReturnType<typeof setTimeout>;
+  offset: number;
+  length: number;
 };
 
-/** Daemon 主动推送事件（见 protocol topics/event.md） */
+type PendingDownloadChunk = {
+  resolve: (payload: Uint8Array) => void;
+  reject: (error: Error) => void;
+  timer: ReturnType<typeof setTimeout>;
+  offset: number;
+  length: number;
+};
+
+/** Daemon 主动推送事件（V2 JSON-RPC notification method = event name） */
 export type DaemonEventPacket = {
   event: string;
   meta?: Record<string, unknown> | null;
   data?: Record<string, unknown> | null;
   time?: number;
+  sequence?: number;
 };
 
 export type DaemonEventListener = (packet: DaemonEventPacket) => void;
@@ -60,27 +78,19 @@ export type UploadProgress = {
 };
 
 /**
- * MCSL Future Daemon WebSocket action 客户端。
- * 协议：ws(s)://host:port/api/v1?token=...
- * 请求：{ action, params, id }  响应：{ status, retcode, data, message, id }
+ * MCSL Future Daemon WebSocket 客户端（Protocol V2）。
+ * 协议：ws(s)://host:port/api/v2?token=...
+ * 请求：{ jsonrpc:"2.0", id, method, params }
+ * 响应：{ jsonrpc:"2.0", id, result } | { jsonrpc:"2.0", id, error }
+ * 事件：{ jsonrpc:"2.0", method:"mcsl.event.*", params:{ sequence, timestamp, data?, meta? } }
+ * 上传确认：{ jsonrpc:"2.0", method:"mcsl.file.upload.ack", params:{...} }
+ * 二进制：32-byte V2 frame header + payload
  */
-
-/** Reverse Encoding.BigEndianUnicode.GetString used by file_download_range. */
-function bigEndianUnicodeToBytes(content: string, byteLength: number): Uint8Array {
-  const out = new Uint8Array(byteLength);
-  let o = 0;
-  for (let i = 0; i < content.length && o < byteLength; i++) {
-    const c = content.charCodeAt(i);
-    if (o < byteLength) out[o++] = (c >> 8) & 0xff;
-    if (o < byteLength) out[o++] = c & 0xff;
-  }
-  return out;
-}
-
 export class DaemonClient {
   private socket: WebSocket | null = null;
-  private pending = new Map<string, Pending>();
-  private pendingBinary = new Map<string, PendingBinary>();
+  private pending = new Map<string, PendingRpc>();
+  private pendingUploadAcks = new Map<string, PendingUploadAck>();
+  private pendingDownloadChunks = new Map<string, PendingDownloadChunk>();
   private eventListeners = new Set<DaemonEventListener>();
   private closedByUser = false;
   private readonly timeoutMs: number;
@@ -119,6 +129,7 @@ export class DaemonClient {
     return new Promise((resolve, reject) => {
       let settled = false;
       const socket = new WebSocket(url);
+      socket.binaryType = "arraybuffer";
       this.socket = socket;
 
       socket.onopen = () => {
@@ -168,7 +179,7 @@ export class DaemonClient {
   }
 
   async request<T = unknown>(
-    action: string,
+    method: string,
     params: Record<string, unknown> | null = {},
     timeoutMs?: number,
   ): Promise<T> {
@@ -177,63 +188,64 @@ export class DaemonClient {
     }
     const id = crypto.randomUUID();
     const payload = {
-      action,
-      params: params ?? {},
+      jsonrpc: "2.0",
       id,
+      method,
+      params: params ?? {},
     };
     const timeout = timeoutMs ?? this.timeoutMs;
 
-    const response = await new Promise<DaemonActionResponse>(
-      (resolve, reject) => {
-        const timer = setTimeout(() => {
-          this.pending.delete(id);
-          reject(new Error(tKey("shared.daemon.error.request-timeout", { action })));
-        }, timeout);
-        this.pending.set(id, { resolve, reject, timer });
-        try {
-          this.socket!.send(JSON.stringify(payload));
-        } catch (error) {
-          clearTimeout(timer);
-          this.pending.delete(id);
-          reject(error instanceof Error ? error : new Error(String(error)));
-        }
-      },
-    );
+    const result = await new Promise<unknown>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        this.pending.delete(id);
+        reject(
+          new Error(
+            tKey("shared.daemon.error.request-timeout", { action: method }),
+          ),
+        );
+      }, timeout);
+      this.pending.set(id, { resolve, reject, timer });
+      try {
+        this.socket!.send(JSON.stringify(payload));
+      } catch (error) {
+        clearTimeout(timer);
+        this.pending.delete(id);
+        reject(error instanceof Error ? error : new Error(String(error)));
+      }
+    });
 
-    if (response.status !== "ok" || response.retcode !== 0) {
-      throw new Error(response.message || tKey("shared.daemon.error.action-failed", { action }));
-    }
-    return response.data as T;
+    return result as T;
   }
 
   ping() {
-    return this.request<{ time?: number }>("ping", {});
+    return this.request<{ time?: number }>(V2_METHODS.ping, {});
   }
 
   getSystemInfo() {
-    return this.request<{ info?: DaemonSystemInfo } | DaemonSystemInfo>(
-      "get_system_info",
-      {},
-    );
+    return this.request<DaemonSystemInfo>(V2_METHODS.systemInfo, {});
   }
 
   getAllReports() {
     return this.request<{ reports?: Record<string, DaemonInstanceReport> }>(
-      "get_all_reports",
+      V2_METHODS.listReports,
       {},
     );
   }
 
   /**
-   * 订阅 Daemon 事件。instance_log 需 meta: { instance_id }。
-   * type 使用 snake_case（与协议文档一致）。
+   * 订阅 Daemon 事件。instance log 需 meta: { instance_id }。
+   * event 使用 catalog 全名（如 mcsl.event.instance.log）。
    */
   subscribeEvent(type: string, meta: Record<string, unknown> | null = null) {
-    return this.request("subscribe_event", { type, meta });
+    const params: Record<string, unknown> = { event: type };
+    if (meta != null) params.meta = meta;
+    return this.request(V2_METHODS.subscribe, params);
   }
 
   unsubscribeEvent(type: string, meta: Record<string, unknown> | null = null) {
-    return this.request("unsubscribe_event", { type, meta });
+    const params: Record<string, unknown> = { event: type };
+    if (meta != null) params.meta = meta;
+    return this.request(V2_METHODS.unsubscribe, params);
   }
 
   /** 订阅某实例实时日志推送；返回清理函数（取消订阅 + 移除监听） */
@@ -243,40 +255,42 @@ export class DaemonClient {
   ): Promise<() => void> {
     const meta = { instance_id: instanceId };
     const off = this.onEvent((packet) => {
-      if (packet.event !== "instance_log") return;
+      if (packet.event !== V2_EVENTS.instanceLog && packet.event !== "instance_log") {
+        return;
+      }
       const packetMeta = packet.meta ?? {};
       const mid = String(
         packetMeta.instance_id ?? packetMeta.InstanceId ?? "",
       );
       if (mid && mid !== instanceId) return;
       const data = packet.data ?? {};
-      const line = data.log ?? data.Log;
+      const line = data.log ?? data.Log ?? data.line ?? data.Line;
       if (line == null) return;
       onLog(String(line));
     });
     try {
-      await this.subscribeEvent("instance_log", meta);
+      await this.subscribeEvent(V2_EVENTS.instanceLog, meta);
     } catch (error) {
       off();
       throw error;
     }
     return () => {
       off();
-      void this.unsubscribeEvent("instance_log", meta).catch(() => {
+      void this.unsubscribeEvent(V2_EVENTS.instanceLog, meta).catch(() => {
         // 连接已断时忽略
       });
     };
   }
 
   getInstanceReport(id: string) {
-    return this.request<
-      { report?: DaemonInstanceReport } | DaemonInstanceReport
-    >("get_instance_report", { id });
+    return this.request<DaemonInstanceReport>(V2_METHODS.getReport, {
+      instance_id: id,
+    });
   }
 
   getInstanceLogHistory(id: string) {
-    return this.request<{ logs?: string[] }>("get_instance_log_history", {
-      id,
+    return this.request<{ logs?: string[] }>(V2_METHODS.getLog, {
+      instance_id: id,
     });
   }
 
@@ -284,11 +298,29 @@ export class DaemonClient {
     return this.request<{
       parent?: string | null;
       Parent?: string | null;
-      files?: Array<{ name?: string; Name?: string; meta?: { size?: number; Size?: number } }>;
-      Files?: Array<{ name?: string; Name?: string; meta?: { size?: number; Size?: number } }>;
+      files?: Array<{
+        name?: string;
+        Name?: string;
+        meta?: {
+          size?: number;
+          Size?: number;
+          last_write_time?: string | number;
+          LastWriteTime?: string | number;
+        };
+      }>;
+      Files?: Array<{
+        name?: string;
+        Name?: string;
+        meta?: {
+          size?: number;
+          Size?: number;
+          last_write_time?: string | number;
+          LastWriteTime?: string | number;
+        };
+      }>;
       directories?: Array<{ name?: string; Name?: string }>;
       Directories?: Array<{ name?: string; Name?: string }>;
-    }>("get_directory_info", { path });
+    }>(V2_METHODS.directoryInfo, { path: toDaemonPath(path) });
   }
 
   getInstanceSettings(id: string) {
@@ -303,40 +335,52 @@ export class DaemonClient {
       CanEdit?: boolean;
       edit_blocked_reason?: string | null;
       EditBlockedReason?: string | null;
-    }>("get_instance_settings", { id });
+    }>(V2_METHODS.getSettings, { instance_id: id });
   }
 
   getEventRules(instanceId: string) {
-    return this.request<{ rules?: unknown[] } | unknown[]>("get_event_rules", {
-      instance_id: instanceId,
-    });
+    return this.request<{ rules?: unknown; instance_id?: string }>(
+      V2_METHODS.getEventRules,
+      { instance_id: instanceId },
+    );
   }
 
   saveEventRules(instanceId: string, rules: unknown[]) {
-    return this.request("save_event_rules", {
+    return this.request(V2_METHODS.updateEventRules, {
       instance_id: instanceId,
       rules,
     });
   }
 
   createDirectory(path: string) {
-    return this.request("create_directory", { path });
+    return this.request(V2_METHODS.createDirectory, {
+      path: toDaemonPath(path),
+    });
   }
 
   deleteFile(path: string) {
-    return this.request("delete_file", { path });
+    return this.request(V2_METHODS.deleteFile, { path: toDaemonPath(path) });
   }
 
   deleteDirectory(path: string, recursive = true) {
-    return this.request("delete_directory", { path, recursive });
+    return this.request(V2_METHODS.deleteDirectory, {
+      path: toDaemonPath(path),
+      recursive,
+    });
   }
 
   renameFile(path: string, newName: string) {
-    return this.request("rename_file", { path, new_name: newName });
+    return this.request(V2_METHODS.renameFile, {
+      path: toDaemonPath(path),
+      new_name: newName,
+    });
   }
 
   renameDirectory(path: string, newName: string) {
-    return this.request("rename_directory", { path, new_name: newName });
+    return this.request(V2_METHODS.renameDirectory, {
+      path: toDaemonPath(path),
+      new_name: newName,
+    });
   }
 
   updateInstanceSettings(params: {
@@ -352,49 +396,58 @@ export class DaemonClient {
       preferred_target_name?: string | null;
     } | null;
   }) {
-    return this.request("update_instance_settings", {
-      id: params.id,
+    return this.request(V2_METHODS.updateSettings, {
+      instance_id: params.id,
       name: params.name,
       instance_type: params.instance_type,
       java_path: params.java_path ?? null,
       arguments: params.arguments ?? [],
       version: params.version ?? null,
       force_rerun_installer: params.force_rerun_installer ?? false,
-      replacement_core: params.replacement_core ?? null,
+      replacement_core: params.replacement_core
+        ? {
+            uploaded_source_path: toDaemonPath(
+              params.replacement_core.uploaded_source_path,
+            ),
+            preferred_target_name:
+              params.replacement_core.preferred_target_name ?? null,
+          }
+        : null,
     });
   }
 
   startInstance(id: string) {
-    return this.request("start_instance", { id });
+    return this.request(V2_METHODS.start, { instance_id: id });
   }
 
   stopInstance(id: string) {
-    return this.request("stop_instance", { id });
+    return this.request(V2_METHODS.stop, { instance_id: id });
   }
 
   killInstance(id: string) {
-    return this.request("kill_instance", { id });
+    return this.request(V2_METHODS.halt, { instance_id: id });
   }
 
   removeInstance(id: string) {
-    return this.request("remove_instance", { id });
+    return this.request(V2_METHODS.remove, { instance_id: id });
   }
 
   sendToInstance(id: string, message: string) {
-    return this.request("send_to_instance", { id, message });
+    return this.request(V2_METHODS.sendCommand, {
+      instance_id: id,
+      command: message,
+    });
   }
 
   async getJavaList(timeoutMs = 60_000): Promise<JavaInfo[]> {
-    // 首次扫描可能较慢；兼容 snake_case / camelCase / PascalCase
-    const data = await this.request<DaemonJavaListResult | JavaInfo[] | Record<string, unknown>>(
-      "get_java_list",
-      {},
-      timeoutMs,
-    );
+    const data = await this.request<
+      DaemonJavaListResult | JavaInfo[] | Record<string, unknown>
+    >(V2_METHODS.javaList, {}, timeoutMs);
     const root = (data ?? {}) as Record<string, unknown>;
     const rawList = Array.isArray(data)
       ? data
-      : (root.java_list ??
+      : (root.items ??
+          root.java_list ??
           root.javaList ??
           root.JavaList ??
           root.list ??
@@ -419,9 +472,10 @@ export class DaemonClient {
     setting: InstanceFactorySettingPayload,
     timeoutMs = 600_000,
   ): Promise<DaemonInstanceConfig> {
+    const request = toCreateInstanceRequest(setting);
     const data = await this.request<DaemonAddInstanceResult>(
-      "add_instance",
-      { setting },
+      V2_METHODS.create,
+      request,
       timeoutMs,
     );
     const config = data?.config ?? (data as unknown as DaemonInstanceConfig);
@@ -432,7 +486,7 @@ export class DaemonClient {
   }
 
   /**
-   * 对齐 DaemonClient.UploadFileAsync：file_upload_request + 二进制分片。
+   * Protocol V2 文件上传：open → binary UploadChunk + ack → close。
    * @returns Daemon 上的相对路径 `dst`
    */
   async uploadFile(
@@ -446,26 +500,30 @@ export class DaemonClient {
   ): Promise<string> {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
       throw new Error(tKey("shared.daemon.error.not-connected"));
-    }
-    const chunkSize = options?.chunkSize ?? 1024 * 1024;
+    }toDaemonPath(dst)
     const total = file.size;
     const buffer = new Uint8Array(await file.arrayBuffer());
-    const sha1 = await sha1Hex(buffer);
+    const sha256 = await sha256Hex(buffer);
 
-    const req = await this.request<DaemonFileUploadRequestResult>(
-      "file_upload_request",
+    const session = await this.request<DaemonUploadSession>(
+      V2_METHODS.uploadOpen,
       {
         path: dst,
-        sha1,
-        size: total,
-        timeout: null,
+        length: total,
+        sha256,
       },
       60_000,
     );
-    const fileId = String(req.file_id ?? req.fileId ?? "");
-    if (!fileId) throw new Error(tKey("shared.daemon.error.upload-session"));
+    const sessionId = String(session.session_id ?? session.sessionId ?? "");
+    if (!sessionId) throw new Error(tKey("shared.daemon.error.upload-session"));
 
+    const maxChunk = Number(
+      session.max_chunk_size ?? session.maxChunkSize ?? 1024 * 1024,
+    );
+    const chunkSize = Math.min(options?.chunkSize ?? maxChunk, maxChunk);
     let offset = 0;
+    let closed = false;
+
     try {
       while (offset < total) {
         if (options?.signal?.aborted) {
@@ -473,36 +531,48 @@ export class DaemonClient {
         }
         const end = Math.min(offset + chunkSize, total);
         const chunk = buffer.subarray(offset, end);
-        const checksum = await sha1Bytes(chunk);
-        const frame = buildBinaryUploadFrame(fileId, offset, chunk, checksum);
-        const { done, received } = await this.sendBinaryChunk(
-          fileId,
-          frame,
-          60_000,
+        const frame = buildBinaryFrame(
+          BINARY_FRAME_KIND_UPLOAD,
+          sessionId,
+          offset,
+          chunk,
+          maxChunk,
         );
+        await this.sendUploadChunk(sessionId, offset, chunk.byteLength, frame, 60_000);
         offset = end;
         options?.onProgress?.({
-          loaded: received || offset,
+          loaded: offset,
           total,
-          done: Boolean(done) || offset >= total,
+          done: offset >= total,
         });
-        if (done) break;
       }
+
+      await this.request(
+        V2_METHODS.uploadClose,
+        { session_id: sessionId },
+        60_000,
+      );
+      closed = true;
       options?.onProgress?.({ loaded: total, total, done: true });
       return dst;
     } catch (error) {
-      try {
-        await this.request("file_upload_cancel", { file_id: fileId }, 10_000);
-      } catch {
-        // ignore
+      if (!closed) {
+        try {
+          await this.request(
+            V2_METHODS.uploadCancel,
+            { session_id: sessionId },
+            10_000,
+          );
+        } catch {
+          // ignore
+        }
       }
       throw error;
     }
   }
 
   /**
-   * 从 daemon 拉取文件到浏览器 Blob（file_download_* + BigEndianUnicode 解码）。
-   * path 为 daemon 虚拟路径，如 /instances/{id}/server.properties
+   * Protocol V2 文件下载：open → read (JSON result + binary frame) → close。
    */
   async downloadFile(
     path: string,
@@ -511,41 +581,55 @@ export class DaemonClient {
       onProgress?: (progress: { loaded: number; total: number }) => void;
     },
   ): Promise<Blob> {
-    const chunkSize = options?.chunkSize ?? 256 * 1024;
-    const req = await this.request<{
-      file_id?: string;
-      FileId?: string;
-      size?: number;
-      Size?: number;
-      sha1?: string;
-      Sha1?: string;
-    }>("file_download_request", { path });
-    const fileId = String(req.file_id ?? req.FileId ?? "");
-    const total = Number(req.size ?? req.Size ?? 0);
-    if (!fileId) throw new Error(tKey("shared.instance.files.download-failed"));
+    const session = await this.request<DaemonDownloadSession>(
+      V2_METHODS.downloadOpen,
+      { path: toDaemonPath(path) },
+      60_000,
+    );
+    const sessionId = String(session.session_id ?? session.sessionId ?? "");
+    const total = Number(session.length ?? 0);
+    if (!sessionId) throw new Error(tKey("shared.instance.files.download-failed"));
 
+    const maxChunk = Number(
+      session.max_chunk_size ?? session.maxChunkSize ?? 256 * 1024,
+    );
+    const chunkSize = Math.min(options?.chunkSize ?? maxChunk, maxChunk);
     const chunks: Uint8Array[] = [];
     let loaded = 0;
+
     try {
       while (loaded < total) {
-        const count = Math.min(chunkSize, total - loaded);
-        const range = `${loaded}..${loaded + count}`;
-        const part = await this.request<{
-          content?: string;
-          Content?: string;
-        }>("file_download_range", {
-          file_id: fileId,
-          range,
-        });
-        const content = String(part.content ?? part.Content ?? "");
-        const bytes = bigEndianUnicodeToBytes(content, count);
-        chunks.push(bytes);
-        loaded += count;
+        const maximumLength = Math.min(chunkSize, total - loaded);
+        const readPromise = this.waitDownloadChunk(
+          sessionId,
+          loaded,
+          maximumLength,
+          60_000,
+        );
+        const meta = await this.request<DaemonDownloadReadResult>(
+          V2_METHODS.downloadRead,
+          {
+            session_id: sessionId,
+            offset: loaded,
+            maximum_length: maximumLength,
+          },
+          60_000,
+        );
+        const payload = await readPromise;
+        const expectedLength = Number(meta.length ?? payload.byteLength);
+        if (payload.byteLength !== expectedLength) {
+          throw new Error(tKey("shared.instance.files.download-failed"));
+        }
+        chunks.push(payload);
+        loaded += payload.byteLength;
         options?.onProgress?.({ loaded, total });
+        if (meta.is_final || meta.isFinal || loaded >= total) break;
       }
     } finally {
       try {
-        await this.request("file_download_close", { file_id: fileId });
+        await this.request(V2_METHODS.downloadClose, {
+          session_id: sessionId,
+        });
       } catch {
         // ignore close errors
       }
@@ -553,42 +637,130 @@ export class DaemonClient {
     return new Blob(chunks as BlobPart[]);
   }
 
-  private sendBinaryChunk(
-    fileId: string,
+  private sendUploadChunk(
+    sessionId: string,
+    offset: number,
+    length: number,
     frame: ArrayBuffer | ArrayBufferView,
     timeoutMs: number,
-  ): Promise<{ done: boolean; received: number }> {
+  ): Promise<void> {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
       return Promise.reject(new Error(tKey("shared.daemon.error.not-connected")));
     }
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
-        this.pendingBinary.delete(fileId);
-        reject(new Error(tKey("shared.daemon.error.request-timeout", { action: "file_upload" })));
+        this.pendingUploadAcks.delete(sessionId);
+        reject(
+          new Error(
+            tKey("shared.daemon.error.request-timeout", {
+              action: V2_METHODS.uploadOpen,
+            }),
+          ),
+        );
       }, timeoutMs);
-      this.pendingBinary.set(fileId, { resolve, reject, timer });
+      this.pendingUploadAcks.set(sessionId, {
+        resolve,
+        reject,
+        timer,
+        offset,
+        length,
+      });
       try {
         this.socket!.send(frame);
       } catch (error) {
         clearTimeout(timer);
-        this.pendingBinary.delete(fileId);
+        this.pendingUploadAcks.delete(sessionId);
         reject(error instanceof Error ? error : new Error(String(error)));
       }
     });
   }
 
+  private waitDownloadChunk(
+    sessionId: string,
+    offset: number,
+    length: number,
+    timeoutMs: number,
+  ): Promise<Uint8Array> {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        this.pendingDownloadChunks.delete(sessionId);
+        reject(
+          new Error(
+            tKey("shared.daemon.error.request-timeout", {
+              action: V2_METHODS.downloadRead,
+            }),
+          ),
+        );
+      }, timeoutMs);
+      this.pendingDownloadChunks.set(sessionId, {
+        resolve,
+        reject,
+        timer,
+        offset,
+        length,
+      });
+    });
+  }
+
   private async handleMessage(raw: unknown) {
-    let text: string;
+    if (raw instanceof ArrayBuffer) {
+      this.handleBinaryFrame(raw);
+      return;
+    }
+    if (ArrayBuffer.isView(raw)) {
+      this.handleBinaryFrame(raw);
+      return;
+    }
+    if (raw instanceof Blob) {
+      const buffer = await raw.arrayBuffer();
+      // Heuristic: binary frames are not valid UTF-8 JSON objects.
+      // Prefer binary parse when length looks like a frame.
+      if (buffer.byteLength >= 32) {
+        const asText = new TextDecoder().decode(buffer);
+        if (!asText.trimStart().startsWith("{") && !asText.trimStart().startsWith("[")) {
+          this.handleBinaryFrame(buffer);
+          return;
+        }
+        await this.handleTextMessage(asText);
+        return;
+      }
+      await this.handleTextMessage(new TextDecoder().decode(buffer));
+      return;
+    }
     if (typeof raw === "string") {
-      text = raw;
-    } else if (raw instanceof ArrayBuffer) {
-      text = new TextDecoder().decode(raw);
-    } else if (raw instanceof Blob) {
-      text = await raw.text();
-    } else {
+      await this.handleTextMessage(raw);
+    }
+  }
+
+  private handleBinaryFrame(raw: ArrayBuffer | ArrayBufferView) {
+    const parsed = tryReadBinaryFrame(raw);
+    if (!parsed.ok) return;
+
+    if (parsed.header.kind === BINARY_FRAME_KIND_DOWNLOAD) {
+      const pending = this.pendingDownloadChunks.get(parsed.header.sessionId);
+      if (!pending) return;
+      if (
+        pending.offset !== parsed.header.offset ||
+        pending.length !== parsed.header.payloadLength
+      ) {
+        clearTimeout(pending.timer);
+        this.pendingDownloadChunks.delete(parsed.header.sessionId);
+        pending.reject(new Error(tKey("shared.instance.files.download-failed")));
+        return;
+      }
+      clearTimeout(pending.timer);
+      this.pendingDownloadChunks.delete(parsed.header.sessionId);
+      pending.resolve(parsed.payload);
       return;
     }
 
+    // Upload chunks are client-originated; ignore unexpected inbound upload frames.
+    if (parsed.header.kind === BINARY_FRAME_KIND_UPLOAD) {
+      return;
+    }
+  }
+
+  private async handleTextMessage(text: string) {
     let parsed: unknown;
     try {
       parsed = JSON.parse(text);
@@ -597,80 +769,127 @@ export class DaemonClient {
     }
 
     this.options.onMessage?.(parsed);
-
-    // 批量事件：EventPacket[]
-    if (Array.isArray(parsed)) {
-      for (const item of parsed) {
-        this.dispatchIfEvent(item);
-      }
-      return;
-    }
-
     if (!parsed || typeof parsed !== "object") return;
+    const message = parsed as Record<string, unknown>;
 
-    // 单条事件推送（无 action id）
-    if (this.dispatchIfEvent(parsed)) {
-      return;
-    }
-
-    const message = parsed as Partial<DaemonActionResponse> &
-      DaemonBinaryUploadResponse & {
-        event?: string;
-        type?: string;
-      };
-
-    const binaryFileId = message.file_id ?? message.fileId;
+    // Upload acknowledgement notification
     if (
-      typeof binaryFileId === "string" &&
-      this.pendingBinary.has(binaryFileId) &&
-      typeof message.id !== "string"
+      message.jsonrpc === "2.0" &&
+      message.method === V2_UPLOAD_ACK_METHOD &&
+      message.params &&
+      typeof message.params === "object"
     ) {
-      const pending = this.pendingBinary.get(binaryFileId)!;
-      clearTimeout(pending.timer);
-      this.pendingBinary.delete(binaryFileId);
-      if (message.error) {
-        pending.reject(new Error(String(message.error)));
-      } else {
-        pending.resolve({
-          done: Boolean(message.done),
-          received: Number(message.received ?? 0),
-        });
-      }
+      this.handleUploadAck(message.params as Record<string, unknown>);
       return;
     }
 
-    if (typeof message.id === "string" && this.pending.has(message.id)) {
-      const pending = this.pending.get(message.id)!;
+    // Typed event notification (no id)
+    if (
+      message.jsonrpc === "2.0" &&
+      typeof message.method === "string" &&
+      message.id == null &&
+      message.params &&
+      typeof message.params === "object"
+    ) {
+      const method = String(message.method);
+      if (method.startsWith("mcsl.event.")) {
+        this.dispatchEventNotification(
+          method,
+          message.params as Record<string, unknown>,
+        );
+        return;
+      }
+    }
+
+    // JSON-RPC response
+    if (message.jsonrpc === "2.0" && message.id != null) {
+      const id = String(message.id);
+      const pending = this.pending.get(id);
+      if (!pending) return;
       clearTimeout(pending.timer);
-      this.pending.delete(message.id);
-      pending.resolve({
-        status: String(message.status ?? "error"),
-        retcode: Number(message.retcode ?? -1),
-        data: (message.data ?? null) as unknown,
-        message: String(message.message ?? ""),
-        id: message.id,
-      });
+      this.pending.delete(id);
+
+      if (message.error && typeof message.error === "object") {
+        pending.reject(toRpcError(message.error as JsonRpcErrorObject));
+        return;
+      }
+      pending.resolve(message.result);
+      return;
     }
   }
 
-  private dispatchIfEvent(value: unknown): boolean {
-    if (!value || typeof value !== "object") return false;
-    const packet = value as Record<string, unknown>;
-    const eventName = packet.event;
-    if (typeof eventName !== "string" || !eventName) return false;
-    // action 响应也可能有 data 字段；有 id + status 时不当作 event
-    if (typeof packet.id === "string" && packet.status != null) return false;
+  private handleUploadAck(params: Record<string, unknown>) {
+    const sessionId = String(params.session_id ?? params.sessionId ?? "");
+    if (!sessionId) return;
+    const pending = this.pendingUploadAcks.get(sessionId);
+    if (!pending) return;
+
+    const offset = Number(params.offset ?? -1);
+    const length = Number(params.length ?? -1);
+    const status = String(params.status ?? "").toLowerCase();
+
+    if (offset !== pending.offset || length !== pending.length) {
+      clearTimeout(pending.timer);
+      this.pendingUploadAcks.delete(sessionId);
+      pending.reject(
+        new Error(
+          tKey("shared.daemon.error.action-failed", {
+            action: V2_UPLOAD_ACK_METHOD,
+          }),
+        ),
+      );
+      return;
+    }
+
+    clearTimeout(pending.timer);
+    this.pendingUploadAcks.delete(sessionId);
+
+    if (status === "accepted") {
+      pending.resolve();
+      return;
+    }
+
+    const errorObj =
+      params.error && typeof params.error === "object"
+        ? (params.error as JsonRpcErrorObject)
+        : null;
+    pending.reject(
+      errorObj
+        ? toRpcError(errorObj)
+        : new Error(
+            tKey("shared.daemon.error.action-failed", {
+              action: V2_UPLOAD_ACK_METHOD,
+            }),
+          ),
+    );
+  }
+
+  private dispatchEventNotification(
+    method: string,
+    params: Record<string, unknown>,
+  ) {
+    const dataRaw = params.data;
+    const metaRaw = params.meta;
     const eventPacket: DaemonEventPacket = {
-      event: eventName,
-      meta:
-        packet.meta && typeof packet.meta === "object"
-          ? (packet.meta as Record<string, unknown>)
-          : null,
+      event: method,
       data:
-        packet.data && typeof packet.data === "object"
-          ? (packet.data as Record<string, unknown>)
+        dataRaw && typeof dataRaw === "object"
+          ? (dataRaw as Record<string, unknown>)
           : null,
-      time: typeof packet.time === "number" ? packet.time : undefined,
+      meta:
+        metaRaw && typeof metaRaw === "object"
+          ? (metaRaw as Record<string, unknown>)
+          : metaRaw === null
+            ? null
+            : null,
+      time:
+        typeof params.timestamp === "number"
+          ? params.timestamp
+          : typeof params.time === "number"
+            ? params.time
+            : undefined,
+      sequence:
+        typeof params.sequence === "number" ? params.sequence : undefined,
     };
     for (const listener of this.eventListeners) {
       try {
@@ -679,19 +898,68 @@ export class DaemonClient {
         // 单个监听器异常不阻断其它监听
       }
     }
-    return true;
   }
 
   private rejectAll(error: Error) {
-    for (const [id, pending] of this.pending) {
+    for (const [, pending] of this.pending) {
       clearTimeout(pending.timer);
       pending.reject(error);
-      this.pending.delete(id);
     }
-    for (const [id, pending] of this.pendingBinary) {
+    this.pending.clear();
+    for (const [, pending] of this.pendingUploadAcks) {
       clearTimeout(pending.timer);
       pending.reject(error);
-      this.pendingBinary.delete(id);
     }
+    this.pendingUploadAcks.clear();
+    for (const [, pending] of this.pendingDownloadChunks) {
+      clearTimeout(pending.timer);
+      pending.reject(error);
+    }
+    this.pendingDownloadChunks.clear();
   }
+}
+
+function toRpcError(error: JsonRpcErrorObject): Error {
+  const dataMessage =
+    error.data && typeof error.data === "object"
+      ? String(
+          (error.data as { message?: string }).message ??
+            (error.data as { code?: string }).code ??
+            "",
+        )
+      : "";
+  const message =
+    dataMessage ||
+    error.message ||
+    tKey("shared.daemon.error.action-failed", { action: "rpc" });
+  return new Error(message);
+}
+
+/** Map flat create wizard payload → V2 nested CreateInstanceRequest. */
+export function toCreateInstanceRequest(
+  setting: InstanceFactorySettingPayload,
+): Record<string, unknown> {
+  const instanceId = crypto.randomUUID();
+  return {
+    setting: {
+      configuration: {
+        instance_id: instanceId,
+        name: setting.name,
+        target: setting.target,
+        instance_type: setting.instance_type,
+        target_type: setting.target_type,
+        version: setting.mc_version ?? "",
+        input_encoding: setting.input_encoding ?? "utf-8",
+        output_encoding: setting.output_encoding ?? "utf-8",
+        java_path: setting.java_path ?? "",
+        arguments: setting.arguments ?? [],
+        environment_variables: {},
+        event_rules: [],
+      },
+      source: setting.source,
+      source_type: setting.source_type,
+      mirror: setting.mirror ?? "none",
+      use_post_process: setting.use_post_process ?? false,
+    },
+  };
 }

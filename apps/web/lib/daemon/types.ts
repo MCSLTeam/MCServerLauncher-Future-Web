@@ -4,6 +4,35 @@ import type {
   JavaInfo,
 } from "@/lib/create/types";
 
+/** JSON-RPC 2.0 success/error envelopes used by Protocol V2. */
+export type JsonRpcSuccessResponse<T = unknown> = {
+  jsonrpc: "2.0";
+  id: string | number;
+  result: T;
+};
+
+export type JsonRpcErrorObject = {
+  code: number;
+  message: string;
+  data?: {
+    kind?: string;
+    code?: string;
+    message?: string;
+    [key: string]: unknown;
+  };
+};
+
+export type JsonRpcErrorResponse = {
+  jsonrpc: "2.0";
+  id: string | number | null;
+  error: JsonRpcErrorObject;
+};
+
+export type JsonRpcResponse<T = unknown> =
+  | JsonRpcSuccessResponse<T>
+  | JsonRpcErrorResponse;
+
+/** @deprecated V1 name retained as alias while call sites migrate. */
 export type DaemonActionResponse<T = unknown> = {
   status: "ok" | "error" | string;
   retcode: number;
@@ -14,38 +43,96 @@ export type DaemonActionResponse<T = unknown> = {
 
 export type { InstanceFactorySettingPayload, JavaInfo };
 
+export const V2_METHODS = {
+  ping: "mcsl.daemon.ping",
+  systemInfo: "mcsl.system.info.get",
+  javaList: "mcsl.java.list",
+  listReports: "mcsl.instance.report.list",
+  getReport: "mcsl.instance.report.get",
+  getLog: "mcsl.instance.log.get",
+  start: "mcsl.instance.start",
+  stop: "mcsl.instance.stop",
+  halt: "mcsl.instance.halt",
+  remove: "mcsl.instance.remove",
+  sendCommand: "mcsl.instance.command.send",
+  create: "mcsl.instance.create",
+  getSettings: "mcsl.instance.settings.get",
+  updateSettings: "mcsl.instance.settings.update",
+  getEventRules: "mcsl.instance.event-rules.get",
+  updateEventRules: "mcsl.instance.event-rules.update",
+  directoryInfo: "mcsl.directory.info.get",
+  createDirectory: "mcsl.directory.create",
+  deleteDirectory: "mcsl.directory.delete",
+  renameDirectory: "mcsl.directory.rename",
+  deleteFile: "mcsl.file.delete",
+  renameFile: "mcsl.file.rename",
+  uploadOpen: "mcsl.file.upload.open",
+  uploadClose: "mcsl.file.upload.close",
+  uploadCancel: "mcsl.file.upload.cancel",
+  downloadOpen: "mcsl.file.download.open",
+  downloadRead: "mcsl.file.download.read",
+  downloadClose: "mcsl.file.download.close",
+  subscribe: "mcsl.event.subscribe",
+  unsubscribe: "mcsl.event.unsubscribe",
+  discover: "rpc.discover",
+} as const;
+
+export const V2_EVENTS = {
+  instanceLog: "mcsl.event.instance.log",
+  notification: "mcsl.event.notification",
+  daemonReport: "mcsl.event.daemon.report",
+  catalogChanged: "mcsl.event.instance.catalog.changed",
+} as const;
+
+export const V2_UPLOAD_ACK_METHOD = "mcsl.file.upload.ack";
+
 export type DaemonJavaListResult = {
+  items?: JavaInfo[];
   java_list?: JavaInfo[];
   javaList?: JavaInfo[];
   JavaList?: JavaInfo[];
   list?: JavaInfo[];
 };
 
-export type DaemonFileUploadRequestResult = {
-  file_id?: string;
-  fileId?: string;
+export type DaemonUploadSession = {
+  session_id?: string;
+  sessionId?: string;
+  max_chunk_size?: number;
+  maxChunkSize?: number;
+  expires_at?: string;
+};
+
+export type DaemonDownloadSession = {
+  session_id?: string;
+  sessionId?: string;
+  length?: number;
+  sha256?: string;
+  max_chunk_size?: number;
+  maxChunkSize?: number;
+  expires_at?: string;
+};
+
+export type DaemonDownloadReadResult = {
+  session_id?: string;
+  sessionId?: string;
+  offset?: number;
+  length?: number;
+  is_final?: boolean;
+  isFinal?: boolean;
 };
 
 export type DaemonAddInstanceResult = {
   config?: DaemonInstanceConfig;
 };
 
-export type DaemonBinaryUploadResponse = {
-  file_id?: string;
-  fileId?: string;
-  done?: boolean;
-  received?: number;
-  error?: string;
-};
-
-/** 对齐 Common.ProtoType.Status.SystemInfo（snake_case 线协议） */
+/** 对齐 Contracts.System.SystemInfo（snake_case） */
 export type DaemonSystemInfo = {
   name?: string;
   version?: string;
   api_version?: string;
   daemon_version?: string;
   daemonVersion?: string;
-  os?: { name?: string; arch?: string; version?: string };
+  os?: { name?: string; architecture?: string; arch?: string; version?: string };
   cpu?: {
     vendor?: string;
     name?: string;
@@ -57,13 +144,22 @@ export type DaemonSystemInfo = {
     thread_count?: number;
     threadCount?: number;
   };
-  mem?: { total?: number; free?: number };
+  mem?: {
+    total?: number;
+    free?: number;
+    total_kilobytes?: number;
+    free_kilobytes?: number;
+    totalKilobytes?: number;
+    freeKilobytes?: number;
+  };
   drive?: {
     name?: string;
     drive_format?: string;
     driveFormat?: string;
     total?: number;
     free?: number;
+    total_bytes?: number;
+    free_bytes?: number;
   };
   drives?: Array<{
     name?: string;
@@ -71,6 +167,8 @@ export type DaemonSystemInfo = {
     driveFormat?: string;
     total?: number;
     free?: number;
+    total_bytes?: number;
+    free_bytes?: number;
   }>;
   [key: string]: unknown;
 };
@@ -80,7 +178,9 @@ export type DaemonInstanceConfig = {
   target?: string;
   instance_type?: string;
   target_type?: string;
+  instance_id?: string;
   uuid?: string;
+  version?: string;
   mc_version?: string;
   java_path?: string;
   arguments?: string[];
@@ -92,7 +192,13 @@ export type DaemonInstanceReport = {
   config?: DaemonInstanceConfig;
   properties?: Record<string, string>;
   players?: unknown[];
-  performance_counter?: { cpu?: number; memory?: number };
+  performance_counter?: {
+    cpu?: number;
+    memory?: number;
+    memory_bytes?: number;
+    memoryBytes?: number;
+  };
+  process_id?: number | null;
   [key: string]: unknown;
 };
 
@@ -117,6 +223,12 @@ export type DaemonLiveInstance = {
   raw: DaemonInstanceReport;
 };
 
+/**
+ * Daemon wire status is only running|stopped|crashed.
+ * UI keeps extra values (starting/stopping/installing) for local/optimistic use;
+ * do not infer them from process_id — it can linger after halt/stop while status
+ * is already stopped.
+ */
 export function mapDaemonStatus(status: unknown): InstanceStatus {
   const value = String(status ?? "stopped").toLowerCase();
   if (value === "running") return "running";
@@ -134,7 +246,7 @@ export function wsUrl(
   token: string,
 ) {
   const scheme = secure ? "wss" : "ws";
-  return `${scheme}://${host}:${port}/api/v1?token=${encodeURIComponent(token)}`;
+  return `${scheme}://${host}:${port}/api/v2?token=${encodeURIComponent(token)}`;
 }
 
 export function httpInfoUrl(host: string, port: string, secure: boolean) {

@@ -13,7 +13,7 @@
     "frontend:preview": "next start --port 3000",
     "lint": "eslint .; prettier --check .; cargo lint",
     "fix": "eslint --fix; prettier --write --list-different .; cargo fix",
-    "test": "tsc --noEmit && cargo test"
+    "test": "tsc --noEmit && node --experimental-strip-types --test lib/daemon/binary.test.ts lib/daemon/rpc-envelope.test.ts && cargo test"
   },
   "dependencies": {
     "@monaco-editor/loader": "^1.7.0",

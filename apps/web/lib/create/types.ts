@@ -253,11 +253,17 @@ export type MinecraftLoaderVersion = {
   loaderVersion: string;
 };
 
+/**
+ * Flat create-wizard payload. DaemonClient.addInstance maps this into the nested
+ * V2 CreateInstanceRequest (`setting.configuration.*` + factory fields).
+ * `mc_version` becomes configuration.version on the wire.
+ */
 export type InstanceFactorySettingPayload = {
   name: string;
   target: string;
   instance_type: InstanceTypeWire;
   target_type: TargetTypeWire;
+  /** Maps to configuration.version on Protocol V2. */
   mc_version?: string;
   java_path?: string;
   arguments?: string[];

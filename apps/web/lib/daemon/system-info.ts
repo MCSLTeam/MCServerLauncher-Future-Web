@@ -51,7 +51,7 @@ function pickOs(info: DaemonSystemInfo) {
   const os = info.os ?? {};
   return {
     name: String(os.name ?? ""),
-    arch: String(os.arch ?? ""),
+    arch: String(os.architecture ?? os.arch ?? ""),
   };
 }
 
@@ -73,10 +73,12 @@ function pickCpu(info: DaemonSystemInfo) {
 
 function pickMem(info: DaemonSystemInfo) {
   const mem = info.mem ?? {};
-  // 协议：MemInfo Total/Free 单位为 KB
+  // V2：total_kilobytes / free_kilobytes；兼容旧 total/free
   return {
-    total: asNumber(mem.total),
-    free: asNumber(mem.free),
+    total: asNumber(
+      mem.total_kilobytes ?? mem.totalKilobytes ?? mem.total,
+    ),
+    free: asNumber(mem.free_kilobytes ?? mem.freeKilobytes ?? mem.free),
   };
 }
 
@@ -93,12 +95,14 @@ function mapDrive(drive: {
   driveFormat?: string;
   total?: number;
   free?: number;
+  total_bytes?: number;
+  free_bytes?: number;
 } | null | undefined): DriveView {
   return {
     name: String(drive?.name ?? ""),
     driveFormat: String(drive?.drive_format ?? drive?.driveFormat ?? ""),
-    total: asNumber(drive?.total),
-    free: asNumber(drive?.free),
+    total: asNumber(drive?.total_bytes ?? drive?.total),
+    free: asNumber(drive?.free_bytes ?? drive?.free),
   };
 }
 
@@ -126,8 +130,9 @@ function pickDrives(info: DaemonSystemInfo): DriveView[] {
  * 不再把 drives[] 全部相加（macOS 多卷会虚高）。
  */
 function pickPrimaryDrive(info: DaemonSystemInfo): DriveView | null {
-  if (info.drive && asNumber(info.drive.total) > 0) {
-    return mapDrive(info.drive);
+  if (info.drive) {
+    const mapped = mapDrive(info.drive);
+    if (mapped.total > 0) return mapped;
   }
   const drives = pickDrives(info);
   if (drives.length === 0) return null;
