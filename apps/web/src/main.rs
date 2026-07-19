@@ -69,6 +69,7 @@ async fn main() -> std::io::Result<()> {
             web::scope("/api")
                 .service(api::api_index)
                 .service(api::api_account_login)
+                .service(api::api_account_desktop_session)
                 .service(api::api_account_logout)
                 .service(api::api_account_register)
                 .service(api::api_account_should_register)

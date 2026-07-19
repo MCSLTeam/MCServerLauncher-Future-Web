@@ -111,7 +111,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
     void (async () => {
+      // Tauri 跳过登录页，但节点/创建实例仍依赖 Actix 会话与权限。
+      // 本机 bootstrap 一个 desktop session，再 hydrate 用户权限。
       if (isTauriRuntime()) {
+        const existing = readToken();
+        if (existing) {
+          setToken(existing);
+          const userInfo = await refreshUser();
+          if (userInfo) {
+            setReady(true);
+            return;
+          }
+        }
+        const bootstrap = await publicApi<string>("/api/account/desktop-session", {
+          method: "POST",
+        });
+        if (bootstrap.ok && bootstrap.data) {
+          writeToken(bootstrap.data, true);
+          setToken(bootstrap.data);
+          await refreshUser();
+        }
         setReady(true);
         return;
       }
