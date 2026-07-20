@@ -219,3 +219,90 @@ body {
     @apply font-sans;
   }
 }
+
+
+/* xterm / PTY console — shadcn muted surface (no pure black canvas) */
+.mcsl-xterm {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  color: var(--foreground);
+  background-color: var(--muted);
+}
+
+.mcsl-xterm .xterm {
+  height: 100%;
+  padding: 0.25rem;
+  background-color: var(--muted) !important;
+}
+
+.mcsl-xterm .xterm-viewport {
+  overflow-y: auto !important;
+  background-color: var(--muted) !important;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklch, var(--muted-foreground) 35%, transparent)
+    transparent;
+}
+
+/* Narrower than global 10px so PTY gutter does not feel chunky */
+.mcsl-xterm .xterm-viewport::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.mcsl-xterm .xterm-viewport::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mcsl-xterm .xterm-viewport::-webkit-scrollbar-thumb {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
+  background-color: color-mix(
+    in oklch,
+    var(--muted-foreground) 40%,
+    transparent
+  );
+}
+
+.mcsl-xterm .xterm-viewport::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(
+    in oklch,
+    var(--muted-foreground) 62%,
+    transparent
+  );
+}
+
+.mcsl-xterm .xterm-screen {
+  background-color: var(--muted) !important;
+}
+
+/* Do not force row/cell backgrounds — ANSI SGR colors must paint freely */
+.mcsl-xterm .xterm-rows,
+.mcsl-xterm .xterm-rows > div {
+  background-color: transparent !important;
+}
+
+/* Canvas layer should not leave opaque black under glyphs on some browsers */
+.mcsl-xterm .xterm-screen canvas {
+  background-color: transparent !important;
+}
+
+.mcsl-xterm .xterm-helpers textarea {
+  /* keep caret invisible; xterm draws its own cursor */
+  opacity: 0;
+  /* Avoid OS/browser dark textarea flash under the canvas */
+  color: transparent !important;
+  caret-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+.mcsl-xterm:focus-within {
+  outline: none;
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--ring) 55%, transparent);
+}

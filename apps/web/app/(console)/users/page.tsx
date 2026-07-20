@@ -36,6 +36,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAuth } from "@/features/auth/auth-provider";
+import { useFeedback } from "@/components/ui-feedback";
 import { useT } from "@/features/i18n/locale-provider";
 import {
   canCreateUsers,
@@ -51,6 +52,7 @@ import {
 
 export default function UsersPage() {
   const t = useT();
+  const { confirm, toast } = useFeedback();
   const { user, listUsers, createUser, deleteUser } = useAuth();
   const [users, setUsers] = useState<UserInfo[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -135,22 +137,22 @@ export default function UsersPage() {
 
   async function onDelete(target: UserInfo) {
     if (target.username === user?.username) {
-      setMessage(t("web.users.delete.self"));
+      toast.error(t("web.users.delete.self"));
       return;
     }
-    if (
-      !window.confirm(
-        t("web.users.delete.confirm", { username: target.username }),
-      )
-    ) {
-      return;
-    }
+    const ok = await confirm({
+      description: t("web.users.delete.confirm", { username: target.username }),
+      destructive: true,
+      confirmLabel: t("ui.common.confirm"),
+      cancelLabel: t("ui.common.cancel"),
+    });
+    if (!ok) return;
     const result = await deleteUser(target.username);
     if (!result.ok) {
-      setMessage(result.message ?? t("web.users.delete.error"));
+      toast.error(result.message ?? t("web.users.delete.error"));
       return;
     }
-    setMessage(t("web.users.delete.success", { username: target.username }));
+    toast.success(t("web.users.delete.success", { username: target.username }));
     await refresh();
   }
 
