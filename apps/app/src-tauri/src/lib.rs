@@ -1,3 +1,6 @@
+use mcsl_web_core::error::InvokeResponse;
+use mcsl_web_core::service::{ApiRequest, ClientMeta};
+use mcsl_web_core::{dispatch, init_data_dir};
 use mcsl_resource_provider::{
     DownloadRequest, ProviderRequest, download_to_path, fetch_download_bytes, fetch_json,
     validate_download_url,
@@ -5,6 +8,37 @@ use mcsl_resource_provider::{
 use serde::Serialize;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
+
+#[derive(serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct WebApiArgs {
+    method: String,
+    path: String,
+    body: Option<serde_json::Value>,
+    authorization: Option<String>,
+}
+
+/// 进程内控制面 API：与 Actix `/api/*` 共用 `mcsl_web_core::dispatch`，不启 HTTP。
+#[tauri::command]
+fn web_api(args: WebApiArgs) -> InvokeResponse<serde_json::Value> {
+    if let Err(e) = init_data_dir() {
+        log::error!("init_data_dir failed: {e}");
+        return InvokeResponse::err(mcsl_web_core::AppError::internal());
+    }
+    let mut meta = ClientMeta::desktop();
+    meta.authorization = args.authorization;
+    match dispatch(ApiRequest {
+        method: args.method,
+        path: args.path,
+        body: args.body,
+        meta,
+    }) {
+        Ok(data) => InvokeResponse::ok(data),
+        Err(err) => InvokeResponse::err(err),
+    }
+}
+
+
 
 #[tauri::command]
 async fn resource_provider(request: ProviderRequest) -> Result<serde_json::Value, String> {
@@ -263,7 +297,14 @@ pub fn run() {
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_opener::init())
+        .setup(|_app| {
+            if let Err(e) = init_data_dir() {
+                eprintln!("init_data_dir failed: {e}");
+            }
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
+            web_api,
             resource_provider,
             pick_save_path,
             resource_download,
