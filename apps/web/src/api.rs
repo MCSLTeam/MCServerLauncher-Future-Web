@@ -1,41 +1,25 @@
-use crate::token::{
-    SessionInfo, create_session, delete_token, delete_token_by_id, delete_token_by_username,
-    get_session_info_by_id, get_session_infos, get_tokens_by_user, get_user_by_token,
-    update_token_info,
-};
-use crate::user::{
-    User, UserInput, UserOutput, add_user, delete_user, get_users, is_user_empty, update_user,
-    verify_password,
-};
 use actix_web::{HttpRequest, HttpResponse, Responder, delete, get, post, put, web};
 use mcsl_resource_provider::{
     DownloadRequest, ProviderError, ProviderRequest, fetch_download_bytes, fetch_json,
 };
-use serde::{Deserialize, Serialize};
+use mcsl_web_core::error::{failed, success, AppError};
+use mcsl_web_core::service::{is_loopback_ip, ApiRequest, ClientMeta};
+use mcsl_web_core::{dispatch, AppResult};
+use serde::Serialize;
+use serde_json::Value;
 use std::net::IpAddr;
 
-/// 只允许 WPF 内置的五个下载源，禁止将此接口变成开放代理。
 #[post("/resource/provider")]
 pub async fn api_resource_provider(body: web::Json<ProviderRequest>) -> impl Responder {
     match fetch_json(&body).await {
-        Ok(data) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data,
-        }),
+        Ok(data) => HttpResponse::Ok().json(success(data)),
         Err(error @ (ProviderError::InvalidProvider | ProviderError::InvalidPath)) => {
-            HttpResponse::BadRequest().json(FailedResponse {
-                status: "failed",
-                err: error.code(),
-            })
+            HttpResponse::BadRequest().json(failed(&AppError::bad_request(error.code())))
         }
-        Err(error) => HttpResponse::BadGateway().json(FailedResponse {
-            status: "failed",
-            err: error.code(),
-        }),
+        Err(error) => HttpResponse::BadGateway().json(failed(&AppError::new(502, error.code()))),
     }
 }
 
-/// 同源下载代理：仅白名单镜像主机，避免浏览器 CORS 拦截。
 #[post("/resource/download")]
 pub async fn api_resource_download(body: web::Json<DownloadRequest>) -> impl Responder {
     match fetch_download_bytes(&body.url).await {
@@ -55,693 +39,189 @@ pub async fn api_resource_download(body: web::Json<DownloadRequest>) -> impl Res
             error @ (ProviderError::InvalidProvider
             | ProviderError::InvalidPath
             | ProviderError::InvalidDownloadUrl),
-        ) => HttpResponse::BadRequest().json(FailedResponse {
-            status: "failed",
-            err: error.code(),
-        }),
-        Err(error) => HttpResponse::BadGateway().json(FailedResponse {
-            status: "failed",
-            err: error.code(),
-        }),
+        ) => HttpResponse::BadRequest().json(failed(&AppError::bad_request(error.code()))),
+        Err(error) => HttpResponse::BadGateway().json(failed(&AppError::new(502, error.code()))),
     }
 }
 
 #[derive(Serialize)]
-pub struct SuccessResponse<T> {
-    pub status: &'static str,
-    pub data: T,
-}
-
-#[derive(Serialize)]
-pub struct FailedResponse {
-    pub status: &'static str,
-    pub err: &'static str,
+struct LegacyFailed {
+    status: &'static str,
+    err: &'static str,
 }
 
 fn get_client_ip(req: &HttpRequest) -> String {
     if let Some(xff) = req.headers().get("X-Forwarded-For") {
         if let Ok(xff_str) = xff.to_str() {
-            // X-Forwarded-For: client_ip, proxy1_ip, proxy2_ip...
-            let xff_ips: Vec<&str> = xff_str.split(',').map(|s| s.trim()).collect();
-            for ip_str in xff_ips {
-                if let Ok(_) = ip_str.parse::<IpAddr>() {
+            for ip_str in xff_str.split(',').map(|s| s.trim()) {
+                if ip_str.parse::<IpAddr>().is_ok() {
                     return ip_str.to_string();
                 }
             }
         }
     }
-
     if let Some(xri) = req.headers().get("X-Real-IP") {
         if let Ok(xri_str) = xri.to_str() {
-            if let Ok(_) = xri_str.parse::<IpAddr>() {
+            if xri_str.parse::<IpAddr>().is_ok() {
                 return xri_str.to_string();
             }
         }
     }
-
     if let Some(peer) = req.peer_addr() {
-        let ip = peer.ip();
-        return ip.to_string();
+        return peer.ip().to_string();
     }
-
     "unknown".to_string()
 }
 
-fn get_token_from_headers(http_request: &HttpRequest) -> Option<&str> {
-    match http_request.headers().get("Authorization") {
-        Some(header) => match header.to_str() {
-            Ok(value) => {
-                if value.starts_with("Bearer ") {
-                    Some(&value[7..])
-                } else {
-                    None
-                }
-            }
-            Err(_) => None,
-        },
-        None => None,
+fn client_meta(http_request: &HttpRequest) -> ClientMeta {
+    let authorization = http_request
+        .headers()
+        .get("Authorization")
+        .and_then(|h| h.to_str().ok())
+        .map(|s| s.to_string());
+    let user_agent = http_request
+        .headers()
+        .get("User-Agent")
+        .and_then(|h| h.to_str().ok())
+        .unwrap_or("unknown")
+        .to_string();
+    ClientMeta {
+        ip: get_client_ip(http_request),
+        user_agent,
+        authorization,
     }
 }
 
-fn get_optional_user_from_headers(http_request: &HttpRequest) -> Option<User> {
-    let token = get_token_from_headers(http_request)?;
-
-    match get_user_by_token(token) {
-        Ok(user) => {
-            update_token_info(token, http_request, &get_client_ip(http_request));
-            Some(user)
-        }
-        Err(_) => None,
+fn respond(result: AppResult<Value>) -> HttpResponse {
+    match result {
+        Ok(data) => HttpResponse::Ok().json(success(data)),
+        Err(err) => HttpResponse::build(
+            actix_web::http::StatusCode::from_u16(err.status)
+                .unwrap_or(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR),
+        )
+        .json(failed(&err)),
     }
 }
 
-fn get_user_from_headers(http_request: &HttpRequest) -> Result<User, HttpResponse> {
-    match get_optional_user_from_headers(http_request) {
-        Some(user) => Ok(user),
-        None => Err(HttpResponse::Unauthorized().json(FailedResponse {
-            status: "failed",
-            err: "invalid-token",
-        })),
-    }
-}
-
-fn verify_user_permission(
+async fn dispatch_http(
+    method: &str,
+    path: &str,
+    body: Option<Value>,
     http_request: &HttpRequest,
-    permission: String,
-) -> Result<User, HttpResponse> {
-    let user = get_user_from_headers(http_request)?;
-    if !user.verify_permission(&permission).unwrap_or(false) {
-        return Err(HttpResponse::Forbidden().json(FailedResponse {
-            status: "failed",
-            err: "permission-denied",
-        }));
+) -> HttpResponse {
+    if path.contains("desktop-session") {
+        let ip = get_client_ip(http_request);
+        if !is_loopback_ip(&ip) {
+            return HttpResponse::Forbidden().json(LegacyFailed {
+                status: "failed",
+                err: "permission-denied",
+            });
+        }
     }
-    Ok(user)
+    respond(dispatch(ApiRequest {
+        method: method.to_string(),
+        path: path.to_string(),
+        body,
+        meta: client_meta(http_request),
+    }))
 }
 
 #[get("/")]
 pub async fn api_index() -> impl Responder {
-    HttpResponse::Ok().json(SuccessResponse {
-        status: "success",
-        data: "Hello from MCSL Future Web API!",
-    })
+    respond(Ok(Value::String("Hello from MCSL Future Web API!".into())))
 }
 
-#[derive(Deserialize)]
-pub struct LoginRequest {
-    username: String,
-    password: String,
-    remember: bool,
+macro_rules! simple {
+    ($name:ident, $method:literal, $path:literal, $http:ident) => {
+        #[$http($path)]
+        pub async fn $name(http_request: HttpRequest) -> impl Responder {
+            dispatch_http($method, $path, None, &http_request).await
+        }
+    };
 }
+
+simple!(api_account_desktop_session, "POST", "/account/desktop-session", post);
+simple!(api_account_should_register, "GET", "/account/should-register", get);
+simple!(api_account_logout, "GET", "/account/logout", get);
+simple!(api_user_get_info_self, "GET", "/user/info/self", get);
+simple!(api_user_get_info_all, "GET", "/user/info/all", get);
+simple!(api_session_get_self, "GET", "/session/self", get);
+simple!(api_session_get_all, "GET", "/session/all", get);
+simple!(api_session_delete_self, "DELETE", "/session/self", delete);
+simple!(api_nodes_list, "GET", "/nodes", get);
+simple!(api_preferences_get, "GET", "/preferences", get);
 
 #[post("/account/login")]
-pub async fn api_account_login(
-    data: web::Json<LoginRequest>,
-    http_request: HttpRequest,
-) -> impl Responder {
-    let user = match verify_password(&data.username, &data.password) {
-        Ok(user) => user,
-        Err(res) => return res,
-    };
-
-    match create_session(
-        &user.username,
-        data.remember,
-        get_client_ip(&http_request),
-        http_request
-            .headers()
-            .get("User-Agent")
-            .unwrap()
-            .to_str()
-            .unwrap_or("unknown")
-            .to_string(),
-    ) {
-        Ok(token_pair) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: token_pair,
-        }),
-        Err(res) => res,
-    }
-}
-
-fn is_loopback_ip(ip: &str) -> bool {
-    ip == "127.0.0.1"
-        || ip == "::1"
-        || ip == "localhost"
-        || ip == "unknown"
-        || ip.starts_with("127.")
-        || ip.starts_with(":ffff:127.")
-}
-
-/// Tauri / 本机桌面启动时用：仅本机可拿会话，跳过登录页但保留节点 API 权限。
-#[post("/account/desktop-session")]
-pub async fn api_account_desktop_session(http_request: HttpRequest) -> impl Responder {
-    let ip = get_client_ip(&http_request);
-    if !is_loopback_ip(&ip) {
-        return HttpResponse::Forbidden().json(FailedResponse {
-            status: "failed",
-            err: "permission-denied",
-        });
-    }
-
-    let username = match crate::user::ensure_desktop_admin_username() {
-        Ok(username) => username,
-        Err(res) => return res,
-    };
-
-    let user_agent = http_request
-        .headers()
-        .get("User-Agent")
-        .and_then(|value| value.to_str().ok())
-        .unwrap_or("mcsl-desktop")
-        .to_string();
-
-    match create_session(&username, true, ip, user_agent) {
-        Ok(token) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: token,
-        }),
-        Err(res) => res,
-    }
-}
-
-#[get("/account/should-register")]
-pub async fn api_account_should_register() -> impl Responder {
-    let is_user_empty = match is_user_empty() {
-        Ok(bool) => bool,
-        Err(res) => return res,
-    };
-
-    HttpResponse::Ok().json(SuccessResponse {
-        status: "success",
-        data: is_user_empty,
-    })
-}
-
-#[derive(Deserialize)]
-pub struct RegisterRequest {
-    username: String,
-    password: String,
+pub async fn api_account_login(data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
+    dispatch_http("POST", "/account/login", Some(data.into_inner()), &http_request).await
 }
 
 #[post("/account/register")]
-pub async fn api_account_register(data: web::Json<RegisterRequest>) -> impl Responder {
-    let is_user_empty = match is_user_empty() {
-        Ok(bool) => bool,
-        Err(res) => return res,
-    };
-
-    if !is_user_empty {
-        return HttpResponse::Forbidden().json(FailedResponse {
-            status: "failed",
-            err: "admin-exists",
-        });
-    }
-
-    match add_user(UserInput {
-        username: data.username.clone(),
-        password: data.password.clone(),
-        permissions: vec!["*".to_string()],
-    }) {
-        Ok(()) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: (),
-        }),
-        Err(res) => res,
-    }
-}
-
-#[get("/account/logout")]
-pub async fn api_account_logout(http_request: HttpRequest) -> impl Responder {
-    let token = match get_token_from_headers(&http_request) {
-        Some(token) => token,
-        None => {
-            return HttpResponse::Forbidden().json(FailedResponse {
-                status: "failed",
-                err: "invalid-token",
-            });
-        }
-    };
-
-    match delete_token(token) {
-        Ok(()) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: (),
-        }),
-        Err(res) => res,
-    }
+pub async fn api_account_register(data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
+    dispatch_http("POST", "/account/register", Some(data.into_inner()), &http_request).await
 }
 
 #[post("/user/create")]
-pub async fn api_user_create(
-    data: web::Json<UserInput>,
-    http_request: HttpRequest,
-) -> impl Responder {
-    if let Err(res) = verify_user_permission(&http_request, "mcsl.web.user.create".to_string()) {
-        return res;
-    }
-
-    match add_user(data.into_inner()) {
-        Ok(_) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: (),
-        }),
-        Err(res) => res,
-    }
+pub async fn api_user_create(data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
+    dispatch_http("POST", "/user/create", Some(data.into_inner()), &http_request).await
 }
 
 #[put("/user/info/{username}")]
-pub async fn api_user_update_info(
-    username: web::Path<String>,
-    data: web::Json<UserInput>,
-    http_request: HttpRequest,
-) -> impl Responder {
-    if let Err(res) = verify_user_permission(
-        &http_request,
-        format!("mcsl.web.user.{}.info.change", username),
-    ) {
-        return res;
-    }
-
-    match update_user(&username, data.into_inner()) {
-        Ok(_) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: (),
-        }),
-        Err(res) => res,
-    }
+pub async fn api_user_update_info(username: web::Path<String>, data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
+    dispatch_http("PUT", &format!("/user/info/{}", username.into_inner()), Some(data.into_inner()), &http_request).await
 }
 
 #[delete("/user/{username}")]
-pub async fn api_user_delete(
-    username: web::Path<String>,
-    http_request: HttpRequest,
-) -> impl Responder {
-    if let Err(res) =
-        verify_user_permission(&http_request, format!("mcsl.web.user.{}.delete", username))
-    {
-        return res;
-    }
-
-    match delete_user(&username) {
-        Ok(_) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: (),
-        }),
-        Err(res) => res,
-    }
-}
-
-#[derive(Deserialize)]
-pub struct ChangePasswordRequest {
-    old_password: String,
-    password: String,
+pub async fn api_user_delete(username: web::Path<String>, http_request: HttpRequest) -> impl Responder {
+    dispatch_http("DELETE", &format!("/user/{}", username.into_inner()), None, &http_request).await
 }
 
 #[put("/user/password")]
-pub async fn api_user_update_password(
-    data: web::Json<ChangePasswordRequest>,
-    http_request: HttpRequest,
-) -> impl Responder {
-    let user = match get_user_from_headers(&http_request) {
-        Ok(user) => user,
-        Err(res) => return res,
-    };
-
-    if let Err(res) = user.verify_password(&data.old_password) {
-        return res;
-    }
-
-    match update_user(
-        &user.username,
-        UserInput {
-            username: user.username.clone(),
-            password: data.password.clone(),
-            permissions: user.info.permissions.clone(),
-        },
-    ) {
-        Ok(_) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: (),
-        }),
-        Err(res) => res,
-    }
-}
-
-#[get("/user/info/self")]
-pub async fn api_user_get_info_self(http_request: HttpRequest) -> impl Responder {
-    let user = match get_user_from_headers(&http_request) {
-        Ok(user) => user,
-        Err(res) => return res,
-    };
-
-    HttpResponse::Ok().json(SuccessResponse {
-        status: "success",
-        data: user.to_output(),
-    })
-}
-
-#[get("/user/info/all")]
-pub async fn api_user_get_info_all(http_request: HttpRequest) -> impl Responder {
-    let current_user = match get_user_from_headers(&http_request) {
-        Ok(user) => user,
-        Err(res) => return res,
-    };
-
-    let users = match get_users() {
-        Ok(users) => users,
-        Err(res) => return res,
-    };
-
-    let filtered_users: Vec<UserOutput> = users
-        .into_iter()
-        .filter(|user| {
-            if user.username == current_user.username {
-                return true;
-            }
-            let read_permission = format!("mcsl.web.user.{}.info.read", user.username);
-            let change_permission = format!("mcsl.web.user.{}.info.change", user.username);
-            let delete_permission = format!("mcsl.web.user.{}.info.delete", user.username);
-            current_user
-                .verify_permission(&read_permission)
-                .unwrap_or(false)
-                || current_user
-                    .verify_permission(&change_permission)
-                    .unwrap_or(false)
-                || current_user
-                    .verify_permission(&delete_permission)
-                    .unwrap_or(false)
-        })
-        .map(|user| user.to_output())
-        .collect();
-
-    HttpResponse::Ok().json(SuccessResponse {
-        status: "success",
-        data: filtered_users,
-    })
-}
-
-#[get("/session/self")]
-pub async fn api_session_get_self(http_request: HttpRequest) -> impl Responder {
-    let user = match get_user_from_headers(&http_request) {
-        Ok(user) => user,
-        Err(res) => return res,
-    };
-
-    match get_tokens_by_user(&user) {
-        Ok(tokens) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: tokens,
-        }),
-        Err(res) => res,
-    }
+pub async fn api_user_update_password(data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
+    dispatch_http("PUT", "/user/password", Some(data.into_inner()), &http_request).await
 }
 
 #[delete("/session/{id}")]
-pub async fn api_session_delete_id(
-    id: web::Path<String>,
-    http_request: HttpRequest,
-) -> impl Responder {
-    let user = match get_user_from_headers(&http_request) {
-        Ok(user) => user,
-        Err(res) => return res,
-    };
-
-    let session_info = match get_session_info_by_id(&id) {
-        Ok(info) => info,
-        Err(res) => return res,
-    };
-
-    if session_info.user != user.username
-        && !user
-            .verify_permission(&format!("mcsl.web.user.{}.session.delete", user.username))
-            .unwrap_or(false)
-    {
-        return HttpResponse::Forbidden().json(FailedResponse {
-            status: "failed",
-            err: "permission-denied",
-        });
-    }
-
-    match delete_token_by_id(&id) {
-        Ok(_) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: (),
-        }),
-        Err(res) => res,
-    }
-}
-
-#[get("/session/all")]
-pub async fn api_session_get_all(http_request: HttpRequest) -> impl Responder {
-    let current_user = match get_user_from_headers(&http_request) {
-        Ok(user) => user,
-        Err(res) => return res,
-    };
-
-    let session_infos = match get_session_infos() {
-        Ok(info) => info,
-        Err(res) => return res,
-    };
-
-    let filtered_sessions: Vec<SessionInfo> = session_infos
-        .into_iter()
-        .filter(|session| {
-            if session.user == current_user.username {
-                return true;
-            }
-            let read_permission = format!("mcsl.web.user.{}.session.read", session.user);
-            let delete_permission = format!("mcsl.web.user.{}.session.delete", session.user);
-            current_user
-                .verify_permission(&read_permission)
-                .unwrap_or(false)
-                || current_user
-                    .verify_permission(&delete_permission)
-                    .unwrap_or(false)
-        })
-        .collect();
-
-    HttpResponse::Ok().json(SuccessResponse {
-        status: "success",
-        data: filtered_sessions,
-    })
-}
-
-#[delete("/session/self")]
-pub async fn api_session_delete_self(http_request: HttpRequest) -> impl Responder {
-    let user = match get_user_from_headers(&http_request) {
-        Ok(user) => user,
-        Err(res) => return res,
-    };
-
-    match delete_token_by_username(&user.username) {
-        Ok(()) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: (),
-        }),
-        Err(res) => res,
-    }
+pub async fn api_session_delete_id(id: web::Path<String>, http_request: HttpRequest) -> impl Responder {
+    dispatch_http("DELETE", &format!("/session/{}", id.into_inner()), None, &http_request).await
 }
 
 #[delete("/session/{username}")]
-pub async fn api_session_delete_username(
-    username: web::Path<String>,
-    http_request: HttpRequest,
-) -> impl Responder {
-    if let Err(res) = verify_user_permission(
-        &http_request,
-        format!("mcsl.web.user.{}.session.delete", username),
-    ) {
-        return res;
-    }
-
-    match delete_token_by_username(&username) {
-        Ok(()) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: (),
-        }),
-        Err(res) => res,
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Shared daemon nodes (global) + per-user preferences
-// ---------------------------------------------------------------------------
-
-#[get("/nodes")]
-pub async fn api_nodes_list(http_request: HttpRequest) -> impl Responder {
-    let user = match get_user_from_headers(&http_request) {
-        Ok(user) => user,
-        Err(res) => return res,
-    };
-    match crate::nodes::list_visible_nodes(&user) {
-        Ok(nodes) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: nodes,
-        }),
-        Err(res) => res,
-    }
+pub async fn api_session_delete_username(username: web::Path<String>, http_request: HttpRequest) -> impl Responder {
+    dispatch_http("DELETE", &format!("/session/{}", username.into_inner()), None, &http_request).await
 }
 
 #[get("/nodes/{id}/token")]
-pub async fn api_nodes_get_token(
-    id: web::Path<String>,
-    http_request: HttpRequest,
-) -> impl Responder {
-    let user = match get_user_from_headers(&http_request) {
-        Ok(user) => user,
-        Err(res) => return res,
-    };
-    match crate::nodes::get_node_token_for_user(&user, &id) {
-        Ok(token) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: serde_json::json!({ "token": token }),
-        }),
-        Err(res) => res,
-    }
+pub async fn api_nodes_get_token(id: web::Path<String>, http_request: HttpRequest) -> impl Responder {
+    dispatch_http("GET", &format!("/nodes/{}/token", id.into_inner()), None, &http_request).await
 }
 
 #[post("/nodes")]
-pub async fn api_nodes_create(
-    data: web::Json<crate::nodes::NodeInput>,
-    http_request: HttpRequest,
-) -> impl Responder {
-    let user = match get_user_from_headers(&http_request) {
-        Ok(user) => user,
-        Err(res) => return res,
-    };
-    match crate::nodes::create_node(&user, data.into_inner()) {
-        Ok(node) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: node,
-        }),
-        Err(res) => res,
-    }
+pub async fn api_nodes_create(data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
+    dispatch_http("POST", "/nodes", Some(data.into_inner()), &http_request).await
 }
 
 #[put("/nodes/{id}")]
-pub async fn api_nodes_update(
-    id: web::Path<String>,
-    data: web::Json<crate::nodes::NodeInput>,
-    http_request: HttpRequest,
-) -> impl Responder {
-    let user = match get_user_from_headers(&http_request) {
-        Ok(user) => user,
-        Err(res) => return res,
-    };
-    match crate::nodes::update_node(&user, &id, data.into_inner()) {
-        Ok(node) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: node,
-        }),
-        Err(res) => res,
-    }
+pub async fn api_nodes_update(id: web::Path<String>, data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
+    dispatch_http("PUT", &format!("/nodes/{}", id.into_inner()), Some(data.into_inner()), &http_request).await
 }
 
 #[put("/nodes/{id}/visibility")]
-pub async fn api_nodes_set_visibility(
-    id: web::Path<String>,
-    data: web::Json<crate::nodes::VisibilityInput>,
-    http_request: HttpRequest,
-) -> impl Responder {
-    let user = match get_user_from_headers(&http_request) {
-        Ok(user) => user,
-        Err(res) => return res,
-    };
-    match crate::nodes::set_visibility(&user, &id, data.into_inner()) {
-        Ok(node) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: node,
-        }),
-        Err(res) => res,
-    }
+pub async fn api_nodes_set_visibility(id: web::Path<String>, data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
+    dispatch_http("PUT", &format!("/nodes/{}/visibility", id.into_inner()), Some(data.into_inner()), &http_request).await
 }
 
 #[delete("/nodes/{id}")]
-pub async fn api_nodes_delete(
-    id: web::Path<String>,
-    http_request: HttpRequest,
-) -> impl Responder {
-    let user = match get_user_from_headers(&http_request) {
-        Ok(user) => user,
-        Err(res) => return res,
-    };
-    match crate::nodes::delete_node(&user, &id) {
-        Ok(()) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: (),
-        }),
-        Err(res) => res,
-    }
+pub async fn api_nodes_delete(id: web::Path<String>, http_request: HttpRequest) -> impl Responder {
+    dispatch_http("DELETE", &format!("/nodes/{}", id.into_inner()), None, &http_request).await
 }
 
 #[post("/nodes/import")]
-pub async fn api_nodes_import(
-    data: web::Json<crate::nodes::ImportNodesInput>,
-    http_request: HttpRequest,
-) -> impl Responder {
-    let user = match get_user_from_headers(&http_request) {
-        Ok(user) => user,
-        Err(res) => return res,
-    };
-    match crate::nodes::import_nodes(&user, data.into_inner()) {
-        Ok(nodes) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: nodes,
-        }),
-        Err(res) => res,
-    }
-}
-
-#[get("/preferences")]
-pub async fn api_preferences_get(http_request: HttpRequest) -> impl Responder {
-    let user = match get_user_from_headers(&http_request) {
-        Ok(user) => user,
-        Err(res) => return res,
-    };
-    match crate::preferences::get_preferences(&user.username) {
-        Ok(prefs) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: prefs,
-        }),
-        Err(res) => res,
-    }
+pub async fn api_nodes_import(data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
+    dispatch_http("POST", "/nodes/import", Some(data.into_inner()), &http_request).await
 }
 
 #[put("/preferences")]
-pub async fn api_preferences_put(
-    data: web::Json<crate::preferences::UserPreferences>,
-    http_request: HttpRequest,
-) -> impl Responder {
-    let user = match get_user_from_headers(&http_request) {
-        Ok(user) => user,
-        Err(res) => return res,
-    };
-    match crate::preferences::set_preferences(&user.username, data.into_inner()) {
-        Ok(prefs) => HttpResponse::Ok().json(SuccessResponse {
-            status: "success",
-            data: prefs,
-        }),
-        Err(res) => res,
-    }
+pub async fn api_preferences_put(data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
+    dispatch_http("PUT", "/preferences", Some(data.into_inner()), &http_request).await
 }
