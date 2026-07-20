@@ -17,6 +17,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useFeedback } from "@/components/ui-feedback";
 import { useLocale, useT } from "@/features/i18n/locale-provider";
 import { useDaemon } from "@/features/nodes/daemon-provider";
 import { useTheme } from "@/features/theme/theme-provider";
@@ -100,6 +101,7 @@ export function FileEditorWorkspace({
   fileSize?: number;
 }) {
   const t = useT();
+  const { confirm } = useFeedback();
   const { locale } = useLocale();
   const { mode } = useTheme();
   const { getStatus, runWithClient, uploadFile } = useDaemon();
@@ -282,9 +284,15 @@ export function FileEditorWorkspace({
     return () => window.removeEventListener("keydown", onKey);
   }, [dirty, saving, loading, error, saveFile]);
 
-  function requestClose() {
-    if (dirty && !window.confirm(t("shared.instance.files.editor-unsaved"))) {
-      return;
+  async function requestClose() {
+    if (dirty) {
+      const ok = await confirm({
+        description: t("shared.instance.files.editor-unsaved"),
+        destructive: true,
+        confirmLabel: t("ui.common.confirm"),
+        cancelLabel: t("ui.common.cancel"),
+      });
+      if (!ok) return;
     }
     window.close();
   }

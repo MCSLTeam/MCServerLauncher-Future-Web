@@ -215,12 +215,6 @@ export default function ResourceCenterPage() {
 
       <Reveal delay={0.03}>
         <div className="relative mt-5 grid min-h-[28rem] grid-cols-[auto_minmax(0,1fr)] gap-2.5">
-          {loading ? (
-            <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center bg-background/15">
-              <RefreshCw className="size-12 animate-spin text-muted-foreground" />
-            </div>
-          ) : null}
-
           <aside
             className={cn(
               "overflow-hidden rounded-xl border bg-card",

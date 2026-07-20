@@ -21,12 +21,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAuth } from "@/features/auth/auth-provider";
+import { useFeedback } from "@/components/ui-feedback";
 import { useT } from "@/features/i18n/locale-provider";
 import type { SessionInfo } from "@/lib/types";
 import { formatDateTime, validatePassword } from "@/lib/validation";
 
 export default function AccountPage() {
   const t = useT();
+  const { confirm, toast } = useFeedback();
   const { user, logout, listSessions, deleteSession, changePassword } =
     useAuth();
   const [sessions, setSessions] = useState<SessionInfo[] | null>(null);
@@ -97,16 +99,22 @@ export default function AccountPage() {
   }
 
   async function onDeleteSession(id: string) {
-    if (!window.confirm(t("web.user-center.sessions.delete.confirm"))) return;
+    const ok = await confirm({
+      description: t("web.user-center.sessions.delete.confirm"),
+      destructive: true,
+      confirmLabel: t("ui.common.confirm"),
+      cancelLabel: t("ui.common.cancel"),
+    });
+    if (!ok) return;
     const result = await deleteSession(id);
     if (!result.ok) {
-      setSessionMsg(
+      toast.error(
         result.message ??
           t("web.user-center.sessions.delete.error", { reason: "" }),
       );
       return;
     }
-    setSessionMsg(t("web.user-center.sessions.delete.success"));
+    toast.success(t("web.user-center.sessions.delete.success"));
     await refreshSessions();
   }
 
@@ -221,13 +229,15 @@ export default function AccountPage() {
                   variant="destructive"
                   size="sm"
                   onClick={() => {
-                    if (
-                      window.confirm(
-                        t("web.user-center.sessions.clear.confirm"),
-                      )
-                    ) {
-                      void logout(true);
-                    }
+                    void (async () => {
+                      const ok = await confirm({
+                        description: t("web.user-center.sessions.clear.confirm"),
+                        destructive: true,
+                        confirmLabel: t("ui.common.confirm"),
+                        cancelLabel: t("ui.common.cancel"),
+                      });
+                      if (ok) void logout(true);
+                    })();
                   }}
                 >
                   {t("web.user-center.sessions.clear.button")}

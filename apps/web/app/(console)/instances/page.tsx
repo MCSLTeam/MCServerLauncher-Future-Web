@@ -39,6 +39,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { useFeedback } from "@/components/ui-feedback";
 import { useT } from "@/features/i18n/locale-provider";
 import { useDaemon } from "@/features/nodes/daemon-provider";
 import {
@@ -112,6 +113,7 @@ function statusColor(status: string) {
 
 export default function InstancesPage() {
   const t = useT();
+  const { confirm, toast } = useFeedback();
   const isTauri = useIsTauriRuntime();
   const {
     instances,
@@ -189,7 +191,13 @@ export default function InstancesPage() {
       kill: t("shared.instances.confirm.kill", { name: item.name }),
       remove: t("shared.instances.confirm.remove", { name: item.name }),
     };
-    if (!window.confirm(confirmations[action])) return;
+    const ok = await confirm({
+      description: confirmations[action],
+      destructive: action === "kill" || action === "remove",
+      confirmLabel: t("ui.common.confirm"),
+      cancelLabel: t("ui.common.cancel"),
+    });
+    if (!ok) return;
     setBusy(`${item.nodeId}:${item.id}:${action}`);
     const result =
       action === "start"
@@ -203,7 +211,7 @@ export default function InstancesPage() {
               : await removeInstance(item.nodeId, item.id);
     setBusy(null);
     if (!result.ok) {
-      window.alert(result.message ?? t("shared.instances.action.failed"));
+      toast.error(result.message ?? t("shared.instances.action.failed"));
     }
   }
 
@@ -321,12 +329,6 @@ export default function InstancesPage() {
 
       <Reveal delay={0.04}>
         <div className="relative mt-3.5 min-h-52">
-          {refreshing ? (
-            <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center bg-muted/15">
-              <RefreshCw className="size-12 animate-spin text-muted-foreground" />
-            </div>
-          ) : null}
-
           {nodes.length === 0 ? (
             <Empty className="border-0 bg-transparent shadow-none">
               <EmptyHeader>

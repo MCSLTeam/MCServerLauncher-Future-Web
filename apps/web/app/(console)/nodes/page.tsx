@@ -44,6 +44,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { useFeedback } from "@/components/ui-feedback";
 import { useT } from "@/features/i18n/locale-provider";
 import { useDaemon } from "@/features/nodes/daemon-provider";
 import {
@@ -153,6 +154,7 @@ function ResourceRow({
 
 export default function NodesPage() {
   const t = useT();
+  const { toast } = useFeedback();
   const {
     connections,
     getStatus,
@@ -181,7 +183,6 @@ export default function NodesPage() {
     id: string;
     name: string;
   } | null>(null);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   async function refreshList() {
     await hydrateNodes();
@@ -401,7 +402,6 @@ export default function NodesPage() {
   }
 
   function requestDelete(id: string, name: string) {
-    setStatusMessage(null);
     setDeleteTarget({
       id,
       name: name.trim() || t("shared.nodes.title"),
@@ -415,19 +415,19 @@ export default function NodesPage() {
       disconnectNode(id, { purge: true });
       const ok = await removeNode(id);
       if (!ok) {
-        setStatusMessage(t("shared.nodes.connect.failed"));
+        toast.error(t("shared.nodes.connect.failed"));
         return;
       }
       if (editingId === id) closeForm();
       setDeleteTarget(null);
       await refreshList();
-      setStatusMessage(
+      toast.success(
         t("shared.nodes.delete.success", {
           name: name || t("shared.nodes.title"),
         }),
       );
     } catch (error) {
-      setStatusMessage(
+      toast.error(
         error instanceof Error
           ? error.message
           : t("shared.nodes.connect.failed"),
@@ -444,9 +444,6 @@ export default function NodesPage() {
         </p>
       </Reveal>
 
-      {statusMessage ? (
-        <p className="text-sm text-emerald-600 dark:text-emerald-400">{statusMessage}</p>
-      ) : null}
 
       {/* 工具栏：右对齐 — 自动刷新 / 间隔 / 搜索 / 刷新 / 新建连接 */}
       <Reveal delay={0.02}>
@@ -592,7 +589,7 @@ export default function NodesPage() {
                       )}
                       title={detail?.error ?? undefined}
                       onClick={() => {
-                        if (detail?.error) window.alert(detail.error);
+                        if (detail?.error) toast.error(detail.error);
                       }}
                     >
                       <StatusIcon
