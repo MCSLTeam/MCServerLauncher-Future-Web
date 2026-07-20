@@ -25,3 +25,4 @@ lerna-debug.log*
 *.njsproj
 *.sln
 *.sw?
+mcsl-web
