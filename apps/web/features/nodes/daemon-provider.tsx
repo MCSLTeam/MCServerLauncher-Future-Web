@@ -11,7 +11,11 @@ import {
   type ReactNode,
 } from "react";
 
-import { DaemonClient, type UploadProgress } from "@/lib/daemon/client";
+import {
+  DaemonClient,
+  isIdempotentLifecycleError,
+  type UploadProgress,
+} from "@/lib/daemon/client";
 import {
   mapDaemonStatus,
   type DaemonConnectionState,
@@ -99,6 +103,29 @@ type DaemonContextValue = {
     instanceId: string,
   ) => Promise<{ ok: boolean; logs?: string[]; message?: string }>;
   /**
+   * 打开 binary console session（ConsoleInput/Output）。
+   * 成功时返回 sessionId + 发送/关闭/输出监听；cleanup 会 closeConsole。
+   * 未运行或 daemon 不支持时 ok=false，页面应回退到 instance.log + command.send。
+   */
+  attachConsoleSession: (
+    nodeId: string,
+    instanceId: string,
+    options?: {
+      columns?: number;
+      rows?: number;
+      onOutput?: (text: string) => void;
+    },
+  ) => Promise<
+    | {
+        ok: true;
+        sessionId: string;
+        sendInput: (text: string) => void;
+        resize: (columns: number, rows: number) => Promise<void>;
+        close: () => Promise<void>;
+      }
+    | { ok: false; message?: string }
+  >;
+  /**
    * 订阅 mcsl.event.instance.log 实时推送。cleanup 会 unsubscribe + 移除监听。
    * 对齐 WPF InstanceDataManager.SubscribeEvent(InstanceLog)。
    */
@@ -168,6 +195,17 @@ function extractSystemInfo(data: unknown): DaemonSystemInfo | null {
   return root as DaemonSystemInfo;
 }
 
+function reportProcessId(report: DaemonInstanceReport): number | null {
+  const raw = report as Record<string, unknown>;
+  const pid = report.process_id ?? raw.processId ?? raw.ProcessId;
+  if (typeof pid === "number" && Number.isFinite(pid)) return pid;
+  if (typeof pid === "string" && pid.trim() !== "") {
+    const n = Number(pid);
+    if (Number.isFinite(n)) return n;
+  }
+  return null;
+}
+
 function reportToLive(
   node: SavedNode,
   id: string,
@@ -182,7 +220,9 @@ function reportToLive(
     nodeId: node.id,
     nodeName: node.name,
     name: String(config.name ?? uuid),
-    status: mapDaemonStatus(report.status),
+    status: mapDaemonStatus(report.status, {
+      processId: reportProcessId(report),
+    }),
     type: String(config.instance_type ?? "universal"),
     gameVersion: version ? String(version) : undefined,
     cpu: perf.cpu,
@@ -532,6 +572,14 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
   const startInstance = useCallback(
     (nodeId: string, instanceId: string) =>
       withClient(nodeId, async (client) => {
+        // Optimistic: MC stays wire-stopped until Done; show starting immediately.
+        setInstances((prev) =>
+          prev.map((item) =>
+            item.nodeId === nodeId && item.id === instanceId
+              ? { ...item, status: "starting" }
+              : item,
+          ),
+        );
         await client.startInstance(instanceId);
         await refreshNodeInstances(nodeId);
       }),
@@ -541,8 +589,40 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
   const stopInstance = useCallback(
     (nodeId: string, instanceId: string) =>
       withClient(nodeId, async (client) => {
-        await client.stopInstance(instanceId);
+        // Optimistic: stop/halt may leave wire status lagging one poll.
+        setInstances((prev) =>
+          prev.map((item) =>
+            item.nodeId === nodeId && item.id === instanceId
+              ? { ...item, status: "stopping" }
+              : item,
+          ),
+        );
+        try {
+          await client.stopInstance(instanceId);
+        } catch (error) {
+          // Already stopped → treat as success (idempotent stop).
+          if (!isIdempotentLifecycleError(error)) throw error;
+          setInstances((prev) =>
+            prev.map((item) =>
+              item.nodeId === nodeId && item.id === instanceId
+                ? {
+                    ...item,
+                    status: "stopped",
+                    raw: {
+                      ...item.raw,
+                      status: "stopped",
+                      process_id: -1,
+                    },
+                  }
+                : item,
+            ),
+          );
+        }
         await refreshNodeInstances(nodeId);
+        // Second refresh after short delay: PID clear / Stopped event can lag kill.
+        window.setTimeout(() => {
+          void refreshNodeInstances(nodeId);
+        }, 400);
       }),
     [refreshNodeInstances, withClient],
   );
@@ -550,8 +630,30 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
   const killInstance = useCallback(
     (nodeId: string, instanceId: string) =>
       withClient(nodeId, async (client) => {
-        await client.killInstance(instanceId);
+        setInstances((prev) =>
+          prev.map((item) =>
+            item.nodeId === nodeId && item.id === instanceId
+              ? {
+                  ...item,
+                  status: "stopped",
+                  raw: {
+                    ...item.raw,
+                    status: "stopped",
+                    process_id: -1,
+                  },
+                }
+              : item,
+          ),
+        );
+        try {
+          await client.killInstance(instanceId);
+        } catch (error) {
+          if (!isIdempotentLifecycleError(error)) throw error;
+        }
         await refreshNodeInstances(nodeId);
+        window.setTimeout(() => {
+          void refreshNodeInstances(nodeId);
+        }, 400);
       }),
     [refreshNodeInstances, withClient],
   );
@@ -560,7 +662,12 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
   const restartInstance = useCallback(
     (nodeId: string, instanceId: string) =>
       withClient(nodeId, async (client) => {
-        await client.stopInstance(instanceId);
+        try {
+          await client.stopInstance(instanceId);
+        } catch (error) {
+          // Already down: still attempt start.
+          if (!isIdempotentLifecycleError(error)) throw error;
+        }
         await new Promise((resolve) => window.setTimeout(resolve, 1000));
         await client.startInstance(instanceId);
         await refreshNodeInstances(nodeId);
@@ -583,6 +690,112 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
         await client.sendToInstance(instanceId, command);
       }),
     [withClient],
+  );
+
+  const attachConsoleSession = useCallback(
+    async (
+      nodeId: string,
+      instanceId: string,
+      options?: {
+        columns?: number;
+        rows?: number;
+        onOutput?: (text: string) => void;
+      },
+    ) => {
+      const client = clientsRef.current.get(nodeId);
+      if (!client?.ready) {
+        const connected = await connectNode(nodeId);
+        if (!connected.ok) {
+          return { ok: false as const, message: connected.message };
+        }
+      }
+      const ready = clientsRef.current.get(nodeId);
+      if (!ready?.ready) {
+        return {
+          ok: false as const,
+          message: tKey("shared.daemon.error.not-connected"),
+        };
+      }
+
+      try {
+        // Register output listener map entry before open so early frames are not dropped
+        // if the server pushes before the open RPC returns (unlikely but safe).
+        const pendingSessionIds = new Set<string>();
+        let resolvedSessionId = "";
+        // stream:true keeps multi-byte UTF-8 intact across binary frames
+        const decoder = new TextDecoder();
+        let offOutput: (() => void) | undefined;
+
+        const session = await ready.openConsole(
+          instanceId,
+          options?.columns ?? 120,
+          options?.rows ?? 40,
+        );
+        const sessionId = String(
+          session.session_id ??
+            session.sessionId ??
+            (session as { SessionId?: string }).SessionId ??
+            "",
+        );
+        if (!sessionId) {
+          return {
+            ok: false as const,
+            message: tKey("shared.daemon.error.operation-failed"),
+          };
+        }
+        resolvedSessionId = sessionId.toLowerCase();
+        pendingSessionIds.add(resolvedSessionId);
+
+        offOutput = options?.onOutput
+          ? ready.onConsoleOutput(sessionId, (_sid, payload) => {
+              // Also accept GUID case variants from binary decode
+              options.onOutput?.(decoder.decode(payload, { stream: true }));
+            })
+          : () => undefined;
+
+        let closed = false;
+        let inputOffset = 0;
+        const close = async () => {
+          if (closed) return;
+          closed = true;
+          offOutput?.();
+          try {
+            await ready.closeConsole(sessionId);
+          } catch {
+            // ignore close errors
+          }
+        };
+
+        return {
+          ok: true as const,
+          sessionId,
+          sendInput: (text: string) => {
+            if (closed || !text) return;
+            const payload = new TextEncoder().encode(text);
+            try {
+              ready.sendConsoleInput(sessionId, payload, inputOffset);
+              inputOffset += payload.byteLength;
+            } catch {
+              // socket may be mid-reconnect; swallow so xterm keys don't throw
+            }
+          },
+          resize: async (columns: number, rows: number) => {
+            if (closed) return;
+            await ready.resizeConsole(sessionId, columns, rows);
+          },
+          close,
+        };
+      } catch (error) {
+        return {
+          ok: false as const,
+          message:
+            error instanceof Error
+              ? error.message
+              : tKey("shared.daemon.error.operation-failed"),
+        };
+      }
+    },
+    [connectNode],
   );
 
   const getLogs = useCallback(
@@ -811,6 +1024,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       removeInstance,
       sendCommand,
       getLogs,
+      attachConsoleSession,
       subscribeInstanceLog,
       refreshInstanceReport,
       runWithClient,
@@ -836,6 +1050,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       removeInstance,
       sendCommand,
       getLogs,
+      attachConsoleSession,
       subscribeInstanceLog,
       refreshInstanceReport,
       runWithClient,

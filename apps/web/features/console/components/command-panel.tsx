@@ -21,12 +21,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import {
+  PtyTerminal,
+  type PtyTerminalHandle,
+} from "@/features/console/components/pty-terminal";
 import { renderLogLines } from "@/features/console/log-utils";
 import { cn } from "@/lib/utils";
+
+export type ConsoleViewMode = "pipe" | "pty" | "log";
 
 /** WPF CommandPage: Row Auto / * / Auto — logger fills height and scrolls itself */
 export function CommandPanel({
   t,
+  mode,
   logs,
   command,
   setCommand,
@@ -44,8 +51,13 @@ export function CommandPanel({
   onSend,
   onToggleFullscreen,
   onLifecycle,
+  onPtyData,
+  onPtyResize,
+  onPtyReady,
 }: {
   t: (key: string, params?: Record<string, string | number>) => string;
+  /** pipe: log + command bar; pty: xterm only; log: read-only log stream */
+  mode: ConsoleViewMode;
   logs: string[];
   command: string;
   setCommand: (v: string) => void;
@@ -63,12 +75,17 @@ export function CommandPanel({
   onSend: () => void;
   onToggleFullscreen: () => void;
   onLifecycle: (action: "start" | "stop" | "restart" | "kill") => void;
+  onPtyData?: (data: string) => void;
+  onPtyResize?: (cols: number, rows: number) => void;
+  onPtyReady?: (handle: PtyTerminalHandle) => void;
 }) {
+  const isPty = mode === "pty";
+  const showCommandBar = mode === "pipe";
+
   return (
     <div
       ref={consoleRootRef}
       className={cn(
-        // Fill remaining console height; logger scrolls internally
         "flex h-full min-h-0 flex-1 flex-col",
         fullscreen && "fixed inset-0 z-50 h-screen bg-background p-4",
       )}
@@ -76,7 +93,9 @@ export function CommandPanel({
       <div className="flex min-h-0 flex-1 flex-col gap-3 rounded-xl border bg-card p-4 sm:p-5">
         <div className="flex shrink-0 flex-wrap items-center gap-2">
           <p className="min-w-0 flex-1 text-sm text-muted-foreground">
-            {t("shared.instance.console.feedback-tip")}
+            {isPty
+              ? t("shared.instance.console.pty-tip")
+              : t("shared.instance.console.feedback-tip")}
           </p>
           <Button
             type="button"
@@ -143,42 +162,58 @@ export function CommandPanel({
           </DropdownMenu>
         </div>
 
-        <pre
-          ref={logPreRef}
-          onScroll={onLogScroll}
-          className="mcsl-scrollbar min-h-0 flex-1 overflow-y-auto overflow-x-hidden rounded-xl bg-muted/40 p-3 font-mono text-xs leading-relaxed break-all whitespace-pre-wrap"
-        >
-          {logs.length > 0
-            ? renderLogLines(logs)
-            : t("shared.instance.console.empty")}
-        </pre>
-
-        <div className="flex shrink-0 gap-2">
-          <Input
-            ref={commandInputRef}
-            value={command}
-            onChange={(e) => setCommand(e.target.value)}
-            placeholder={t("shared.instance.console.placeholder")}
-            disabled={!canSend || busy}
-            className="h-8"
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                onSend();
-              }
-            }}
+        {isPty ? (
+          <PtyTerminal
+            active
+            // Soft-gate only when offline/stopped; do not lock stdin on busy alone.
+            disabled={!canSend}
+            // PTY master echoes; local echo would double every keystroke.
+            localEcho={false}
+            className="min-h-0 flex-1 overflow-hidden rounded-xl border border-border/60 bg-muted p-2 shadow-xs"
+            onData={(data) => onPtyData?.(data)}
+            onResize={(cols, rows) => onPtyResize?.(cols, rows)}
+            onReady={onPtyReady}
           />
-          <Button
-            type="button"
-            size="icon"
-            className="size-8 shrink-0"
-            disabled={!canSend || busy || !command.trim()}
-            onClick={() => onSend()}
-            aria-label={t("shared.instance.console.send")}
+        ) : (
+          <pre
+            ref={logPreRef}
+            onScroll={onLogScroll}
+            className="mcsl-scrollbar min-h-0 flex-1 overflow-y-auto overflow-x-hidden rounded-xl border border-border/60 bg-muted/50 p-3 font-mono text-xs leading-relaxed break-all whitespace-pre-wrap text-foreground shadow-xs"
           >
-            <Send className="size-4" />
-          </Button>
-        </div>
+            {logs.length > 0
+              ? renderLogLines(logs)
+              : t("shared.instance.console.empty")}
+          </pre>
+        )}
+
+        {showCommandBar ? (
+          <div className="flex shrink-0 gap-2">
+            <Input
+              ref={commandInputRef}
+              value={command}
+              onChange={(e) => setCommand(e.target.value)}
+              placeholder={t("shared.instance.console.placeholder")}
+              disabled={!canSend || busy}
+              className="h-8"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  onSend();
+                }
+              }}
+            />
+            <Button
+              type="button"
+              size="icon"
+              className="size-8 shrink-0"
+              disabled={!canSend || busy || !command.trim()}
+              onClick={() => onSend()}
+              aria-label={t("shared.instance.console.send")}
+            >
+              <Send className="size-4" />
+            </Button>
+          </div>
+        ) : null}
       </div>
     </div>
   );

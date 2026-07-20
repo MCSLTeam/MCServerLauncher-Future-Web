@@ -18,6 +18,12 @@ export type JsonRpcErrorObject = {
     kind?: string;
     code?: string;
     message?: string;
+    /** V2 wire: e.g. instance.not_running */
+    daemon_error_code?: string;
+    /** V2 wire: validation | not_found | conflict | … */
+    daemon_error_kind?: string;
+    correlation_id?: string;
+    details?: unknown;
     [key: string]: unknown;
   };
 };
@@ -55,6 +61,9 @@ export const V2_METHODS = {
   halt: "mcsl.instance.halt",
   remove: "mcsl.instance.remove",
   sendCommand: "mcsl.instance.command.send",
+  consoleOpen: "mcsl.instance.console.open",
+  consoleResize: "mcsl.instance.console.resize",
+  consoleClose: "mcsl.instance.console.close",
   create: "mcsl.instance.create",
   getSettings: "mcsl.instance.settings.get",
   updateSettings: "mcsl.instance.settings.update",
@@ -92,6 +101,19 @@ export type DaemonJavaListResult = {
   javaList?: JavaInfo[];
   JavaList?: JavaInfo[];
   list?: JavaInfo[];
+};
+
+export type DaemonConsoleSession = {
+  session_id?: string;
+  sessionId?: string;
+  instance_id?: string;
+  instanceId?: string;
+  expires_at?: string;
+  expiresAt?: string;
+  max_chunk_size?: number;
+  maxChunkSize?: number;
+  columns?: number;
+  rows?: number;
 };
 
 export type DaemonUploadSession = {
@@ -225,18 +247,32 @@ export type DaemonLiveInstance = {
 
 /**
  * Daemon wire status is only running|stopped|crashed.
- * UI keeps extra values (starting/stopping/installing) for local/optimistic use;
- * do not infer them from process_id — it can linger after halt/stop while status
- * is already stopped.
+ * MC servers stay `stopped` until the Done log line; while the process is up
+ * (process_id > 0) we surface `starting` so the console can attach and stop/kill
+ * work before Ready. After stop the daemon clears process_id.
  */
-export function mapDaemonStatus(status: unknown): InstanceStatus {
+export function mapDaemonStatus(
+  status: unknown,
+  options?: { processId?: number | null },
+): InstanceStatus {
   const value = String(status ?? "stopped").toLowerCase();
   if (value === "running") return "running";
   if (value === "crashed") return "crashed";
   if (value === "starting") return "starting";
   if (value === "stopping") return "stopping";
   if (value === "installing") return "installing";
+  if (value === "stopped" || value === "") {
+    const pid = options?.processId;
+    if (typeof pid === "number" && Number.isFinite(pid) && pid > 0) {
+      return "starting";
+    }
+  }
   return "stopped";
+}
+
+/** Console attach / command / stop while process is up (running or MC boot). */
+export function isInstanceProcessUp(status: InstanceStatus): boolean {
+  return status === "running" || status === "starting";
 }
 
 export function wsUrl(

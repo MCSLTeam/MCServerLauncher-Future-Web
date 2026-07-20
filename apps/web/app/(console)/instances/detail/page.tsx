@@ -37,7 +37,12 @@ import {
   EmptyHeader,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { CommandPanel } from "@/features/console/components/command-panel";
+import { useFeedback } from "@/components/ui-feedback";
+import {
+  CommandPanel,
+  type ConsoleViewMode,
+} from "@/features/console/components/command-panel";
+import type { PtyTerminalHandle } from "@/features/console/components/pty-terminal";
 import {
   ComponentManagerPanel,
   type ComponentEntry,
@@ -76,6 +81,7 @@ import { useLocale, useT } from "@/features/i18n/locale-provider";
 import { useDaemon } from "@/features/nodes/daemon-provider";
 import type { JavaInfo } from "@/lib/create/types";
 import { tryValidateJavaPath } from "@/lib/create/validation";
+import { isInstanceProcessUp } from "@/lib/daemon/types";
 import {
   buildInstanceConsoleWindowTitle,
   openFileEditorWindow,
@@ -107,6 +113,21 @@ const REPORT_POLL_MS = 2000;
 const PING_POLL_MS = 5000;
 const LOG_STICK_THRESHOLD_PX = 48;
 
+
+function normalizeSettingsConsoleMode(value: unknown): "pipe" | "pty" {
+  return String(value ?? "pipe").toLowerCase() === "pty" ? "pty" : "pipe";
+}
+
+function extractInstanceConsoleMode(
+  instance: { raw?: Record<string, unknown> | null } | null | undefined,
+): "pipe" | "pty" | null {
+  const raw = (instance?.raw ?? {}) as Record<string, unknown>;
+  const config = (raw.config ?? raw.Config ?? raw) as Record<string, unknown>;
+  const value = config.console_mode ?? config.ConsoleMode;
+  if (value == null || value === "") return null;
+  return normalizeSettingsConsoleMode(value);
+}
+
 function formatBytes(bytes: number) {
   if (!Number.isFinite(bytes) || bytes <= 0) return "0 B";
   const units = ["B", "KB", "MB", "GB", "TB"];
@@ -119,6 +140,7 @@ function formatBytes(bytes: number) {
 
 function InstanceDetailInner() {
   const t = useT();
+  const { confirm, prompt, toast } = useFeedback();
   const { locale } = useLocale();
   const search = useSearchParams();
   const id = search.get("id")?.trim() || "";
@@ -133,6 +155,7 @@ function InstanceDetailInner() {
     restartInstance,
     sendCommand,
     getLogs,
+    attachConsoleSession,
     subscribeInstanceLog,
     refreshInstanceReport,
     runWithClient,
@@ -178,6 +201,9 @@ function InstanceDetailInner() {
   const [settingsType, setSettingsType] = useState("universal");
   const [settingsTarget, setSettingsTarget] = useState("");
   const [settingsForceRerun, setSettingsForceRerun] = useState(false);
+  const [settingsConsoleMode, setSettingsConsoleMode] = useState<"pipe" | "pty">(
+    "pipe",
+  );
   const [settingsCanEdit, setSettingsCanEdit] = useState(true);
   const [settingsBlocked, setSettingsBlocked] = useState<string | null>(null);
   const [settingsError, setSettingsError] = useState<string | null>(null);
@@ -198,6 +224,14 @@ function InstanceDetailInner() {
   const stickToBottomRef = useRef(true);
   const consoleRootRef = useRef<HTMLDivElement | null>(null);
   const commandInputRef = useRef<HTMLInputElement | null>(null);
+  const consoleSessionRef = useRef<{
+    sendInput: (text: string) => void;
+    resize: (columns: number, rows: number) => Promise<void>;
+    close: () => Promise<void>;
+    interactive: boolean;
+  } | null>(null);
+  const ptyHandleRef = useRef<PtyTerminalHandle | null>(null);
+  const ptyBufferRef = useRef("");
 
   const instance = useMemo(
     () =>
@@ -207,16 +241,28 @@ function InstanceDetailInner() {
     [instances, id, nodeId],
   );
 
+  // UI mode 只跟实例配置的显式 console_mode 走；report 偶发缺字段时保持上次值，避免 pipe/pty 闪烁
+  const [consoleViewMode, setConsoleViewMode] = useState<ConsoleViewMode>("pipe");
+  useEffect(() => {
+    const next = extractInstanceConsoleMode(instance);
+    if (next) setConsoleViewMode(next);
+  }, [instance]);
+  // 仅在 console_mode 真值变化时重建终端会话
+  const consoleModeKey = consoleViewMode;
+
   const resolvedNodeId = instance?.nodeId ?? nodeId;
   const nodeOnline =
     resolvedNodeId !== "" && getStatus(resolvedNodeId) === "online";
   const canOperate = Boolean(instance && resolvedNodeId && nodeOnline);
 
   const status = instance?.status ?? "stopped";
-  const canSend = nodeOnline && status === "running";
+  // MC stays stopped on the wire until Done; mapDaemonStatus may report starting
+  // while process_id > 0 — allow console I/O and stop/kill during boot.
+  const processUp = isInstanceProcessUp(status);
+  const canSend = nodeOnline && processUp;
   const canStart =
     nodeOnline && (status === "stopped" || status === "crashed");
-  const canStop = nodeOnline && status === "running";
+  const canStop = nodeOnline && processUp;
   const canRestart = canStop;
   const canKill = canStop;
 
@@ -301,7 +347,7 @@ function InstanceDetailInner() {
     stickToBottomRef.current = distance <= LOG_STICK_THRESHOLD_PX;
   }, []);
 
-  // 终端：history + subscribe；进入 command 时 focus
+  // 注意：不要依赖整个 instance 对象（report 2s 会换引用），否则会话反复拆建 → 模式闪烁
   useEffect(() => {
     if (tab !== "command" || !resolvedNodeId || !id || !nodeOnline) {
       return undefined;
@@ -309,11 +355,19 @@ function InstanceDetailInner() {
 
     let cancelled = false;
     let unsubscribe: (() => void) | undefined;
+    let closeConsole: (() => Promise<void>) | undefined;
     stickToBottomRef.current = true;
+    consoleSessionRef.current = null;
+    // 不清空 ptyHandleRef / buffer：PtyTerminal 可能仍挂载，避免重 attach 丢 handle
+
+    const interactive = consoleModeKey === "pty";
 
     void (async () => {
       const history = await getLogs(resolvedNodeId, id);
       if (cancelled) return;
+      const historyText = history.ok
+        ? (history.logs ?? []).join("\n")
+        : "";
       if (history.ok) {
         setLogs(history.logs ?? []);
         setMessage(null);
@@ -326,30 +380,101 @@ function InstanceDetailInner() {
         );
       }
 
-      const sub = await subscribeInstanceLog(resolvedNodeId, id, (line) => {
-        if (cancelled) return;
-        setLogs((prev) => appendLogLines(prev, line));
-      });
-      if (cancelled) {
-        sub.unsubscribe?.();
-        return;
+      if (interactive && historyText) {
+        // History bytes as-is: xterm renders real ANSI/SGR if present.
+        const hist =
+          historyText.endsWith("\n") ? historyText : `${historyText}\n`;
+        if (ptyHandleRef.current) {
+          // 已有 xterm：直接灌历史，避免只缓冲不显示
+          ptyHandleRef.current.clear();
+          ptyHandleRef.current.write(hist);
+          ptyBufferRef.current = "";
+        } else {
+          ptyBufferRef.current = hist + ptyBufferRef.current;
+        }
       }
-      if (sub.ok && sub.unsubscribe) {
-        unsubscribe = sub.unsubscribe;
-      } else if (!sub.ok) {
-        setMessage(
-          sub.message ?? t("shared.instance.console.need-connection"),
-        );
+
+      if (processUp) {
+        const cols = ptyHandleRef.current?.cols?.() ?? 120;
+        const rows = ptyHandleRef.current?.rows?.() ?? 40;
+        const attached = await attachConsoleSession(resolvedNodeId, id, {
+          columns: cols,
+          rows: rows,
+          onOutput: (text) => {
+            if (cancelled) return;
+            if (interactive) {
+              if (ptyHandleRef.current) {
+                ptyHandleRef.current.write(text);
+              } else {
+                ptyBufferRef.current += text;
+              }
+              return;
+            }
+            setLogs((prev) => appendLogLines(prev, text));
+          },
+        });
+        if (cancelled) {
+          if (attached.ok) void attached.close();
+          return;
+        }
+        if (attached.ok) {
+          consoleSessionRef.current = {
+            sendInput: attached.sendInput,
+            resize: attached.resize,
+            close: attached.close,
+            interactive,
+          };
+          closeConsole = attached.close;
+          // Push current xterm size after open (initial open used fit size)
+          try {
+            const c = ptyHandleRef.current?.cols?.() ?? cols;
+            const r = ptyHandleRef.current?.rows?.() ?? rows;
+            void attached.resize(c, r);
+          } catch {
+            // ignore
+          }
+          return;
+        }
+        if (interactive) {
+          setMessage(
+            attached.message ?? t("shared.instance.console.need-connection"),
+          );
+        }
+      }
+
+      // binary console 不可用：pipe 订阅 log 事件；pty 仍保留 xterm，仅展示 history
+      if (!interactive) {
+        const sub = await subscribeInstanceLog(resolvedNodeId, id, (line) => {
+          if (cancelled) return;
+          setLogs((prev) => appendLogLines(prev, line));
+        });
+        if (cancelled) {
+          sub.unsubscribe?.();
+          return;
+        }
+        if (sub.ok && sub.unsubscribe) {
+          unsubscribe = sub.unsubscribe;
+        } else if (!sub.ok) {
+          setMessage(
+            sub.message ?? t("shared.instance.console.need-connection"),
+          );
+        }
       }
     })();
 
     const focusTimer = window.setTimeout(() => {
-      commandInputRef.current?.focus();
+      if (interactive) {
+        ptyHandleRef.current?.focus();
+      } else {
+        commandInputRef.current?.focus();
+      }
     }, 50);
 
     return () => {
       cancelled = true;
+      consoleSessionRef.current = null;
       unsubscribe?.();
+      void closeConsole?.();
       window.clearTimeout(focusTimer);
     };
   }, [
@@ -357,7 +482,13 @@ function InstanceDetailInner() {
     resolvedNodeId,
     id,
     nodeOnline,
+    // Do NOT depend on `status` / processUp string churn (starting→running):
+    // that tore down binary console mid-typing. Re-attach only when process
+    // up/down flips or mode/tab/node changes.
+    processUp,
+    consoleModeKey,
     getLogs,
+    attachConsoleSession,
     subscribeInstanceLog,
     scrollLogToEnd,
     t,
@@ -494,6 +625,11 @@ function InstanceDetailInner() {
       setSettingsType(normalizeInstanceType(String(fallback.instance_type ?? instance?.type ?? "universal")));
       setSettingsTarget(String(fallback.target ?? ""));
       setSettingsForceRerun(false);
+      const fbMode = normalizeSettingsConsoleMode(
+        fallback.console_mode ?? fallback.ConsoleMode,
+      );
+      setSettingsConsoleMode(fbMode);
+      setConsoleViewMode(fbMode);
       setSettingsSnapshot(
         JSON.stringify({
           name: String(fallback.name ?? instance?.name ?? ""),
@@ -502,6 +638,7 @@ function InstanceDetailInner() {
           version: String(fallback.version ?? fallback.mc_version ?? ""),
           type: normalizeInstanceType(String(fallback.instance_type ?? instance?.type ?? "universal")),
           force: false,
+          consoleMode: fbMode,
         }),
       );
       setSettingsCanEdit(true);
@@ -533,6 +670,11 @@ function InstanceDetailInner() {
     setSettingsType(nextType);
     setSettingsTarget(String(config.target ?? config.Target ?? ""));
     setSettingsForceRerun(false);
+    const nextConsoleMode = normalizeSettingsConsoleMode(
+      config.console_mode ?? config.ConsoleMode,
+    );
+    setSettingsConsoleMode(nextConsoleMode);
+    setConsoleViewMode(nextConsoleMode);
     const canEdit = data.can_edit ?? data.CanEdit;
     setSettingsCanEdit(canEdit !== false);
     setSettingsBlocked(
@@ -550,6 +692,7 @@ function InstanceDetailInner() {
         version: String(config.version ?? config.Version ?? config.mc_version ?? ""),
         type: nextType,
         force: false,
+        consoleMode: nextConsoleMode,
       }),
     );
 
@@ -689,8 +832,23 @@ function InstanceDetailInner() {
       setMessage(t("shared.instance.console.action-unavailable"));
       return;
     }
+    const line = command.trim();
     setBusy(true);
-    const result = await sendCommand(resolvedNodeId, id, command.trim());
+    const session = consoleSessionRef.current;
+    if (session && !session.interactive) {
+      try {
+        // Pipe session：行模式补换行
+        session.sendInput(`${line}\n`);
+        setBusy(false);
+        setCommand("");
+        setMessage(null);
+        commandInputRef.current?.focus();
+        return;
+      } catch {
+        // fall through to command.send
+      }
+    }
+    const result = await sendCommand(resolvedNodeId, id, line);
     setBusy(false);
     if (result.ok) {
       setCommand("");
@@ -719,7 +877,11 @@ function InstanceDetailInner() {
 
   async function onCreateDirectory() {
     if (!resolvedNodeId || !canOperate) return;
-    const name = window.prompt(t("shared.instance.files.mkdir-prompt"));
+    const name = await prompt({
+      title: t("shared.instance.files.mkdir-prompt"),
+      confirmLabel: t("ui.common.confirm"),
+      cancelLabel: t("ui.common.cancel"),
+    });
     if (!name?.trim()) return;
     const real = getRealPath(
       rootPath,
@@ -742,10 +904,12 @@ function InstanceDetailInner() {
     if (!resolvedNodeId || !canOperate || !selectedNames[0]) return;
     const entry = fileEntries.find((item) => item.name === selectedNames[0]);
     if (!entry) return;
-    const next = window.prompt(
-      t("shared.instance.files.rename-prompt"),
-      entry.name,
-    );
+    const next = await prompt({
+      title: t("shared.instance.files.rename-prompt"),
+      defaultValue: entry.name,
+      confirmLabel: t("ui.common.confirm"),
+      cancelLabel: t("ui.common.cancel"),
+    });
     if (!next?.trim() || next.trim() === entry.name) return;
     const real = getRealPath(
       rootPath,
@@ -776,9 +940,12 @@ function InstanceDetailInner() {
       entries.length === 1
         ? entries[0].name
         : t("shared.instance.files.delete-multi", { count: entries.length });
-    const ok = window.confirm(
-      t("shared.instance.files.delete-confirm", { name: label }),
-    );
+    const ok = await confirm({
+      description: t("shared.instance.files.delete-confirm", { name: label }),
+      destructive: true,
+      confirmLabel: t("ui.common.confirm"),
+      cancelLabel: t("ui.common.cancel"),
+    });
     if (!ok) return;
     setBusy(true);
     setMessage(null);
@@ -853,11 +1020,12 @@ function InstanceDetailInner() {
   async function openFileEditor(entry: DirEntry) {
     if (!resolvedNodeId || !canOperate || entry.kind !== "file") return;
     if (!isLikelyTextFile(entry.name, entry.size)) {
-      if (
-        !window.confirm(t("shared.instance.files.editor-binary-confirm"))
-      ) {
-        return;
-      }
+      const ok = await confirm({
+        description: t("shared.instance.files.editor-binary-confirm"),
+        confirmLabel: t("ui.common.confirm"),
+        cancelLabel: t("ui.common.cancel"),
+      });
+      if (!ok) return;
     }
     const real = getRealPath(
       rootPath,
@@ -994,6 +1162,7 @@ function InstanceDetailInner() {
         arguments: args,
         version: settingsVersion.trim() || null,
         force_rerun_installer: settingsForceRerun,
+        console_mode: settingsConsoleMode,
         replacement_core,
       }),
     );
@@ -1006,6 +1175,7 @@ function InstanceDetailInner() {
     }
     setReplacementCoreFile(null);
     setMessage(null);
+    setConsoleViewMode(settingsConsoleMode);
     void refreshInstanceReport(resolvedNodeId, id);
     void loadSettings();
   }
@@ -1098,9 +1268,13 @@ function InstanceDetailInner() {
 
   async function deleteComponent(entry: ComponentEntry) {
     if (!resolvedNodeId || !canOperate) return;
-    if (!window.confirm(t("shared.instance.files.delete-confirm", { name: entry.name }))) {
-      return;
-    }
+    const ok = await confirm({
+      description: t("shared.instance.files.delete-confirm", { name: entry.name }),
+      destructive: true,
+      confirmLabel: t("ui.common.confirm"),
+      cancelLabel: t("ui.common.cancel"),
+    });
+    if (!ok) return;
     const real = getRealPath(rootPath, `/${entry.kind}/${entry.name}`);
     setBusy(true);
     const result = await runWithClient(resolvedNodeId, (client) =>
@@ -1145,6 +1319,7 @@ function InstanceDetailInner() {
         version: settingsVersion,
         type: settingsType,
         force: settingsForceRerun,
+        consoleMode: settingsConsoleMode,
       }) || Boolean(replacementCoreFile);
 
   if (!id) {
@@ -1423,8 +1598,9 @@ function InstanceDetailInner() {
 
       {tab === "command" ? (
         <Reveal delay={0.04} className="flex h-full min-h-0 flex-1 flex-col">
-          <CommandPanel
+                    <CommandPanel
             t={t}
+            mode={consoleViewMode === "pty" ? "pty" : "pipe"}
             logs={logs}
             command={command}
             setCommand={setCommand}
@@ -1442,6 +1618,25 @@ function InstanceDetailInner() {
             onSend={() => void onSend()}
             onToggleFullscreen={() => void toggleFullscreen()}
             onLifecycle={requestLifecycle}
+            onPtyData={(data) => {
+              const session = consoleSessionRef.current;
+              if (!session) return;
+              // Always forward raw keystrokes once binary session exists
+              // (interactive PTY or pipe session used as raw channel).
+              session.sendInput(data);
+            }}
+            onPtyResize={(cols, rows) => {
+              void consoleSessionRef.current?.resize(cols, rows);
+            }}
+            onPtyReady={(handle) => {
+              ptyHandleRef.current = handle;
+              if (ptyBufferRef.current) {
+                handle.write(ptyBufferRef.current);
+                ptyBufferRef.current = "";
+              }
+              handle.fit();
+              handle.focus();
+            }}
           />
         </Reveal>
       ) : null}
@@ -1583,6 +1778,8 @@ function InstanceDetailInner() {
             target={settingsTarget}
             forceRerun={settingsForceRerun}
             setForceRerun={setSettingsForceRerun}
+            consoleMode={settingsConsoleMode}
+            setConsoleMode={setSettingsConsoleMode}
             replacementCoreName={replacementCoreFile?.name ?? null}
             dirty={settingsDirty}
             onRefresh={() => void loadSettings()}

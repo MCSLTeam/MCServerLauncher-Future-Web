@@ -1,6 +1,9 @@
 import {
+  BINARY_FRAME_KIND_CONSOLE_INPUT,
+  BINARY_FRAME_KIND_CONSOLE_OUTPUT,
   BINARY_FRAME_KIND_DOWNLOAD,
   BINARY_FRAME_KIND_UPLOAD,
+  DEFAULT_MAX_CHUNK_SIZE,
   buildBinaryFrame,
   sha256Hex,
   tryReadBinaryFrame,
@@ -9,6 +12,7 @@ import { toDaemonPath } from "@/features/console/virtual-path";
 import { tKey } from "@/lib/i18n/translate";
 import {
   type DaemonAddInstanceResult,
+  type DaemonConsoleSession,
   type DaemonDownloadReadResult,
   type DaemonDownloadSession,
   type DaemonInstanceConfig,
@@ -46,6 +50,12 @@ type PendingDownloadChunk = {
   offset: number;
   length: number;
 };
+
+export type ConsoleOutputListener = (
+  sessionId: string,
+  payload: Uint8Array,
+  offset: number,
+) => void;
 
 /** Daemon 主动推送事件（V2 JSON-RPC notification method = event name） */
 export type DaemonEventPacket = {
@@ -92,6 +102,7 @@ export class DaemonClient {
   private pendingUploadAcks = new Map<string, PendingUploadAck>();
   private pendingDownloadChunks = new Map<string, PendingDownloadChunk>();
   private eventListeners = new Set<DaemonEventListener>();
+  private consoleOutputListeners = new Map<string, Set<ConsoleOutputListener>>();
   private closedByUser = false;
   private readonly timeoutMs: number;
 
@@ -391,6 +402,7 @@ export class DaemonClient {
     arguments?: string[];
     version?: string | null;
     force_rerun_installer?: boolean;
+    console_mode?: "pipe" | "pty";
     replacement_core?: {
       uploaded_source_path: string;
       preferred_target_name?: string | null;
@@ -404,6 +416,7 @@ export class DaemonClient {
       arguments: params.arguments ?? [],
       version: params.version ?? null,
       force_rerun_installer: params.force_rerun_installer ?? false,
+      console_mode: params.console_mode ?? "pipe",
       replacement_core: params.replacement_core
         ? {
             uploaded_source_path: toDaemonPath(
@@ -421,11 +434,13 @@ export class DaemonClient {
   }
 
   stopInstance(id: string) {
-    return this.request(V2_METHODS.stop, { instance_id: id });
+    // Graceful stop can take a while for MC; keep default unless hung.
+    return this.request(V2_METHODS.stop, { instance_id: id }, 30_000);
   }
 
   killInstance(id: string) {
-    return this.request(V2_METHODS.halt, { instance_id: id });
+    // Halt must return quickly after daemon fix; still allow >12s for slow kill trees.
+    return this.request(V2_METHODS.halt, { instance_id: id }, 30_000);
   }
 
   removeInstance(id: string) {
@@ -437,6 +452,74 @@ export class DaemonClient {
       instance_id: id,
       command: message,
     });
+  }
+
+  openConsole(instanceId: string, columns = 120, rows = 40) {
+    return this.request<DaemonConsoleSession>(V2_METHODS.consoleOpen, {
+      instance_id: instanceId,
+      columns,
+      rows,
+    });
+  }
+
+  resizeConsole(sessionId: string, columns: number, rows: number) {
+    return this.request(V2_METHODS.consoleResize, {
+      session_id: sessionId,
+      columns,
+      rows,
+    });
+  }
+
+  closeConsole(sessionId: string) {
+    return this.request(V2_METHODS.consoleClose, {
+      session_id: sessionId,
+    });
+  }
+
+  /** 订阅某 console session 的 ConsoleOutput 二进制帧。 */
+  onConsoleOutput(
+    sessionId: string,
+    listener: ConsoleOutputListener,
+  ): () => void {
+    // Normalize GUID case so binary big-endian decode matches JSON open result.
+    const key = sessionId.toLowerCase();
+    let set = this.consoleOutputListeners.get(key);
+    if (!set) {
+      set = new Set();
+      this.consoleOutputListeners.set(key, set);
+    }
+    set.add(listener);
+    return () => {
+      const current = this.consoleOutputListeners.get(key);
+      if (!current) return;
+      current.delete(listener);
+      if (current.size === 0) {
+        this.consoleOutputListeners.delete(key);
+      }
+    };
+  }
+
+  /**
+   * 发送 ConsoleInput 二进制帧（无 ack）。
+   * PTY 模式下应发送原始按键/字节；pipe 模式仍可用 sendToInstance。
+   */
+  sendConsoleInput(
+    sessionId: string,
+    payload: Uint8Array,
+    offset = 0,
+    maximumChunkSize = DEFAULT_MAX_CHUNK_SIZE,
+  ): void {
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+      throw new Error(tKey("shared.daemon.error.not-connected"));
+    }
+    const frame = buildBinaryFrame(
+      BINARY_FRAME_KIND_CONSOLE_INPUT,
+      sessionId,
+      offset,
+      payload,
+      maximumChunkSize,
+    );
+    this.socket.send(frame);
   }
 
   async getJavaList(timeoutMs = 60_000): Promise<JavaInfo[]> {
@@ -500,7 +583,8 @@ export class DaemonClient {
   ): Promise<string> {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
       throw new Error(tKey("shared.daemon.error.not-connected"));
-    }toDaemonPath(dst)
+    }
+    const path = toDaemonPath(dst);
     const total = file.size;
     const buffer = new Uint8Array(await file.arrayBuffer());
     const sha256 = await sha256Hex(buffer);
@@ -508,7 +592,7 @@ export class DaemonClient {
     const session = await this.request<DaemonUploadSession>(
       V2_METHODS.uploadOpen,
       {
-        path: dst,
+        path,
         length: total,
         sha256,
       },
@@ -554,7 +638,7 @@ export class DaemonClient {
       );
       closed = true;
       options?.onProgress?.({ loaded: total, total, done: true });
-      return dst;
+      return path;
     } catch (error) {
       if (!closed) {
         try {
@@ -758,6 +842,29 @@ export class DaemonClient {
     if (parsed.header.kind === BINARY_FRAME_KIND_UPLOAD) {
       return;
     }
+
+    if (parsed.header.kind === BINARY_FRAME_KIND_CONSOLE_OUTPUT) {
+      const key = parsed.header.sessionId.toLowerCase();
+      const listeners = this.consoleOutputListeners.get(key);
+      if (!listeners || listeners.size === 0) return;
+      for (const listener of listeners) {
+        try {
+          listener(
+            parsed.header.sessionId,
+            parsed.payload,
+            parsed.header.offset,
+          );
+        } catch {
+          // ignore listener errors
+        }
+      }
+      return;
+    }
+
+    // ConsoleInput is client-originated; ignore unexpected inbound frames.
+    if (parsed.header.kind === BINARY_FRAME_KIND_CONSOLE_INPUT) {
+      return;
+    }
   }
 
   private async handleTextMessage(text: string) {
@@ -916,23 +1023,79 @@ export class DaemonClient {
       pending.reject(error);
     }
     this.pendingDownloadChunks.clear();
+    this.consoleOutputListeners.clear();
   }
 }
 
+/** Prefer V2 daemon_error_code; map common lifecycle codes to Chinese soft strings. */
 function toRpcError(error: JsonRpcErrorObject): Error {
-  const dataMessage =
+  const data =
     error.data && typeof error.data === "object"
-      ? String(
-          (error.data as { message?: string }).message ??
-            (error.data as { code?: string }).code ??
-            "",
-        )
+      ? (error.data as Record<string, unknown>)
+      : null;
+  const daemonCode =
+    data && typeof data.daemon_error_code === "string"
+      ? data.daemon_error_code
+      : data && typeof data.code === "string"
+        ? data.code
+        : "";
+  const dataMessage =
+    data && typeof data.message === "string" && data.message.trim()
+      ? data.message.trim()
       : "";
+
+  const mapped = mapDaemonErrorCode(daemonCode);
+  if (mapped) {
+    const err = new Error(mapped);
+    (err as Error & { daemonErrorCode?: string }).daemonErrorCode = daemonCode;
+    return err;
+  }
+
+  // Avoid bare "Daemon error" / "Rejected" when we have a structured code.
+  const top = (error.message || "").trim();
+  const topIsGeneric =
+    !top ||
+    /^daemon error$/i.test(top) ||
+    /^rejected$/i.test(top) ||
+    /^failed$/i.test(top) ||
+    /^remote failure$/i.test(top);
+
   const message =
+    (!topIsGeneric ? top : "") ||
     dataMessage ||
-    error.message ||
-    tKey("shared.daemon.error.action-failed", { action: "rpc" });
-  return new Error(message);
+    daemonCode ||
+    tKey("shared.daemon.error.operation-failed");
+  const err = new Error(message);
+  if (daemonCode) {
+    (err as Error & { daemonErrorCode?: string }).daemonErrorCode = daemonCode;
+  }
+  return err;
+}
+
+function mapDaemonErrorCode(code: string): string | null {
+  if (!code) return null;
+  const key = `shared.daemon.error.code.${code}`;
+  const translated = tKey(key);
+  return translated !== key ? translated : null;
+}
+
+/** True when stop/kill against an already-stopped instance (idempotent success). */
+export function isIdempotentLifecycleError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  const code = (error as Error & { daemonErrorCode?: string }).daemonErrorCode;
+  if (
+    code === "instance.not_running" ||
+    code === "instance.already_stopped"
+  ) {
+    return true;
+  }
+  const msg = error.message.toLowerCase();
+  return (
+    msg.includes("instance.not_running") ||
+    msg.includes("not running") ||
+    msg.includes("实例未运行") ||
+    msg.includes("实例不在运行")
+  );
 }
 
 /** Map flat create wizard payload → V2 nested CreateInstanceRequest. */

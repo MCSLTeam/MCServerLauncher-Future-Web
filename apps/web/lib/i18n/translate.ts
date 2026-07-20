@@ -994,6 +994,7 @@ const SOFT_DEFAULTS: Record<string, SoftDefault> = {
   },
   "ui.common.actions": { zh: "操作", en: "Actions" },
   "ui.common.close": { zh: "关闭", en: "Close" },
+  "ui.common.confirm": { zh: "确定", en: "OK" },
   "ui.common.cancel": { zh: "取消", en: "Cancel" },
   "ui.common.delete": { zh: "删除", en: "Delete" },
   "shared.nodes.title": { zh: "远程主机", en: "Remote Host",
@@ -1061,6 +1062,10 @@ const SOFT_DEFAULTS: Record<string, SoftDefault> = {
   "shared.instance.console.feedback-tip": {
     zh: "控制台输出会实时追加。若实例未运行，无法发送命令。",
     en: "Console output appends in real time. Commands can only be sent while the instance is running.",
+  },
+  "shared.instance.console.pty-tip": {
+    zh: "交互式 PTY 终端：直接在终端内输入，无需底部命令栏。",
+    en: "Interactive PTY terminal: type in the terminal itself; no separate command bar.",
   },
   "shared.instance.console.enter-fullscreen": {
     zh: "全屏控制台",
@@ -1385,6 +1390,22 @@ const SOFT_DEFAULTS: Record<string, SoftDefault> = {
     zh: "保存实例设置失败。",
     en: "Failed to save instance settings.",
   },
+  "shared.instance.settings.console-mode": {
+    zh: "终端模式",
+    en: "Console mode",
+  },
+  "shared.instance.settings.console-mode-pipe": {
+    zh: "管道（命令行）",
+    en: "Pipe (command line)",
+  },
+  "shared.instance.settings.console-mode-pty": {
+    zh: "PTY（交互式终端）",
+    en: "PTY (interactive terminal)",
+  },
+  "shared.instance.settings.console-mode-hint": {
+    zh: "切换后需停止并重新启动实例才会生效。PTY 适合交互式程序；Minecraft 服务端通常使用管道模式。",
+    en: "Stop and restart the instance for changes to take effect. PTY suits interactive programs; Minecraft servers usually use pipe mode.",
+  },
   "shared.instance.detail.overview": { zh: "实例看板", en: "Board" },
   "shared.instance.detail.console": { zh: "实时终端", en: "Console" },
   "shared.instance.detail.files": { zh: "文件管理", en: "Files",
@@ -1618,6 +1639,30 @@ const SOFT_DEFAULTS: Record<string, SoftDefault> = {
   "shared.daemon.error.upload-cancelled": { zh: "上传已取消", en: "Upload cancelled" },
   "shared.daemon.error.upload-chunk-timeout": { zh: "文件分片上传超时", en: "Upload chunk timed out" },
   "shared.daemon.error.read-logs-failed": { zh: "读取日志失败", en: "Failed to read logs" },
+  "shared.daemon.error.code.instance.not_running": {
+    zh: "实例未在运行（可能已关闭）",
+    en: "Instance is not running (already stopped)",
+  },
+  "shared.daemon.error.code.instance.already_running": {
+    zh: "实例已在运行",
+    en: "Instance is already running",
+  },
+  "shared.daemon.error.code.instance.running": {
+    zh: "实例仍在运行，请先关闭",
+    en: "Instance is still running; stop it first",
+  },
+  "shared.daemon.error.code.instance.not_found": {
+    zh: "找不到该实例",
+    en: "Instance not found",
+  },
+  "shared.daemon.error.code.instance.start_failed": {
+    zh: "启动实例失败",
+    en: "Failed to start instance",
+  },
+  "shared.daemon.error.code.instance.stop_failed": {
+    zh: "关闭实例失败",
+    en: "Failed to stop instance",
+  },
   "shared.download.cancelled": { zh: "下载已取消", en: "Download cancelled" },
   "shared.resource-center.tag.proxy": { zh: "代理", en: "Proxy",
     ja: "ダウンロードキャンセル",

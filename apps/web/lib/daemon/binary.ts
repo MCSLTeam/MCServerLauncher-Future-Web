@@ -4,11 +4,15 @@ export const BINARY_FRAME_HEADER_SIZE = 32;
 export const BINARY_FRAME_VERSION = 1;
 export const BINARY_FRAME_KIND_UPLOAD = 1;
 export const BINARY_FRAME_KIND_DOWNLOAD = 2;
+export const BINARY_FRAME_KIND_CONSOLE_INPUT = 3;
+export const BINARY_FRAME_KIND_CONSOLE_OUTPUT = 4;
 export const DEFAULT_MAX_CHUNK_SIZE = 1024 * 1024;
 
 export type BinaryFrameKind =
   | typeof BINARY_FRAME_KIND_UPLOAD
-  | typeof BINARY_FRAME_KIND_DOWNLOAD;
+  | typeof BINARY_FRAME_KIND_DOWNLOAD
+  | typeof BINARY_FRAME_KIND_CONSOLE_INPUT
+  | typeof BINARY_FRAME_KIND_CONSOLE_OUTPUT;
 
 export type BinaryFrameHeader = {
   version: number;
@@ -95,7 +99,12 @@ export function tryReadBinaryFrame(
     return { ok: false, error: "unsupported_version" };
   }
   const kind = bytes[1] as BinaryFrameKind;
-  if (kind !== BINARY_FRAME_KIND_UPLOAD && kind !== BINARY_FRAME_KIND_DOWNLOAD) {
+  if (
+    kind !== BINARY_FRAME_KIND_UPLOAD &&
+    kind !== BINARY_FRAME_KIND_DOWNLOAD &&
+    kind !== BINARY_FRAME_KIND_CONSOLE_INPUT &&
+    kind !== BINARY_FRAME_KIND_CONSOLE_OUTPUT
+  ) {
     return { ok: false, error: "unknown_kind" };
   }
   if (bytes[2] !== 0 || bytes[3] !== 0) {
