@@ -64,6 +64,8 @@ export function InstanceSettingsPanel({
   target,
   forceRerun,
   setForceRerun,
+  consoleMode,
+  setConsoleMode,
   replacementCoreName,
   dirty,
   onRefresh,
@@ -96,6 +98,8 @@ export function InstanceSettingsPanel({
   target: string;
   forceRerun: boolean;
   setForceRerun: (v: boolean) => void;
+  consoleMode: "pipe" | "pty";
+  setConsoleMode: (v: "pipe" | "pty") => void;
   replacementCoreName: string | null;
   dirty: boolean;
   onRefresh: () => void;
@@ -194,6 +198,31 @@ export function InstanceSettingsPanel({
                   </Select>
                 </Field>
               </div>
+              <Field>
+                <FieldLabel>{t("shared.instance.settings.console-mode")}</FieldLabel>
+                <Select
+                  value={consoleMode}
+                  disabled={!canEdit}
+                  onValueChange={(v) =>
+                    setConsoleMode(v === "pty" ? "pty" : "pipe")
+                  }
+                >
+                  <SelectTrigger className="w-full sm:max-w-md">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pipe">
+                      {t("shared.instance.settings.console-mode-pipe")}
+                    </SelectItem>
+                    <SelectItem value="pty">
+                      {t("shared.instance.settings.console-mode-pty")}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <FieldDescription>
+                  {t("shared.instance.settings.console-mode-hint")}
+                </FieldDescription>
+              </Field>
               {!canEdit && blockedReason ? (
                 <FieldDescription>{blockedReason}</FieldDescription>
               ) : null}

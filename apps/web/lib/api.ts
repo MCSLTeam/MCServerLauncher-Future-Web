@@ -1,5 +1,6 @@
 import { formatApiError } from "@/lib/api-errors";
 import { clearToken, readToken } from "@/lib/auth-storage";
+import { invokeTauri, isTauriRuntime } from "@/lib/tauri-runtime";
 
 export type ApiResult<T> = {
   ok: boolean;
@@ -59,6 +60,53 @@ export async function requestApi<T>(
   }
 
   const url = path.startsWith("/") ? path : `/api/${path}`;
+
+  // Tauri：进程内调用 Rust 业务函数，不依赖 Actix HTTP / Next rewrite。
+  if (isTauriRuntime()) {
+    try {
+      const invokeResult = await invokeTauri<{
+        ok: boolean;
+        status: number;
+        data?: T;
+        err?: string;
+      }>("web_api", {
+        args: {
+          method,
+          path: url,
+          body: options.body ?? null,
+          authorization: headers.Authorization ?? null,
+        },
+      });
+
+      if (!invokeResult.ok) {
+        const errCode = invokeResult.err;
+        if (errCode === "invalid-token" && !options.silentAuthError) {
+          clearToken();
+          onUnauthorized?.();
+        }
+        return {
+          ok: false,
+          status: invokeResult.status || 500,
+          err: errCode,
+          message: formatApiError(errCode),
+          data: invokeResult.data,
+        };
+      }
+
+      return {
+        ok: true,
+        status: invokeResult.status || 200,
+        data: invokeResult.data as T,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        status: 0,
+        err: "network-error",
+        message: formatApiError("network-error"),
+      };
+    }
+  }
 
   try {
     const response = await fetch(url, {
