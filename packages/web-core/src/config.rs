@@ -1,8 +1,8 @@
+use crate::MAIN_DIR_NAME;
 use log::{error, info};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
-use crate::MAIN_DIR_NAME;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct WebConfig {
@@ -58,7 +58,7 @@ pub fn load_config(main_dir: &Path) -> std::io::Result<WebConfig> {
             config_file.display(),
             e
         );
-        e
+        std::io::Error::new(std::io::ErrorKind::InvalidData, e)
     })?;
 
     info!("Loaded config file");

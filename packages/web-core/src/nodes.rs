@@ -1,10 +1,9 @@
-use crate::api::FailedResponse;
+use crate::error::{AppError, AppResult};
 use crate::user::User;
 use crate::utils::{
     acquire_read_lock, acquire_write_lock, current_time, generate_random_string,
 };
 use crate::MAIN_DIR_NAME;
-use actix_web::HttpResponse;
 use log::{error, info};
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -12,10 +11,6 @@ use std::io::Error;
 use std::path::Path;
 use std::sync::{Arc, RwLock};
 
-/// 可见性：
-/// - `all`：所有已登录用户可见（默认）
-/// - `selected`：仅 `visible_to` 中的用户名可见
-/// - `admins`：仅具备 node.manage 的管理员可见
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum NodeVisibilityMode {
@@ -39,11 +34,9 @@ pub struct StoredNode {
     pub host: String,
     pub port: String,
     pub secure: bool,
-    /// Daemon 访问令牌（服务端持久化；列表接口默认不返回）
     pub token: String,
     #[serde(default)]
     pub visibility: NodeVisibilityMode,
-    /// `selected` 模式下的可见用户名列表
     #[serde(default)]
     pub visible_to: Vec<String>,
     pub created_at: u128,
@@ -66,31 +59,30 @@ pub struct NodePublic {
     pub updated_at: u128,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct NodeInput {
     pub name: String,
     pub host: String,
     pub port: String,
     pub secure: bool,
-    /// 创建必填；更新时省略或空字符串表示不修改
     pub token: Option<String>,
     pub visibility: Option<NodeVisibilityMode>,
     pub visible_to: Option<Vec<String>>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct VisibilityInput {
     pub visibility: NodeVisibilityMode,
     #[serde(default)]
     pub visible_to: Vec<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct ImportNodesInput {
     pub nodes: Vec<ImportNodeItem>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct ImportNodeItem {
     pub id: Option<String>,
     pub name: String,
@@ -127,7 +119,7 @@ pub fn load_nodes() -> Result<(), Error> {
 
     let nodes: Vec<StoredNode> = serde_json::from_str(&json).map_err(|e| {
         error!("Failed to parse nodes file at {}: {}", file.display(), e);
-        e
+        Error::new(std::io::ErrorKind::InvalidData, e)
     })?;
 
     let mut cache = NODES_CACHE.write().map_err(|e| {
@@ -138,28 +130,22 @@ pub fn load_nodes() -> Result<(), Error> {
     Ok(())
 }
 
-fn save_nodes(nodes: &[StoredNode]) -> Result<(), HttpResponse> {
+fn save_nodes(nodes: &[StoredNode]) -> AppResult<()> {
     let file = Path::new(MAIN_DIR_NAME).join(NODES_FILE_NAME);
     let json = serde_json::to_string_pretty(nodes).map_err(|e| {
         error!("Failed to serialize nodes: {}", e);
-        HttpResponse::InternalServerError().json(FailedResponse {
-            status: "failed",
-            err: "internal-server-error",
-        })
+        AppError::internal()
     })?;
     fs::write(&file, json).map_err(|e| {
         error!("Failed to write nodes file at {}: {}", file.display(), e);
-        HttpResponse::InternalServerError().json(FailedResponse {
-            status: "failed",
-            err: "internal-server-error",
-        })
+        AppError::internal()
     })?;
     Ok(())
 }
 
-fn with_nodes_mut<F, T>(f: F) -> Result<T, HttpResponse>
+fn with_nodes_mut<F, T>(f: F) -> AppResult<T>
 where
-    F: FnOnce(&mut Vec<StoredNode>) -> Result<T, HttpResponse>,
+    F: FnOnce(&mut Vec<StoredNode>) -> AppResult<T>,
 {
     let mut cache = acquire_write_lock(&NODES_CACHE)?;
     let nodes = cache.0.get_or_insert_with(Vec::new);
@@ -169,9 +155,9 @@ where
     Ok(result)
 }
 
-fn with_nodes_read<F, T>(f: F) -> Result<T, HttpResponse>
+fn with_nodes_read<F, T>(f: F) -> AppResult<T>
 where
-    F: FnOnce(&[StoredNode]) -> Result<T, HttpResponse>,
+    F: FnOnce(&[StoredNode]) -> AppResult<T>,
 {
     let cache = acquire_read_lock(&NODES_CACHE)?;
     let nodes = cache.0.as_ref().map(|v| v.as_slice()).unwrap_or(&[]);
@@ -212,23 +198,17 @@ fn to_public(node: &StoredNode) -> NodePublic {
     }
 }
 
-fn validate_input(name: &str, host: &str, port: &str) -> Result<(), HttpResponse> {
+fn validate_input(name: &str, host: &str, port: &str) -> AppResult<()> {
     if name.trim().is_empty() || host.trim().is_empty() || port.trim().is_empty() {
-        return Err(HttpResponse::BadRequest().json(FailedResponse {
-            status: "failed",
-            err: "invalid-params",
-        }));
+        return Err(AppError::bad_request("invalid-params"));
     }
     if port.parse::<u16>().is_err() {
-        return Err(HttpResponse::BadRequest().json(FailedResponse {
-            status: "failed",
-            err: "invalid-params",
-        }));
+        return Err(AppError::bad_request("invalid-params"));
     }
     Ok(())
 }
 
-pub fn list_visible_nodes(user: &User) -> Result<Vec<NodePublic>, HttpResponse> {
+pub fn list_visible_nodes(user: &User) -> AppResult<Vec<NodePublic>> {
     with_nodes_read(|nodes| {
         let mut out: Vec<NodePublic> = nodes
             .iter()
@@ -240,44 +220,30 @@ pub fn list_visible_nodes(user: &User) -> Result<Vec<NodePublic>, HttpResponse> 
     })
 }
 
-pub fn get_node_token_for_user(user: &User, id: &str) -> Result<String, HttpResponse> {
+pub fn get_node_token_for_user(user: &User, id: &str) -> AppResult<String> {
     with_nodes_read(|nodes| {
-        let node = nodes.iter().find(|n| n.id == id).ok_or_else(|| {
-            HttpResponse::NotFound().json(FailedResponse {
-                status: "failed",
-                err: "not-found",
-            })
-        })?;
+        let node = nodes
+            .iter()
+            .find(|n| n.id == id)
+            .ok_or_else(|| AppError::not_found("not-found"))?;
         if !user_can_see_node(user, node) {
-            return Err(HttpResponse::Forbidden().json(FailedResponse {
-                status: "failed",
-                err: "permission-denied",
-            }));
+            return Err(AppError::forbidden("permission-denied"));
         }
         if node.token.trim().is_empty() {
-            return Err(HttpResponse::NotFound().json(FailedResponse {
-                status: "failed",
-                err: "not-found",
-            }));
+            return Err(AppError::not_found("not-found"));
         }
         Ok(node.token.clone())
     })
 }
 
-pub fn create_node(user: &User, input: NodeInput) -> Result<NodePublic, HttpResponse> {
+pub fn create_node(user: &User, input: NodeInput) -> AppResult<NodePublic> {
     if !user_can_manage_nodes(user) {
-        return Err(HttpResponse::Forbidden().json(FailedResponse {
-            status: "failed",
-            err: "permission-denied",
-        }));
+        return Err(AppError::forbidden("permission-denied"));
     }
     validate_input(&input.name, &input.host, &input.port)?;
     let token = input.token.unwrap_or_default().trim().to_string();
     if token.is_empty() {
-        return Err(HttpResponse::BadRequest().json(FailedResponse {
-            status: "failed",
-            err: "invalid-params",
-        }));
+        return Err(AppError::bad_request("invalid-params"));
     }
     let now = current_time();
     let node = StoredNode {
@@ -300,21 +266,16 @@ pub fn create_node(user: &User, input: NodeInput) -> Result<NodePublic, HttpResp
     })
 }
 
-pub fn update_node(user: &User, id: &str, input: NodeInput) -> Result<NodePublic, HttpResponse> {
+pub fn update_node(user: &User, id: &str, input: NodeInput) -> AppResult<NodePublic> {
     if !user_can_manage_nodes(user) {
-        return Err(HttpResponse::Forbidden().json(FailedResponse {
-            status: "failed",
-            err: "permission-denied",
-        }));
+        return Err(AppError::forbidden("permission-denied"));
     }
     validate_input(&input.name, &input.host, &input.port)?;
     with_nodes_mut(|nodes| {
-        let node = nodes.iter_mut().find(|n| n.id == id).ok_or_else(|| {
-            HttpResponse::NotFound().json(FailedResponse {
-                status: "failed",
-                err: "not-found",
-            })
-        })?;
+        let node = nodes
+            .iter_mut()
+            .find(|n| n.id == id)
+            .ok_or_else(|| AppError::not_found("not-found"))?;
         node.name = input.name.trim().to_string();
         node.host = input.host.trim().to_string();
         node.port = input.port.trim().to_string();
@@ -336,24 +297,15 @@ pub fn update_node(user: &User, id: &str, input: NodeInput) -> Result<NodePublic
     })
 }
 
-pub fn set_visibility(
-    user: &User,
-    id: &str,
-    input: VisibilityInput,
-) -> Result<NodePublic, HttpResponse> {
+pub fn set_visibility(user: &User, id: &str, input: VisibilityInput) -> AppResult<NodePublic> {
     if !user_can_manage_nodes(user) {
-        return Err(HttpResponse::Forbidden().json(FailedResponse {
-            status: "failed",
-            err: "permission-denied",
-        }));
+        return Err(AppError::forbidden("permission-denied"));
     }
     with_nodes_mut(|nodes| {
-        let node = nodes.iter_mut().find(|n| n.id == id).ok_or_else(|| {
-            HttpResponse::NotFound().json(FailedResponse {
-                status: "failed",
-                err: "not-found",
-            })
-        })?;
+        let node = nodes
+            .iter_mut()
+            .find(|n| n.id == id)
+            .ok_or_else(|| AppError::not_found("not-found"))?;
         node.visibility = input.visibility;
         node.visible_to = input.visible_to;
         node.updated_at = current_time();
@@ -361,33 +313,23 @@ pub fn set_visibility(
     })
 }
 
-pub fn delete_node(user: &User, id: &str) -> Result<(), HttpResponse> {
+pub fn delete_node(user: &User, id: &str) -> AppResult<()> {
     if !user_can_manage_nodes(user) {
-        return Err(HttpResponse::Forbidden().json(FailedResponse {
-            status: "failed",
-            err: "permission-denied",
-        }));
+        return Err(AppError::forbidden("permission-denied"));
     }
     with_nodes_mut(|nodes| {
         let before = nodes.len();
         nodes.retain(|n| n.id != id);
         if nodes.len() == before {
-            return Err(HttpResponse::NotFound().json(FailedResponse {
-                status: "failed",
-                err: "not-found",
-            }));
+            return Err(AppError::not_found("not-found"));
         }
         Ok(())
     })
 }
 
-/// 管理员一次性导入（迁移 localStorage）。已存在 id 则跳过。
-pub fn import_nodes(user: &User, input: ImportNodesInput) -> Result<Vec<NodePublic>, HttpResponse> {
+pub fn import_nodes(user: &User, input: ImportNodesInput) -> AppResult<Vec<NodePublic>> {
     if !user_can_manage_nodes(user) {
-        return Err(HttpResponse::Forbidden().json(FailedResponse {
-            status: "failed",
-            err: "permission-denied",
-        }));
+        return Err(AppError::forbidden("permission-denied"));
     }
     with_nodes_mut(|nodes| {
         let mut imported = Vec::new();

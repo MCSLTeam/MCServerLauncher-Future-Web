@@ -1,5 +1,4 @@
-use crate::api::FailedResponse;
-use actix_web::HttpResponse;
+use crate::error::{AppError, AppResult};
 use log::error;
 use rand::RngExt;
 use sha2::{Digest, Sha256};
@@ -45,22 +44,16 @@ pub fn permission_match(user_permission: &str, matching_permission: &str) -> boo
     regex.is_match(matching_permission)
 }
 
-pub fn acquire_write_lock<T>(lock: &Arc<RwLock<T>>) -> Result<RwLockWriteGuard<'_, T>, HttpResponse> {
+pub fn acquire_write_lock<T>(lock: &Arc<RwLock<T>>) -> AppResult<RwLockWriteGuard<'_, T>> {
     lock.write().map_err(|e| {
         error!("Failed to acquire write lock: {}", e);
-        HttpResponse::InternalServerError().json(FailedResponse {
-            status: "failed",
-            err: "internal-server-error",
-        })
+        AppError::internal()
     })
 }
 
-pub fn acquire_read_lock<T>(lock: &Arc<RwLock<T>>) -> Result<RwLockReadGuard<'_, T>, HttpResponse> {
+pub fn acquire_read_lock<T>(lock: &Arc<RwLock<T>>) -> AppResult<RwLockReadGuard<'_, T>> {
     lock.read().map_err(|e| {
         error!("Failed to acquire read lock: {}", e);
-        HttpResponse::InternalServerError().json(FailedResponse {
-            status: "failed",
-            err: "internal-server-error",
-        })
+        AppError::internal()
     })
 }

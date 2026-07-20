@@ -1,7 +1,6 @@
-use crate::api::FailedResponse;
+use crate::error::{AppError, AppResult};
 use crate::utils::{acquire_read_lock, acquire_write_lock, current_time};
 use crate::MAIN_DIR_NAME;
-use actix_web::HttpResponse;
 use log::{error, info};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -103,7 +102,7 @@ pub fn load_preferences() -> Result<(), Error> {
             file.display(),
             e
         );
-        e
+        Error::new(std::io::ErrorKind::InvalidData, e)
     })?;
     let mut cache = PREFS_CACHE.write().map_err(|e| {
         error!("Failed to acquire write lock: {}", e);
@@ -113,14 +112,11 @@ pub fn load_preferences() -> Result<(), Error> {
     Ok(())
 }
 
-fn save_prefs(map: &HashMap<String, UserPreferences>) -> Result<(), HttpResponse> {
+fn save_prefs(map: &HashMap<String, UserPreferences>) -> AppResult<()> {
     let file = Path::new(MAIN_DIR_NAME).join(PREFS_FILE_NAME);
     let json = serde_json::to_string_pretty(map).map_err(|e| {
         error!("Failed to serialize preferences: {}", e);
-        HttpResponse::InternalServerError().json(FailedResponse {
-            status: "failed",
-            err: "internal-server-error",
-        })
+        AppError::internal()
     })?;
     fs::write(&file, json).map_err(|e| {
         error!(
@@ -128,15 +124,12 @@ fn save_prefs(map: &HashMap<String, UserPreferences>) -> Result<(), HttpResponse
             file.display(),
             e
         );
-        HttpResponse::InternalServerError().json(FailedResponse {
-            status: "failed",
-            err: "internal-server-error",
-        })
+        AppError::internal()
     })?;
     Ok(())
 }
 
-pub fn get_preferences(username: &str) -> Result<UserPreferences, HttpResponse> {
+pub fn get_preferences(username: &str) -> AppResult<UserPreferences> {
     let cache = acquire_read_lock(&PREFS_CACHE)?;
     let map = cache.0.as_ref();
     Ok(map
@@ -144,10 +137,7 @@ pub fn get_preferences(username: &str) -> Result<UserPreferences, HttpResponse> 
         .unwrap_or_default())
 }
 
-pub fn set_preferences(
-    username: &str,
-    prefs: UserPreferences,
-) -> Result<UserPreferences, HttpResponse> {
+pub fn set_preferences(username: &str, prefs: UserPreferences) -> AppResult<UserPreferences> {
     let mut cache = acquire_write_lock(&PREFS_CACHE)?;
     let map = cache.0.get_or_insert_with(HashMap::new);
     map.insert(username.to_string(), prefs.clone());

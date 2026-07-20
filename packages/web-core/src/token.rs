@@ -1,8 +1,7 @@
-use crate::api::FailedResponse;
+use crate::error::{AppError, AppResult};
 use crate::user::{get_user, User};
 use crate::utils::{acquire_read_lock, acquire_write_lock, current_time, generate_random_string};
 use crate::MAIN_DIR_NAME;
-use actix_web::{HttpRequest, HttpResponse};
 use log::{error, info};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -97,7 +96,7 @@ pub fn load_tokens() -> Result<(), Error> {
                 tokens_file.display(),
                 e
             );
-            e
+            Error::new(std::io::ErrorKind::InvalidData, e)
         })?;
 
     let mut cache = TOKENS_CACHE.write().map_err(|e| {
@@ -117,9 +116,7 @@ pub fn load_tokens() -> Result<(), Error> {
     Ok(())
 }
 
-pub fn save_tokens(
-    cache: &(Option<HashMap<String, SessionInfo>>, u128),
-) -> Result<(), HttpResponse> {
+pub fn save_tokens(cache: &(Option<HashMap<String, SessionInfo>>, u128)) -> AppResult<()> {
     let tokens = cache.0.as_ref().expect("Tokens cache not initialized");
 
     let tokens_file = Path::new(MAIN_DIR_NAME).join(TOKENS_FILE_NAME);
@@ -136,10 +133,7 @@ pub fn save_tokens(
             tokens_file.display(),
             e
         );
-        HttpResponse::InternalServerError().json(FailedResponse {
-            status: "failed",
-            err: "internal-server-error",
-        })
+        AppError::internal()
     })?;
 
     fs::write(&tokens_file, tokens_json).map_err(|e| {
@@ -148,16 +142,13 @@ pub fn save_tokens(
             tokens_file.display(),
             e
         );
-        HttpResponse::InternalServerError().json(FailedResponse {
-            status: "failed",
-            err: "internal-server-error",
-        })
+        AppError::internal()
     })?;
 
     Ok(())
 }
 
-pub fn get_session_infos() -> Result<Vec<SessionInfo>, HttpResponse> {
+pub fn get_session_infos() -> AppResult<Vec<SessionInfo>> {
     let cache = acquire_read_lock(&TOKENS_CACHE)?;
     let tokens = cache
         .0
@@ -173,14 +164,13 @@ pub fn create_session(
     remember: bool,
     ip: String,
     user_agent: String,
-) -> Result<String, HttpResponse> {
+) -> AppResult<String> {
     let mut cache = acquire_write_lock(&TOKENS_CACHE)?;
     let tokens = cache.0.as_mut().expect("Tokens cache not initialized");
 
     let mut token;
     loop {
         token = generate_random_string(32);
-
         if !tokens.contains_key(&token) {
             break;
         }
@@ -189,7 +179,6 @@ pub fn create_session(
     let mut token_id;
     loop {
         token_id = generate_random_string(32);
-
         if tokens
             .iter()
             .all(|(_, token_info)| token_info.token_id != token_id)
@@ -219,25 +208,21 @@ pub fn create_session(
     Ok(token)
 }
 
-pub fn delete_token(token: &str) -> Result<(), HttpResponse> {
+pub fn delete_token(token: &str) -> AppResult<()> {
     let mut cache = acquire_write_lock(&TOKENS_CACHE)?;
     let tokens = cache.0.as_mut().expect("Tokens cache not initialized");
     match tokens.remove(token) {
         Some(token) => {
             cache.1 = current_time();
             save_tokens(&*cache)?;
-
             info!("User {} deleted session {}", token.user, token.token_id);
             Ok(())
         }
-        None => Err(HttpResponse::NotFound().json(FailedResponse {
-            status: "failed",
-            err: "session-not-found",
-        })),
+        None => Err(AppError::not_found("session-not-found")),
     }
 }
 
-pub fn delete_token_by_id(token_id: &str) -> Result<(), HttpResponse> {
+pub fn delete_token_by_id(token_id: &str) -> AppResult<()> {
     let mut cache = acquire_write_lock(&TOKENS_CACHE)?;
     let tokens = cache.0.as_mut().expect("Tokens cache not initialized");
 
@@ -247,24 +232,18 @@ pub fn delete_token_by_id(token_id: &str) -> Result<(), HttpResponse> {
         .map(|(token, _)| token.clone());
 
     if token.is_none() {
-        return Err(HttpResponse::NotFound().json(FailedResponse {
-            status: "failed",
-            err: "session-not-found",
-        }));
+        return Err(AppError::not_found("session-not-found"));
     }
 
     let token = token.unwrap();
-
     tokens.remove(&token);
     cache.1 = current_time();
-
     save_tokens(&*cache)?;
-
     info!("User {} deleted session {}", token_id, token);
     Ok(())
 }
 
-pub fn delete_token_by_username(username: &str) -> Result<(), HttpResponse> {
+pub fn delete_token_by_username(username: &str) -> AppResult<()> {
     let mut cache = acquire_write_lock(&TOKENS_CACHE)?;
     let tokens = cache.0.as_mut().expect("Tokens cache not initialized");
 
@@ -278,13 +257,11 @@ pub fn delete_token_by_username(username: &str) -> Result<(), HttpResponse> {
         tokens.remove(token);
     });
     cache.1 = current_time();
-
     save_tokens(&*cache)?;
-
     Ok(())
 }
 
-pub fn get_session_info_by_id(token_id: &str) -> Result<SessionInfo, HttpResponse> {
+pub fn get_session_info_by_id(token_id: &str) -> AppResult<SessionInfo> {
     let cache = acquire_read_lock(&TOKENS_CACHE)?;
     let tokens = cache.0.as_ref().expect("Tokens cache not initialized");
 
@@ -294,62 +271,44 @@ pub fn get_session_info_by_id(token_id: &str) -> Result<SessionInfo, HttpRespons
         .map(|(_, token_info)| token_info.clone());
 
     if token_info.is_none() {
-        return Err(HttpResponse::NotFound().json(FailedResponse {
-            status: "failed",
-            err: "session-not-found",
-        }));
+        return Err(AppError::not_found("session-not-found"));
     }
 
     Ok(token_info.unwrap().clone())
 }
 
-pub fn get_tokens_by_user(user: &User) -> Result<Vec<SessionInfo>, HttpResponse> {
+pub fn get_tokens_by_user(user: &User) -> AppResult<Vec<SessionInfo>> {
     let cache = acquire_read_lock(&TOKENS_CACHE)?;
     let tokens = cache.0.as_ref().expect("Tokens cache not initialized");
 
-    let token_infos = tokens
+    Ok(tokens
         .iter()
         .filter(|(_, token_info)| token_info.user == user.username)
         .map(|(_, token_info)| token_info.clone())
-        .collect::<Vec<SessionInfo>>();
-
-    Ok(token_infos)
+        .collect())
 }
 
-pub fn update_token_info(token: &str, req: &HttpRequest, ip: &str) {
+pub fn update_token_activity(token: &str, user_agent: &str, ip: &str) {
     match TOKENS_CACHE.write() {
         Ok(mut cache) => {
             let tokens = cache.0.as_mut().expect("Tokens cache not initialized");
-
             if let Some(token_info) = tokens.get_mut(token) {
-                token_info.user_agent = req
-                    .headers()
-                    .get("User-Agent")
-                    .unwrap()
-                    .to_str()
-                    .unwrap_or("unknown")
-                    .to_string();
+                token_info.user_agent = user_agent.to_string();
                 token_info.last_active_ip = ip.to_string();
                 token_info.last_active_at = current_time();
             }
         }
-        Err(e) => {
-            error!("Failed to acquire write lock: {}", e);
-        }
+        Err(e) => error!("Failed to acquire write lock: {}", e),
     }
 }
 
-pub fn get_user_by_token(token: &str) -> Result<User, HttpResponse> {
+pub fn get_user_by_token(token: &str) -> AppResult<User> {
     let mut cache = acquire_write_lock(&TOKENS_CACHE)?;
     let tokens = cache.0.as_mut().expect("Tokens cache not initialized");
 
     let token_info = tokens.get(token);
-
     if token_info.is_none() {
-        return Err(HttpResponse::NotFound().json(FailedResponse {
-            status: "failed",
-            err: "invalid-token",
-        }));
+        return Err(AppError::not_found("invalid-token"));
     }
 
     let token_info = token_info.unwrap();
@@ -361,16 +320,13 @@ pub fn get_user_by_token(token: &str) -> Result<User, HttpResponse> {
         tokens.remove(token);
         cache.1 = current_time();
         save_tokens(&*cache)?;
-        return Err(HttpResponse::NotFound().json(FailedResponse {
-            status: "failed",
-            err: "invalid-token",
-        }));
+        return Err(AppError::not_found("invalid-token"));
     }
 
     Ok(user.unwrap())
 }
 
-pub fn cleanup_expired_tokens() -> Result<usize, HttpResponse> {
+pub fn cleanup_expired_tokens() -> AppResult<usize> {
     let mut cache = acquire_write_lock(&TOKENS_CACHE)?;
     let tokens = cache.0.as_mut().expect("Tokens cache not initialized");
 
