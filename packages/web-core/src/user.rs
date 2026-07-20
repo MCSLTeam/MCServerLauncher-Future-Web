@@ -1,11 +1,10 @@
-use crate::api::FailedResponse;
+use crate::error::{AppError, AppResult};
 use crate::token::delete_token_by_username;
 use crate::utils::{
     acquire_read_lock, acquire_write_lock, current_time, generate_random_string, permission_match,
     sha256,
 };
 use crate::MAIN_DIR_NAME;
-use actix_web::HttpResponse;
 use log::{error, info};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -23,18 +22,18 @@ pub struct User {
 #[derive(Serialize, Deserialize, Clone)]
 pub struct UserInfo {
     pub created_at: u128,
-    pub password: String, // SHA256哈希后的密码
+    pub password: String,
     pub permissions: Vec<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct UserInput {
     pub username: String,
-    pub password: String, // 明文密码
+    pub password: String,
     pub permissions: Vec<String>,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub struct UserOutput {
     pub username: String,
     pub permissions: Vec<String>,
@@ -50,16 +49,10 @@ impl User {
         }
     }
 
-    pub fn verify_permission(&self, permission: &str) -> Result<bool, HttpResponse> {
-        let permission_regex = regex::Regex::new(
-            r"^(([a-zA-Z-_]+|\*{1,2})\.)*([a-zA-Z-_]+|\*{1,2})$",
-        )
-        .map_err(|_| {
-            HttpResponse::InternalServerError().json(FailedResponse {
-                status: "failed",
-                err: "internal-server-error",
-            })
-        })?;
+    pub fn verify_permission(&self, permission: &str) -> AppResult<bool> {
+        let permission_regex =
+            regex::Regex::new(r"^(([a-zA-Z-_]+|\*{1,2})\.)*([a-zA-Z-_]+|\*{1,2})$")
+                .map_err(|_| AppError::internal())?;
 
         if !permission_regex.is_match(permission) {
             return Ok(false);
@@ -74,13 +67,11 @@ impl User {
         Ok(false)
     }
 
-    pub fn verify_password(&self, password: &str) -> Result<(), HttpResponse> {
-        match sha256(password) == self.info.password {
-            true => Ok(()),
-            false => Err(HttpResponse::Unauthorized().json(FailedResponse {
-                status: "failed",
-                err: "login-failed",
-            })),
+    pub fn verify_password(&self, password: &str) -> AppResult<()> {
+        if sha256(password) == self.info.password {
+            Ok(())
+        } else {
+            Err(AppError::unauthorized("login-failed"))
         }
     }
 }
@@ -125,7 +116,7 @@ pub fn load_users() -> Result<(), Error> {
             users_file.display(),
             e
         );
-        e
+        Error::new(std::io::ErrorKind::InvalidData, e)
     })?;
 
     let mut cache = USERS_CACHE.write().map_err(|e| {
@@ -137,7 +128,7 @@ pub fn load_users() -> Result<(), Error> {
     Ok(())
 }
 
-pub fn save_users(cache: &(Option<HashMap<String, UserInfo>>, u128)) -> Result<(), HttpResponse> {
+pub fn save_users(cache: &(Option<HashMap<String, UserInfo>>, u128)) -> AppResult<()> {
     let users = cache.0.as_ref().expect("Users cache not initialized");
     let users_file = Path::new(MAIN_DIR_NAME).join(USERS_FILE_NAME);
     let users_json = serde_json::to_string_pretty(users).map_err(|e| {
@@ -146,10 +137,7 @@ pub fn save_users(cache: &(Option<HashMap<String, UserInfo>>, u128)) -> Result<(
             users_file.display(),
             e
         );
-        HttpResponse::InternalServerError().json(FailedResponse {
-            status: "failed",
-            err: "internal-server-error",
-        })
+        AppError::internal()
     })?;
 
     fs::write(&users_file, users_json).map_err(|e| {
@@ -158,16 +146,13 @@ pub fn save_users(cache: &(Option<HashMap<String, UserInfo>>, u128)) -> Result<(
             users_file.display(),
             e
         );
-        HttpResponse::InternalServerError().json(FailedResponse {
-            status: "failed",
-            err: "internal-server-error",
-        })
+        AppError::internal()
     })?;
 
     Ok(())
 }
 
-pub fn is_user_empty() -> Result<bool, HttpResponse> {
+pub fn is_user_empty() -> AppResult<bool> {
     let cache = acquire_read_lock(&USERS_CACHE)?;
     Ok(cache
         .0
@@ -176,8 +161,7 @@ pub fn is_user_empty() -> Result<bool, HttpResponse> {
         .is_empty())
 }
 
-/// 供桌面端本地会话：优先返回具备 `*` 或 node.manage 的用户名。
-pub fn find_local_admin_username() -> Result<Option<String>, HttpResponse> {
+pub fn find_local_admin_username() -> AppResult<Option<String>> {
     let users = get_users()?;
     if users.is_empty() {
         return Ok(None);
@@ -194,24 +178,19 @@ pub fn find_local_admin_username() -> Result<Option<String>, HttpResponse> {
     Ok(Some(users[0].username.clone()))
 }
 
-/// 确保存在可管理节点的本地用户；没有用户时创建 `desktop` 管理员。
-pub fn ensure_desktop_admin_username() -> Result<String, HttpResponse> {
+pub fn ensure_desktop_admin_username() -> AppResult<String> {
     if let Some(username) = find_local_admin_username()? {
         return Ok(username);
     }
     add_user(UserInput {
         username: "desktop".to_string(),
-        password: generate_random_desktop_password(),
+        password: generate_random_string(32),
         permissions: vec!["*".to_string()],
     })?;
     Ok("desktop".to_string())
 }
 
-fn generate_random_desktop_password() -> String {
-    generate_random_string(32)
-}
-
-pub fn get_users() -> Result<Vec<User>, HttpResponse> {
+pub fn get_users() -> AppResult<Vec<User>> {
     let cache = acquire_read_lock(&USERS_CACHE)?;
     Ok(cache
         .0
@@ -225,15 +204,12 @@ pub fn get_users() -> Result<Vec<User>, HttpResponse> {
         .collect())
 }
 
-pub fn add_user(user_input: UserInput) -> Result<(), HttpResponse> {
+pub fn add_user(user_input: UserInput) -> AppResult<()> {
     let mut cache = acquire_write_lock(&USERS_CACHE)?;
     let users = cache.0.as_mut().expect("Users cache not initialized");
 
     if users.contains_key(&user_input.username) {
-        return Err(HttpResponse::Conflict().json(FailedResponse {
-            status: "failed",
-            err: "username-exists",
-        }));
+        return Err(AppError::conflict("username-exists"));
     }
 
     let user = User {
@@ -268,22 +244,16 @@ pub fn get_user(username: &str) -> Option<User> {
         })
 }
 
-pub fn update_user(username: &str, user_input: UserInput) -> Result<Option<User>, HttpResponse> {
+pub fn update_user(username: &str, user_input: UserInput) -> AppResult<Option<User>> {
     let mut cache = acquire_write_lock(&USERS_CACHE)?;
     let users = cache.0.as_mut().expect("Users cache not initialized");
 
     if !users.contains_key(username) {
-        return Err(HttpResponse::NotFound().json(FailedResponse {
-            status: "failed",
-            err: "user-not-found",
-        }));
+        return Err(AppError::not_found("user-not-found"));
     }
 
     if user_input.username != username && users.contains_key(&user_input.username) {
-        return Err(HttpResponse::Conflict().json(FailedResponse {
-            status: "failed",
-            err: "username-exists",
-        }));
+        return Err(AppError::conflict("username-exists"));
     }
 
     let updated_user = User {
@@ -307,15 +277,12 @@ pub fn update_user(username: &str, user_input: UserInput) -> Result<Option<User>
     Ok(Some(updated_user))
 }
 
-pub fn delete_user(username: &str) -> Result<(), HttpResponse> {
+pub fn delete_user(username: &str) -> AppResult<()> {
     let mut cache = acquire_write_lock(&USERS_CACHE)?;
     let users = cache.0.as_mut().expect("Users cache not initialized");
 
     if users.remove(username).is_none() {
-        return Err(HttpResponse::NotFound().json(FailedResponse {
-            status: "failed",
-            err: "user-not-found",
-        }));
+        return Err(AppError::not_found("user-not-found"));
     }
     cache.1 = current_time();
 
@@ -327,15 +294,12 @@ pub fn delete_user(username: &str) -> Result<(), HttpResponse> {
     Ok(())
 }
 
-pub fn verify_password(name: &str, password: &str) -> Result<User, HttpResponse> {
+pub fn verify_password(name: &str, password: &str) -> AppResult<User> {
     match get_user(name) {
         Some(user) => {
             user.verify_password(password)?;
             Ok(user)
         }
-        None => Err(HttpResponse::Unauthorized().json(FailedResponse {
-            status: "failed",
-            err: "login-failed",
-        })),
+        None => Err(AppError::unauthorized("login-failed")),
     }
 }

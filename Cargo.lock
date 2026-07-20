@@ -2575,7 +2575,9 @@ checksum = "2532096657941c2fea9c289d370a250971c689d4f143798ff67113ec042024a5"
 name = "mcsl_future_tauri"
 version = "0.1.0"
 dependencies = [
+ "log",
  "mcsl_resource_provider",
+ "mcsl_web_core",
  "rfd",
  "serde",
  "serde_json",
@@ -2593,17 +2595,13 @@ version = "0.1.0"
 dependencies = [
  "actix-web",
  "env_logger",
- "hex",
  "include_dir",
- "lazy_static",
  "log",
  "mcsl_resource_provider",
+ "mcsl_web_core",
  "mime_guess",
- "rand 0.10.0",
- "regex",
  "serde",
  "serde_json",
- "sha2",
  "tokio",
 ]
 
@@ -2614,6 +2612,20 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "mcsl_web_core"
+version = "0.1.0"
+dependencies = [
+ "hex",
+ "lazy_static",
+ "log",
+ "rand 0.10.0",
+ "regex",
+ "serde",
+ "serde_json",
+ "sha2",
 ]
 
 [[package]]
