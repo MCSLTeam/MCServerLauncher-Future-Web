@@ -186,7 +186,6 @@ function InstanceDetailInner() {
   const [selectedNames, setSelectedNames] = useState<string[]>([]);
   const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const [treeDirs, setTreeDirs] = useState<string[]>([]);
-  const [fileMultiTip, setFileMultiTip] = useState(true);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [jvmHelperOpen, setJvmHelperOpen] = useState(false);
   const [replacementCoreFile, setReplacementCoreFile] = useState<File | null>(
@@ -232,6 +231,8 @@ function InstanceDetailInner() {
   } | null>(null);
   const ptyHandleRef = useRef<PtyTerminalHandle | null>(null);
   const ptyBufferRef = useRef("");
+  /** Survives console re-attach after processUp flips (history reload would wipe it). */
+  const pendingConsoleNoticeRef = useRef<string | null>(null);
 
   const instance = useMemo(
     () =>
@@ -347,9 +348,35 @@ function InstanceDetailInner() {
     stickToBottomRef.current = distance <= LOG_STICK_THRESHOLD_PX;
   }, []);
 
+  const writeConsoleSystemNotice = useCallback(
+    (text: string, options?: { persist?: boolean }) => {
+      const line = text.trimEnd();
+      if (!line) return;
+      if (options?.persist !== false) {
+        pendingConsoleNoticeRef.current = line;
+      }
+      const ptyChunk = `\r\n\x1b[36m${line}\x1b[0m\r\n`;
+      if (consoleModeKey === "pty") {
+        if (ptyHandleRef.current) {
+          ptyHandleRef.current.write(ptyChunk);
+        } else {
+          ptyBufferRef.current += ptyChunk;
+        }
+      }
+      setLogs((prev) => appendLogLines(prev, line));
+      stickToBottomRef.current = true;
+      requestAnimationFrame(() => {
+        if (stickToBottomRef.current) scrollLogToEnd();
+      });
+    },
+    [consoleModeKey, scrollLogToEnd],
+  );
+
+  // Keep console session for the whole detail visit (not only command tab).
+  // Switching board/files must not close binary console or remount xterm.
   // 注意：不要依赖整个 instance 对象（report 2s 会换引用），否则会话反复拆建 → 模式闪烁
   useEffect(() => {
-    if (tab !== "command" || !resolvedNodeId || !id || !nodeOnline) {
+    if (!resolvedNodeId || !id || !nodeOnline) {
       return undefined;
     }
 
@@ -361,6 +388,9 @@ function InstanceDetailInner() {
     // 不清空 ptyHandleRef / buffer：PtyTerminal 可能仍挂载，避免重 attach 丢 handle
 
     const interactive = consoleModeKey === "pty";
+    // Seed history once per attach cycle; live output continues in xterm/logs.
+    // Do not re-clear xterm when user only switches UI tabs (tab is not a dep).
+    let seededPtyHistory = false;
 
     void (async () => {
       const history = await getLogs(resolvedNodeId, id);
@@ -369,7 +399,9 @@ function InstanceDetailInner() {
         ? (history.logs ?? []).join("\n")
         : "";
       if (history.ok) {
-        setLogs(history.logs ?? []);
+        const base = history.logs ?? [];
+        const notice = pendingConsoleNoticeRef.current;
+        setLogs(notice ? appendLogLines(base, notice) : base);
         setMessage(null);
         requestAnimationFrame(() => {
           if (stickToBottomRef.current) scrollLogToEnd();
@@ -380,17 +412,32 @@ function InstanceDetailInner() {
         );
       }
 
-      if (interactive && historyText) {
+      if (interactive && historyText && !seededPtyHistory) {
         // History bytes as-is: xterm renders real ANSI/SGR if present.
         const hist =
           historyText.endsWith("\n") ? historyText : `${historyText}\n`;
+        const notice = pendingConsoleNoticeRef.current;
+        const noticeChunk = notice
+          ? `\r\n\x1b[36m${notice}\x1b[0m\r\n`
+          : "";
+        seededPtyHistory = true;
         if (ptyHandleRef.current) {
           // 已有 xterm：直接灌历史，避免只缓冲不显示
           ptyHandleRef.current.clear();
-          ptyHandleRef.current.write(hist);
+          ptyHandleRef.current.write(hist + noticeChunk);
           ptyBufferRef.current = "";
         } else {
-          ptyBufferRef.current = hist + ptyBufferRef.current;
+          ptyBufferRef.current = hist + noticeChunk + ptyBufferRef.current;
+        }
+      } else if (interactive && !historyText) {
+        const notice = pendingConsoleNoticeRef.current;
+        if (notice) {
+          const noticeChunk = `\r\n\x1b[36m${notice}\x1b[0m\r\n`;
+          if (ptyHandleRef.current) {
+            ptyHandleRef.current.write(noticeChunk);
+          } else {
+            ptyBufferRef.current += noticeChunk;
+          }
         }
       }
 
@@ -462,29 +509,19 @@ function InstanceDetailInner() {
       }
     })();
 
-    const focusTimer = window.setTimeout(() => {
-      if (interactive) {
-        ptyHandleRef.current?.focus();
-      } else {
-        commandInputRef.current?.focus();
-      }
-    }, 50);
-
     return () => {
       cancelled = true;
       consoleSessionRef.current = null;
       unsubscribe?.();
       void closeConsole?.();
-      window.clearTimeout(focusTimer);
     };
   }, [
-    tab,
     resolvedNodeId,
     id,
     nodeOnline,
     // Do NOT depend on `status` / processUp string churn (starting→running):
     // that tore down binary console mid-typing. Re-attach only when process
-    // up/down flips or mode/tab/node changes.
+    // up/down flips or mode/node changes — not UI tab.
     processUp,
     consoleModeKey,
     getLogs,
@@ -493,6 +530,20 @@ function InstanceDetailInner() {
     scrollLogToEnd,
     t,
   ]);
+
+  // Refocus / fit when user returns to the command tab (panel stayed mounted).
+  useEffect(() => {
+    if (tab !== "command") return;
+    const timer = window.setTimeout(() => {
+      if (consoleModeKey === "pty") {
+        ptyHandleRef.current?.fit();
+        ptyHandleRef.current?.focus();
+      } else {
+        commandInputRef.current?.focus();
+      }
+    }, 50);
+    return () => window.clearTimeout(timer);
+  }, [tab, consoleModeKey]);
 
   useEffect(() => {
     if (tab !== "command") return;
@@ -818,11 +869,25 @@ function InstanceDetailInner() {
             ? await restartInstance(resolvedNodeId, id)
             : await killInstance(resolvedNodeId, id);
     setBusy(false);
-    setMessage(
-      result.ok
-        ? null
-        : (result.message ?? t("shared.instance.console.need-connection")),
-    );
+    if (result.ok) {
+      setMessage(null);
+      const noticeKey =
+        action === "start"
+          ? "shared.instance.console.system.start"
+          : action === "stop"
+            ? "shared.instance.console.system.stop"
+            : action === "restart"
+              ? "shared.instance.console.system.restart"
+              : "shared.instance.console.system.kill";
+      writeConsoleSystemNotice(t(noticeKey));
+    } else {
+      const failMessage =
+        result.message ?? t("shared.instance.console.need-connection");
+      setMessage(failMessage);
+      writeConsoleSystemNotice(
+        t("shared.instance.console.system.failed", { message: failMessage }),
+      );
+    }
     void refreshInstanceReport(resolvedNodeId, id);
   }
 
@@ -1596,50 +1661,57 @@ function InstanceDetailInner() {
         </Reveal>
       ) : null}
 
-      {tab === "command" ? (
-        <Reveal delay={0.04} className="flex h-full min-h-0 flex-1 flex-col">
-                    <CommandPanel
-            t={t}
-            mode={consoleViewMode === "pty" ? "pty" : "pipe"}
-            logs={logs}
-            command={command}
-            setCommand={setCommand}
-            busy={busy}
-            canSend={canSend}
-            canStart={canStart}
-            canStop={canStop}
-            canRestart={canRestart}
-            canKill={canKill}
-            fullscreen={fullscreen}
-            logPreRef={logPreRef}
-            commandInputRef={commandInputRef}
-            consoleRootRef={consoleRootRef}
-            onLogScroll={onLogScroll}
-            onSend={() => void onSend()}
-            onToggleFullscreen={() => void toggleFullscreen()}
-            onLifecycle={requestLifecycle}
-            onPtyData={(data) => {
-              const session = consoleSessionRef.current;
-              if (!session) return;
-              // Always forward raw keystrokes once binary session exists
-              // (interactive PTY or pipe session used as raw channel).
-              session.sendInput(data);
-            }}
-            onPtyResize={(cols, rows) => {
-              void consoleSessionRef.current?.resize(cols, rows);
-            }}
-            onPtyReady={(handle) => {
-              ptyHandleRef.current = handle;
-              if (ptyBufferRef.current) {
-                handle.write(ptyBufferRef.current);
-                ptyBufferRef.current = "";
-              }
-              handle.fit();
-              handle.focus();
-            }}
-          />
-        </Reveal>
-      ) : null}
+      {/* Keep mounted across tabs so xterm scrollback + binary session survive. */}
+      <Reveal
+        delay={0.04}
+        className={cn(
+          "min-h-0 flex-1 flex-col",
+          tab === "command" ? "flex h-full" : "hidden",
+        )}
+        aria-hidden={tab !== "command"}
+      >
+        <CommandPanel
+          t={t}
+          mode={consoleViewMode === "pty" ? "pty" : "pipe"}
+          logs={logs}
+          command={command}
+          setCommand={setCommand}
+          busy={busy}
+          canSend={canSend}
+          canStart={canStart}
+          canStop={canStop}
+          canRestart={canRestart}
+          canKill={canKill}
+          fullscreen={fullscreen}
+          terminalActive={tab === "command"}
+          logPreRef={logPreRef}
+          commandInputRef={commandInputRef}
+          consoleRootRef={consoleRootRef}
+          onLogScroll={onLogScroll}
+          onSend={() => void onSend()}
+          onToggleFullscreen={() => void toggleFullscreen()}
+          onLifecycle={requestLifecycle}
+          onPtyData={(data) => {
+            const session = consoleSessionRef.current;
+            if (!session) return;
+            // Always forward raw keystrokes once binary session exists
+            // (interactive PTY or pipe session used as raw channel).
+            session.sendInput(data);
+          }}
+          onPtyResize={(cols, rows) => {
+            void consoleSessionRef.current?.resize(cols, rows);
+          }}
+          onPtyReady={(handle) => {
+            ptyHandleRef.current = handle;
+            if (ptyBufferRef.current) {
+              handle.write(ptyBufferRef.current);
+              ptyBufferRef.current = "";
+            }
+            handle.fit();
+            if (tab === "command") handle.focus();
+          }}
+        />
+      </Reveal>
 
       {tab === "files" ? (
         <Reveal delay={0.04} className="flex min-h-0 flex-1 flex-col">
@@ -1654,8 +1726,6 @@ function InstanceDetailInner() {
             selectedNames={selectedNames}
             setSelectedNames={setSelectedNames}
             treeDirs={treeDirs}
-            multiSelectTip={fileMultiTip}
-            onDismissTip={() => setFileMultiTip(false)}
             canBack={fileHistoryIndex > 0}
             canForward={fileHistoryIndex < fileHistory.length - 1}
             uploadProgress={uploadProgress}
