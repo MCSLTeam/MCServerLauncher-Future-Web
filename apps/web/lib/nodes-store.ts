@@ -1,4 +1,5 @@
 import { requestApi } from "@/lib/api";
+import { isTauriRuntime } from "@/lib/tauri-runtime";
 import type { SavedNode } from "@/lib/types";
 
 const LEGACY_STORAGE_KEY = "mcsl-web-nodes";
@@ -73,6 +74,11 @@ export function getNodeToken(id: string): string | null {
 export async function getNodeTokenAsync(id: string): Promise<string | null> {
   const cached = tokenCache.get(id);
   if (cached) return cached;
+  if (isTauriRuntime()) {
+    const token = window.localStorage.getItem(LEGACY_TOKEN_PREFIX + id);
+    if (token) tokenCache.set(id, token);
+    return token;
+  }
   const res = await requestApi<{ token: string }>(`/api/nodes/${id}/token`, {
     auth: true,
   });
@@ -87,6 +93,26 @@ export function nodeAddress(node: SavedNode): string {
 }
 
 export async function refreshNodes(): Promise<SavedNode[]> {
+  if (isTauriRuntime()) {
+    cache = readLegacyLocalNodes().map((node) => ({
+      id: node.id,
+      name: node.name,
+      type: "mcsl-daemon",
+      host: node.host,
+      port: node.port,
+      secure: node.secure,
+      hasToken: true,
+      visibility: "all",
+      visibleTo: [],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    }));
+    for (const node of cache) {
+      const token = window.localStorage.getItem(LEGACY_TOKEN_PREFIX + node.id);
+      if (token) tokenCache.set(node.id, token);
+    }
+    return listNodes();
+  }
   const res = await requestApi<ApiNode[]>("/api/nodes", { auth: true });
   if (!res.ok || !Array.isArray(res.data)) {
     return listNodes();
@@ -99,6 +125,7 @@ export async function refreshNodes(): Promise<SavedNode[]> {
 export function hydrateNodes(): Promise<SavedNode[]> {
   if (!hydratePromise) {
     hydratePromise = (async () => {
+      if (isTauriRuntime()) return refreshNodes();
       await maybeMigrateLegacyNodes();
       return refreshNodes();
     })();
@@ -107,6 +134,32 @@ export function hydrateNodes(): Promise<SavedNode[]> {
 }
 
 export async function addNode(input: NodeInput): Promise<SavedNode | null> {
+  if (isTauriRuntime()) {
+    const now = Date.now();
+    const node: SavedNode = {
+      id: crypto.randomUUID(),
+      name: input.name.trim(),
+      type: "mcsl-daemon",
+      host: input.host.trim(),
+      port: input.port.trim(),
+      secure: input.secure,
+      hasToken: Boolean(input.token?.trim()),
+      visibility: "all",
+      visibleTo: [],
+      createdAt: now,
+      updatedAt: now,
+    };
+    window.localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify([...cache, node]));
+    if (input.token?.trim()) {
+      tokenCache.set(node.id, input.token.trim());
+      window.localStorage.setItem(
+        LEGACY_TOKEN_PREFIX + node.id,
+        input.token.trim(),
+      );
+    }
+    cache = [...cache, node];
+    return node;
+  }
   const res = await requestApi<ApiNode>("/api/nodes", {
     method: "POST",
     auth: true,
@@ -131,6 +184,26 @@ export async function updateNode(
   id: string,
   input: NodeInput,
 ): Promise<SavedNode | null> {
+  if (isTauriRuntime()) {
+    const existing = getNode(id);
+    if (!existing) return null;
+    const node: SavedNode = {
+      ...existing,
+      name: input.name.trim(),
+      host: input.host.trim(),
+      port: input.port.trim(),
+      secure: input.secure,
+      hasToken: Boolean(input.token?.trim()) || existing.hasToken,
+      updatedAt: Date.now(),
+    };
+    cache = cache.map((item) => (item.id === id ? node : item));
+    window.localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(cache));
+    if (input.token?.trim()) {
+      tokenCache.set(id, input.token.trim());
+      window.localStorage.setItem(LEGACY_TOKEN_PREFIX + id, input.token.trim());
+    }
+    return node;
+  }
   const res = await requestApi<ApiNode>(`/api/nodes/${id}`, {
     method: "PUT",
     auth: true,
@@ -171,6 +244,13 @@ export async function setNodeVisibility(
 }
 
 export async function removeNode(id: string): Promise<boolean> {
+  if (isTauriRuntime()) {
+    cache = cache.filter((node) => node.id !== id);
+    tokenCache.delete(id);
+    window.localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(cache));
+    window.localStorage.removeItem(LEGACY_TOKEN_PREFIX + id);
+    return true;
+  }
   const res = await requestApi<unknown>(`/api/nodes/${id}`, {
     method: "DELETE",
     auth: true,
