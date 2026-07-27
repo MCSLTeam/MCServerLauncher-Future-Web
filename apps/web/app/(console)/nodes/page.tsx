@@ -68,6 +68,7 @@ import {
   type NodeVisibilityMode,
 } from "@/lib/nodes-store";
 import { canManageNodes } from "@/lib/permission";
+import { useIsTauriRuntime } from "@/lib/tauri-runtime";
 import type { NodeStatus, SavedNode } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -164,7 +165,8 @@ export default function NodesPage() {
     refreshing,
   } = useDaemon();
   const { user } = useAuth();
-  const manageNodes = canManageNodes(user?.permissions);
+  const isTauri = useIsTauriRuntime();
+  const manageNodes = isTauri || canManageNodes(user?.permissions);
 
   const [nodes, setNodes] = useState<SavedNode[]>([]);
   const [searchText, setSearchText] = useState("");
