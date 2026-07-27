@@ -87,36 +87,60 @@ const emptyForm: NodeInput = {
 function OsGlyph({ type }: { type: string | null }) {
   if (type === "Windows") {
     return (
-      <span
-        className="inline-flex size-5 items-center justify-center rounded-lg bg-[#0078D4] text-[10px] font-bold text-white"
-        title="Windows"
+      <svg
+        aria-label="Windows"
+        className="size-5 shrink-0"
+        viewBox="0 0 1024 1024"
+        role="img"
       >
-        W
-      </span>
+        <path
+          fill="#0078D4"
+          d="M0 0h485.42v485.21H0zM538.58 0H1024v485.21H538.58zM0 538.58h485.42V1024H0zM538.58 538.58H1024V1024H538.58z"
+        />
+      </svg>
     );
   }
   if (type === "Darwin") {
     return (
-      <span
-        className="inline-flex size-5 items-center justify-center rounded-full bg-foreground text-[10px] font-bold text-background"
-        title="macOS"
+      <svg
+        aria-label="macOS"
+        className="size-5 shrink-0"
+        viewBox="0 0 1024 1024"
+        role="img"
       >
-        ⌘
-      </span>
+        <rect x="37" y="39" width="949" height="948" rx="237" fill="currentColor" />
+        <path
+          fill="var(--background)"
+          d="M427.5 809.1c37-1.5 50.9-24.3 95.5-24.3 44.7 0 57.2 24.3 96.2 23.6 39.6-.8 64.8-36.7 89.1-72.8 28.1-41.8 39.6-82.2 40.3-84.2-.9-.4-77.4-30.2-78.2-119.8-.7-75 60.2-111 62.9-112.8-34.2-50.9-87.6-57.9-106.6-58.7-45.4-4.7-88.5 27.1-111.5 27.1-23 0-58.5-26.5-96.1-25.8-49.4.8-95 29.3-120.5 74.3-51.4 90.6-13.1 224.9 36.9 298.5 24.5 36 53.6 76.4 91.9 74.9zm114.1-547.5c-18.8 22.2-35.3 57.6-30.9 91.7 32.7 2.6 66-16.9 86.4-41.9 20.3-25.1 34-59.9 30.3-94.5-29.3 1.2-64.8 19.8-85.8 44.7z"
+        />
+      </svg>
     );
   }
   if (type === "Linux") {
     return (
-      <span
-        className="inline-flex size-5 items-center justify-center rounded-full bg-[#FCC624] text-[10px] font-bold text-black"
-        title="Linux"
+      <svg
+        aria-label="Linux"
+        className="size-5 shrink-0"
+        viewBox="0 0 1024 1024"
+        role="img"
       >
-        Lx
-      </span>
+        <path
+          fill="#020204"
+          d="M512 8c-95 0-145 91-145 205 0 64 4 91 0 132-20 32-61 74-79 119-24 59-31 123-27 188-38 34-79 72-79 111 0 52 68 65 119 80 31 10 55 45 101 45 42 0 69-27 110-27 42 0 69 27 111 27 46 0 70-35 101-45 51-15 119-28 119-80 0-39-41-77-79-111 4-65-3-129-27-188-18-45-59-87-79-119-4-41 0-68 0-132C657 99 607 8 512 8z"
+        />
+        <ellipse cx="512" cy="180" rx="55" ry="43" fill="#fff" />
+        <path fill="#f5bd0c" d="M390 298c42-33 91-42 142-32 40 8 72 27 66 50-8 29-63 61-101 61-42 0-86-30-107-57z" />
+        <circle cx="487" cy="210" r="14" fill="#020204" />
+        <circle cx="537" cy="210" r="14" fill="#020204" />
+        <path fill="#d99a03" d="M487 235h50l-25 23z" />
+      </svg>
     );
   }
   return (
-    <span className="inline-flex size-5 items-center justify-center rounded-lg bg-muted text-[10px] text-muted-foreground">
+    <span
+      aria-label="Unknown operating system"
+      className="inline-flex size-5 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground"
+    >
       ?
     </span>
   );
