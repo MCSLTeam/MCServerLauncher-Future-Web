@@ -189,7 +189,7 @@ export default function ResourceCenterPage() {
   }
 
   return (
-    <ConsolePage className="gap-0">
+    <ConsolePage className="min-h-0 flex-1 gap-0">
       <Reveal>
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
@@ -213,11 +213,11 @@ export default function ResourceCenterPage() {
         </div>
       </Reveal>
 
-      <Reveal delay={0.03}>
-        <div className="relative mt-5 grid min-h-[28rem] grid-cols-[auto_minmax(0,1fr)] gap-2.5">
+      <Reveal className="flex min-h-0 flex-1 flex-col" delay={0.03}>
+        <div className="relative mt-5 grid min-h-0 flex-1 grid-cols-[auto_minmax(0,1fr)] gap-2.5">
           <aside
             className={cn(
-              "overflow-hidden rounded-xl border bg-card",
+              "flex min-h-0 flex-col overflow-hidden rounded-xl border bg-card",
               provider.sidebarWidth === "wide" ? "w-[12.5rem]" : "w-[9.375rem]",
             )}
           >
@@ -225,7 +225,7 @@ export default function ResourceCenterPage() {
               {t("shared.resource-center.cores")}
             </div>
             <RadioGroup
-              className="mcsl-scrollbar mt-2 max-h-[25rem] gap-1 overflow-y-auto px-2.5 pb-3.5"
+              className="mcsl-scrollbar mt-2 min-h-0 flex-1 gap-1 overflow-y-auto px-2.5 pb-3.5"
               value={currentCoreId}
               onValueChange={(id) => {
                 const core = cores.find((item) => item.id === id);
@@ -259,7 +259,7 @@ export default function ResourceCenterPage() {
             </RadioGroup>
           </aside>
 
-          <section className="min-w-0 rounded-xl border bg-card p-2.5">
+          <section className="flex min-h-0 min-w-0 flex-col rounded-xl border bg-card p-2.5">
             {currentCore ? (
               <>
                 {provider.id === "FastMirror" || provider.id === "MCSLSync" ? (
@@ -333,7 +333,7 @@ export default function ResourceCenterPage() {
                   </div>
                 )}
 
-                <div className="mcsl-scrollbar mt-2.5 max-h-[23rem] space-y-2 overflow-y-auto">
+                <div className="mcsl-scrollbar mt-2.5 min-h-0 flex-1 space-y-2 overflow-y-auto">
                   {files.map((file) => (
                     <div
                       key={file.id}
