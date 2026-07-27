@@ -44,6 +44,8 @@ export function CommandPanel({
   canRestart,
   canKill,
   fullscreen,
+  /** When false, panel may stay mounted but hidden (keep xterm / scrollback). */
+  terminalActive = true,
   logPreRef,
   commandInputRef,
   consoleRootRef,
@@ -68,6 +70,7 @@ export function CommandPanel({
   canRestart: boolean;
   canKill: boolean;
   fullscreen: boolean;
+  terminalActive?: boolean;
   logPreRef: RefObject<HTMLPreElement | null>;
   commandInputRef: RefObject<HTMLInputElement | null>;
   consoleRootRef: RefObject<HTMLDivElement | null>;
@@ -164,7 +167,7 @@ export function CommandPanel({
 
         {isPty ? (
           <PtyTerminal
-            active
+            active={terminalActive}
             // Soft-gate only when offline/stopped; do not lock stdin on busy alone.
             disabled={!canSend}
             // PTY master echoes; local echo would double every keystroke.

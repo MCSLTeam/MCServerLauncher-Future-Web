@@ -1067,6 +1067,26 @@ const SOFT_DEFAULTS: Record<string, SoftDefault> = {
     zh: "交互式 PTY 终端：直接在终端内输入，无需底部命令栏。",
     en: "Interactive PTY terminal: type in the terminal itself; no separate command bar.",
   },
+  "shared.instance.console.system.start": {
+    zh: "[系统] 已请求启动实例。",
+    en: "[system] Start requested.",
+  },
+  "shared.instance.console.system.stop": {
+    zh: "[系统] 已请求关闭实例。",
+    en: "[system] Stop requested.",
+  },
+  "shared.instance.console.system.restart": {
+    zh: "[系统] 已请求重启实例。",
+    en: "[system] Restart requested.",
+  },
+  "shared.instance.console.system.kill": {
+    zh: "[系统] 已请求强制终止实例 (halt)。",
+    en: "[system] Halt requested.",
+  },
+  "shared.instance.console.system.failed": {
+    zh: "[系统] 操作失败：{message}",
+    en: "[system] Operation failed: {message}",
+  },
   "shared.instance.console.enter-fullscreen": {
     zh: "全屏控制台",
     en: "Enter fullscreen console",
@@ -1137,6 +1157,7 @@ const SOFT_DEFAULTS: Record<string, SoftDefault> = {
   "shared.instance.files.back": { zh: "后退", en: "Back" },
   "shared.instance.files.forward": { zh: "前进", en: "Forward" },
   "shared.instance.files.up": { zh: "上级", en: "Up" },
+  "shared.instance.files.tree-menu": { zh: "目录导航", en: "Folders" },
   "shared.instance.files.open": { zh: "打开", en: "Open" },
   "shared.instance.files.multi-select-tip": {
     zh: "按住 Ctrl/⌘ 可多选文件。",

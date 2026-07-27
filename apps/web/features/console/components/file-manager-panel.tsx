@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type PointerEvent as ReactPointerEvent,
   type RefObject,
 } from "react";
 import {
@@ -18,11 +19,11 @@ import {
   Folder,
   FolderPlus,
   MoreHorizontal,
+  PanelLeft,
   Pencil,
   RefreshCw,
   Trash2,
   Upload,
-  X,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -63,6 +70,10 @@ export type DirEntry = {
 const ROW_HEIGHT = 40;
 const VIRTUAL_THRESHOLD = 80;
 const OVERSCAN = 12;
+/** Ignore tiny drags so plain clicks still work. */
+const MARQUEE_THRESHOLD_PX = 4;
+
+type Rect = { left: number; top: number; right: number; bottom: number };
 
 function formatBytes(bytes: number) {
   if (!Number.isFinite(bytes) || bytes <= 0) return "—";
@@ -72,6 +83,27 @@ function formatBytes(bytes: number) {
     units.length - 1,
   );
   return `${(bytes / 1024 ** index).toFixed(2)} ${units[index]}`;
+}
+
+function normalizeRect(
+  a: { x: number; y: number },
+  b: { x: number; y: number },
+): Rect {
+  return {
+    left: Math.min(a.x, b.x),
+    top: Math.min(a.y, b.y),
+    right: Math.max(a.x, b.x),
+    bottom: Math.max(a.y, b.y),
+  };
+}
+
+function rectsIntersect(a: Rect, b: Rect) {
+  return !(
+    a.right < b.left ||
+    a.left > b.right ||
+    a.bottom < b.top ||
+    a.top > b.bottom
+  );
 }
 
 type FileRowProps = {
@@ -99,12 +131,13 @@ const FileRow = memo(function FileRow({
 }: FileRowProps) {
   return (
     <TableRow
+      data-file-row={isParent ? undefined : entry.name}
       data-state={selected ? "selected" : undefined}
       className={cn("cursor-default", selected && "bg-muted/50")}
       style={{ contentVisibility: "auto", containIntrinsicSize: "auto 40px" }}
       onClick={(e) => {
         if (isParent) return;
-        onToggleSelect(entry.name, e.metaKey || e.ctrlKey);
+        onToggleSelect(entry.name, e.metaKey || e.ctrlKey || e.shiftKey);
       }}
       onContextMenu={() => {
         if (isParent) return;
@@ -146,8 +179,6 @@ type FileManagerPanelProps = {
     names: string[] | ((prev: string[]) => string[]),
   ) => void;
   treeDirs: string[];
-  multiSelectTip: boolean;
-  onDismissTip: () => void;
   canBack: boolean;
   canForward: boolean;
   uploadProgress: string | null;
@@ -178,8 +209,6 @@ export const FileManagerPanel = memo(function FileManagerPanel({
   selectedNames,
   setSelectedNames,
   treeDirs,
-  multiSelectTip,
-  onDismissTip,
   canBack,
   canForward,
   uploadProgress,
@@ -198,6 +227,7 @@ export const FileManagerPanel = memo(function FileManagerPanel({
   onDelete,
 }: FileManagerPanelProps) {
   const [pathDraft, setPathDraft] = useState(virtualPath);
+  const [treeOpen, setTreeOpen] = useState(false);
   useEffect(() => {
     setPathDraft(virtualPath);
   }, [virtualPath]);
@@ -283,6 +313,15 @@ export const FileManagerPanel = memo(function FileManagerPanel({
   const [viewportH, setViewportH] = useState(480);
   const useVirtual = displayEntries.length >= VIRTUAL_THRESHOLD;
 
+  const [marquee, setMarquee] = useState<Rect | null>(null);
+  const marqueeRef = useRef<{
+    origin: { x: number; y: number };
+    additive: boolean;
+    base: Set<string>;
+    active: boolean;
+    pointerId: number;
+  } | null>(null);
+
   useEffect(() => {
     const el = scrollRef.current;
     if (!el || !useVirtual) return;
@@ -329,9 +368,203 @@ export const FileManagerPanel = memo(function FileManagerPanel({
     onNavigatePath(pathDraft || "/");
   }, [onNavigatePath, pathDraft]);
 
+  const navigateTree = useCallback(
+    (path: string) => {
+      onTreeNavigate(path);
+      setTreeOpen(false);
+    },
+    [onTreeNavigate],
+  );
+
+  const treeNav = (
+    <div className="mcsl-scrollbar h-full min-h-0 overflow-auto p-1.5">
+      <button
+        type="button"
+        className={cn(
+          "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm",
+          virtualPath === "/"
+            ? "bg-primary/10 font-medium"
+            : "hover:bg-muted/60",
+        )}
+        onClick={() => navigateTree("/")}
+      >
+        <Folder className="size-3.5 shrink-0 opacity-70" />
+        <span className="truncate">/</span>
+      </button>
+      {treeDirs.map((dir) => {
+        const path = `/${dir}`;
+        const active =
+          virtualPath === path || virtualPath.startsWith(`${path}/`);
+        return (
+          <button
+            key={dir}
+            type="button"
+            className={cn(
+              "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm",
+              active ? "bg-primary/10 font-medium" : "hover:bg-muted/60",
+            )}
+            onClick={() => navigateTree(path)}
+          >
+            <Folder className="size-3.5 shrink-0 opacity-70" />
+            <span className="truncate">{dir}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  const applyMarqueeSelection = useCallback(
+    (box: Rect, additive: boolean, base: Set<string>) => {
+      const root = scrollRef.current;
+      if (!root) return;
+      const hit = new Set<string>();
+      const rows = root.querySelectorAll<HTMLElement>("[data-file-row]");
+      for (const row of rows) {
+        const name = row.dataset.fileRow;
+        if (!name) continue;
+        const r = row.getBoundingClientRect();
+        const rowRect: Rect = {
+          left: r.left,
+          top: r.top,
+          right: r.right,
+          bottom: r.bottom,
+        };
+        if (rectsIntersect(box, rowRect)) hit.add(name);
+      }
+      if (additive) {
+        const next = new Set(base);
+        for (const name of hit) next.add(name);
+        setSelectedNames([...next]);
+      } else {
+        setSelectedNames([...hit]);
+      }
+    },
+    [setSelectedNames],
+  );
+
+  const endMarquee = useCallback((pointerId?: number) => {
+    const session = marqueeRef.current;
+    if (!session) return;
+    if (pointerId !== undefined && session.pointerId !== pointerId) return;
+    marqueeRef.current = null;
+    setMarquee(null);
+    try {
+      scrollRef.current?.releasePointerCapture(session.pointerId);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const onListPointerDown = useCallback(
+    (e: ReactPointerEvent<HTMLDivElement>) => {
+      if (e.button !== 0) return;
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("button, a, input, textarea, [role='menuitem']")) {
+        return;
+      }
+      const root = scrollRef.current;
+      if (!root) return;
+
+      const additive = e.metaKey || e.ctrlKey || e.shiftKey;
+      marqueeRef.current = {
+        origin: { x: e.clientX, y: e.clientY },
+        additive,
+        base: additive ? new Set(selectedNames) : new Set(),
+        active: false,
+        pointerId: e.pointerId,
+      };
+
+      const onMove = (ev: PointerEvent) => {
+        const session = marqueeRef.current;
+        if (!session || session.pointerId !== ev.pointerId) return;
+        const dx = ev.clientX - session.origin.x;
+        const dy = ev.clientY - session.origin.y;
+        if (!session.active && Math.hypot(dx, dy) < MARQUEE_THRESHOLD_PX) {
+          return;
+        }
+        if (!session.active) {
+          session.active = true;
+          try {
+            root.setPointerCapture(ev.pointerId);
+          } catch {
+            // ignore
+          }
+          document.body.style.userSelect = "none";
+        }
+        ev.preventDefault();
+        const box = normalizeRect(session.origin, {
+          x: ev.clientX,
+          y: ev.clientY,
+        });
+        setMarquee(box);
+        applyMarqueeSelection(box, session.additive, session.base);
+      };
+
+      const onUp = (ev: PointerEvent) => {
+        const session = marqueeRef.current;
+        if (!session || session.pointerId !== ev.pointerId) return;
+        const wasActive = session.active;
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("pointercancel", onUp);
+        document.body.style.userSelect = "";
+        if (wasActive) {
+          const box = normalizeRect(session.origin, {
+            x: ev.clientX,
+            y: ev.clientY,
+          });
+          applyMarqueeSelection(box, session.additive, session.base);
+          const swallowClick = (clickEv: MouseEvent) => {
+            clickEv.preventDefault();
+            clickEv.stopPropagation();
+            window.removeEventListener("click", swallowClick, true);
+          };
+          window.addEventListener("click", swallowClick, true);
+          window.setTimeout(
+            () => window.removeEventListener("click", swallowClick, true),
+            0,
+          );
+        } else if (
+          !additive &&
+          !(ev.target as HTMLElement | null)?.closest("[data-file-row]")
+        ) {
+          setSelectedNames([]);
+        }
+        endMarquee(ev.pointerId);
+      };
+
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+      window.addEventListener("pointercancel", onUp);
+    },
+    [applyMarqueeSelection, endMarquee, selectedNames, setSelectedNames],
+  );
+
+  const marqueeStyle = useMemo(() => {
+    if (!marquee || !scrollRef.current) return null;
+    const root = scrollRef.current.getBoundingClientRect();
+    return {
+      left: marquee.left - root.left + scrollRef.current.scrollLeft,
+      top: marquee.top - root.top + scrollRef.current.scrollTop,
+      width: marquee.right - marquee.left,
+      height: marquee.bottom - marquee.top,
+    };
+  }, [marquee]);
+
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col gap-3">
       <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+        <Button
+          type="button"
+          size="icon-sm"
+          variant="outline"
+          className="md:hidden"
+          onClick={() => setTreeOpen(true)}
+          aria-label={t("shared.instance.files.tree-menu")}
+          title={t("shared.instance.files.tree-menu")}
+        >
+          <PanelLeft className="size-4" />
+        </Button>
         <Button
           type="button"
           size="icon-sm"
@@ -450,7 +683,10 @@ export const FileManagerPanel = memo(function FileManagerPanel({
               {t("shared.instance.files.open")}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem disabled={!canDownload || busy} onSelect={onDownload}>
+            <DropdownMenuItem
+              disabled={!canDownload || busy}
+              onSelect={onDownload}
+            >
               <Download className="size-4" />
               {t("shared.instance.files.download")}
               {selectedFiles.length > 1 ? ` (${selectedFiles.length})` : ""}
@@ -475,7 +711,10 @@ export const FileManagerPanel = memo(function FileManagerPanel({
               {t("ui.common.delete")}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem disabled={!canOperate} onSelect={onCreateDirectory}>
+            <DropdownMenuItem
+              disabled={!canOperate}
+              onSelect={onCreateDirectory}
+            >
               <FolderPlus className="size-4" />
               {t("shared.instance.files.mkdir")}
             </DropdownMenuItem>
@@ -488,24 +727,9 @@ export const FileManagerPanel = memo(function FileManagerPanel({
       </div>
 
       {uploadProgress ? (
-        <p className="shrink-0 text-xs text-muted-foreground">{uploadProgress}</p>
-      ) : null}
-
-      {multiSelectTip ? (
-        <div className="flex shrink-0 items-start gap-2 rounded-xl border bg-muted/40 px-3 py-2 text-sm">
-          <p className="min-w-0 flex-1 text-muted-foreground">
-            {t("shared.instance.files.multi-select-tip")}
-          </p>
-          <Button
-            type="button"
-            size="icon-sm"
-            variant="ghost"
-            onClick={onDismissTip}
-            aria-label={t("ui.common.close")}
-          >
-            <X className="size-3.5" />
-          </Button>
-        </div>
+        <p className="shrink-0 text-xs text-muted-foreground">
+          {uploadProgress}
+        </p>
       ) : null}
 
       {fileError ? (
@@ -520,191 +744,192 @@ export const FileManagerPanel = memo(function FileManagerPanel({
           }
         />
       ) : (
-        <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 md:grid-cols-[200px_minmax(0,1fr)]">
-          <div className="mcsl-scrollbar h-full min-h-0 overflow-auto rounded-xl border bg-card p-2">
-            <button
-              type="button"
-              className={cn(
-                "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm",
-                virtualPath === "/"
-                  ? "bg-primary/10 font-medium"
-                  : "hover:bg-muted/60",
-              )}
-              onClick={() => onTreeNavigate("/")}
+        <>
+          <Sheet open={treeOpen} onOpenChange={setTreeOpen}>
+            <SheetContent
+              side="left"
+              className="w-[min(18rem,calc(100%-2rem))] gap-0 p-0"
             >
-              <Folder className="size-3.5 shrink-0 opacity-70" />
-              <span className="truncate">/</span>
-            </button>
-            {treeDirs.map((dir) => {
-              const path = `/${dir}`;
-              const active =
-                virtualPath === path || virtualPath.startsWith(`${path}/`);
-              return (
-                <button
-                  key={dir}
-                  type="button"
-                  className={cn(
-                    "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm",
-                    active ? "bg-primary/10 font-medium" : "hover:bg-muted/60",
-                  )}
-                  onClick={() => onTreeNavigate(path)}
-                >
-                  <Folder className="size-3.5 shrink-0 opacity-70" />
-                  <span className="truncate">{dir}</span>
-                </button>
-              );
-            })}
-          </div>
+              <SheetHeader className="shrink-0">
+                <SheetTitle>{t("shared.instance.files.tree-menu")}</SheetTitle>
+              </SheetHeader>
+              <div className="min-h-0 flex-1 overflow-hidden">{treeNav}</div>
+            </SheetContent>
+          </Sheet>
 
-          <ContextMenu>
-            <ContextMenuTrigger asChild>
-              <div
-                ref={scrollRef}
-                onScroll={useVirtual ? onScroll : undefined}
-                className="mcsl-scrollbar h-full min-h-0 overflow-auto rounded-xl border bg-card"
-              >
-                <Table>
-                  <TableHeader className="sticky top-0 z-10 bg-card">
-                    <TableRow>
-                      <TableHead className="w-[40%]">
-                        {t("shared.instance.files.col.name")}
-                      </TableHead>
-                      <TableHead className="w-[22%]">
-                        {t("shared.instance.files.col.modified")}
-                      </TableHead>
-                      <TableHead className="w-[18%]">
-                        {t("shared.instance.files.col.type")}
-                      </TableHead>
-                      <TableHead className="w-[20%]">
-                        {t("shared.instance.files.col.size")}
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {displayEntries.length === 0 ? (
+          {/* Single card: tree rail + list, no outer gap/padding between panes. */}
+          <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl border bg-card">
+            <aside className="hidden h-full w-50 shrink-0 overflow-hidden border-r md:block">
+              {treeNav}
+            </aside>
+
+            <ContextMenu>
+              <ContextMenuTrigger asChild>
+                <div
+                  ref={scrollRef}
+                  onScroll={useVirtual ? onScroll : undefined}
+                  onPointerDown={onListPointerDown}
+                  className="mcsl-scrollbar relative min-h-0 min-w-0 flex-1 overflow-auto select-none"
+                >
+                  <Table>
+                    <TableHeader className="sticky top-0 z-10 bg-card">
                       <TableRow>
-                        <TableCell
-                          colSpan={4}
-                          className="h-24 text-center text-muted-foreground"
-                        >
-                          {fileLoading
-                            ? t("ui.common.loading")
-                            : t("shared.instance.files.empty")}
-                        </TableCell>
+                        <TableHead className="w-[40%]">
+                          {t("shared.instance.files.col.name")}
+                        </TableHead>
+                        <TableHead className="w-[22%]">
+                          {t("shared.instance.files.col.modified")}
+                        </TableHead>
+                        <TableHead className="w-[18%]">
+                          {t("shared.instance.files.col.type")}
+                        </TableHead>
+                        <TableHead className="w-[20%]">
+                          {t("shared.instance.files.col.size")}
+                        </TableHead>
                       </TableRow>
-                    ) : (
-                      <>
-                        {useVirtual && virtualSlice.padTop > 0 ? (
-                          <TableRow
-                            aria-hidden
-                            className="border-0 hover:bg-transparent"
+                    </TableHeader>
+                    <TableBody>
+                      {displayEntries.length === 0 ? (
+                        <TableRow>
+                          <TableCell
+                            colSpan={4}
+                            className="h-24 text-center text-muted-foreground"
                           >
-                            <TableCell
-                              colSpan={4}
-                              className="p-0"
-                              style={{ height: virtualSlice.padTop }}
-                            />
-                          </TableRow>
-                        ) : null}
-                        {visibleEntries.map((entry) => {
-                          const isParent = entry.name === "..";
-                          const key = `${entry.kind}:${entry.name}`;
-                          const labels = labelsByKey.get(key) ?? {
-                            type: "—",
-                            modified: "—",
-                            size: "—",
-                          };
-                          return (
-                            <FileRow
-                              key={key}
-                              entry={entry}
-                              isParent={isParent}
-                              selected={!isParent && selectedSet.has(entry.name)}
-                              typeLabel={labels.type}
-                              modifiedLabel={labels.modified}
-                              sizeLabel={labels.size}
-                              onToggleSelect={toggleSelect}
-                              onSelectOnly={selectOnly}
-                              onOpen={onOpenEntry}
-                            />
-                          );
-                        })}
-                        {useVirtual && virtualSlice.padBottom > 0 ? (
-                          <TableRow
-                            aria-hidden
-                            className="border-0 hover:bg-transparent"
-                          >
-                            <TableCell
-                              colSpan={4}
-                              className="p-0"
-                              style={{ height: virtualSlice.padBottom }}
-                            />
-                          </TableRow>
-                        ) : null}
-                      </>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </ContextMenuTrigger>
-            <ContextMenuContent className="w-48">
-              <ContextMenuItem
-                disabled={!selected && selectedNames.length === 0}
-                onSelect={() => {
-                  const entry =
-                    selected ?? entryByName.get(selectedNames[0] ?? "");
-                  if (entry) onOpenEntry(entry);
-                }}
-              >
-                {t("shared.instance.files.open")}
-              </ContextMenuItem>
-              <ContextMenuSeparator />
-              <ContextMenuItem
-                disabled={!canDownload || busy || !canOperate}
-                onSelect={onDownload}
-              >
-                <Download className="size-4" />
-                {t("shared.instance.files.download")}
-                {selectedFiles.length > 1 ? ` (${selectedFiles.length})` : ""}
-              </ContextMenuItem>
-              <ContextMenuItem
-                disabled={!canOperate || busy}
-                onSelect={() => fileInputRef.current?.click()}
-              >
-                <Upload className="size-4" />
-                {t("shared.instance.files.upload")}
-              </ContextMenuItem>
-              <ContextMenuSeparator />
-              <ContextMenuItem
-                disabled={!selected || busy || !canOperate}
-                onSelect={onRename}
-              >
-                <Pencil className="size-4" />
-                {t("shared.instance.files.rename")}
-              </ContextMenuItem>
-              <ContextMenuItem
-                variant="destructive"
-                disabled={!selectedNames.length || busy || !canOperate}
-                onSelect={onDelete}
-              >
-                <Trash2 className="size-4" />
-                {t("ui.common.delete")}
-              </ContextMenuItem>
-              <ContextMenuSeparator />
-              <ContextMenuItem
-                disabled={!canOperate || busy}
-                onSelect={onCreateDirectory}
-              >
-                <FolderPlus className="size-4" />
-                {t("shared.instance.files.mkdir")}
-              </ContextMenuItem>
-              <ContextMenuItem disabled={busy} onSelect={onRefresh}>
-                <RefreshCw className="size-4" />
-                {t("ui.common.refresh")}
-              </ContextMenuItem>
-            </ContextMenuContent>
-          </ContextMenu>
-        </div>
+                            {fileLoading
+                              ? t("ui.common.loading")
+                              : t("shared.instance.files.empty")}
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        <>
+                          {useVirtual && virtualSlice.padTop > 0 ? (
+                            <TableRow
+                              aria-hidden
+                              className="border-0 hover:bg-transparent"
+                            >
+                              <TableCell
+                                colSpan={4}
+                                className="p-0"
+                                style={{ height: virtualSlice.padTop }}
+                              />
+                            </TableRow>
+                          ) : null}
+                          {visibleEntries.map((entry) => {
+                            const isParent = entry.name === "..";
+                            const key = `${entry.kind}:${entry.name}`;
+                            const labels = labelsByKey.get(key) ?? {
+                              type: "—",
+                              modified: "—",
+                              size: "—",
+                            };
+                            return (
+                              <FileRow
+                                key={key}
+                                entry={entry}
+                                isParent={isParent}
+                                selected={
+                                  !isParent && selectedSet.has(entry.name)
+                                }
+                                typeLabel={labels.type}
+                                modifiedLabel={labels.modified}
+                                sizeLabel={labels.size}
+                                onToggleSelect={toggleSelect}
+                                onSelectOnly={selectOnly}
+                                onOpen={onOpenEntry}
+                              />
+                            );
+                          })}
+                          {useVirtual && virtualSlice.padBottom > 0 ? (
+                            <TableRow
+                              aria-hidden
+                              className="border-0 hover:bg-transparent"
+                            >
+                              <TableCell
+                                colSpan={4}
+                                className="p-0"
+                                style={{ height: virtualSlice.padBottom }}
+                              />
+                            </TableRow>
+                          ) : null}
+                        </>
+                      )}
+                    </TableBody>
+                  </Table>
+                  {marqueeStyle ? (
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute z-20 border border-primary/70 bg-primary/15"
+                      style={{
+                        left: marqueeStyle.left,
+                        top: marqueeStyle.top,
+                        width: marqueeStyle.width,
+                        height: marqueeStyle.height,
+                      }}
+                    />
+                  ) : null}
+                </div>
+              </ContextMenuTrigger>
+              <ContextMenuContent className="w-48">
+                <ContextMenuItem
+                  disabled={!selected && selectedNames.length === 0}
+                  onSelect={() => {
+                    const entry =
+                      selected ?? entryByName.get(selectedNames[0] ?? "");
+                    if (entry) onOpenEntry(entry);
+                  }}
+                >
+                  {t("shared.instance.files.open")}
+                </ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem
+                  disabled={!canDownload || busy || !canOperate}
+                  onSelect={onDownload}
+                >
+                  <Download className="size-4" />
+                  {t("shared.instance.files.download")}
+                  {selectedFiles.length > 1
+                    ? ` (${selectedFiles.length})`
+                    : ""}
+                </ContextMenuItem>
+                <ContextMenuItem
+                  disabled={!canOperate || busy}
+                  onSelect={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="size-4" />
+                  {t("shared.instance.files.upload")}
+                </ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem
+                  disabled={!selected || busy || !canOperate}
+                  onSelect={onRename}
+                >
+                  <Pencil className="size-4" />
+                  {t("shared.instance.files.rename")}
+                </ContextMenuItem>
+                <ContextMenuItem
+                  variant="destructive"
+                  disabled={!selectedNames.length || busy || !canOperate}
+                  onSelect={onDelete}
+                >
+                  <Trash2 className="size-4" />
+                  {t("ui.common.delete")}
+                </ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem
+                  disabled={!canOperate || busy}
+                  onSelect={onCreateDirectory}
+                >
+                  <FolderPlus className="size-4" />
+                  {t("shared.instance.files.mkdir")}
+                </ContextMenuItem>
+                <ContextMenuItem disabled={busy} onSelect={onRefresh}>
+                  <RefreshCw className="size-4" />
+                  {t("ui.common.refresh")}
+                </ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
+          </div>
+        </>
       )}
     </div>
   );
