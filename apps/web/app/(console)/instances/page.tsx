@@ -354,7 +354,9 @@ export default function InstancesPage() {
                 </EmptyDescription>
               </EmptyHeader>
               <EmptyContent>
-                <Button disabled>{t("shared.create.button")}</Button>
+                <Button asChild>
+                  <Link href="/create/">{t("shared.create.button")}</Link>
+                </Button>
               </EmptyContent>
             </Empty>
           ) : (

@@ -1,11 +1,13 @@
 "use client";
 
+import { FileUp } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -133,6 +135,8 @@ export function CreateWizard() {
 
   const [coreFile, setCoreFile] = useState<File | null>(null);
   const [archiveFile, setArchiveFile] = useState<File | null>(null);
+  const coreFileInputRef = useRef<HTMLInputElement>(null);
+  const archiveFileInputRef = useRef<HTMLInputElement>(null);
   const [runCommand, setRunCommand] = useState("");
 
   const [useMirror, setUseMirror] = useState(true);
@@ -508,14 +512,17 @@ export function CreateWizard() {
 
   if (nodes.length === 0) {
     return (
-      <ConsolePage>
+      <ConsolePage className="min-h-0 flex-1">
         <Reveal>
           <ConsolePageHeader
             title={t("shared.create.title")}
             subtitle={t("shared.create.subtitle")}
           />
         </Reveal>
-        <Reveal delay={0.04}>
+        <Reveal
+          className="mcsl-scrollbar min-h-0 flex-1 overflow-y-auto"
+          delay={0.04}
+        >
           <Empty>
             <EmptyHeader>
               <EmptyTitle>{t("shared.create.need-node.title")}</EmptyTitle>
@@ -542,7 +549,7 @@ export function CreateWizard() {
   ];
 
   return (
-    <ConsolePage>
+    <ConsolePage className="min-h-0 flex-1">
       <Reveal>
         <ConsolePageHeader
           title={t("shared.create.title")}
@@ -577,7 +584,10 @@ export function CreateWizard() {
 
       {/* —— 选 Daemon（对齐 SelectDaemon dialog 内容，以卡片列表呈现） —— */}
       {nav === "node" ? (
-        <Reveal delay={0.06}>
+        <Reveal
+          className="mcsl-scrollbar min-h-0 flex-1 overflow-y-auto pr-1"
+          delay={0.06}
+        >
           <div className="flex flex-col gap-3">
             {nodes.map((node) => {
               const status = daemon.getStatus(node.id);
@@ -609,7 +619,10 @@ export function CreateWizard() {
 
       {/* —— 分类卡片 —— */}
       {nav === "category" ? (
-        <Reveal delay={0.06}>
+        <Reveal
+          className="mcsl-scrollbar min-h-0 flex-1 overflow-y-auto pr-1"
+          delay={0.06}
+        >
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {CREATE_CATEGORIES.map((item) => (
               <button
@@ -673,7 +686,10 @@ export function CreateWizard() {
 
       {/* —— 类型卡片 —— */}
       {nav === "type" && category ? (
-        <Reveal delay={0.06}>
+        <Reveal
+          className="mcsl-scrollbar min-h-0 flex-1 overflow-y-auto pr-1"
+          delay={0.06}
+        >
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {getTypesForCategory(category).map((item) => (
               <button
@@ -726,7 +742,10 @@ export function CreateWizard() {
 
       {/* —— Provider：纵向 step cards —— */}
       {nav === "settings" ? (
-        <Reveal delay={0.06}>
+        <Reveal
+          className="mcsl-scrollbar min-h-0 flex-1 overflow-y-auto pr-1"
+          delay={0.06}
+        >
           <div className="flex flex-col gap-4">
             <p className="text-sm text-muted-foreground">
               {t(`shared.create.type.${coreType}`)}
@@ -758,12 +777,30 @@ export function CreateWizard() {
                   label={t("shared.create.field.core-jar.label")}
                   htmlFor="core-jar"
                 >
-                  <Input
+                  <input
+                    ref={coreFileInputRef}
                     id="core-jar"
                     type="file"
                     accept=".jar,application/java-archive"
+                    className="hidden"
                     onChange={(e) => setCoreFile(e.target.files?.[0] ?? null)}
                   />
+                  <div className="flex min-w-0 flex-wrap items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => coreFileInputRef.current?.click()}
+                    >
+                      <FileUp className="size-4" />
+                      {t("shared.create.field.choose-file")}
+                    </Button>
+                    <span
+                      className="min-w-0 truncate text-sm text-muted-foreground"
+                      title={coreFile?.name}
+                    >
+                      {coreFile?.name ?? t("shared.create.field.file-none")}
+                    </span>
+                  </div>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {t("shared.create.field.core-jar.hint")}{" "}
                     <Link
@@ -782,13 +819,32 @@ export function CreateWizard() {
                     label={t("shared.create.field.archive")}
                     htmlFor="archive"
                   >
-                    <Input
+                    <input
+                      ref={archiveFileInputRef}
                       id="archive"
                       type="file"
+                      className="hidden"
                       onChange={(e) =>
                         setArchiveFile(e.target.files?.[0] ?? null)
                       }
                     />
+                    <div className="flex min-w-0 flex-wrap items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => archiveFileInputRef.current?.click()}
+                      >
+                        <FileUp className="size-4" />
+                        {t("shared.create.field.choose-file")}
+                      </Button>
+                      <span
+                        className="min-w-0 truncate text-sm text-muted-foreground"
+                        title={archiveFile?.name}
+                      >
+                        {archiveFile?.name ??
+                          t("shared.create.field.file-none")}
+                      </span>
+                    </div>
                   </LabeledField>
                   {coreType === "universal" ? (
                     <LabeledField

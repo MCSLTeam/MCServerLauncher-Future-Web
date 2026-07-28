@@ -615,6 +615,18 @@ const SOFT_DEFAULTS: Record<string, SoftDefault> = {
     ja: "アーカイブ",
     ru: "Zip пакет",
   },
+  "shared.create.field.choose-file": {
+    zh: "选择文件",
+    en: "Choose file",
+    ja: "ファイルを選択",
+    ru: "Выбрать файл",
+  },
+  "shared.create.field.file-none": {
+    zh: "未选择文件",
+    en: "No file selected",
+    ja: "ファイルが選択されていません",
+    ru: "Файл не выбран",
+  },
   "shared.create.field.mc-version": {
     zh: "Minecraft 版本",
     en: "Minecraft Version",
