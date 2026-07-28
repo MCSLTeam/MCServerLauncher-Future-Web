@@ -441,7 +441,7 @@ function InstanceDetailInner() {
         }
       }
 
-      if (processUp) {
+      if (interactive && processUp) {
         const cols = ptyHandleRef.current?.cols?.() ?? 120;
         const rows = ptyHandleRef.current?.rows?.() ?? 40;
         const attached = await attachConsoleSession(resolvedNodeId, id, {

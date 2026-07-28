@@ -718,11 +718,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       }
 
       try {
-        // Register output listener map entry before open so early frames are not dropped
-        // if the server pushes before the open RPC returns (unlikely but safe).
-        const pendingSessionIds = new Set<string>();
-        let resolvedSessionId = "";
-        // stream:true keeps multi-byte UTF-8 intact across binary frames
+        // stream:true keeps multi-byte UTF-8 intact across binary frames.
         const decoder = new TextDecoder();
         let offOutput: (() => void) | undefined;
 
@@ -743,9 +739,6 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
             message: tKey("shared.daemon.error.operation-failed"),
           };
         }
-        resolvedSessionId = sessionId.toLowerCase();
-        pendingSessionIds.add(resolvedSessionId);
-
         offOutput = options?.onOutput
           ? ready.onConsoleOutput(sessionId, (_sid, payload) => {
               // Also accept GUID case variants from binary decode
@@ -758,6 +751,10 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
         const close = async () => {
           if (closed) return;
           closed = true;
+          const remainingText = decoder.decode();
+          if (remainingText) {
+            options?.onOutput?.(remainingText);
+          }
           offOutput?.();
           try {
             await ready.closeConsole(sessionId);

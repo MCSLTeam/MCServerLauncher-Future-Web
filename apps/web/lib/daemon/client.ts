@@ -57,6 +57,15 @@ export type ConsoleOutputListener = (
   offset: number,
 ) => void;
 
+type PendingConsoleOutput = {
+  sessionId: string;
+  payload: Uint8Array;
+  offset: number;
+};
+
+const MAXIMUM_EARLY_CONSOLE_SESSIONS = 16;
+const MAXIMUM_EARLY_CONSOLE_BYTES = 2 * 1024 * 1024;
+
 /** Daemon 主动推送事件（V2 JSON-RPC notification method = event name） */
 export type DaemonEventPacket = {
   event: string;
@@ -103,6 +112,8 @@ export class DaemonClient {
   private pendingDownloadChunks = new Map<string, PendingDownloadChunk>();
   private eventListeners = new Set<DaemonEventListener>();
   private consoleOutputListeners = new Map<string, Set<ConsoleOutputListener>>();
+  private pendingConsoleOutput = new Map<string, PendingConsoleOutput[]>();
+  private pendingConsoleOutputBytes = 0;
   private closedByUser = false;
   private readonly timeoutMs: number;
 
@@ -489,6 +500,18 @@ export class DaemonClient {
       this.consoleOutputListeners.set(key, set);
     }
     set.add(listener);
+    const early = this.pendingConsoleOutput.get(key);
+    if (early) {
+      this.pendingConsoleOutput.delete(key);
+      for (const frame of early) {
+        this.pendingConsoleOutputBytes -= frame.payload.byteLength;
+        try {
+          listener(frame.sessionId, frame.payload, frame.offset);
+        } catch {
+          // ignore listener errors
+        }
+      }
+    }
     return () => {
       const current = this.consoleOutputListeners.get(key);
       if (!current) return;
@@ -846,7 +869,14 @@ export class DaemonClient {
     if (parsed.header.kind === BINARY_FRAME_KIND_CONSOLE_OUTPUT) {
       const key = parsed.header.sessionId.toLowerCase();
       const listeners = this.consoleOutputListeners.get(key);
-      if (!listeners || listeners.size === 0) return;
+      if (!listeners || listeners.size === 0) {
+        this.bufferEarlyConsoleOutput(key, {
+          sessionId: parsed.header.sessionId,
+          payload: parsed.payload.slice(),
+          offset: parsed.header.offset,
+        });
+        return;
+      }
       for (const listener of listeners) {
         try {
           listener(
@@ -865,6 +895,29 @@ export class DaemonClient {
     if (parsed.header.kind === BINARY_FRAME_KIND_CONSOLE_INPUT) {
       return;
     }
+  }
+
+  private bufferEarlyConsoleOutput(
+    key: string,
+    frame: PendingConsoleOutput,
+  ) {
+    if (frame.payload.byteLength > MAXIMUM_EARLY_CONSOLE_BYTES) return;
+    let pending = this.pendingConsoleOutput.get(key);
+    if (!pending) {
+      if (this.pendingConsoleOutput.size >= MAXIMUM_EARLY_CONSOLE_SESSIONS) {
+        return;
+      }
+      pending = [];
+      this.pendingConsoleOutput.set(key, pending);
+    }
+    if (
+      this.pendingConsoleOutputBytes + frame.payload.byteLength >
+      MAXIMUM_EARLY_CONSOLE_BYTES
+    ) {
+      return;
+    }
+    pending.push(frame);
+    this.pendingConsoleOutputBytes += frame.payload.byteLength;
   }
 
   private async handleTextMessage(text: string) {
@@ -1024,6 +1077,8 @@ export class DaemonClient {
     }
     this.pendingDownloadChunks.clear();
     this.consoleOutputListeners.clear();
+    this.pendingConsoleOutput.clear();
+    this.pendingConsoleOutputBytes = 0;
   }
 }
 
