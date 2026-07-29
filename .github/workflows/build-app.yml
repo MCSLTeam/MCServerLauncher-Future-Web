@@ -7,8 +7,6 @@ on:
       - .github/workflows/build-app.yml
       - "apps/app/**"
       - "apps/web/**"
-      - "packages/shared/**"
-      - "packages/ui/**"
       - "packages/configs/**"
       - "packages/locales/**"
       - "packages/resource-provider/**"
@@ -24,8 +22,6 @@ on:
       - .github/workflows/build-app.yml
       - "apps/app/**"
       - "apps/web/**"
-      - "packages/shared/**"
-      - "packages/ui/**"
       - "packages/configs/**"
       - "packages/locales/**"
       - "packages/resource-provider/**"

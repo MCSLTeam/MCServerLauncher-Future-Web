@@ -42,9 +42,6 @@ pnpm lint                 # Lint all packages
 pnpm fix                  # Fix all linting issues
 pnpm test                 # Test all packages
 
-# Package-specific Commands
-pnpm ui:lint              # Lint UI package
-pnpm shared:lint          # Lint shared package
 ```
 
 ## Project Structure
@@ -61,11 +58,7 @@ MCServerLauncher-Future-Web/
 │   │   ├── package.json     # Frontend dependencies
 │   │   └── Dockerfile       # Docker build config
 │   │
-│   └── app/                 # Tauri Desktop App (Vue 3 + Tauri)
-│       ├── src/             # Vue 3 frontend source
-│       │   ├── App.vue      # Root component
-│       │   ├── index.ts     # Entry point
-│       │   └── components/  # App-specific components
+│   └── app/                 # Tauri Desktop App shell
 │       ├── src-tauri/       # Tauri backend (Rust)
 │       │   ├── src/         # Rust source
 │       │   ├── Cargo.toml   # Rust dependencies
@@ -84,15 +77,8 @@ MCServerLauncher-Future-Web/
 │   │   ├── eula/            # EULA translations
 │   │   └── scripts/         # Locale formatting scripts
 │   │
-│   ├── shared/              # Shared code and pages
-│   │   └── src/
-│   │       ├── assets/      # Shared assets
-│   │       ├── components/  # Shared components
-│   │       ├── layouts/     # Shared layouts
-│   │       └── utils/       # Shared utilities
-│   │
-│   └── ui/                  # UI component library
-│       └── src/             # UI components for MCSL Future
+│   ├── resource-provider/   # Rust resource provider package
+│   └── web-core/            # Shared Rust web core package
 │
 ├── turbo.json               # Turborepo configuration
 ├── package.json             # Root package.json
@@ -142,7 +128,7 @@ MCServerLauncher-Future-Web/
 - **Monorepo**: Turborepo 2.8+
 - **Package Manager**: pnpm 11+
 - **Linting**: ESLint 10.0+, Prettier 3.8+
-- **Type Checking**: vue-tsc 3.2+, TypeScript 6.0+
+- **Type Checking**: TypeScript 6.0+
 
 ## Code Organization
 
@@ -188,28 +174,14 @@ MCServerLauncher-Future-Web/
 - EULA translations
 - Formatting scripts for locale files
 
-**`@repo/shared`**:
-
-- Common components used by both web and app
-- Shared layouts and page templates
-- Utility functions
-- Assets (icons, images, styles)
-
-**`@repo/ui`**:
-
-- UI component library specific to MCSL Future
-- Reusable components with consistent styling
-
 ## Naming Conventions & Code Style
 
-### TypeScript/Vue
+### TypeScript/React
 
 - Use PascalCase for components and classes
 - Use camelCase for variables, functions, and methods
-- Use kebab-case for file names (e.g., `user-profile.vue`)
+- Use kebab-case for utility file names
 - Use UPPER_SNAKE_CASE for constants
-- Prefer Composition API over Options API in Vue 3
-- Use `<script setup>` syntax for Vue components
 
 ### Rust
 
@@ -231,10 +203,8 @@ MCServerLauncher-Future-Web/
 - **Monorepo Architecture**: Uses Turborepo for efficient builds and caching across packages
 - **Workspace Dependencies**: Packages reference each other via `workspace:*` protocol
 - **Dual Backend**: Web panel uses Rust Actix-web, Tauri app uses Tauri framework
-- **Shared Frontend**: Both apps share Vue 3 components and utilities
+- **Shared Frontend**: The Tauri app hosts the same Next.js console as the web panel
 - **i18n Support**: 6 languages supported via git submodule
-- **RsBuild**: Modern build tool replacing Webpack/Vite for faster builds
-- **Bun Package Manager**: Recently migrated from pnpm for faster installs
 - **Docker Support**: Web panel can be containerized for deployment
 - **Cross-Platform**: Tauri app supports Windows, macOS, and Linux
 
@@ -317,7 +287,7 @@ The `turbo.json` file defines:
 
 ## Testing
 
-- **Type Checking**: `vue-tsc --noEmit` for TypeScript validation
+- **Type Checking**: `tsc --noEmit` for TypeScript validation
 - **Rust Tests**: `cargo test` for backend tests
 - **Linting**: ESLint for code quality
 - **Manual Testing**: Start dev servers and test in browser

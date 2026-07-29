@@ -6,8 +6,6 @@ on:
     paths:
       - .github/workflows/build-web.yml
       - "apps/web/**"
-      - "packages/shared/**"
-      - "packages/ui/**"
       - "packages/configs/**"
       - "packages/locales/**"
       - "packages/resource-provider/**"
@@ -22,8 +20,6 @@ on:
     paths:
       - .github/workflows/build-web.yml
       - "apps/web/**"
-      - "packages/shared/**"
-      - "packages/ui/**"
       - "packages/configs/**"
       - "packages/locales/**"
       - "packages/resource-provider/**"

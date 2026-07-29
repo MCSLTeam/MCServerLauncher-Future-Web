@@ -22,7 +22,7 @@ function interpolate(
   });
 }
 
-/** vue-i18n 风格 fallback：当前语言 → zh-CN → en-US → key */
+/** Locale fallback order: current locale -> zh-CN -> en-US -> key. */
 export function resolveLocaleMessages(locale: LocaleCode): Messages[] {
   const chain: LocaleCode[] = [locale];
   if (locale.startsWith("zh") && locale !== "zh-CN") chain.push("zh-CN");
