@@ -26,7 +26,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.40.0",
-    "lucide-react": "^1.18.0",
+    "lucide-react": "^1.28.0",
     "monaco-editor": "^0.55.1",
     "next": "^16.2.9",
     "radix-ui": "^1.5.0",
