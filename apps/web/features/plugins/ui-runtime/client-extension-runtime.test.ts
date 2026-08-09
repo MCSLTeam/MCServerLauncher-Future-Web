@@ -30,7 +30,9 @@ const entry: ClientExtensionCacheEntry = {
         ui: { path: "client/ui.json", sha256: "a".repeat(64) },
         theme: { path: "client/theme.json", sha256: "b".repeat(64) },
       },
-      daemon: { plugin: { path: "daemon/plugin.dll", sha256: "c".repeat(64) } },
+      daemon: {
+        plugin: { path: "daemon/plugin-bundle.zip", sha256: "c".repeat(64) },
+      },
     },
     entry: {
       script: { path: "bundle.js", sha256: "d".repeat(64), module: "default" },
@@ -63,7 +65,7 @@ const entry: ClientExtensionCacheEntry = {
       ],
     },
     daemon: {
-      plugin: { path: "daemon/plugin.dll", sha256: "c".repeat(64) },
+      plugin: { path: "daemon/plugin-bundle.zip", sha256: "c".repeat(64) },
       extensionPoints: [
         { kind: "command", id: "command.daemon", target: "daemon" },
       ],

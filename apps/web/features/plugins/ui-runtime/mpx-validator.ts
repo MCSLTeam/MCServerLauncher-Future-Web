@@ -578,6 +578,11 @@ function validateManifest(
               "$.targets.daemon.plugin",
               diagnostics,
             );
+            validateDaemonBundleRef(
+              targets.daemon.plugin,
+              "$.targets.daemon.plugin",
+              diagnostics,
+            );
           }
         }
       }
@@ -1237,6 +1242,25 @@ function isAllowedEventPermission(
     ALLOWED_EVENT_CAPABILITIES.has(eventName) ||
     eventName === `plugin.${packageId}.event.extension`
   );
+}
+
+function validateDaemonBundleRef(
+  ref: MpxManifestFileRef | undefined,
+  path: string,
+  diagnostics: MpxPackageDiagnostic[],
+): void {
+  if (!isRecord(ref) || typeof ref.path !== "string") return;
+  const normalized = normalizeMpxPath(ref.path);
+  if (!normalized.ok) return;
+  if (!normalized.path.endsWith(".zip")) {
+    diagnostics.push(
+      diagnostic(
+        "daemon_bundle_path_invalid",
+        `${path}.path`,
+        "Daemon plugin payload must be a zip bundle containing mcsl-plugin.json and plugin assemblies.",
+      ),
+    );
+  }
 }
 
 function validateManifestFileRef(

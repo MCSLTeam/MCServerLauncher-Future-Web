@@ -103,10 +103,10 @@ export async function buildMpxPackageFromSources(
   }
 
   if (input.daemonPlugin !== undefined) {
-    entries["daemon/plugin.dll"] = input.daemonPlugin;
+    entries["daemon/plugin-bundle.zip"] = input.daemonPlugin;
     targets.daemon = {
       plugin: {
-        path: "daemon/plugin.dll",
+        path: "daemon/plugin-bundle.zip",
         sha256: await sha256Hex(input.daemonPlugin),
       },
     };

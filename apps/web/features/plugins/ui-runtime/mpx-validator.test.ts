@@ -55,6 +55,43 @@ test("validates a declarative .mpx package without a script bundle", async () =>
 test("validates declared daemon plugin payloads in unified targets", async () => {
   const pluginBytes = encoder.encode("not-a-real-assembly-yet");
   const zip = await buildMpxPackage({
+    extraEntries: { "daemon/plugin-bundle.zip": pluginBytes },
+    mutateManifest: async (manifest) => ({
+      ...manifest,
+      targets: {
+        ...manifest.targets,
+        daemon: {
+          plugin: {
+            path: "daemon/plugin-bundle.zip",
+            sha256: await sha256Hex(pluginBytes),
+          },
+        },
+      },
+    }),
+  });
+
+  const result = await validateMpxPackage(zip);
+
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.match(
+      result.package.fileDigests["daemon/plugin-bundle.zip"] ?? "",
+      /^[a-f0-9]{64}$/,
+    );
+    assert.deepEqual(result.package.deploymentPlan.scopes, [
+      "client",
+      "daemon",
+    ]);
+    assert.equal(
+      result.package.deploymentPlan.daemon?.plugin?.path,
+      "daemon/plugin-bundle.zip",
+    );
+  }
+});
+
+test("rejects single dll daemon payloads because daemon install requires a bundle", async () => {
+  const pluginBytes = encoder.encode("not-a-real-assembly-yet");
+  const zip = await buildMpxPackage({
     extraEntries: { "daemon/plugin.dll": pluginBytes },
     mutateManifest: async (manifest) => ({
       ...manifest,
@@ -72,19 +109,13 @@ test("validates declared daemon plugin payloads in unified targets", async () =>
 
   const result = await validateMpxPackage(zip);
 
-  assert.equal(result.ok, true);
-  if (result.ok) {
-    assert.match(
-      result.package.fileDigests["daemon/plugin.dll"] ?? "",
-      /^[a-f0-9]{64}$/,
-    );
-    assert.deepEqual(result.package.deploymentPlan.scopes, [
-      "client",
-      "daemon",
-    ]);
+  assert.equal(result.ok, false);
+  if (!result.ok) {
     assert.equal(
-      result.package.deploymentPlan.daemon?.plugin?.path,
-      "daemon/plugin.dll",
+      result.diagnostics.some(
+        (diagnostic) => diagnostic.code === "daemon_bundle_path_invalid",
+      ),
+      true,
     );
   }
 });
@@ -136,7 +167,7 @@ test("validates daemon-only provider extension packages", async () => {
   const zip = await buildMpxPackage({
     ui: null,
     script: null,
-    extraEntries: { "daemon/plugin.dll": pluginBytes },
+    extraEntries: { "daemon/plugin-bundle.zip": pluginBytes },
     mutateManifest: async (manifest) => ({
       ...manifest,
       package: {
@@ -147,7 +178,7 @@ test("validates daemon-only provider extension packages", async () => {
       targets: {
         daemon: {
           plugin: {
-            path: "daemon/plugin.dll",
+            path: "daemon/plugin-bundle.zip",
             sha256: await sha256Hex(pluginBytes),
           },
         },
@@ -190,14 +221,14 @@ test("validates declared daemon command bindings in unified packages", async () 
   });
   const zip = await buildMpxPackage({
     ui: commandUi,
-    extraEntries: { "daemon/plugin.dll": pluginBytes },
+    extraEntries: { "daemon/plugin-bundle.zip": pluginBytes },
     mutateManifest: async (manifest) => ({
       ...manifest,
       targets: {
         ...manifest.targets,
         daemon: {
           plugin: {
-            path: "daemon/plugin.dll",
+            path: "daemon/plugin-bundle.zip",
             sha256: await sha256Hex(pluginBytes),
           },
         },
@@ -266,14 +297,14 @@ test("rejects undeclared UI command bindings", async () => {
 test("rejects command declarations without daemon command extension point", async () => {
   const pluginBytes = encoder.encode("not-a-real-assembly-yet");
   const zip = await buildMpxPackage({
-    extraEntries: { "daemon/plugin.dll": pluginBytes },
+    extraEntries: { "daemon/plugin-bundle.zip": pluginBytes },
     mutateManifest: async (manifest) => ({
       ...manifest,
       targets: {
         ...manifest.targets,
         daemon: {
           plugin: {
-            path: "daemon/plugin.dll",
+            path: "daemon/plugin-bundle.zip",
             sha256: await sha256Hex(pluginBytes),
           },
         },
@@ -447,14 +478,14 @@ test("rejects unknown event permissions", async () => {
 test("accepts package-owned extension protocol event permission", async () => {
   const pluginBytes = encoder.encode("not-a-real-assembly-yet");
   const zip = await buildMpxPackage({
-    extraEntries: { "daemon/plugin.dll": pluginBytes },
+    extraEntries: { "daemon/plugin-bundle.zip": pluginBytes },
     mutateManifest: async (manifest) => ({
       ...manifest,
       targets: {
         ...manifest.targets,
         daemon: {
           plugin: {
-            path: "daemon/plugin.dll",
+            path: "daemon/plugin-bundle.zip",
             sha256: await sha256Hex(pluginBytes),
           },
         },

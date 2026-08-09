@@ -573,6 +573,18 @@ export function ClientExtensionCenter() {
                   empty="No resource"
                 />
               </div>
+              {selectedEntry.deploymentPlan.daemon?.plugin ? (
+                <Alert className="mt-3">
+                  <TriangleAlert className="size-4" />
+                  <AlertTitle>Daemon deployment pending</AlertTitle>
+                  <AlertDescription>
+                    Bundle {selectedEntry.deploymentPlan.daemon.plugin.path} is
+                    cached with this package. Deploying it to daemon plugins and
+                    applying the required daemon restart is a separate lifecycle
+                    step.
+                  </AlertDescription>
+                </Alert>
+              ) : null}
             </ConsolePanel>
 
             {selectedEntry.uiSchema ? (

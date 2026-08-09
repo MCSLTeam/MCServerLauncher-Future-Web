@@ -65,7 +65,7 @@ test("client extension manager rejects daemon-only packages", () => {
       deploymentPlan: {
         scopes: ["daemon"],
         daemon: {
-          plugin: { path: "daemon/plugin.dll", sha256: "b".repeat(64) },
+          plugin: { path: "daemon/plugin-bundle.zip", sha256: "b".repeat(64) },
           extensionPoints: [
             { kind: "provider", id: "provider.java", target: "daemon" },
           ],
@@ -161,7 +161,7 @@ test("client extension manager skips non-client entries restored from a store", 
     deploymentPlan: {
       scopes: ["daemon"],
       daemon: {
-        plugin: { path: "daemon/plugin.dll", sha256: "d".repeat(64) },
+        plugin: { path: "daemon/plugin-bundle.zip", sha256: "d".repeat(64) },
         extensionPoints: [
           { kind: "provider", id: "provider.java", target: "daemon" },
         ],
