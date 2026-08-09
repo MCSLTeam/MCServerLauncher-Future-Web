@@ -5,8 +5,11 @@ import {
   FileArchive,
   PlugZap,
   RefreshCw,
+  ShieldCheck,
   Trash2,
+  TriangleAlert,
   Upload,
+  X,
 } from "lucide-react";
 import {
   useCallback,
@@ -49,7 +52,11 @@ import {
   type ExtensionProtocolEnvelope,
   type ExtensionStateSnapshot,
 } from "./extension-protocol";
-import { validateMpxPackage, type MpxPackageDiagnostic } from "./mpx-validator";
+import {
+  validateMpxPackage,
+  type MpxPackageDiagnostic,
+  type ValidatedMpxPackage,
+} from "./mpx-validator";
 import { PluginUiRenderer, type PluginUiEvent } from "./web-renderer";
 
 interface ExtensionCenterMessage {
@@ -65,6 +72,12 @@ interface ExtensionEventRecord {
   readonly status?: string;
 }
 
+interface PendingExtensionInstall {
+  readonly fileName: string;
+  readonly bytes: Uint8Array;
+  readonly package: ValidatedMpxPackage;
+}
+
 export function ClientExtensionCenter() {
   const daemon = useDaemon();
   const managerRef = useRef<ClientExtensionManager | null>(null);
@@ -75,6 +88,8 @@ export function ClientExtensionCenter() {
   const [selectedId, setSelectedId] = useState("");
   const [message, setMessage] = useState<ExtensionCenterMessage | null>(null);
   const [installing, setInstalling] = useState(false);
+  const [pendingInstall, setPendingInstall] =
+    useState<PendingExtensionInstall | null>(null);
   const [events, setEvents] = useState<readonly ExtensionEventRecord[]>([]);
   const [stateSnapshots, setStateSnapshots] = useState<
     Readonly<Record<string, ExtensionStateSnapshot>>
@@ -271,6 +286,7 @@ export function ClientExtensionCenter() {
     if (!manager) return;
     setInstalling(true);
     setMessage(null);
+    setPendingInstall(null);
 
     try {
       const bytes = new Uint8Array(await file.arrayBuffer());
@@ -284,9 +300,39 @@ export function ClientExtensionCenter() {
         return;
       }
 
-      const installed = await manager.installPersisted(
-        validation.package,
+      setPendingInstall({
+        fileName: file.name,
         bytes,
+        package: validation.package,
+      });
+      setMessage({
+        kind: "info",
+        title: "Review extension permissions before installation.",
+        details:
+          "The package is validated, but no client cache entry has been written yet.",
+      });
+    } catch (error) {
+      setMessage({
+        kind: "error",
+        title: "Extension package could not be read.",
+        details: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setInstalling(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  async function confirmPendingInstall() {
+    const manager = managerRef.current;
+    if (!manager || !pendingInstall) return;
+    setInstalling(true);
+    setMessage(null);
+
+    try {
+      const installed = await manager.installPersisted(
+        pendingInstall.package,
+        pendingInstall.bytes,
       );
       if (!installed.ok) {
         setMessage({
@@ -300,6 +346,7 @@ export function ClientExtensionCenter() {
       await manager.restore();
       refreshEntries();
       setSelectedId(installed.entry.id);
+      setPendingInstall(null);
       setMessage({
         kind: "success",
         title: "Extension installed.",
@@ -308,13 +355,20 @@ export function ClientExtensionCenter() {
     } catch (error) {
       setMessage({
         kind: "error",
-        title: "Extension package could not be read.",
+        title: "Extension could not be installed.",
         details: error instanceof Error ? error.message : String(error),
       });
     } finally {
       setInstalling(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
     }
+  }
+
+  function cancelPendingInstall() {
+    setPendingInstall(null);
+    setMessage({
+      kind: "info",
+      title: "Extension installation cancelled.",
+    });
   }
 
   async function uninstallSelected() {
@@ -473,6 +527,15 @@ export function ClientExtensionCenter() {
           </Alert>
         ) : null}
 
+        {pendingInstall ? (
+          <PendingInstallReview
+            review={pendingInstall}
+            installing={installing}
+            onConfirm={() => void confirmPendingInstall()}
+            onCancel={cancelPendingInstall}
+          />
+        ) : null}
+
         {selectedEntry ? (
           <>
             <ConsolePanel>
@@ -567,6 +630,102 @@ export function ClientExtensionCenter() {
         )}
       </div>
     </div>
+  );
+}
+
+function PendingInstallReview({
+  review,
+  installing,
+  onConfirm,
+  onCancel,
+}: {
+  readonly review: PendingExtensionInstall;
+  readonly installing: boolean;
+  readonly onConfirm: () => void;
+  readonly onCancel: () => void;
+}) {
+  const manifest = review.package.manifest;
+  const daemonPlan = review.package.deploymentPlan.daemon;
+  const extensionPoints =
+    review.package.deploymentPlan.daemon?.extensionPoints ??
+    manifest.extensionPoints ??
+    [];
+  return (
+    <ConsolePanel>
+      <ConsolePanelHeader
+        title="Permission review"
+        description={`${manifest.package.displayName ?? manifest.package.id} ${manifest.package.version} from ${review.fileName}`}
+        action={
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={installing}
+              onClick={onCancel}
+            >
+              <X className="size-4" />
+              Cancel
+            </Button>
+            <Button type="button" disabled={installing} onClick={onConfirm}>
+              <ShieldCheck className="size-4" />
+              Confirm install
+            </Button>
+          </div>
+        }
+      />
+      <div className="space-y-3">
+        <Alert>
+          <TriangleAlert className="size-4" />
+          <AlertTitle>Local package audit</AlertTitle>
+          <AlertDescription>
+            {manifest.integrity.signed === true
+              ? "Package signature metadata is present and must be verified before installation."
+              : "This package is unsigned; install only if the source is trusted."}{" "}
+            {daemonPlan?.plugin
+              ? "It also carries a daemon payload, so daemon deployment and restart status must be handled separately."
+              : "It will only be cached by this client."}
+          </AlertDescription>
+        </Alert>
+        <div className="grid gap-3 text-sm md:grid-cols-3">
+          <SummaryBlock
+            icon={<PlugZap className="size-4" />}
+            label="Host permissions"
+            values={manifest.permissions.host ?? []}
+            empty="No host capability"
+          />
+          <SummaryBlock
+            icon={<ShieldCheck className="size-4" />}
+            label="Event permissions"
+            values={manifest.permissions.events ?? []}
+            empty="No event subscription"
+          />
+          <SummaryBlock
+            icon={<FileArchive className="size-4" />}
+            label="Daemon commands"
+            values={(manifest.commands ?? []).map((command) => command.id)}
+            empty="No daemon command"
+          />
+          <SummaryBlock
+            icon={<FileArchive className="size-4" />}
+            label="Extension points"
+            values={extensionPoints.map((point) => `${point.kind}:${point.id}`)}
+            empty="No extension point"
+          />
+          <SummaryBlock
+            icon={<FileArchive className="size-4" />}
+            label="Resources"
+            values={(manifest.resources ?? []).map((resource) => resource.path)}
+            empty="No resource"
+          />
+          <SummaryBlock
+            icon={<FileArchive className="size-4" />}
+            label="Package size"
+            values={[formatBytes(review.package.totalUncompressedBytes)]}
+            empty="No payload"
+          />
+        </div>
+      </div>
+    </ConsolePanel>
   );
 }
 
@@ -737,4 +896,12 @@ function formatDiagnostics(
     .slice(0, 6)
     .map((diagnostic) => `${diagnostic.path}: ${diagnostic.message}`)
     .join("\n");
+}
+
+function formatBytes(bytes: number): string {
+  if (!Number.isFinite(bytes) || bytes < 0) return "Unknown";
+  if (bytes < 1024) return `${bytes} B`;
+  const kib = bytes / 1024;
+  if (kib < 1024) return `${kib.toFixed(1)} KiB`;
+  return `${(kib / 1024).toFixed(1)} MiB`;
 }
