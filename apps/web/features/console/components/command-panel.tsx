@@ -239,7 +239,9 @@ export function PanelEmpty({
       <div className="space-y-1">
         <p className="text-base font-medium">{title}</p>
         {description ? (
-          <p className="max-w-md text-sm text-muted-foreground">{description}</p>
+          <p className="max-w-md text-sm text-muted-foreground">
+            {description}
+          </p>
         ) : null}
       </div>
       {action}

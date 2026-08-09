@@ -10,10 +10,7 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  HardDrive,
-  Package,
-} from "lucide-react";
+import { HardDrive, Package } from "lucide-react";
 
 import { Reveal } from "@/components/motion/reveal";
 import {
@@ -113,7 +110,6 @@ const REPORT_POLL_MS = 2000;
 const PING_POLL_MS = 5000;
 const LOG_STICK_THRESHOLD_PX = 48;
 
-
 function normalizeSettingsConsoleMode(value: unknown): "pipe" | "pty" {
   return String(value ?? "pipe").toLowerCase() === "pty" ? "pty" : "pipe";
 }
@@ -200,9 +196,9 @@ function InstanceDetailInner() {
   const [settingsType, setSettingsType] = useState("universal");
   const [settingsTarget, setSettingsTarget] = useState("");
   const [settingsForceRerun, setSettingsForceRerun] = useState(false);
-  const [settingsConsoleMode, setSettingsConsoleMode] = useState<"pipe" | "pty">(
-    "pipe",
-  );
+  const [settingsConsoleMode, setSettingsConsoleMode] = useState<
+    "pipe" | "pty"
+  >("pipe");
   const [settingsCanEdit, setSettingsCanEdit] = useState(true);
   const [settingsBlocked, setSettingsBlocked] = useState<string | null>(null);
   const [settingsError, setSettingsError] = useState<string | null>(null);
@@ -243,7 +239,8 @@ function InstanceDetailInner() {
   );
 
   // UI mode 只跟实例配置的显式 console_mode 走；report 偶发缺字段时保持上次值，避免 pipe/pty 闪烁
-  const [consoleViewMode, setConsoleViewMode] = useState<ConsoleViewMode>("pipe");
+  const [consoleViewMode, setConsoleViewMode] =
+    useState<ConsoleViewMode>("pipe");
   useEffect(() => {
     const next = extractInstanceConsoleMode(instance);
     if (next) setConsoleViewMode(next);
@@ -261,8 +258,7 @@ function InstanceDetailInner() {
   // while process_id > 0 — allow console I/O and stop/kill during boot.
   const processUp = isInstanceProcessUp(status);
   const canSend = nodeOnline && processUp;
-  const canStart =
-    nodeOnline && (status === "stopped" || status === "crashed");
+  const canStart = nodeOnline && (status === "stopped" || status === "crashed");
   const canStop = nodeOnline && processUp;
   const canRestart = canStop;
   const canKill = canStop;
@@ -286,9 +282,14 @@ function InstanceDetailInner() {
     // board / command 需要实时状态；文件管理页暂停 2s 轮询
     if (tab === "files") return;
     void refreshInstanceReport(resolvedNodeId, id);
-    const timer = window.setInterval(() => {
-      void refreshInstanceReport(resolvedNodeId, id);
-    }, tab === "board" || tab === "command" ? REPORT_POLL_MS : REPORT_POLL_MS * 3);
+    const timer = window.setInterval(
+      () => {
+        void refreshInstanceReport(resolvedNodeId, id);
+      },
+      tab === "board" || tab === "command"
+        ? REPORT_POLL_MS
+        : REPORT_POLL_MS * 3,
+    );
     return () => window.clearInterval(timer);
   }, [resolvedNodeId, id, nodeOnline, refreshInstanceReport, tab]);
 
@@ -395,9 +396,7 @@ function InstanceDetailInner() {
     void (async () => {
       const history = await getLogs(resolvedNodeId, id);
       if (cancelled) return;
-      const historyText = history.ok
-        ? (history.logs ?? []).join("\n")
-        : "";
+      const historyText = history.ok ? (history.logs ?? []).join("\n") : "";
       if (history.ok) {
         const base = history.logs ?? [];
         const notice = pendingConsoleNoticeRef.current;
@@ -414,12 +413,11 @@ function InstanceDetailInner() {
 
       if (interactive && historyText && !seededPtyHistory) {
         // History bytes as-is: xterm renders real ANSI/SGR if present.
-        const hist =
-          historyText.endsWith("\n") ? historyText : `${historyText}\n`;
+        const hist = historyText.endsWith("\n")
+          ? historyText
+          : `${historyText}\n`;
         const notice = pendingConsoleNoticeRef.current;
-        const noticeChunk = notice
-          ? `\r\n\x1b[36m${notice}\x1b[0m\r\n`
-          : "";
+        const noticeChunk = notice ? `\r\n\x1b[36m${notice}\x1b[0m\r\n` : "";
         seededPtyHistory = true;
         if (ptyHandleRef.current) {
           // 已有 xterm：直接灌历史，避免只缓冲不显示
@@ -584,9 +582,7 @@ function InstanceDetailInner() {
       );
       setFileLoading(false);
       if (!result.ok) {
-        setFileError(
-          result.message ?? t("shared.instance.files.load-failed"),
-        );
+        setFileError(result.message ?? t("shared.instance.files.load-failed"));
         setFileEntries([]);
         return;
       }
@@ -633,9 +629,7 @@ function InstanceDetailInner() {
       setFileEntries(entries);
       setSelectedNames([]);
       if (virtual === "/" || virtual === "") {
-        setTreeDirs(
-          entries.filter((e) => e.kind === "dir").map((e) => e.name),
-        );
+        setTreeDirs(entries.filter((e) => e.kind === "dir").map((e) => e.name));
       }
       setVirtualPath(virtual);
       if (options?.pushHistory !== false) {
@@ -648,14 +642,7 @@ function InstanceDetailInner() {
         });
       }
     },
-    [
-      resolvedNodeId,
-      id,
-      rootPath,
-      runWithClient,
-      t,
-      fileHistoryIndex,
-    ],
+    [resolvedNodeId, id, rootPath, runWithClient, t, fileHistoryIndex],
   );
 
   const loadSettings = useCallback(async () => {
@@ -673,7 +660,11 @@ function InstanceDetailInner() {
         : [];
       setSettingsArgs(fbArgs);
       setSettingsVersion(String(fallback.version ?? fallback.mc_version ?? ""));
-      setSettingsType(normalizeInstanceType(String(fallback.instance_type ?? instance?.type ?? "universal")));
+      setSettingsType(
+        normalizeInstanceType(
+          String(fallback.instance_type ?? instance?.type ?? "universal"),
+        ),
+      );
       setSettingsTarget(String(fallback.target ?? ""));
       setSettingsForceRerun(false);
       const fbMode = normalizeSettingsConsoleMode(
@@ -687,7 +678,9 @@ function InstanceDetailInner() {
           java: String(fallback.java_path ?? ""),
           args: fbArgs,
           version: String(fallback.version ?? fallback.mc_version ?? ""),
-          type: normalizeInstanceType(String(fallback.instance_type ?? instance?.type ?? "universal")),
+          type: normalizeInstanceType(
+            String(fallback.instance_type ?? instance?.type ?? "universal"),
+          ),
           force: false,
           consoleMode: fbMode,
         }),
@@ -740,7 +733,9 @@ function InstanceDetailInner() {
         name: String(config.name ?? instance?.name ?? ""),
         java: String(config.java_path ?? config.JavaPath ?? ""),
         args,
-        version: String(config.version ?? config.Version ?? config.mc_version ?? ""),
+        version: String(
+          config.version ?? config.Version ?? config.mc_version ?? "",
+        ),
         type: nextType,
         force: false,
         consoleMode: nextConsoleMode,
@@ -1052,7 +1047,9 @@ function InstanceDetailInner() {
     if (!resolvedNodeId || !canOperate || selectedNames.length === 0) return;
     const files = selectedNames
       .map((name) => fileEntries.find((item) => item.name === name))
-      .filter((item): item is DirEntry => Boolean(item && item.kind === "file"));
+      .filter((item): item is DirEntry =>
+        Boolean(item && item.kind === "file"),
+      );
     if (files.length === 0) {
       setMessage(t("shared.instance.files.download-failed"));
       return;
@@ -1113,8 +1110,6 @@ function InstanceDetailInner() {
       );
     }
   }
-
-
 
   async function onUploadFiles(fileList: FileList | null) {
     if (!resolvedNodeId || !canOperate || !fileList || fileList.length === 0) {
@@ -1193,12 +1188,10 @@ function InstanceDetailInner() {
     setSettingsSaving(true);
     setSettingsError(null);
     const args = settingsArgs.map((line) => line.trim()).filter(Boolean);
-    let replacement_core:
-      | {
-          uploaded_source_path: string;
-          preferred_target_name?: string | null;
-        }
-      | null = null;
+    let replacement_core: {
+      uploaded_source_path: string;
+      preferred_target_name?: string | null;
+    } | null = null;
     if (replacementCoreFile) {
       const uploadPath = `/instances/${id}/uploads/${replacementCoreFile.name}`;
       const upload = await uploadFile(
@@ -1334,7 +1327,9 @@ function InstanceDetailInner() {
   async function deleteComponent(entry: ComponentEntry) {
     if (!resolvedNodeId || !canOperate) return;
     const ok = await confirm({
-      description: t("shared.instance.files.delete-confirm", { name: entry.name }),
+      description: t("shared.instance.files.delete-confirm", {
+        name: entry.name,
+      }),
       destructive: true,
       confirmLabel: t("ui.common.confirm"),
       cancelLabel: t("ui.common.cancel"),
@@ -1421,12 +1416,10 @@ function InstanceDetailInner() {
     ? instance.raw.players
     : [];
   const serverIp = properties["server-ip"] ?? properties.server_ip ?? "";
-  const serverPort =
-    properties["server-port"] ?? properties.server_port ?? "";
-  const addressText =
-    hideServerIp
-      ? `•••:${serverPort || "?"}`
-      : `${serverIp || "0.0.0.0"}:${serverPort || "?"}`;
+  const serverPort = properties["server-port"] ?? properties.server_port ?? "";
+  const addressText = hideServerIp
+    ? `•••:${serverPort || "?"}`
+    : `${serverIp || "0.0.0.0"}:${serverPort || "?"}`;
 
   const confirmTitle =
     confirmAction === "start"
@@ -1463,18 +1456,15 @@ function InstanceDetailInner() {
               : t("shared.instance.action.kill")
             : t("ui.common.done");
 
-  const killPrimaryDisabled =
-    confirmAction === "kill" && killCountdown > 0;
+  const killPrimaryDisabled = confirmAction === "kill" && killCountdown > 0;
 
   const cpuValue =
     instance?.cpu != null
       ? Math.max(0, Math.min(100, Number(instance.cpu)))
       : null;
-  const memValue =
-    instance?.memory != null ? Number(instance.memory) : null;
+  const memValue = instance?.memory != null ? Number(instance.memory) : null;
 
-  const memMb =
-    memValue != null ? memValue / 1024 / 1024 : null;
+  const memMb = memValue != null ? memValue / 1024 / 1024 : null;
 
   return (
     <ConsolePage className="flex h-full min-h-0 flex-1 flex-col gap-0">
@@ -1782,10 +1772,7 @@ function InstanceDetailInner() {
             onCopy={(ruleId) => {
               const rule = eventRules.find((r) => r.id === ruleId);
               if (!rule) return;
-              setEventRules((prev) => [
-                ...prev,
-                cloneRule(rule, " - Copy"),
-              ]);
+              setEventRules((prev) => [...prev, cloneRule(rule, " - Copy")]);
             }}
             onDelete={(ruleId) =>
               setEventRules((prev) => prev.filter((r) => r.id !== ruleId))
@@ -1824,7 +1811,7 @@ function InstanceDetailInner() {
 
       {tab === "settings" ? (
         <Reveal delay={0.04} className="flex min-h-0 flex-1 flex-col">
-                    <InstanceSettingsPanel
+          <InstanceSettingsPanel
             t={t}
             instanceId={id}
             canOperate={canOperate}
@@ -1859,10 +1846,9 @@ function InstanceDetailInner() {
             onPickReplacementCore={(file) => setReplacementCoreFile(file)}
             onClearReplacementCore={() => setReplacementCoreFile(null)}
           />
-
         </Reveal>
       ) : null}
-<JvmArgHelperDialog
+      <JvmArgHelperDialog
         open={jvmHelperOpen}
         onOpenChange={setJvmHelperOpen}
         onInsert={(args) => {
@@ -1871,7 +1857,7 @@ function InstanceDetailInner() {
         }}
       />
 
-<Dialog
+      <Dialog
         open={confirmAction != null}
         onOpenChange={(open) => {
           if (!open) setConfirmAction(null);

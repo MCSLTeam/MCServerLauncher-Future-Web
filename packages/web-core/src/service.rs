@@ -76,9 +76,7 @@ fn bearer_token(meta: &ClientMeta) -> Option<&str> {
             .map(str::trim)
             .filter(|s| !s.is_empty())
             .or_else(|| {
-                if value.is_empty() {
-                    None
-                } else if value.contains(' ') {
+                if value.is_empty() || value.contains(' ') {
                     None
                 } else {
                     Some(value)

@@ -108,7 +108,14 @@ function OsGlyph({ type }: { type: string | null }) {
         viewBox="0 0 1024 1024"
         role="img"
       >
-        <rect x="37" y="39" width="949" height="948" rx="237" fill="currentColor" />
+        <rect
+          x="37"
+          y="39"
+          width="949"
+          height="948"
+          rx="237"
+          fill="currentColor"
+        />
         <path
           fill="var(--background)"
           d="M427.5 809.1c37-1.5 50.9-24.3 95.5-24.3 44.7 0 57.2 24.3 96.2 23.6 39.6-.8 64.8-36.7 89.1-72.8 28.1-41.8 39.6-82.2 40.3-84.2-.9-.4-77.4-30.2-78.2-119.8-.7-75 60.2-111 62.9-112.8-34.2-50.9-87.6-57.9-106.6-58.7-45.4-4.7-88.5 27.1-111.5 27.1-23 0-58.5-26.5-96.1-25.8-49.4.8-95 29.3-120.5 74.3-51.4 90.6-13.1 224.9 36.9 298.5 24.5 36 53.6 76.4 91.9 74.9zm114.1-547.5c-18.8 22.2-35.3 57.6-30.9 91.7 32.7 2.6 66-16.9 86.4-41.9 20.3-25.1 34-59.9 30.3-94.5-29.3 1.2-64.8 19.8-85.8 44.7z"
@@ -129,7 +136,10 @@ function OsGlyph({ type }: { type: string | null }) {
           d="M512 8c-95 0-145 91-145 205 0 64 4 91 0 132-20 32-61 74-79 119-24 59-31 123-27 188-38 34-79 72-79 111 0 52 68 65 119 80 31 10 55 45 101 45 42 0 69-27 110-27 42 0 69 27 111 27 46 0 70-35 101-45 51-15 119-28 119-80 0-39-41-77-79-111 4-65-3-129-27-188-18-45-59-87-79-119-4-41 0-68 0-132C657 99 607 8 512 8z"
         />
         <ellipse cx="512" cy="180" rx="55" ry="43" fill="#fff" />
-        <path fill="#f5bd0c" d="M390 298c42-33 91-42 142-32 40 8 72 27 66 50-8 29-63 61-101 61-42 0-86-30-107-57z" />
+        <path
+          fill="#f5bd0c"
+          d="M390 298c42-33 91-42 142-32 40 8 72 27 66 50-8 29-63 61-101 61-42 0-86-30-107-57z"
+        />
         <circle cx="487" cy="210" r="14" fill="#020204" />
         <circle cx="537" cy="210" r="14" fill="#020204" />
         <path fill="#d99a03" d="M487 235h50l-25 23z" />
@@ -463,11 +473,8 @@ export default function NodesPage() {
     <ConsolePage className="gap-3">
       {/* tip 保留；章节标题由 topbar 提供 */}
       <Reveal>
-        <p className="text-sm text-muted-foreground">
-          {t("shared.nodes.tip")}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("shared.nodes.tip")}</p>
       </Reveal>
-
 
       {/* 工具栏：右对齐 — 自动刷新 / 间隔 / 搜索 / 刷新 / 新建连接 */}
       <Reveal delay={0.02}>
@@ -533,7 +540,12 @@ export default function NodesPage() {
             {t("shared.nodes.refresh")}
           </Button>
 
-          <Button type="button" className="h-9" onClick={openAdd} disabled={!manageNodes}>
+          <Button
+            type="button"
+            className="h-9"
+            onClick={openAdd}
+            disabled={!manageNodes}
+          >
             <Plus className="size-4" aria-hidden />
             {t("shared.nodes.connect.new")}
           </Button>
@@ -555,7 +567,12 @@ export default function NodesPage() {
                 : t("shared.nodes.search.empty.desc")}
             </p>
             {nodes.length === 0 ? (
-              <Button type="button" className="mt-1" onClick={openAdd} disabled={!manageNodes}>
+              <Button
+                type="button"
+                className="mt-1"
+                onClick={openAdd}
+                disabled={!manageNodes}
+              >
                 <Plus className="size-4" aria-hidden />
                 {t("shared.nodes.connect.new")}
               </Button>
@@ -693,7 +710,7 @@ export default function NodesPage() {
       </Reveal>
 
       {/* 新建/编辑连接对话框 — 对齐 NewDaemonConnectionInput ContentDialog */}
-            <Dialog
+      <Dialog
         open={Boolean(deleteTarget)}
         onOpenChange={(open) => {
           if (!open) setDeleteTarget(null);
@@ -724,7 +741,7 @@ export default function NodesPage() {
         </DialogContent>
       </Dialog>
 
-<Dialog
+      <Dialog
         open={formOpen}
         onOpenChange={(open) => {
           if (!open && !submitting) closeForm();
@@ -811,7 +828,6 @@ export default function NodesPage() {
                 autoComplete="off"
               />
             </div>
-
 
             {manageNodes ? (
               <div className="space-y-1.5">

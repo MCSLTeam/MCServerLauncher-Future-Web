@@ -83,9 +83,7 @@ async function ensureNlsGlobals(nls: string): Promise<void> {
       if (withDeps) {
         factory({
           getDefaultExportFromCjs: (value: unknown) =>
-            value &&
-            typeof value === "object" &&
-            "default" in (value as object)
+            value && typeof value === "object" && "default" in (value as object)
               ? (value as { default: unknown }).default
               : value,
         });
@@ -94,7 +92,6 @@ async function ensureNlsGlobals(nls: string): Promise<void> {
       }
     };
     // Pack is AMD: define("vs/nls.messages.xx.js", function(){ globalThis._VSCODE_... })
-    // eslint-disable-next-line no-new-func -- evaluate vendor AMD pack once
     new Function("define", code)(defineShim);
   })()
     .catch((err) => {
@@ -114,7 +111,7 @@ async function ensureNlsGlobals(nls: string): Promise<void> {
 
 export function configureMonacoLoader(locale?: LocaleCode) {
   if (typeof window === "undefined") return;
-  const nls = locale ? monacoNlsFromLocale(locale) : lastNls ?? "";
+  const nls = locale ? monacoNlsFromLocale(locale) : (lastNls ?? "");
   // Reconfigure when nls changes before first init; after init, nls is fixed for this page.
   if (configured && lastNls === nls && initPromise) return;
   if (initPromise && lastNls !== nls) {
@@ -195,7 +192,7 @@ export function defineMcslMonacoThemes(monaco: typeof Monaco) {
       "scrollbarSlider.hoverBackground": `${mutedFg}55`,
       "scrollbarSlider.activeBackground": `${mutedFg}77`,
       "minimap.background": isDark ? "#f5fbfa" : bg,
-      "focusBorder": primary,
+      focusBorder: primary,
       "inputValidation.errorBorder": destructive,
     },
   });
@@ -231,7 +228,7 @@ export function defineMcslMonacoThemes(monaco: typeof Monaco) {
       "scrollbarSlider.hoverBackground": `${darkMutedFg}55`,
       "scrollbarSlider.activeBackground": `${darkMutedFg}77`,
       "minimap.background": isDark ? darkBg : "#081316",
-      "focusBorder": darkPrimary,
+      focusBorder: darkPrimary,
       "inputValidation.errorBorder": darkDestructive,
     },
   });
@@ -251,7 +248,7 @@ export function refreshMcslMonacoThemes(monaco: typeof Monaco) {
 export function preloadMonaco(locale?: LocaleCode): Promise<typeof Monaco> {
   configureMonacoLoader(locale);
   if (!initPromise) {
-    const nls = locale ? monacoNlsFromLocale(locale) : lastNls ?? "";
+    const nls = locale ? monacoNlsFromLocale(locale) : (lastNls ?? "");
     initPromise = (async () => {
       await ensureNlsGlobals(nls);
       // Re-apply path config after NLS (in case nothing configured yet on first call).

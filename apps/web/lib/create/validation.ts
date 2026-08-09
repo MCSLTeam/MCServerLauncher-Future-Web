@@ -13,7 +13,8 @@ export function tryValidateInstanceName(
   name: string,
 ): { ok: true } | { ok: false; error: string } {
   const value = normalizeString(name);
-  if (!value) return { ok: false, error: tKey("shared.create.validation.name.empty") };
+  if (!value)
+    return { ok: false, error: tKey("shared.create.validation.name.empty") };
   if (value === "." || value === "..") {
     return { ok: false, error: tKey("shared.create.validation.name.dot") };
   }
@@ -27,7 +28,8 @@ export function tryValidateJavaPath(
   path: string,
 ): { ok: true } | { ok: false; error: string } {
   const value = normalizeString(path);
-  if (!value) return { ok: false, error: tKey("shared.create.validation.java.empty") };
+  if (!value)
+    return { ok: false, error: tKey("shared.create.validation.java.empty") };
   // WPF 展示串: "(ver, arch) path"
   if (value.startsWith("(") && value.includes(") ")) {
     return { ok: false, error: tKey("shared.create.validation.java.display") };
@@ -38,7 +40,8 @@ export function tryValidateJavaPath(
 export function tryValidateLocalJarFile(
   file: File | null,
 ): { ok: true } | { ok: false; error: string } {
-  if (!file) return { ok: false, error: tKey("shared.create.validation.jar.empty") };
+  if (!file)
+    return { ok: false, error: tKey("shared.create.validation.jar.empty") };
   if (!file.name.toLowerCase().endsWith(".jar")) {
     return { ok: false, error: tKey("shared.create.validation.jar.ext") };
   }

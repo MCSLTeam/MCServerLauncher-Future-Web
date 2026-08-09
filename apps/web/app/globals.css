@@ -226,7 +226,6 @@ body {
   }
 }
 
-
 /* xterm / PTY console — shadcn muted surface (no pure black canvas) */
 .mcsl-xterm {
   position: relative;

@@ -57,8 +57,10 @@ fn session_storage_to_info(storage: SessionStorage) -> SessionInfo {
 const TOKENS_FILE_NAME: &str = "user_tokens.json";
 const TEMP_TOKEN_EXPIRE_MILLIS: u128 = 24 * 60 * 60 * 1000;
 
+type TokensCache = Arc<RwLock<(Option<HashMap<String, SessionInfo>>, u128)>>;
+
 lazy_static::lazy_static! {
-    static ref TOKENS_CACHE: Arc<RwLock<(Option<HashMap<String, SessionInfo>>, u128)>> = Arc::new(RwLock::new((None, 0)));
+    static ref TOKENS_CACHE: TokensCache = Arc::new(RwLock::new((None, 0)));
 }
 
 pub fn load_tokens() -> Result<(), Error> {
@@ -100,8 +102,8 @@ pub fn load_tokens() -> Result<(), Error> {
         })?;
 
     let mut cache = TOKENS_CACHE.write().map_err(|e| {
-        error!("Failed to acquire write lock: {}", e);
-        Error::new(std::io::ErrorKind::Other, "Failed to acquire lock")
+        error!("Failed to acquire write lock: {e}");
+        Error::other("Failed to acquire lock")
     })?;
     *cache = (
         Some(
@@ -202,9 +204,9 @@ pub fn create_session(
     tokens.insert(token.clone(), token_info.clone());
     cache.1 = current_time;
 
-    save_tokens(&*cache)?;
+    save_tokens(&cache)?;
 
-    info!("User logged in with new session: {:?}", token_info);
+    info!("User logged in with new session: {token_info:?}");
     Ok(token)
 }
 
@@ -214,7 +216,7 @@ pub fn delete_token(token: &str) -> AppResult<()> {
     match tokens.remove(token) {
         Some(token) => {
             cache.1 = current_time();
-            save_tokens(&*cache)?;
+            save_tokens(&cache)?;
             info!("User {} deleted session {}", token.user, token.token_id);
             Ok(())
         }
@@ -238,8 +240,8 @@ pub fn delete_token_by_id(token_id: &str) -> AppResult<()> {
     let token = token.unwrap();
     tokens.remove(&token);
     cache.1 = current_time();
-    save_tokens(&*cache)?;
-    info!("User {} deleted session {}", token_id, token);
+    save_tokens(&cache)?;
+    info!("User {token_id} deleted session {token}");
     Ok(())
 }
 
@@ -257,7 +259,7 @@ pub fn delete_token_by_username(username: &str) -> AppResult<()> {
         tokens.remove(token);
     });
     cache.1 = current_time();
-    save_tokens(&*cache)?;
+    save_tokens(&cache)?;
     Ok(())
 }
 
@@ -298,7 +300,7 @@ pub fn update_token_activity(token: &str, user_agent: &str, ip: &str) {
                 token_info.last_active_at = current_time();
             }
         }
-        Err(e) => error!("Failed to acquire write lock: {}", e),
+        Err(e) => error!("Failed to acquire write lock: {e}"),
     }
 }
 
@@ -319,7 +321,7 @@ pub fn get_user_by_token(token: &str) -> AppResult<User> {
     {
         tokens.remove(token);
         cache.1 = current_time();
-        save_tokens(&*cache)?;
+        save_tokens(&cache)?;
         return Err(AppError::not_found("invalid-token"));
     }
 
@@ -353,7 +355,7 @@ pub fn cleanup_expired_tokens() -> AppResult<usize> {
 
     if deleted_permanent_count > 0 {
         cache.1 = current_time;
-        save_tokens(&*cache)?;
+        save_tokens(&cache)?;
     }
 
     Ok(deleted_permanent_count)

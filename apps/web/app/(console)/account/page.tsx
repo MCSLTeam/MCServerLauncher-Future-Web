@@ -34,7 +34,7 @@ export default function AccountPage() {
   const [sessions, setSessions] = useState<SessionInfo[] | null>(null);
   const [oldPassword, setOldPassword] = useState("");
   const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [pwdError, setPwdError] = useState<string | null>(null);
   const [pwdOk, setPwdOk] = useState<string | null>(null);
@@ -51,8 +51,8 @@ export default function AccountPage() {
     const newKey = validatePassword(password);
     if (!password.trim()) next.password = t("ui.form.invalid.require");
     else if (newKey) next.password = t(newKey);
-    if (!confirm.trim()) next.confirm = t("ui.form.invalid.require");
-    else if (password !== confirm) {
+    if (!confirmPassword.trim()) next.confirm = t("ui.form.invalid.require");
+    else if (password !== confirmPassword) {
       next.confirm = t("web.auth.password-confirm.invalid");
     }
     if (password && password === oldPassword) {
@@ -61,7 +61,7 @@ export default function AccountPage() {
       );
     }
     return next;
-  }, [oldPassword, password, confirm, t]);
+  }, [oldPassword, password, confirmPassword, t]);
 
   const refreshSessions = useCallback(async () => {
     const data = await listSessions();
@@ -93,7 +93,7 @@ export default function AccountPage() {
     }
     setOldPassword("");
     setPassword("");
-    setConfirm("");
+    setConfirmPassword("");
     setTouched({});
     setPwdOk(t("web.user-center.password-reset.success"));
   }
@@ -187,8 +187,8 @@ export default function AccountPage() {
                 type="password"
                 label={t("web.auth.password-confirm.label")}
                 placeholder={t("web.auth.password-confirm.placeholder")}
-                value={confirm}
-                onChange={setConfirm}
+                value={confirmPassword}
+                onChange={setConfirmPassword}
                 onBlur={() => setTouched((c) => ({ ...c, confirm: true }))}
                 touched={touched.confirm}
                 error={fieldErrors.confirm}
@@ -231,7 +231,9 @@ export default function AccountPage() {
                   onClick={() => {
                     void (async () => {
                       const ok = await confirm({
-                        description: t("web.user-center.sessions.clear.confirm"),
+                        description: t(
+                          "web.user-center.sessions.clear.confirm",
+                        ),
                         destructive: true,
                         confirmLabel: t("ui.common.confirm"),
                         cancelLabel: t("ui.common.cancel"),

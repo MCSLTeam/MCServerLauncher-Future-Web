@@ -175,9 +175,7 @@ type FileManagerPanelProps = {
   fileError: string | null;
   fileLoading: boolean;
   selectedNames: string[];
-  setSelectedNames: (
-    names: string[] | ((prev: string[]) => string[]),
-  ) => void;
+  setSelectedNames: (names: string[] | ((prev: string[]) => string[])) => void;
   treeDirs: string[];
   canBack: boolean;
   canForward: boolean;
@@ -275,13 +273,9 @@ export const FileManagerPanel = memo(function FileManagerPanel({
       map.set(`${entry.kind}:${entry.name}`, {
         type: isParent ? "—" : entry.kind === "dir" ? folderLabel : fileLabel,
         modified:
-          isParent || !entry.modified
-            ? "—"
-            : formatUnixSeconds(entry.modified),
+          isParent || !entry.modified ? "—" : formatUnixSeconds(entry.modified),
         size:
-          isParent || entry.kind === "dir"
-            ? "—"
-            : formatBytes(entry.size ?? 0),
+          isParent || entry.kind === "dir" ? "—" : formatBytes(entry.size ?? 0),
       });
     }
     return map;
@@ -887,9 +881,7 @@ export const FileManagerPanel = memo(function FileManagerPanel({
                 >
                   <Download className="size-4" />
                   {t("shared.instance.files.download")}
-                  {selectedFiles.length > 1
-                    ? ` (${selectedFiles.length})`
-                    : ""}
+                  {selectedFiles.length > 1 ? ` (${selectedFiles.length})` : ""}
                 </ContextMenuItem>
                 <ContextMenuItem
                   disabled={!canOperate || busy}

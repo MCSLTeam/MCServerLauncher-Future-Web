@@ -60,7 +60,7 @@ export default function UsersPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [presetId, setPresetId] =
     useState<(typeof PERMISSION_PRESETS)[number]["id"]>("operator");
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -76,12 +76,12 @@ export default function UsersPage() {
     const pwdKey = validatePassword(password);
     if (!password.trim()) next.password = t("ui.form.invalid.require");
     else if (pwdKey) next.password = t(pwdKey);
-    if (!confirm.trim()) next.confirm = t("ui.form.invalid.require");
-    else if (password !== confirm) {
+    if (!confirmPassword.trim()) next.confirm = t("ui.form.invalid.require");
+    else if (password !== confirmPassword) {
       next.confirm = t("web.auth.password-confirm.invalid");
     }
     return next;
-  }, [username, password, confirm, t]);
+  }, [username, password, confirmPassword, t]);
 
   const refresh = useCallback(async () => {
     setLoadError(null);
@@ -129,7 +129,7 @@ export default function UsersPage() {
     }
     setUsername("");
     setPassword("");
-    setConfirm("");
+    setConfirmPassword("");
     setTouched({});
     setMessage(t("web.users.create.success", { username: username.trim() }));
     await refresh();
@@ -350,8 +350,8 @@ export default function UsersPage() {
                   type="password"
                   label={t("web.auth.password-confirm.label")}
                   placeholder={t("web.auth.password-confirm.placeholder")}
-                  value={confirm}
-                  onChange={setConfirm}
+                  value={confirmPassword}
+                  onChange={setConfirmPassword}
                   onBlur={() => setTouched((c) => ({ ...c, confirm: true }))}
                   touched={touched.confirm}
                   error={fieldErrors.confirm}

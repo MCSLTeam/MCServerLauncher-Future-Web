@@ -13,7 +13,9 @@ async function fetchJson<T>(url: string): Promise<T> {
     credentials: "omit",
   });
   if (!res.ok) {
-    throw new Error(tKey("shared.create.status.request-failed", { status: res.status, url }));
+    throw new Error(
+      tKey("shared.create.status.request-failed", { status: res.status, url }),
+    );
   }
   return (await res.json()) as T;
 }

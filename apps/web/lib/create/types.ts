@@ -281,7 +281,9 @@ export type JavaInfo = {
   architecture: string;
 };
 
-export function getTypesForCategory(category: CreateCategory): CreateTypeMeta[] {
+export function getTypesForCategory(
+  category: CreateCategory,
+): CreateTypeMeta[] {
   return CREATE_TYPES.filter((item) => item.category === category);
 }
 

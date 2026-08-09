@@ -19,10 +19,7 @@ import {
 } from "@/lib/downloads/manager";
 import { cn } from "@/lib/utils";
 
-function statusLabel(
-  t: (key: string) => string,
-  status: string,
-): string {
+function statusLabel(t: (key: string) => string, status: string): string {
   switch (status) {
     case "running":
       return t("shared.resource-center.history.status.running");

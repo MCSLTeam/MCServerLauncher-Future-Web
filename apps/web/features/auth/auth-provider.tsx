@@ -123,9 +123,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             return;
           }
         }
-        const bootstrap = await publicApi<string>("/api/account/desktop-session", {
-          method: "POST",
-        });
+        const bootstrap = await publicApi<string>(
+          "/api/account/desktop-session",
+          {
+            method: "POST",
+          },
+        );
         if (bootstrap.ok && bootstrap.data) {
           writeToken(bootstrap.data, true);
           setToken(bootstrap.data);
@@ -151,7 +154,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: { username, password, remember },
       });
       if (!result.ok || !result.data) {
-        return { ok: false as const, message: result.message ?? tKey("web.auth.login-failed") };
+        return {
+          ok: false as const,
+          message: result.message ?? tKey("web.auth.login-failed"),
+        };
       }
       writeToken(result.data, remember);
       setToken(result.data);
@@ -167,7 +173,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       body: { username, password },
     });
     if (!result.ok) {
-      return { ok: false as const, message: result.message ?? tKey("web.auth.register-failed") };
+      return {
+        ok: false as const,
+        message: result.message ?? tKey("web.auth.register-failed"),
+      };
     }
     // 公开注册仅创建首个管理员；成功后需自行登录（与 Vue 一致）
     return { ok: true as const };

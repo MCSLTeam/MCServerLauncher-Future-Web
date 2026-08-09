@@ -96,9 +96,7 @@ export default function DashboardPage() {
                 label={t("web.user-center.user-info.username")}
                 value={user?.username ?? "—"}
                 hint={
-                  user?.created_at
-                    ? formatDateTime(user.created_at)
-                    : undefined
+                  user?.created_at ? formatDateTime(user.created_at) : undefined
                 }
               />
               <ConsoleMetric

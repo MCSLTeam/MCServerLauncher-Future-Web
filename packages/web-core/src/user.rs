@@ -78,8 +78,10 @@ impl User {
 
 const USERS_FILE_NAME: &str = "users.json";
 
+type UsersCache = Arc<RwLock<(Option<HashMap<String, UserInfo>>, u128)>>;
+
 lazy_static::lazy_static! {
-    static ref USERS_CACHE: Arc<RwLock<(Option<HashMap<String, UserInfo>>, u128)>> = Arc::new(RwLock::new((None, 0)));
+    static ref USERS_CACHE: UsersCache = Arc::new(RwLock::new((None, 0)));
 }
 
 pub fn load_users() -> Result<(), Error> {
@@ -120,8 +122,8 @@ pub fn load_users() -> Result<(), Error> {
     })?;
 
     let mut cache = USERS_CACHE.write().map_err(|e| {
-        error!("Failed to acquire write lock: {}", e);
-        Error::new(std::io::ErrorKind::Other, "Failed to acquire lock")
+        error!("Failed to acquire write lock: {e}");
+        Error::other("Failed to acquire lock")
     })?;
     *cache = (Some(users), current_time());
 
@@ -224,7 +226,7 @@ pub fn add_user(user_input: UserInput) -> AppResult<()> {
     users.insert(user_input.username, user.info.clone());
     cache.1 = current_time();
 
-    save_users(&*cache)?;
+    save_users(&cache)?;
 
     info!("Added new user: {:?}", user.to_output());
     Ok(())
@@ -271,7 +273,7 @@ pub fn update_user(username: &str, user_input: UserInput) -> AppResult<Option<Us
     users.insert(user_input.username.clone(), updated_user.info.clone());
     cache.1 = current_time();
 
-    save_users(&*cache)?;
+    save_users(&cache)?;
 
     info!("Updated user: {:?}", updated_user.to_output());
     Ok(Some(updated_user))
@@ -286,11 +288,11 @@ pub fn delete_user(username: &str) -> AppResult<()> {
     }
     cache.1 = current_time();
 
-    save_users(&*cache)?;
+    save_users(&cache)?;
 
     delete_token_by_username(username)?;
 
-    info!("Deleted user with username {}", username);
+    info!("Deleted user with username {username}");
     Ok(())
 }
 

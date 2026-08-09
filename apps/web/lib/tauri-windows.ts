@@ -101,10 +101,8 @@ export async function openFileEditorWindow(options: {
 
   const features =
     "popup=yes,width=1100,height=760,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes";
-  const label = `mcsl-file-editor-${options.instanceId}-${options.filePath}`.slice(
-    0,
-    96,
-  );
+  const label =
+    `mcsl-file-editor-${options.instanceId}-${options.filePath}`.slice(0, 96);
   const opened = window.open(path, label, features);
   if (opened) {
     try {

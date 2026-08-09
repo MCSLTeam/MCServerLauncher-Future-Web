@@ -75,9 +75,7 @@ function pickMem(info: DaemonSystemInfo) {
   const mem = info.mem ?? {};
   // V2：total_kilobytes / free_kilobytes；兼容旧 total/free
   return {
-    total: asNumber(
-      mem.total_kilobytes ?? mem.totalKilobytes ?? mem.total,
-    ),
+    total: asNumber(mem.total_kilobytes ?? mem.totalKilobytes ?? mem.total),
     free: asNumber(mem.free_kilobytes ?? mem.freeKilobytes ?? mem.free),
   };
 }
@@ -89,15 +87,20 @@ type DriveView = {
   free: number;
 };
 
-function mapDrive(drive: {
-  name?: string;
-  drive_format?: string;
-  driveFormat?: string;
-  total?: number;
-  free?: number;
-  total_bytes?: number;
-  free_bytes?: number;
-} | null | undefined): DriveView {
+function mapDrive(
+  drive:
+    | {
+        name?: string;
+        drive_format?: string;
+        driveFormat?: string;
+        total?: number;
+        free?: number;
+        total_bytes?: number;
+        free_bytes?: number;
+      }
+    | null
+    | undefined,
+): DriveView {
   return {
     name: String(drive?.name ?? ""),
     driveFormat: String(drive?.drive_format ?? drive?.driveFormat ?? ""),
@@ -145,7 +148,10 @@ function pickPrimaryDrive(info: DaemonSystemInfo): DriveView | null {
   return prefer ?? drives[0] ?? null;
 }
 
-function friendlyOsName(raw: string, systemType: DaemonResourceView["systemType"]) {
+function friendlyOsName(
+  raw: string,
+  systemType: DaemonResourceView["systemType"],
+) {
   const name = raw.trim();
   if (!name) {
     if (systemType === "Darwin") return "macOS";
@@ -285,7 +291,12 @@ export function buildResourceView(
     cpuUsageText: `${cpuUsage.toFixed(2)}% (${cpu.coreCount}C / ${cpu.threadCount}T)`,
     memoryUsageText: `${memoryUsage.toFixed(2)}% (${formatSize(usedMemoryKb * 1024)} / ${formatSize(mem.total * 1024)})`,
     driveUsageText: `${driveUsage.toFixed(2)}% (${formatSize(usedDrive)} / ${formatSize(totalDrive)})`,
-    driveUsageTooltip: (drives.length > 0 ? drives : primaryDrive ? [primaryDrive] : [])
+    driveUsageTooltip: (drives.length > 0
+      ? drives
+      : primaryDrive
+        ? [primaryDrive]
+        : []
+    )
       .map((d) => {
         const used = d.total > d.free ? d.total - d.free : 0;
         const pct = calculateUsagePercentage(d.total, d.free).toFixed(2);

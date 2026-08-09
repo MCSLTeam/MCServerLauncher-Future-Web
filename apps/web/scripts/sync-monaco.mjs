@@ -30,7 +30,7 @@ if (!existsSync(marker)) {
   process.exit(1);
 }
 
-const sizeMb = (statSync(source).isDirectory() ? 0 : 0);
+const sizeMb = statSync(source).isDirectory() ? 0 : 0;
 console.log(`[sync-monaco] monaco-editor -> public/monaco/vs`);
 console.log(`[sync-monaco] ready: ${marker}`);
 void sizeMb;

@@ -80,10 +80,7 @@ export function DownloadProvider({ children }: { children: ReactNode }) {
 
   const cancel = useCallback((id: string) => downloadManager.cancel(id), []);
   const remove = useCallback((id: string) => downloadManager.remove(id), []);
-  const clearFinished = useCallback(
-    () => downloadManager.clearFinished(),
-    [],
-  );
+  const clearFinished = useCallback(() => downloadManager.clearFinished(), []);
 
   const activeCount = useMemo(
     () =>
@@ -104,19 +101,13 @@ export function DownloadProvider({ children }: { children: ReactNode }) {
       clearFinished,
       activeCount,
     }),
-    [
-      tasks,
-      open,
-      startDownload,
-      cancel,
-      remove,
-      clearFinished,
-      activeCount,
-    ],
+    [tasks, open, startDownload, cancel, remove, clearFinished, activeCount],
   );
 
   return (
-    <DownloadContext.Provider value={value}>{children}</DownloadContext.Provider>
+    <DownloadContext.Provider value={value}>
+      {children}
+    </DownloadContext.Provider>
   );
 }
 

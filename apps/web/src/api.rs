@@ -2,9 +2,9 @@ use actix_web::{HttpRequest, HttpResponse, Responder, delete, get, post, put, we
 use mcsl_resource_provider::{
     DownloadRequest, ProviderError, ProviderRequest, fetch_download_bytes, fetch_json,
 };
-use mcsl_web_core::error::{failed, success, AppError};
-use mcsl_web_core::service::{is_loopback_ip, ApiRequest, ClientMeta};
-use mcsl_web_core::{dispatch, AppResult};
+use mcsl_web_core::error::{AppError, failed, success};
+use mcsl_web_core::service::{ApiRequest, ClientMeta, is_loopback_ip};
+use mcsl_web_core::{AppResult, dispatch};
 use serde::Serialize;
 use serde_json::Value;
 use std::net::IpAddr;
@@ -29,10 +29,7 @@ pub async fn api_resource_download(body: web::Json<DownloadRequest>) -> impl Res
                 actix_web::http::header::CONTENT_TYPE,
                 content_type.unwrap_or_else(|| "application/octet-stream".to_owned()),
             ));
-            builder.insert_header((
-                actix_web::http::header::CONTENT_DISPOSITION,
-                "attachment",
-            ));
+            builder.insert_header((actix_web::http::header::CONTENT_DISPOSITION, "attachment"));
             builder.body(bytes)
         }
         Err(
@@ -140,8 +137,18 @@ macro_rules! simple {
     };
 }
 
-simple!(api_account_desktop_session, "POST", "/account/desktop-session", post);
-simple!(api_account_should_register, "GET", "/account/should-register", get);
+simple!(
+    api_account_desktop_session,
+    "POST",
+    "/account/desktop-session",
+    post
+);
+simple!(
+    api_account_should_register,
+    "GET",
+    "/account/should-register",
+    get
+);
 simple!(api_account_logout, "GET", "/account/logout", get);
 simple!(api_user_get_info_self, "GET", "/user/info/self", get);
 simple!(api_user_get_info_all, "GET", "/user/info/all", get);
@@ -152,48 +159,127 @@ simple!(api_nodes_list, "GET", "/nodes", get);
 simple!(api_preferences_get, "GET", "/preferences", get);
 
 #[post("/account/login")]
-pub async fn api_account_login(data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
-    dispatch_http("POST", "/account/login", Some(data.into_inner()), &http_request).await
+pub async fn api_account_login(
+    data: web::Json<Value>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    dispatch_http(
+        "POST",
+        "/account/login",
+        Some(data.into_inner()),
+        &http_request,
+    )
+    .await
 }
 
 #[post("/account/register")]
-pub async fn api_account_register(data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
-    dispatch_http("POST", "/account/register", Some(data.into_inner()), &http_request).await
+pub async fn api_account_register(
+    data: web::Json<Value>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    dispatch_http(
+        "POST",
+        "/account/register",
+        Some(data.into_inner()),
+        &http_request,
+    )
+    .await
 }
 
 #[post("/user/create")]
 pub async fn api_user_create(data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
-    dispatch_http("POST", "/user/create", Some(data.into_inner()), &http_request).await
+    dispatch_http(
+        "POST",
+        "/user/create",
+        Some(data.into_inner()),
+        &http_request,
+    )
+    .await
 }
 
 #[put("/user/info/{username}")]
-pub async fn api_user_update_info(username: web::Path<String>, data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
-    dispatch_http("PUT", &format!("/user/info/{}", username.into_inner()), Some(data.into_inner()), &http_request).await
+pub async fn api_user_update_info(
+    username: web::Path<String>,
+    data: web::Json<Value>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    dispatch_http(
+        "PUT",
+        &format!("/user/info/{}", username.into_inner()),
+        Some(data.into_inner()),
+        &http_request,
+    )
+    .await
 }
 
 #[delete("/user/{username}")]
-pub async fn api_user_delete(username: web::Path<String>, http_request: HttpRequest) -> impl Responder {
-    dispatch_http("DELETE", &format!("/user/{}", username.into_inner()), None, &http_request).await
+pub async fn api_user_delete(
+    username: web::Path<String>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    dispatch_http(
+        "DELETE",
+        &format!("/user/{}", username.into_inner()),
+        None,
+        &http_request,
+    )
+    .await
 }
 
 #[put("/user/password")]
-pub async fn api_user_update_password(data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
-    dispatch_http("PUT", "/user/password", Some(data.into_inner()), &http_request).await
+pub async fn api_user_update_password(
+    data: web::Json<Value>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    dispatch_http(
+        "PUT",
+        "/user/password",
+        Some(data.into_inner()),
+        &http_request,
+    )
+    .await
 }
 
 #[delete("/session/{id}")]
-pub async fn api_session_delete_id(id: web::Path<String>, http_request: HttpRequest) -> impl Responder {
-    dispatch_http("DELETE", &format!("/session/{}", id.into_inner()), None, &http_request).await
+pub async fn api_session_delete_id(
+    id: web::Path<String>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    dispatch_http(
+        "DELETE",
+        &format!("/session/{}", id.into_inner()),
+        None,
+        &http_request,
+    )
+    .await
 }
 
 #[delete("/session/{username}")]
-pub async fn api_session_delete_username(username: web::Path<String>, http_request: HttpRequest) -> impl Responder {
-    dispatch_http("DELETE", &format!("/session/{}", username.into_inner()), None, &http_request).await
+pub async fn api_session_delete_username(
+    username: web::Path<String>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    dispatch_http(
+        "DELETE",
+        &format!("/session/{}", username.into_inner()),
+        None,
+        &http_request,
+    )
+    .await
 }
 
 #[get("/nodes/{id}/token")]
-pub async fn api_nodes_get_token(id: web::Path<String>, http_request: HttpRequest) -> impl Responder {
-    dispatch_http("GET", &format!("/nodes/{}/token", id.into_inner()), None, &http_request).await
+pub async fn api_nodes_get_token(
+    id: web::Path<String>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    dispatch_http(
+        "GET",
+        &format!("/nodes/{}/token", id.into_inner()),
+        None,
+        &http_request,
+    )
+    .await
 }
 
 #[post("/nodes")]
@@ -202,26 +288,67 @@ pub async fn api_nodes_create(data: web::Json<Value>, http_request: HttpRequest)
 }
 
 #[put("/nodes/{id}")]
-pub async fn api_nodes_update(id: web::Path<String>, data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
-    dispatch_http("PUT", &format!("/nodes/{}", id.into_inner()), Some(data.into_inner()), &http_request).await
+pub async fn api_nodes_update(
+    id: web::Path<String>,
+    data: web::Json<Value>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    dispatch_http(
+        "PUT",
+        &format!("/nodes/{}", id.into_inner()),
+        Some(data.into_inner()),
+        &http_request,
+    )
+    .await
 }
 
 #[put("/nodes/{id}/visibility")]
-pub async fn api_nodes_set_visibility(id: web::Path<String>, data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
-    dispatch_http("PUT", &format!("/nodes/{}/visibility", id.into_inner()), Some(data.into_inner()), &http_request).await
+pub async fn api_nodes_set_visibility(
+    id: web::Path<String>,
+    data: web::Json<Value>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    dispatch_http(
+        "PUT",
+        &format!("/nodes/{}/visibility", id.into_inner()),
+        Some(data.into_inner()),
+        &http_request,
+    )
+    .await
 }
 
 #[delete("/nodes/{id}")]
 pub async fn api_nodes_delete(id: web::Path<String>, http_request: HttpRequest) -> impl Responder {
-    dispatch_http("DELETE", &format!("/nodes/{}", id.into_inner()), None, &http_request).await
+    dispatch_http(
+        "DELETE",
+        &format!("/nodes/{}", id.into_inner()),
+        None,
+        &http_request,
+    )
+    .await
 }
 
 #[post("/nodes/import")]
 pub async fn api_nodes_import(data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
-    dispatch_http("POST", "/nodes/import", Some(data.into_inner()), &http_request).await
+    dispatch_http(
+        "POST",
+        "/nodes/import",
+        Some(data.into_inner()),
+        &http_request,
+    )
+    .await
 }
 
 #[put("/preferences")]
-pub async fn api_preferences_put(data: web::Json<Value>, http_request: HttpRequest) -> impl Responder {
-    dispatch_http("PUT", "/preferences", Some(data.into_inner()), &http_request).await
+pub async fn api_preferences_put(
+    data: web::Json<Value>,
+    http_request: HttpRequest,
+) -> impl Responder {
+    dispatch_http(
+        "PUT",
+        "/preferences",
+        Some(data.into_inner()),
+        &http_request,
+    )
+    .await
 }

@@ -123,8 +123,8 @@ pub fn load_nodes() -> Result<(), Error> {
     })?;
 
     let mut cache = NODES_CACHE.write().map_err(|e| {
-        error!("Failed to acquire write lock: {}", e);
-        Error::new(std::io::ErrorKind::Other, "Failed to acquire lock")
+        error!("Failed to acquire write lock: {e}");
+        Error::other("Failed to acquire lock")
     })?;
     *cache = (Some(nodes), current_time());
     Ok(())
@@ -133,7 +133,7 @@ pub fn load_nodes() -> Result<(), Error> {
 fn save_nodes(nodes: &[StoredNode]) -> AppResult<()> {
     let file = Path::new(MAIN_DIR_NAME).join(NODES_FILE_NAME);
     let json = serde_json::to_string_pretty(nodes).map_err(|e| {
-        error!("Failed to serialize nodes: {}", e);
+        error!("Failed to serialize nodes: {e}");
         AppError::internal()
     })?;
     fs::write(&file, json).map_err(|e| {
@@ -160,7 +160,7 @@ where
     F: FnOnce(&[StoredNode]) -> AppResult<T>,
 {
     let cache = acquire_read_lock(&NODES_CACHE)?;
-    let nodes = cache.0.as_ref().map(|v| v.as_slice()).unwrap_or(&[]);
+    let nodes = cache.0.as_deref().unwrap_or(&[]);
     f(nodes)
 }
 

@@ -94,11 +94,17 @@ export function JvmArgHelperDialog({
             <div className="grid gap-3 sm:grid-cols-3">
               <Field>
                 <FieldLabel>{t("shared.create.jvm-helper.min")}</FieldLabel>
-                <Input value={minMem} onChange={(e) => setMinMem(e.target.value)} />
+                <Input
+                  value={minMem}
+                  onChange={(e) => setMinMem(e.target.value)}
+                />
               </Field>
               <Field>
                 <FieldLabel>{t("shared.create.jvm-helper.max")}</FieldLabel>
-                <Input value={maxMem} onChange={(e) => setMaxMem(e.target.value)} />
+                <Input
+                  value={maxMem}
+                  onChange={(e) => setMaxMem(e.target.value)}
+                />
               </Field>
               <Field>
                 <FieldLabel>{t("shared.create.jvm-helper.unit")}</FieldLabel>
@@ -162,7 +168,11 @@ export function JvmArgHelperDialog({
         </div>
 
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+          >
             {t("shared.create.jvm-helper.cancel")}
           </Button>
           <Button

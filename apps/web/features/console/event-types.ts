@@ -69,7 +69,10 @@ function normalizeRule(item: unknown): EventRule {
     isEnabled: Boolean(r.is_enabled ?? r.isEnabled ?? r.IsEnabled ?? true),
     triggerCondition:
       String(
-        r.trigger_condition ?? r.triggerCondition ?? r.TriggerCondition ?? "Any",
+        r.trigger_condition ??
+          r.triggerCondition ??
+          r.TriggerCondition ??
+          "Any",
       ) === "All"
         ? "All"
         : "Any",

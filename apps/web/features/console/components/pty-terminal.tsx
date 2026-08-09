@@ -144,8 +144,11 @@ function echoLocally(term: Terminal, data: string) {
 function hasRenderer(term: Terminal | null | undefined): boolean {
   if (!term?.element) return false;
   try {
-    const core = (term as unknown as { _core?: { _renderService?: { _renderer?: { value?: unknown } } } })
-      ._core;
+    const core = (
+      term as unknown as {
+        _core?: { _renderService?: { _renderer?: { value?: unknown } } };
+      }
+    )._core;
     return Boolean(core?._renderService?._renderer?.value);
   } catch {
     return false;
@@ -201,11 +204,14 @@ export function PtyTerminal({
   const onReadyRef = useRef(onReady);
   const disabledRef = useRef(disabled);
   const localEchoRef = useRef(localEcho);
-  onDataRef.current = onData;
-  onResizeRef.current = onResize;
-  onReadyRef.current = onReady;
-  disabledRef.current = disabled;
-  localEchoRef.current = localEcho;
+
+  useEffect(() => {
+    onDataRef.current = onData;
+    onResizeRef.current = onResize;
+    onReadyRef.current = onReady;
+    disabledRef.current = disabled;
+    localEchoRef.current = localEcho;
+  }, [onData, onResize, onReady, disabled, localEcho]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -413,10 +419,7 @@ export function PtyTerminal({
   return (
     <div
       ref={hostRef}
-      className={cn(
-        "mcsl-xterm min-h-[12rem] h-full w-full",
-        className,
-      )}
+      className={cn("mcsl-xterm min-h-[12rem] h-full w-full", className)}
       data-slot="pty-terminal"
       onMouseDown={() => {
         const term = termRef.current;

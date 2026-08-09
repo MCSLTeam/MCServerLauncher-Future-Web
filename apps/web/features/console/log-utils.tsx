@@ -75,9 +75,7 @@ export function parseAnsiToSpans(input: string): AnsiSpan[] {
   // Drop OSC (ESC ] ... BEL/ST) and non-SGR CSI so only text + SGR remain.
   let text = input
     .replace(/\u001b\][^\u0007\u001b]*(?:\u0007|\u001b\\)/g, "")
-    .replace(/\u001b\[[0-9;?]*[ -/]*[@-~]/g, (m) =>
-      m.endsWith("m") ? m : "",
-    );
+    .replace(/\u001b\[[0-9;?]*[ -/]*[@-~]/g, (m) => (m.endsWith("m") ? m : ""));
 
   const spans: AnsiSpan[] = [];
   let style: AnsiStyle = {};
@@ -147,7 +145,11 @@ export function parseAnsiToSpans(input: string): AnsiSpan[] {
           params[i + 3] != null &&
           params[i + 4] != null
         ) {
-          const color = rgbToHex(params[i + 2]!, params[i + 3]!, params[i + 4]!);
+          const color = rgbToHex(
+            params[i + 2]!,
+            params[i + 3]!,
+            params[i + 4]!,
+          );
           style = isFg
             ? { ...style, color }
             : { ...style, backgroundColor: color };
@@ -179,7 +181,9 @@ export function parseAnsiToSpans(input: string): AnsiSpan[] {
     buf += text.slice(last);
     flush();
   }
-  return spans.length > 0 ? spans : [{ text: input.replace(/\u001b\[[0-9;]*m/g, ""), style: {} }];
+  return spans.length > 0
+    ? spans
+    : [{ text: input.replace(/\u001b\[[0-9;]*m/g, ""), style: {} }];
 }
 
 function rgbToHex(r: number, g: number, b: number): string {

@@ -206,9 +206,7 @@ class DownloadManager {
     }
 
     const resolvedName =
-      destPath?.split(/[/\\]/).pop()?.trim() ||
-      browserHandle?.name ||
-      fileName;
+      destPath?.split(/[/\\]/).pop()?.trim() || browserHandle?.name || fileName;
 
     const id = crypto.randomUUID();
     const now = Date.now();
@@ -251,11 +249,7 @@ class DownloadManager {
       }
 
       // 需要 blob：本机浏览器 和/或 推 daemon
-      const { blob, total } = await this.fetchBlob(
-        id,
-        url,
-        controller.signal,
-      );
+      const { blob, total } = await this.fetchBlob(id, url, controller.signal);
 
       if (wantLocal && isTauriRuntime() && destPath) {
         // Tauri 本地落盘：再走原生下载（与 blob 并行语义一致，省去 bytes 命令）

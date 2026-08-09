@@ -149,7 +149,10 @@ export async function addNode(input: NodeInput): Promise<SavedNode | null> {
       createdAt: now,
       updatedAt: now,
     };
-    window.localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify([...cache, node]));
+    window.localStorage.setItem(
+      LEGACY_STORAGE_KEY,
+      JSON.stringify([...cache, node]),
+    );
     if (input.token?.trim()) {
       tokenCache.set(node.id, input.token.trim());
       window.localStorage.setItem(

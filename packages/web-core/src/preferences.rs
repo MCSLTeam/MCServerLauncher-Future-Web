@@ -68,9 +68,10 @@ impl Default for UserPreferences {
 
 const PREFS_FILE_NAME: &str = "preferences.json";
 
+type PreferencesCache = Arc<RwLock<(Option<HashMap<String, UserPreferences>>, u128)>>;
+
 lazy_static::lazy_static! {
-    static ref PREFS_CACHE: Arc<RwLock<(Option<HashMap<String, UserPreferences>>, u128)>> =
-        Arc::new(RwLock::new((None, 0)));
+    static ref PREFS_CACHE: PreferencesCache = Arc::new(RwLock::new((None, 0)));
 }
 
 pub fn load_preferences() -> Result<(), Error> {
@@ -105,8 +106,8 @@ pub fn load_preferences() -> Result<(), Error> {
         Error::new(std::io::ErrorKind::InvalidData, e)
     })?;
     let mut cache = PREFS_CACHE.write().map_err(|e| {
-        error!("Failed to acquire write lock: {}", e);
-        Error::new(std::io::ErrorKind::Other, "Failed to acquire lock")
+        error!("Failed to acquire write lock: {e}");
+        Error::other("Failed to acquire lock")
     })?;
     *cache = (Some(map), current_time());
     Ok(())
@@ -115,7 +116,7 @@ pub fn load_preferences() -> Result<(), Error> {
 fn save_prefs(map: &HashMap<String, UserPreferences>) -> AppResult<()> {
     let file = Path::new(MAIN_DIR_NAME).join(PREFS_FILE_NAME);
     let json = serde_json::to_string_pretty(map).map_err(|e| {
-        error!("Failed to serialize preferences: {}", e);
+        error!("Failed to serialize preferences: {e}");
         AppError::internal()
     })?;
     fs::write(&file, json).map_err(|e| {

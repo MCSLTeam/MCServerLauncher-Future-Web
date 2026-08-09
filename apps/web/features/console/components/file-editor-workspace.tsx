@@ -55,7 +55,11 @@ export function languageFromFileName(name: string): string {
   const lower = name.toLowerCase();
   if (lower.endsWith(".json") || lower.endsWith(".mcmeta")) return "json";
   if (lower.endsWith(".yml") || lower.endsWith(".yaml")) return "yaml";
-  if (lower.endsWith(".xml") || lower.endsWith(".html") || lower.endsWith(".htm"))
+  if (
+    lower.endsWith(".xml") ||
+    lower.endsWith(".html") ||
+    lower.endsWith(".htm")
+  )
     return "html";
   if (lower.endsWith(".css")) return "css";
   if (lower.endsWith(".ts") || lower.endsWith(".tsx")) return "typescript";
@@ -208,9 +212,7 @@ export function FileEditorWorkspace({
     ]);
     if (!result.ok) {
       setLoading(false);
-      setError(
-        result.message ?? t("shared.instance.files.editor-load-failed"),
-      );
+      setError(result.message ?? t("shared.instance.files.editor-load-failed"));
       return;
     }
     try {
@@ -250,9 +252,7 @@ export function FileEditorWorkspace({
     const result = await uploadFile(nodeId, file, filePath);
     setSaving(false);
     if (!result.ok) {
-      setError(
-        result.message ?? t("shared.instance.files.editor-save-failed"),
-      );
+      setError(result.message ?? t("shared.instance.files.editor-save-failed"));
       return;
     }
     baselineRef.current = current;
@@ -580,7 +580,10 @@ export function FileEditorWorkspace({
                   isDarkDocument() ? MONACO_THEME_DARK : MONACO_THEME_LIGHT,
                 );
                 // If file finished loading before mount, push content into model.
-                if (contentRef.current && ed.getValue() !== contentRef.current) {
+                if (
+                  contentRef.current &&
+                  ed.getValue() !== contentRef.current
+                ) {
                   ed.setValue(contentRef.current);
                 }
                 ed.onDidChangeCursorPosition((e) => {

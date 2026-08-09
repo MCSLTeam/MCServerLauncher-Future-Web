@@ -13,7 +13,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -164,7 +169,8 @@ export function InstanceSettingsPanel({
           <CardHeader>
             <CardTitle>{t("shared.instance.detail.settings")}</CardTitle>
             <CardDescription>
-              {t("shared.instances.table.name")} / {t("shared.instances.table.type")}
+              {t("shared.instances.table.name")} /{" "}
+              {t("shared.instances.table.type")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -199,7 +205,9 @@ export function InstanceSettingsPanel({
                 </Field>
               </div>
               <Field>
-                <FieldLabel>{t("shared.instance.settings.console-mode")}</FieldLabel>
+                <FieldLabel>
+                  {t("shared.instance.settings.console-mode")}
+                </FieldLabel>
                 <Select
                   value={consoleMode}
                   disabled={!canEdit}

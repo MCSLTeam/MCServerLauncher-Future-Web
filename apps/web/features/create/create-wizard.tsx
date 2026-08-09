@@ -185,7 +185,11 @@ export function CreateWizard() {
     coreType === "mcbe" || coreType === "terraria" || coreType === "universal";
 
   const jvmArgsText = useMemo(
-    () => jvmArgItems.map((s) => s.trim()).filter(Boolean).join(" "),
+    () =>
+      jvmArgItems
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .join(" "),
     [jvmArgItems],
   );
 
@@ -287,14 +291,7 @@ export function CreateWizard() {
     } finally {
       setVersionsLoading(false);
     }
-  }, [
-    coreType,
-    loaderVersion,
-    mcVersion,
-    needsLoader,
-    onlyStable,
-    useMirror,
-  ]);
+  }, [coreType, loaderVersion, mcVersion, needsLoader, onlyStable, useMirror]);
 
   useEffect(() => {
     if (nav === "settings" && needsLoader) {
@@ -385,14 +382,10 @@ export function CreateWizard() {
       if (coreType === "mcje" && coreFile) {
         const dst = `caches/downloads/${coreFile.name}`;
         setMessage(t("shared.create.status.uploading"));
-        const upload = await daemon.uploadFile(
-          nodeId,
-          coreFile,
-          dst,
-          (p) =>
-            setUploadProgress(
-              p.total > 0 ? Math.round((p.loaded / p.total) * 100) : 0,
-            ),
+        const upload = await daemon.uploadFile(nodeId, coreFile, dst, (p) =>
+          setUploadProgress(
+            p.total > 0 ? Math.round((p.loaded / p.total) * 100) : 0,
+          ),
         );
         if (!upload.ok || !upload.path) {
           throw new Error(
@@ -895,9 +888,7 @@ export function CreateWizard() {
                     <Select
                       value={loaderVersion}
                       onValueChange={setLoaderVersion}
-                      disabled={
-                        versionsLoading || loaderVersions.length === 0
-                      }
+                      disabled={versionsLoading || loaderVersions.length === 0}
                     >
                       <SelectTrigger>
                         <SelectValue

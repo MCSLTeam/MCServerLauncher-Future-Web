@@ -96,9 +96,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
 
   const confirm = useCallback((options: ConfirmOptions | string) => {
     const normalized =
-      typeof options === "string"
-        ? { description: options }
-        : options;
+      typeof options === "string" ? { description: options } : options;
     return new Promise<boolean>((resolve) => {
       confirmOpenRef.current = true;
       setConfirmState({
@@ -115,9 +113,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
 
   const prompt = useCallback((options: PromptOptions | string) => {
     const normalized =
-      typeof options === "string"
-        ? { title: options }
-        : options;
+      typeof options === "string" ? { title: options } : options;
     return new Promise<string | null>((resolve) => {
       promptOpenRef.current = true;
       setPromptState({
@@ -172,9 +168,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => finishConfirm(false)}
-            >
+            <AlertDialogCancel onClick={() => finishConfirm(false)}>
               {confirmState?.cancelLabel ?? "Cancel"}
             </AlertDialogCancel>
             <AlertDialogAction

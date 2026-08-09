@@ -22,7 +22,12 @@ test("guid big-endian roundtrip", () => {
 
 test("build + read upload frame", () => {
   const payload = new Uint8Array([1, 2, 3, 4, 5]);
-  const frame = buildBinaryFrame(BINARY_FRAME_KIND_UPLOAD, SESSION, 1024, payload);
+  const frame = buildBinaryFrame(
+    BINARY_FRAME_KIND_UPLOAD,
+    SESSION,
+    1024,
+    payload,
+  );
   assert.equal(frame.byteLength, BINARY_FRAME_HEADER_SIZE + payload.byteLength);
   const parsed = tryReadBinaryFrame(frame);
   assert.equal(parsed.ok, true);

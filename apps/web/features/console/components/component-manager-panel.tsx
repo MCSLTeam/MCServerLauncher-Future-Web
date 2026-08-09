@@ -1,13 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import {
-  MoreHorizontal,
-  Package,
-  Plus,
-  RefreshCw,
-  Trash2,
-} from "lucide-react";
+import { MoreHorizontal, Package, Plus, RefreshCw, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -190,7 +184,9 @@ export function ComponentManagerPanel({
                       <span
                         className={cn(
                           "size-2 shrink-0 rounded-full",
-                          entry.enabled ? "bg-emerald-500" : "bg-muted-foreground/50",
+                          entry.enabled
+                            ? "bg-emerald-500"
+                            : "bg-muted-foreground/50",
                         )}
                       />
                       <div className="min-w-0 flex-1">

@@ -20,7 +20,6 @@ import { cn } from "@/lib/utils";
 
 const THEME_MODES = ["system", "light", "dark"] as const satisfies ThemeMode[];
 
-
 export function PreferencesMenu() {
   const t = useT();
   const { preference, locales, setPreference } = useLocale();

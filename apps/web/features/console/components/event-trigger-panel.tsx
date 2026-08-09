@@ -158,7 +158,12 @@ export function EventTriggerPanel({
           title={t("shared.instance.events.empty-title")}
           description={t("shared.instance.events.empty-desc")}
           action={
-            <Button type="button" size="sm" disabled={!canOperate} onClick={onAdd}>
+            <Button
+              type="button"
+              size="sm"
+              disabled={!canOperate}
+              onClick={onAdd}
+            >
               <Plus className="size-4" />
               {t("ui.common.add")}
             </Button>
@@ -179,11 +184,9 @@ export function EventTriggerPanel({
                   {rule.description || "—"}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {rule.triggers.length}{" "}
-                  {t("shared.instance.events.triggers")}
+                  {rule.triggers.length} {t("shared.instance.events.triggers")}
                   {" | "}
-                  {rule.rulesets.length}{" "}
-                  {t("shared.instance.events.rulesets")}
+                  {rule.rulesets.length} {t("shared.instance.events.rulesets")}
                   {" | "}
                   {rule.actions.length} {t("shared.instance.events.actions")}
                 </p>
@@ -289,9 +292,7 @@ function EventRuleEditorInner({
   onOpenChange: (open: boolean) => void;
   onSave: (rule: EventRule) => void;
 }) {
-  const [draft, setDraft] = useState<EventRule>(() =>
-    structuredClone(initial),
-  );
+  const [draft, setDraft] = useState<EventRule>(() => structuredClone(initial));
 
   function updateTrigger(index: number, next: EventTrigger) {
     setDraft((prev) => {
@@ -362,11 +363,11 @@ function EventRuleEditorInner({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Any">
-                      {t("shared.instance.events.condition.any")}
-                    </SelectItem>
-                    <SelectItem value="All">
-                      {t("shared.instance.events.condition.all")}
-                    </SelectItem>
+                    {t("shared.instance.events.condition.any")}
+                  </SelectItem>
+                  <SelectItem value="All">
+                    {t("shared.instance.events.condition.all")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -799,7 +800,11 @@ function EventRuleEditorInner({
         </div>
 
         <DialogFooter>
-          <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => onOpenChange(false)}
+          >
             {t("ui.common.cancel")}
           </Button>
           <Button type="button" onClick={() => onSave(draft)}>

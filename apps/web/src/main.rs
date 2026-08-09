@@ -8,7 +8,7 @@ use include_dir::{Dir, include_dir};
 use log::{error, info};
 use mcsl_web_core::config;
 use mcsl_web_core::token;
-use mcsl_web_core::{init_data_dir, MAIN_DIR_NAME};
+use mcsl_web_core::{MAIN_DIR_NAME, init_data_dir};
 use std::path::Path;
 
 #[cfg(not(debug_assertions))]
@@ -19,7 +19,7 @@ async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
     init_data_dir().map_err(|e| {
-        error!("Failed to initialize data directory: {}", e);
+        error!("Failed to initialize data directory: {e}");
         e
     })?;
 
@@ -29,7 +29,7 @@ async fn main() -> std::io::Result<()> {
         loop {
             interval.tick().await;
             if let Err(e) = token::cleanup_expired_tokens() {
-                error!("Failed to cleanup expired tokens: {:?}", e);
+                error!("Failed to cleanup expired tokens: {e:?}");
             }
         }
     });
@@ -37,7 +37,7 @@ async fn main() -> std::io::Result<()> {
     let main_dir = Path::new(MAIN_DIR_NAME);
     let config = config::load_config(main_dir)?;
     let bind_addr = format!("{}:{}", config.host, config.port);
-    info!("Starting MCSL Future Web API on {}", bind_addr);
+    info!("Starting MCSL Future Web API on {bind_addr}");
 
     HttpServer::new(move || {
         let mut app = App::new().wrap(Logger::default());
@@ -92,17 +92,28 @@ async fn main() -> std::io::Result<()> {
 #[cfg(not(debug_assertions))]
 async fn serve_static_files(path: web::Path<String>) -> HttpResponse {
     let path = path.into_inner();
-    let path = if path.is_empty() || path == "/" { "index.html" } else { &path };
+    let path = if path.is_empty() || path == "/" {
+        "index.html"
+    } else {
+        &path
+    };
     match STATIC_DIR.get_file(path) {
         Some(file) => {
             let content = file.contents();
             let mime_type = mime_guess::from_path(path).first_or_octet_stream();
-            HttpResponse::Ok().content_type(mime_type.as_ref()).body(content)
+            HttpResponse::Ok()
+                .content_type(mime_type.as_ref())
+                .body(content)
         }
         None => match STATIC_DIR.get_file("index.html") {
-            Some(index_file) => HttpResponse::Ok().content_type("text/html").body(index_file.contents()),
+            Some(index_file) => HttpResponse::Ok()
+                .content_type("text/html")
+                .body(index_file.contents()),
             None => {
-                error!("Static file '{}' not found and index.html not available", path);
+                error!(
+                    "Static file '{}' not found and index.html not available",
+                    path
+                );
                 HttpResponse::NotFound().into()
             }
         },

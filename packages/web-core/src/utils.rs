@@ -40,20 +40,20 @@ pub fn permission_match(user_permission: &str, matching_permission: &str) -> boo
 
     pattern.push_str("(\\..+)?");
 
-    let regex = regex::Regex::new(&format!("^{}$", pattern)).unwrap();
+    let regex = regex::Regex::new(&format!("^{pattern}$")).unwrap();
     regex.is_match(matching_permission)
 }
 
 pub fn acquire_write_lock<T>(lock: &Arc<RwLock<T>>) -> AppResult<RwLockWriteGuard<'_, T>> {
     lock.write().map_err(|e| {
-        error!("Failed to acquire write lock: {}", e);
+        error!("Failed to acquire write lock: {e}");
         AppError::internal()
     })
 }
 
 pub fn acquire_read_lock<T>(lock: &Arc<RwLock<T>>) -> AppResult<RwLockReadGuard<'_, T>> {
     lock.read().map_err(|e| {
-        error!("Failed to acquire read lock: {}", e);
+        error!("Failed to acquire read lock: {e}");
         AppError::internal()
     })
 }
