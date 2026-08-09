@@ -83,6 +83,7 @@ export const V2_METHODS = {
   downloadClose: "mcsl.file.download.close",
   subscribe: "mcsl.event.subscribe",
   unsubscribe: "mcsl.event.unsubscribe",
+  extensionDispatch: "mcsl.extension.dispatch",
   discover: "rpc.discover",
 } as const;
 
@@ -154,7 +155,12 @@ export type DaemonSystemInfo = {
   api_version?: string;
   daemon_version?: string;
   daemonVersion?: string;
-  os?: { name?: string; architecture?: string; arch?: string; version?: string };
+  os?: {
+    name?: string;
+    architecture?: string;
+    arch?: string;
+    version?: string;
+  };
   cpu?: {
     vendor?: string;
     name?: string;

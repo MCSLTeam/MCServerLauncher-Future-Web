@@ -23,8 +23,35 @@ test("V2 method catalog uses mcsl.* names", () => {
   assert.equal(V2_UPLOAD_ACK_METHOD, "mcsl.file.upload.ack");
 });
 
+type JsonRpcFixtureMessage = {
+  jsonrpc?: string;
+  method?: string;
+  id?: string | number | null;
+  params?: Record<string, unknown>;
+  error?: { message?: string } & Record<string, unknown>;
+  result?: unknown;
+};
+
+type CreateFixtureSetting = {
+  name: string;
+  target: string;
+  instance_type: string;
+  target_type: string;
+  mc_version?: string;
+  input_encoding?: string;
+  output_encoding?: string;
+  java_path?: string;
+  arguments?: string[];
+  source: string;
+  source_type: string;
+  mirror?: string;
+  use_post_process?: boolean;
+};
+
 /** Minimal envelope classifier used by DaemonClient.handleTextMessage paths. */
-function classifyJsonRpcMessage(message) {
+function classifyJsonRpcMessage(
+  message: JsonRpcFixtureMessage | null | undefined,
+) {
   if (!message || typeof message !== "object") return { kind: "ignore" };
   if (
     message.jsonrpc === "2.0" &&
@@ -71,7 +98,7 @@ test("classifies error", () => {
     error: { code: -32000, message: "fail", data: { message: "nope" } },
   });
   assert.equal(c.kind, "error");
-  assert.equal(c.error.message, "fail");
+  assert.equal(c.error!.message, "fail");
 });
 
 test("classifies event notification", () => {
@@ -101,7 +128,7 @@ test("classifies upload ack", () => {
     },
   });
   assert.equal(c.kind, "upload_ack");
-  assert.equal(c.params.status, "accepted");
+  assert.equal(c.params!.status, "accepted");
 });
 
 function SESSION_PLACEHOLDER() {
@@ -109,7 +136,7 @@ function SESSION_PLACEHOLDER() {
 }
 
 // create request shape helper (mirror client.toCreateInstanceRequest without crypto)
-function toCreateInstanceRequest(setting) {
+function toCreateInstanceRequest(setting: CreateFixtureSetting) {
   const instanceId = "11111111-2222-3333-4444-555555555555";
   return {
     setting: {

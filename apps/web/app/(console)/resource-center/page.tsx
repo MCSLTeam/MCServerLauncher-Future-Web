@@ -1,12 +1,19 @@
 "use client";
 
-import { Download, ExternalLink, RefreshCw } from "lucide-react";
+import {
+  Download,
+  ExternalLink,
+  Puzzle,
+  RefreshCw,
+  Server,
+} from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Reveal } from "@/components/motion/reveal";
 import { ConsolePage } from "@/components/templates/console-surface";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -15,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DownloadDestinationDialog } from "@/features/downloads/download-destination-dialog";
+import { ClientExtensionCenter } from "@/features/plugins/ui-runtime/client-extension-center";
 import { useDownloads } from "@/features/downloads/download-provider";
 import type { DownloadDestination } from "@/lib/downloads/manager";
 import { useT } from "@/features/i18n/locale-provider";
@@ -55,6 +63,7 @@ export default function ResourceCenterPage() {
   const [pendingFile, setPendingFile] = useState<ResourceFile | null>(null);
   const [destOpen, setDestOpen] = useState(false);
   const [pendingUrl, setPendingUrl] = useState<string | null>(null);
+  const [surface, setSurface] = useState("server-cores");
 
   const provider = useMemo(
     () =>
@@ -190,203 +199,236 @@ export default function ResourceCenterPage() {
 
   return (
     <ConsolePage className="min-h-0 flex-1 gap-0">
-      <Reveal>
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="truncate text-sm text-muted-foreground">
-              {t("shared.resource-center.wpf-tip", {
-                provider: t(provider.displayNameKey),
-              })}
-            </p>
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              disabled={loading}
-              onClick={() => void refresh()}
-            >
-              <RefreshCw className={cn("size-4", loading && "animate-spin")} />
-              {t("shared.nodes.refresh")}
-            </Button>
-          </div>
-        </div>
-      </Reveal>
-
-      <Reveal className="flex min-h-0 flex-1 flex-col" delay={0.03}>
-        <div className="relative mt-5 grid min-h-0 flex-1 grid-cols-[auto_minmax(0,1fr)] gap-2.5">
-          <aside
-            className={cn(
-              "flex min-h-0 flex-col overflow-hidden rounded-xl border bg-card",
-              provider.sidebarWidth === "wide" ? "w-[12.5rem]" : "w-[9.375rem]",
-            )}
-          >
-            <div className="px-4 pt-3.5 text-center text-sm text-muted-foreground">
-              {t("shared.resource-center.cores")}
+      <Tabs
+        value={surface}
+        onValueChange={setSurface}
+        className="min-h-0 flex-1 gap-0"
+      >
+        <Reveal>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0 space-y-3">
+              <TabsList>
+                <TabsTrigger value="server-cores">
+                  <Server className="size-4" />
+                  {t("shared.resource-center.cores")}
+                </TabsTrigger>
+                <TabsTrigger value="extensions">
+                  <Puzzle className="size-4" />
+                  扩展 / 插件
+                </TabsTrigger>
+              </TabsList>
+              <p className="truncate text-sm text-muted-foreground">
+                {surface === "server-cores"
+                  ? t("shared.resource-center.wpf-tip", {
+                      provider: t(provider.displayNameKey),
+                    })
+                  : "安装、恢复和管理本机已校验的 .mpx 扩展包。"}
+              </p>
             </div>
-            <RadioGroup
-              className="mcsl-scrollbar mt-2 min-h-0 flex-1 gap-1 overflow-y-auto px-2.5 pb-3.5"
-              value={currentCoreId}
-              onValueChange={(id) => {
-                const core = cores.find((item) => item.id === id);
-                if (core) void chooseCore(core);
-              }}
-            >
-              {cores.map((core) => (
-                <label
-                  key={core.id}
-                  className={cn(
-                    "flex w-full cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition-colors",
-                    currentCoreId === core.id
-                      ? "bg-accent text-accent-foreground"
-                      : "hover:bg-muted/60",
-                    core.recommended &&
-                      currentCoreId !== core.id &&
-                      "bg-gradient-to-r from-amber-500 to-yellow-400 text-white",
-                  )}
+            {surface === "server-cores" ? (
+              <div className="flex shrink-0 items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={loading}
+                  onClick={() => void refresh()}
                 >
-                  <RadioGroupItem value={core.id} />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate">{core.name}</span>
-                    {core.tag ? (
-                      <span className="mt-0.5 block text-xs opacity-75">
-                        {tagName(core.tag, t)}
-                      </span>
-                    ) : null}
-                  </span>
-                </label>
-              ))}
-            </RadioGroup>
-          </aside>
+                  <RefreshCw
+                    className={cn("size-4", loading && "animate-spin")}
+                  />
+                  {t("shared.nodes.refresh")}
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        </Reveal>
 
-          <section className="flex min-h-0 min-w-0 flex-col rounded-xl border bg-card p-2.5">
-            {currentCore ? (
-              <>
-                {provider.id === "FastMirror" || provider.id === "MCSLSync" ? (
-                  <div className="flex gap-2.5">
-                    <Select
-                      value={currentVersion}
-                      onValueChange={(version) => {
-                        setCurrentVersion(version);
-                        void loadFiles(currentCore, version);
-                      }}
+        <TabsContent value="server-cores" className="min-h-0 flex-1">
+          <Reveal className="flex min-h-0 flex-1 flex-col" delay={0.03}>
+            <div className="relative mt-5 grid min-h-0 flex-1 grid-cols-[auto_minmax(0,1fr)] gap-2.5">
+              <aside
+                className={cn(
+                  "flex min-h-0 flex-col overflow-hidden rounded-xl border bg-card",
+                  provider.sidebarWidth === "wide"
+                    ? "w-[12.5rem]"
+                    : "w-[9.375rem]",
+                )}
+              >
+                <div className="px-4 pt-3.5 text-center text-sm text-muted-foreground">
+                  {t("shared.resource-center.cores")}
+                </div>
+                <RadioGroup
+                  className="mcsl-scrollbar mt-2 min-h-0 flex-1 gap-1 overflow-y-auto px-2.5 pb-3.5"
+                  value={currentCoreId}
+                  onValueChange={(id) => {
+                    const core = cores.find((item) => item.id === id);
+                    if (core) void chooseCore(core);
+                  }}
+                >
+                  {cores.map((core) => (
+                    <label
+                      key={core.id}
+                      className={cn(
+                        "flex w-full cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition-colors",
+                        currentCoreId === core.id
+                          ? "bg-accent text-accent-foreground"
+                          : "hover:bg-muted/60",
+                        core.recommended &&
+                          currentCoreId !== core.id &&
+                          "bg-gradient-to-r from-amber-500 to-yellow-400 text-white",
+                      )}
                     >
-                      <SelectTrigger className="flex-1">
-                        <SelectValue
-                          placeholder={t(
-                            "shared.resource-center.minecraft-version",
-                          )}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {versions.map((version) => (
-                          <SelectItem key={version} value={version}>
-                            {formatMinecraftVersion(
-                              version,
-                              "minecraft-prefixed",
-                            )}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {provider.id === "FastMirror" ? (
-                      <Button
-                        asChild
-                        variant="outline"
-                        disabled={!currentCore.homepage}
-                      >
-                        <a
-                          href={currentCore.homepage || "#"}
-                          target="_blank"
-                          rel="noreferrer"
+                      <RadioGroupItem value={core.id} />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate">{core.name}</span>
+                        {core.tag ? (
+                          <span className="mt-0.5 block text-xs opacity-75">
+                            {tagName(core.tag, t)}
+                          </span>
+                        ) : null}
+                      </span>
+                    </label>
+                  ))}
+                </RadioGroup>
+              </aside>
+
+              <section className="flex min-h-0 min-w-0 flex-col rounded-xl border bg-card p-2.5">
+                {currentCore ? (
+                  <>
+                    {provider.id === "FastMirror" ||
+                    provider.id === "MCSLSync" ? (
+                      <div className="flex gap-2.5">
+                        <Select
+                          value={currentVersion}
+                          onValueChange={(version) => {
+                            setCurrentVersion(version);
+                            void loadFiles(currentCore, version);
+                          }}
                         >
-                          <ExternalLink className="size-4" />
-                          {t("shared.resource-center.open-homepage")}
-                        </a>
-                      </Button>
-                    ) : null}
-                  </div>
-                ) : (
-                  <div className="mb-2.5 flex items-center gap-2.5">
-                    {provider.id === "PolarsMirror" && currentCore.icon ? (
-                      // 图标 URL 只来自固定白名单 Provider 返回值。
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={currentCore.icon}
-                        alt=""
-                        width={55}
-                        height={55}
-                        className="size-[55px] shrink-0 rounded-lg object-contain"
-                        referrerPolicy="no-referrer"
-                      />
-                    ) : null}
-                    <div className="min-w-0">
-                      <h3 className="truncate text-lg font-semibold">
-                        {currentCore.name}
-                      </h3>
-                      {currentCore.description ? (
-                        <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                          {currentCore.description}
+                          <SelectTrigger className="flex-1">
+                            <SelectValue
+                              placeholder={t(
+                                "shared.resource-center.minecraft-version",
+                              )}
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {versions.map((version) => (
+                              <SelectItem key={version} value={version}>
+                                {formatMinecraftVersion(
+                                  version,
+                                  "minecraft-prefixed",
+                                )}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {provider.id === "FastMirror" ? (
+                          <Button
+                            asChild
+                            variant="outline"
+                            disabled={!currentCore.homepage}
+                          >
+                            <a
+                              href={currentCore.homepage || "#"}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              <ExternalLink className="size-4" />
+                              {t("shared.resource-center.open-homepage")}
+                            </a>
+                          </Button>
+                        ) : null}
+                      </div>
+                    ) : (
+                      <div className="mb-2.5 flex items-center gap-2.5">
+                        {provider.id === "PolarsMirror" && currentCore.icon ? (
+                          // 图标 URL 只来自固定白名单 Provider 返回值。
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={currentCore.icon}
+                            alt=""
+                            width={55}
+                            height={55}
+                            className="size-[55px] shrink-0 rounded-lg object-contain"
+                            referrerPolicy="no-referrer"
+                          />
+                        ) : null}
+                        <div className="min-w-0">
+                          <h3 className="truncate text-lg font-semibold">
+                            {currentCore.name}
+                          </h3>
+                          {currentCore.description ? (
+                            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                              {currentCore.description}
+                            </p>
+                          ) : null}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="mcsl-scrollbar mt-2.5 min-h-0 flex-1 space-y-2 overflow-y-auto">
+                      {files.map((file) => (
+                        <div
+                          key={file.id}
+                          className="flex items-center justify-between gap-3 rounded-xl border px-3.5 py-2.5"
+                        >
+                          <div className="min-w-0">
+                            {file.minecraftVersion ? (
+                              <div className="text-sm">
+                                {t("shared.resource-center.minecraft-version")}:{" "}
+                                {file.minecraftVersion}
+                              </div>
+                            ) : null}
+                            {file.buildVersion ? (
+                              <div className="text-sm text-muted-foreground">
+                                {t("shared.resource-center.build-version")}:{" "}
+                                {file.buildVersion}
+                              </div>
+                            ) : null}
+                            {!file.minecraftVersion && !file.buildVersion ? (
+                              <div className="truncate text-sm">
+                                {file.name}
+                              </div>
+                            ) : null}
+                            {file.size ? (
+                              <div className="text-xs text-muted-foreground">
+                                {formatSize(file.size)}
+                              </div>
+                            ) : null}
+                          </div>
+                          <Button
+                            type="button"
+                            size="icon-sm"
+                            variant="outline"
+                            title={t("shared.resource-center.download")}
+                            disabled={downloading === file.id}
+                            onClick={() => void downloadFile(file)}
+                          >
+                            <Download className="size-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      {!loading && files.length === 0 ? (
+                        <p className="py-10 text-center text-sm text-muted-foreground">
+                          {t("shared.resource-center.no-files")}
                         </p>
                       ) : null}
                     </div>
-                  </div>
-                )}
+                  </>
+                ) : null}
+                {error ? (
+                  <p className="p-4 text-sm text-destructive">{error}</p>
+                ) : null}
+              </section>
+            </div>
+          </Reveal>
+        </TabsContent>
 
-                <div className="mcsl-scrollbar mt-2.5 min-h-0 flex-1 space-y-2 overflow-y-auto">
-                  {files.map((file) => (
-                    <div
-                      key={file.id}
-                      className="flex items-center justify-between gap-3 rounded-xl border px-3.5 py-2.5"
-                    >
-                      <div className="min-w-0">
-                        {file.minecraftVersion ? (
-                          <div className="text-sm">
-                            {t("shared.resource-center.minecraft-version")}:{" "}
-                            {file.minecraftVersion}
-                          </div>
-                        ) : null}
-                        {file.buildVersion ? (
-                          <div className="text-sm text-muted-foreground">
-                            {t("shared.resource-center.build-version")}:{" "}
-                            {file.buildVersion}
-                          </div>
-                        ) : null}
-                        {!file.minecraftVersion && !file.buildVersion ? (
-                          <div className="truncate text-sm">{file.name}</div>
-                        ) : null}
-                        {file.size ? (
-                          <div className="text-xs text-muted-foreground">
-                            {formatSize(file.size)}
-                          </div>
-                        ) : null}
-                      </div>
-                      <Button
-                        type="button"
-                        size="icon-sm"
-                        variant="outline"
-                        title={t("shared.resource-center.download")}
-                        disabled={downloading === file.id}
-                        onClick={() => void downloadFile(file)}
-                      >
-                        <Download className="size-4" />
-                      </Button>
-                    </div>
-                  ))}
-                  {!loading && files.length === 0 ? (
-                    <p className="py-10 text-center text-sm text-muted-foreground">
-                      {t("shared.resource-center.no-files")}
-                    </p>
-                  ) : null}
-                </div>
-              </>
-            ) : null}
-            {error ? (
-              <p className="p-4 text-sm text-destructive">{error}</p>
-            ) : null}
-          </section>
-        </div>
-      </Reveal>
+        <TabsContent value="extensions" className="min-h-0 flex-1 pt-5">
+          <ClientExtensionCenter />
+        </TabsContent>
+      </Tabs>
       <DownloadDestinationDialog
         open={destOpen}
         fileName={pendingFile?.name ?? ""}

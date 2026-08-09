@@ -14,6 +14,8 @@ import {
 import {
   DaemonClient,
   isIdempotentLifecycleError,
+  type DaemonEventListener,
+  type DaemonEventPacket,
   type UploadProgress,
 } from "@/lib/daemon/client";
 import {
@@ -49,6 +51,11 @@ type Credentials = {
   secure: boolean;
   token: string;
 };
+
+type DaemonEventSubscriptionListener = (
+  nodeId: string,
+  packet: DaemonEventPacket,
+) => void;
 
 type DaemonContextValue = {
   connections: Record<string, DaemonConnectionState>;
@@ -139,8 +146,12 @@ type DaemonContextValue = {
     nodeId: string,
     instanceId: string,
   ) => Promise<{ ok: boolean; message?: string }>;
+  /** 订阅所有已连接 daemon 的 V2 event notification。 */
+  subscribeDaemonEvents: (
+    listener: DaemonEventSubscriptionListener,
+  ) => () => void;
   /** 在已连接节点上执行任意 DaemonClient 操作 */
-  runWithClient: <T,>(
+  runWithClient: <T>(
     nodeId: string,
     run: (client: DaemonClient) => Promise<T>,
   ) => Promise<{ ok: true; data: T } | { ok: false; message?: string }>;
@@ -256,6 +267,9 @@ async function mapPool<T>(
 
 export function DaemonProvider({ children }: { children: ReactNode }) {
   const clientsRef = useRef<Map<string, DaemonClient>>(new Map());
+  const daemonEventListenersRef = useRef<Set<DaemonEventSubscriptionListener>>(
+    new Set(),
+  );
   const [connections, setConnections] =
     useState<Record<string, DaemonConnectionState>>(initialConnections);
   const [instances, setInstances] = useState<DaemonLiveInstance[]>([]);
@@ -322,11 +336,17 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
 
   const attachClient = useCallback(
     (nodeId: string, credentials: Credentials) => {
+      const fanoutEvent: DaemonEventListener = (packet) => {
+        for (const listener of daemonEventListenersRef.current) {
+          listener(nodeId, packet);
+        }
+      };
       const client = new DaemonClient({
         host: credentials.host,
         port: credentials.port,
         secure: credentials.secure,
         token: credentials.token,
+        onEvent: fanoutEvent,
         onClose: () => {
           if (clientsRef.current.get(nodeId) === client) {
             if (client.intentionallyClosed) return;
@@ -360,7 +380,10 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
           error: tKey("shared.daemon.error.token-missing"),
           systemInfo: null,
         });
-        return { ok: false, message: tKey("shared.daemon.error.token-missing") };
+        return {
+          ok: false,
+          message: tKey("shared.daemon.error.token-missing"),
+        };
       }
 
       const credentials: Credentials = {
@@ -428,7 +451,10 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         client.close();
         clientsRef.current.delete(nodeId);
-        const message = error instanceof Error ? error.message : tKey("shared.daemon.error.connect-failed");
+        const message =
+          error instanceof Error
+            ? error.message
+            : tKey("shared.daemon.error.connect-failed");
         setNodeState(nodeId, {
           status: "offline",
           error: message,
@@ -492,7 +518,10 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
           } catch (error) {
             setNodeState(nodeId, {
               status: "offline",
-              error: error instanceof Error ? error.message : tKey("shared.daemon.error.refresh-failed"),
+              error:
+                error instanceof Error
+                  ? error.message
+                  : tKey("shared.daemon.error.refresh-failed"),
             });
           }
         }),
@@ -537,7 +566,10 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       client.close();
       return {
         ok: false,
-        message: error instanceof Error ? error.message : tKey("shared.daemon.error.connect-failed"),
+        message:
+          error instanceof Error
+            ? error.message
+            : tKey("shared.daemon.error.connect-failed"),
       };
     }
   }, []);
@@ -554,7 +586,10 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       }
       const ready = clientsRef.current.get(nodeId);
       if (!ready?.ready) {
-        return { ok: false, message: tKey("shared.daemon.error.not-connected") };
+        return {
+          ok: false,
+          message: tKey("shared.daemon.error.not-connected"),
+        };
       }
       try {
         await run(ready);
@@ -562,7 +597,10 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         return {
           ok: false,
-          message: error instanceof Error ? error.message : tKey("shared.daemon.error.operation-failed"),
+          message:
+            error instanceof Error
+              ? error.message
+              : tKey("shared.daemon.error.operation-failed"),
         };
       }
     },
@@ -806,7 +844,10 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       }
       const ready = clientsRef.current.get(nodeId);
       if (!ready?.ready) {
-        return { ok: false, message: tKey("shared.daemon.error.not-connected") };
+        return {
+          ok: false,
+          message: tKey("shared.daemon.error.not-connected"),
+        };
       }
       try {
         const data = await ready.getInstanceLogHistory(instanceId);
@@ -819,7 +860,10 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         return {
           ok: false,
-          message: error instanceof Error ? error.message : tKey("shared.daemon.error.read-logs-failed"),
+          message:
+            error instanceof Error
+              ? error.message
+              : tKey("shared.daemon.error.read-logs-failed"),
         };
       }
     },
@@ -908,6 +952,16 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  const subscribeDaemonEvents = useCallback(
+    (listener: DaemonEventSubscriptionListener) => {
+      daemonEventListenersRef.current.add(listener);
+      return () => {
+        daemonEventListenersRef.current.delete(listener);
+      };
+    },
+    [],
+  );
+
   const runWithClient = useCallback(
     async <T,>(
       nodeId: string,
@@ -920,7 +974,10 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       }
       const ready = clientsRef.current.get(nodeId);
       if (!ready?.ready) {
-        return { ok: false, message: tKey("shared.daemon.error.not-connected") };
+        return {
+          ok: false,
+          message: tKey("shared.daemon.error.not-connected"),
+        };
       }
       try {
         const data = await run(ready);
@@ -928,7 +985,10 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         return {
           ok: false,
-          message: error instanceof Error ? error.message : tKey("shared.daemon.error.operation-failed"),
+          message:
+            error instanceof Error
+              ? error.message
+              : tKey("shared.daemon.error.operation-failed"),
         };
       }
     },
@@ -1024,6 +1084,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       attachConsoleSession,
       subscribeInstanceLog,
       refreshInstanceReport,
+      subscribeDaemonEvents,
       runWithClient,
       getJavaList,
       addInstance,
@@ -1050,6 +1111,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       attachConsoleSession,
       subscribeInstanceLog,
       refreshInstanceReport,
+      subscribeDaemonEvents,
       runWithClient,
       getJavaList,
       addInstance,

@@ -11,9 +11,9 @@
     "frontend:dev": "node ./scripts/sync-monaco.mjs && next dev --port 3000",
     "frontend:build": "node ./scripts/sync-monaco.mjs && node ./scripts/next-export-build.mjs && node ./scripts/sync-dist.mjs",
     "frontend:preview": "next start --port 3000",
-    "lint": "eslint .; prettier --check .; cargo lint",
-    "fix": "eslint --fix; prettier --write --list-different .; cargo fix",
-    "test": "tsc --noEmit && node --experimental-strip-types --test lib/daemon/binary.test.ts lib/daemon/rpc-envelope.test.ts && cargo test"
+    "lint": "eslint . && prettier --check . && cargo fmt --check && cargo clippy --all-targets -- -D warnings",
+    "fix": "eslint --fix . && prettier --write --list-different . && cargo fmt && cargo fix --allow-dirty --all-targets",
+    "test": "tsc --noEmit && node --experimental-strip-types --test lib/daemon/binary.test.ts lib/daemon/rpc-envelope.test.ts features/plugins/ui-runtime/schema.test.ts features/plugins/ui-runtime/design-tokens.test.ts features/plugins/ui-runtime/theme-runtime.test.ts features/plugins/ui-runtime/extension-protocol.test.ts features/plugins/ui-runtime/client-extension-manager.test.ts features/plugins/ui-runtime/client-extension-runtime.test.ts features/plugins/ui-runtime/package-builder.test.ts features/plugins/ui-runtime/mpx-validator.test.ts features/plugins/ui-runtime/host-api.test.ts && cargo test"
   },
   "dependencies": {
     "@monaco-editor/loader": "^1.7.0",
@@ -26,6 +26,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.40.0",
+    "json5": "^2.2.3",
     "lucide-react": "^1.18.0",
     "monaco-editor": "^0.55.1",
     "next": "^16.2.9",

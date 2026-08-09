@@ -111,7 +111,10 @@ export class DaemonClient {
   private pendingUploadAcks = new Map<string, PendingUploadAck>();
   private pendingDownloadChunks = new Map<string, PendingDownloadChunk>();
   private eventListeners = new Set<DaemonEventListener>();
-  private consoleOutputListeners = new Map<string, Set<ConsoleOutputListener>>();
+  private consoleOutputListeners = new Map<
+    string,
+    Set<ConsoleOutputListener>
+  >();
   private pendingConsoleOutput = new Map<string, PendingConsoleOutput[]>();
   private pendingConsoleOutputBytes = 0;
   private closedByUser = false;
@@ -169,11 +172,15 @@ export class DaemonClient {
       };
 
       socket.onclose = (event) => {
-        this.rejectAll(new Error(event.reason || tKey("shared.daemon.error.disconnected")));
+        this.rejectAll(
+          new Error(event.reason || tKey("shared.daemon.error.disconnected")),
+        );
         this.options.onClose?.(event);
         if (!settled) {
           settled = true;
-          reject(new Error(event.reason || tKey("shared.daemon.error.ws-closed")));
+          reject(
+            new Error(event.reason || tKey("shared.daemon.error.ws-closed")),
+          );
         }
       };
 
@@ -239,6 +246,12 @@ export class DaemonClient {
     return result as T;
   }
 
+  dispatchExtensionEnvelope(envelope: Record<string, unknown>) {
+    return this.request<{ envelope?: unknown }>(V2_METHODS.extensionDispatch, {
+      envelope,
+    });
+  }
+
   ping() {
     return this.request<{ time?: number }>(V2_METHODS.ping, {});
   }
@@ -277,13 +290,14 @@ export class DaemonClient {
   ): Promise<() => void> {
     const meta = { instance_id: instanceId };
     const off = this.onEvent((packet) => {
-      if (packet.event !== V2_EVENTS.instanceLog && packet.event !== "instance_log") {
+      if (
+        packet.event !== V2_EVENTS.instanceLog &&
+        packet.event !== "instance_log"
+      ) {
         return;
       }
       const packetMeta = packet.meta ?? {};
-      const mid = String(
-        packetMeta.instance_id ?? packetMeta.InstanceId ?? "",
-      );
+      const mid = String(packetMeta.instance_id ?? packetMeta.InstanceId ?? "");
       if (mid && mid !== instanceId) return;
       const data = packet.data ?? {};
       const line = data.log ?? data.Log ?? data.line ?? data.Line;
@@ -553,11 +567,11 @@ export class DaemonClient {
     const rawList = Array.isArray(data)
       ? data
       : (root.items ??
-          root.java_list ??
-          root.javaList ??
-          root.JavaList ??
-          root.list ??
-          []);
+        root.java_list ??
+        root.javaList ??
+        root.JavaList ??
+        root.list ??
+        []);
     if (!Array.isArray(rawList)) return [];
     return rawList
       .map((item) => {
@@ -645,7 +659,13 @@ export class DaemonClient {
           chunk,
           maxChunk,
         );
-        await this.sendUploadChunk(sessionId, offset, chunk.byteLength, frame, 60_000);
+        await this.sendUploadChunk(
+          sessionId,
+          offset,
+          chunk.byteLength,
+          frame,
+          60_000,
+        );
         offset = end;
         options?.onProgress?.({
           loaded: offset,
@@ -695,7 +715,8 @@ export class DaemonClient {
     );
     const sessionId = String(session.session_id ?? session.sessionId ?? "");
     const total = Number(session.length ?? 0);
-    if (!sessionId) throw new Error(tKey("shared.instance.files.download-failed"));
+    if (!sessionId)
+      throw new Error(tKey("shared.instance.files.download-failed"));
 
     const maxChunk = Number(
       session.max_chunk_size ?? session.maxChunkSize ?? 256 * 1024,
@@ -752,7 +773,9 @@ export class DaemonClient {
     timeoutMs: number,
   ): Promise<void> {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
-      return Promise.reject(new Error(tKey("shared.daemon.error.not-connected")));
+      return Promise.reject(
+        new Error(tKey("shared.daemon.error.not-connected")),
+      );
     }
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
@@ -824,7 +847,10 @@ export class DaemonClient {
       // Prefer binary parse when length looks like a frame.
       if (buffer.byteLength >= 32) {
         const asText = new TextDecoder().decode(buffer);
-        if (!asText.trimStart().startsWith("{") && !asText.trimStart().startsWith("[")) {
+        if (
+          !asText.trimStart().startsWith("{") &&
+          !asText.trimStart().startsWith("[")
+        ) {
           this.handleBinaryFrame(buffer);
           return;
         }
@@ -852,7 +878,9 @@ export class DaemonClient {
       ) {
         clearTimeout(pending.timer);
         this.pendingDownloadChunks.delete(parsed.header.sessionId);
-        pending.reject(new Error(tKey("shared.instance.files.download-failed")));
+        pending.reject(
+          new Error(tKey("shared.instance.files.download-failed")),
+        );
         return;
       }
       clearTimeout(pending.timer);
@@ -897,10 +925,7 @@ export class DaemonClient {
     }
   }
 
-  private bufferEarlyConsoleOutput(
-    key: string,
-    frame: PendingConsoleOutput,
-  ) {
+  private bufferEarlyConsoleOutput(key: string, frame: PendingConsoleOutput) {
     if (frame.payload.byteLength > MAXIMUM_EARLY_CONSOLE_BYTES) return;
     let pending = this.pendingConsoleOutput.get(key);
     if (!pending) {
@@ -1138,10 +1163,7 @@ function mapDaemonErrorCode(code: string): string | null {
 export function isIdempotentLifecycleError(error: unknown): boolean {
   if (!(error instanceof Error)) return false;
   const code = (error as Error & { daemonErrorCode?: string }).daemonErrorCode;
-  if (
-    code === "instance.not_running" ||
-    code === "instance.already_stopped"
-  ) {
+  if (code === "instance.not_running" || code === "instance.already_stopped") {
     return true;
   }
   const msg = error.message.toLowerCase();

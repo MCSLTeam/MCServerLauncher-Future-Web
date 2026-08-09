@@ -1,0 +1,740 @@
+"use client";
+
+import {
+  CheckCircle2,
+  FileArchive,
+  PlugZap,
+  RefreshCw,
+  Trash2,
+  Upload,
+} from "lucide-react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  ConsolePanel,
+  ConsolePanelHeader,
+} from "@/components/templates/console-surface";
+import { useDaemon } from "@/features/nodes/daemon-provider";
+import { type DaemonEventPacket } from "@/lib/daemon/client";
+import { V2_EVENTS } from "@/lib/daemon/types";
+import { cn } from "@/lib/utils";
+
+import {
+  ClientExtensionManager,
+  IndexedDbClientExtensionPayloadStore,
+  LocalStorageClientExtensionCacheStore,
+  MemoryClientExtensionPayloadStore,
+  type ClientExtensionCacheEntry,
+} from "./client-extension-manager";
+import {
+  applyClientExtensionStateEnvelope,
+  createClientExtensionState,
+  dispatchClientExtensionCommand,
+  dispatchClientExtensionEvent,
+  listClientExtensionResources,
+} from "./client-extension-runtime";
+import {
+  parseExtensionProtocolEnvelope,
+  type ExtensionJsonValue,
+  type ExtensionProtocolEnvelope,
+  type ExtensionStateSnapshot,
+} from "./extension-protocol";
+import { validateMpxPackage, type MpxPackageDiagnostic } from "./mpx-validator";
+import { PluginUiRenderer, type PluginUiEvent } from "./web-renderer";
+
+interface ExtensionCenterMessage {
+  readonly kind: "success" | "error" | "info";
+  readonly title: string;
+  readonly details?: string;
+}
+
+interface ExtensionEventRecord {
+  readonly timestamp: string;
+  readonly extensionId: string;
+  readonly event: PluginUiEvent | ExtensionProtocolEnvelope;
+  readonly status?: string;
+}
+
+export function ClientExtensionCenter() {
+  const daemon = useDaemon();
+  const managerRef = useRef<ClientExtensionManager | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [entries, setEntries] = useState<readonly ClientExtensionCacheEntry[]>(
+    [],
+  );
+  const [selectedId, setSelectedId] = useState("");
+  const [message, setMessage] = useState<ExtensionCenterMessage | null>(null);
+  const [installing, setInstalling] = useState(false);
+  const [events, setEvents] = useState<readonly ExtensionEventRecord[]>([]);
+  const [stateSnapshots, setStateSnapshots] = useState<
+    Readonly<Record<string, ExtensionStateSnapshot>>
+  >({});
+
+  const connectedNodeId = useMemo(
+    () =>
+      Object.values(daemon.connections).find(
+        (connection) => connection.status === "online",
+      )?.nodeId ?? "",
+    [daemon.connections],
+  );
+
+  const selectedEntry = useMemo(
+    () => entries.find((entry) => entry.id === selectedId) ?? entries[0],
+    [entries, selectedId],
+  );
+
+  const recordEvent = useCallback(
+    (
+      entry: ClientExtensionCacheEntry,
+      event: PluginUiEvent | ExtensionProtocolEnvelope,
+      status?: string,
+    ) => {
+      setEvents((current) =>
+        [
+          {
+            timestamp: new Date().toLocaleTimeString(),
+            extensionId: entry.id,
+            event,
+            status,
+          },
+          ...current,
+        ].slice(0, 8),
+      );
+    },
+    [],
+  );
+
+  const routeExtensionEnvelope = useCallback(
+    (nodeId: string, envelope: ExtensionProtocolEnvelope) => {
+      const entry = managerRef.current?.get(envelope.plugin ?? "");
+      if (entry === undefined) return;
+
+      if (
+        envelope.type === "state.patch" ||
+        envelope.type === "state.snapshot"
+      ) {
+        setStateSnapshots((current) => {
+          const snapshot =
+            current[entry.id] ?? createClientExtensionState(entry);
+          const next = applyClientExtensionStateEnvelope(
+            entry,
+            snapshot,
+            envelope,
+          );
+          if (!next.applied) return current;
+          return { ...current, [entry.id]: next };
+        });
+        recordEvent(
+          entry,
+          envelope,
+          `State revision ${envelope.revision} applied from ${nodeId}.`,
+        );
+        return;
+      }
+
+      if (envelope.type === "event") {
+        void dispatchClientExtensionEvent(
+          entry,
+          envelope,
+          async (eventEnvelope) => {
+            recordEvent(
+              entry,
+              eventEnvelope,
+              `Daemon event '${eventEnvelope.name}' accepted from ${nodeId}.`,
+            );
+          },
+        ).then((result) => {
+          if (!result.dispatched) {
+            recordEvent(entry, envelope, result.diagnostics.join(", "));
+          }
+        });
+      }
+    },
+    [recordEvent],
+  );
+
+  const refreshEntries = useCallback(() => {
+    const nextEntries = managerRef.current?.list() ?? [];
+    setEntries(nextEntries);
+    setSelectedId((current) => {
+      if (current && nextEntries.some((entry) => entry.id === current)) {
+        return current;
+      }
+      return nextEntries[0]?.id ?? "";
+    });
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const payloadStore =
+      typeof window.indexedDB === "undefined"
+        ? new MemoryClientExtensionPayloadStore()
+        : new IndexedDbClientExtensionPayloadStore();
+    const manager = new ClientExtensionManager(
+      new LocalStorageClientExtensionCacheStore(window.localStorage),
+      payloadStore,
+    );
+    managerRef.current = manager;
+
+    void manager
+      .restore()
+      .then(() => {
+        if (!cancelled) refreshEntries();
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setMessage({
+          kind: "error",
+          title: "Could not restore installed extensions.",
+          details: error instanceof Error ? error.message : String(error),
+        });
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [refreshEntries]);
+
+  useEffect(() => {
+    return daemon.subscribeDaemonEvents((nodeId, packet) => {
+      const directEnvelope = parseExtensionProtocolEnvelope(
+        extractExtensionEnvelope(packet.data),
+      );
+      if (directEnvelope.ok) {
+        if (
+          isPluginExtensionEnvelopeSource(directEnvelope.envelope, packet.event)
+        ) {
+          routeExtensionEnvelope(nodeId, directEnvelope.envelope);
+        }
+        return;
+      }
+
+      for (const entry of managerRef.current?.list() ?? []) {
+        const envelope = wrapDaemonEventForEntry(entry, packet);
+        if (envelope !== undefined) {
+          routeExtensionEnvelope(nodeId, envelope);
+        }
+      }
+    });
+  }, [daemon, routeExtensionEnvelope]);
+
+  useEffect(() => {
+    if (!connectedNodeId || entries.length === 0) return;
+
+    const eventNames = Array.from(
+      new Set(
+        entries.flatMap((entry) =>
+          (entry.manifest.permissions.events ?? [])
+            .map((eventName) => toDaemonEventName(entry, eventName))
+            .filter((name): name is string => name !== undefined),
+        ),
+      ),
+    );
+    if (eventNames.length === 0) return;
+
+    let cancelled = false;
+    const subscribed: string[] = [];
+    void (async () => {
+      for (const eventName of eventNames) {
+        if (cancelled) return;
+        const result = await daemon.runWithClient(connectedNodeId, (client) =>
+          client.subscribeEvent(eventName),
+        );
+        if (result.ok) {
+          subscribed.push(eventName);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      for (const eventName of subscribed) {
+        void daemon.runWithClient(connectedNodeId, (client) =>
+          client.unsubscribeEvent(eventName),
+        );
+      }
+    };
+  }, [connectedNodeId, daemon, entries]);
+
+  async function installPackage(file: File) {
+    const manager = managerRef.current;
+    if (!manager) return;
+    setInstalling(true);
+    setMessage(null);
+
+    try {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const validation = await validateMpxPackage(bytes);
+      if (!validation.ok) {
+        setMessage({
+          kind: "error",
+          title: "Extension package was rejected.",
+          details: formatDiagnostics(validation.diagnostics),
+        });
+        return;
+      }
+
+      const installed = await manager.installPersisted(
+        validation.package,
+        bytes,
+      );
+      if (!installed.ok) {
+        setMessage({
+          kind: "error",
+          title: "Extension could not be installed.",
+          details: `${installed.code}: ${installed.message}`,
+        });
+        return;
+      }
+
+      await manager.restore();
+      refreshEntries();
+      setSelectedId(installed.entry.id);
+      setMessage({
+        kind: "success",
+        title: "Extension installed.",
+        details: `${installed.entry.id} ${installed.entry.version}`,
+      });
+    } catch (error) {
+      setMessage({
+        kind: "error",
+        title: "Extension package could not be read.",
+        details: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setInstalling(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  async function uninstallSelected() {
+    if (!selectedEntry) return;
+    const removed = await managerRef.current?.uninstallPersisted(
+      selectedEntry.id,
+    );
+    refreshEntries();
+    setMessage({
+      kind: removed ? "success" : "info",
+      title: removed ? "Extension removed." : "Extension was already absent.",
+      details: selectedEntry.id,
+    });
+  }
+
+  async function handleUiEvent(
+    entry: ClientExtensionCacheEntry,
+    event: PluginUiEvent,
+  ) {
+    recordEvent(entry, event);
+    if (!event.command) return;
+
+    if (!connectedNodeId) {
+      recordEvent(
+        entry,
+        event,
+        "No connected daemon is available for command dispatch.",
+      );
+      return;
+    }
+
+    const result = await dispatchClientExtensionCommand(
+      entry,
+      {
+        async request<T>(method: string, params: Record<string, unknown>) {
+          const dispatched = await daemon.runWithClient(
+            connectedNodeId,
+            (client) => client.request<T>(method, params),
+          );
+          if (!dispatched.ok) {
+            throw new Error(dispatched.message ?? "Daemon request failed.");
+          }
+          return dispatched.data;
+        },
+      },
+      event,
+    );
+
+    recordEvent(
+      entry,
+      event,
+      result.ok
+        ? "Extension Protocol command accepted."
+        : result.diagnostics.join(", "),
+    );
+  }
+
+  const selectedState = selectedEntry
+    ? (stateSnapshots[selectedEntry.id]?.state ?? {})
+    : {};
+  const selectedResources = selectedEntry
+    ? listClientExtensionResources(selectedEntry)
+    : [];
+
+  return (
+    <div className="grid min-h-0 gap-4 xl:grid-cols-[19rem_minmax(0,1fr)]">
+      <ConsolePanel className="flex min-h-0 flex-col gap-4" padded={false}>
+        <div className="border-b p-4">
+          <ConsolePanelHeader
+            className="mb-0"
+            title="扩展 / 插件"
+            description="安装、恢复和管理本机已校验的 .mpx 扩展包。"
+            action={
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  size="icon-sm"
+                  variant="outline"
+                  title="Refresh"
+                  onClick={refreshEntries}
+                >
+                  <RefreshCw className="size-4" />
+                </Button>
+                <Button
+                  type="button"
+                  size="icon-sm"
+                  title="Install .mpx"
+                  disabled={installing}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="size-4" />
+                </Button>
+              </div>
+            }
+          />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".mpx,application/zip"
+            className="hidden"
+            onChange={(event) => {
+              const file = event.currentTarget.files?.[0];
+              if (file) void installPackage(file);
+            }}
+          />
+        </div>
+
+        <div className="mcsl-scrollbar min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
+          {entries.map((entry) => (
+            <button
+              key={entry.id}
+              type="button"
+              className={cn(
+                "flex w-full min-w-0 flex-col gap-2 rounded-xl border p-3 text-left transition-colors",
+                selectedEntry?.id === entry.id
+                  ? "border-primary/50 bg-primary/5"
+                  : "hover:bg-muted/50",
+              )}
+              onClick={() => setSelectedId(entry.id)}
+            >
+              <span className="flex items-center justify-between gap-2">
+                <span className="truncate text-sm font-medium">{entry.id}</span>
+                <Badge variant={entry.uiSchema ? "success" : "secondary"}>
+                  {entry.uiSchema ? "UI" : "assets"}
+                </Badge>
+              </span>
+              <span className="flex flex-wrap gap-1 text-xs text-muted-foreground">
+                <Badge variant="outline">v{entry.version}</Badge>
+                <Badge variant="outline">
+                  {entry.commands.length} command(s)
+                </Badge>
+                <Badge variant="outline">
+                  {entry.resources.length} resource(s)
+                </Badge>
+              </span>
+            </button>
+          ))}
+          {entries.length === 0 ? (
+            <div className="rounded-xl border border-dashed p-5 text-sm text-muted-foreground">
+              No extension package is installed in the client cache yet.
+            </div>
+          ) : null}
+        </div>
+      </ConsolePanel>
+
+      <div className="min-w-0 space-y-4">
+        {message ? (
+          <Alert variant={message.kind === "error" ? "destructive" : "default"}>
+            {message.kind === "success" ? (
+              <CheckCircle2 className="size-4" />
+            ) : null}
+            <AlertTitle>{message.title}</AlertTitle>
+            {message.details ? (
+              <AlertDescription>{message.details}</AlertDescription>
+            ) : null}
+          </Alert>
+        ) : null}
+
+        {selectedEntry ? (
+          <>
+            <ConsolePanel>
+              <ConsolePanelHeader
+                title={selectedEntry.id}
+                description={`Version ${selectedEntry.version}. ${connectedNodeId ? `Daemon dispatch target: ${connectedNodeId}.` : "Connect a daemon to enable command dispatch."}`}
+                action={
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => void uninstallSelected()}
+                  >
+                    <Trash2 className="size-4" />
+                    Remove
+                  </Button>
+                }
+              />
+              <div className="grid gap-3 text-sm md:grid-cols-3">
+                <SummaryBlock
+                  icon={<PlugZap className="size-4" />}
+                  label="Capabilities"
+                  values={selectedEntry.manifest.permissions.host ?? []}
+                  empty="No host capability"
+                />
+                <SummaryBlock
+                  icon={<FileArchive className="size-4" />}
+                  label="Commands"
+                  values={selectedEntry.commands.map((command) => command.id)}
+                  empty="No command"
+                />
+                <SummaryBlock
+                  icon={<FileArchive className="size-4" />}
+                  label="Resources"
+                  values={selectedResources.map((resource) => resource.path)}
+                  empty="No resource"
+                />
+              </div>
+            </ConsolePanel>
+
+            {selectedEntry.uiSchema ? (
+              <PluginUiRenderer
+                schema={selectedEntry.uiSchema}
+                state={selectedState}
+                onEvent={(event) => void handleUiEvent(selectedEntry, event)}
+              />
+            ) : (
+              <Alert>
+                <AlertTitle>This extension has no UI panel.</AlertTitle>
+                <AlertDescription>
+                  It is installed and available to runtime helpers, but it only
+                  contributes resources, theme data, or daemon payloads.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <ConsolePanel>
+              <ConsolePanelHeader
+                title="Runtime events"
+                description="Recent UI events and command dispatch results for this installed extension."
+              />
+              <div className="space-y-2">
+                {events.filter(
+                  (event) => event.extensionId === selectedEntry.id,
+                ).length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    No event emitted yet.
+                  </p>
+                ) : null}
+                {events
+                  .filter((event) => event.extensionId === selectedEntry.id)
+                  .map((record, index) => (
+                    <pre
+                      key={`${record.timestamp}-${index}`}
+                      className="overflow-auto rounded-xl bg-muted p-3 text-xs text-foreground"
+                    >
+                      {record.timestamp} {record.status ?? "UI event"}
+                      {"\n"}
+                      {JSON.stringify(record.event, null, 2)}
+                    </pre>
+                  ))}
+              </div>
+            </ConsolePanel>
+          </>
+        ) : (
+          <ConsolePanel className="flex min-h-[20rem] items-center justify-center text-center">
+            <div className="max-w-sm text-sm text-muted-foreground">
+              <FileArchive className="mx-auto mb-3 size-8" />
+              Install a validated .mpx package to inspect its declared commands,
+              resources, capabilities, and UI surface.
+            </div>
+          </ConsolePanel>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SummaryBlock({
+  icon,
+  label,
+  values,
+  empty,
+}: {
+  readonly icon: ReactNode;
+  readonly label: string;
+  readonly values: readonly string[];
+  readonly empty: string;
+}) {
+  return (
+    <div className="rounded-xl border p-3">
+      <div className="mb-2 flex items-center gap-2 text-xs font-medium text-muted-foreground">
+        {icon}
+        {label}
+      </div>
+      <div className="flex flex-wrap gap-1">
+        {values.length === 0 ? (
+          <span className="text-xs text-muted-foreground">{empty}</span>
+        ) : (
+          values.slice(0, 8).map((value) => (
+            <Badge
+              key={value}
+              variant="outline"
+              className="max-w-full truncate"
+            >
+              {value}
+            </Badge>
+          ))
+        )}
+        {values.length > 8 ? (
+          <Badge variant="secondary">+{values.length - 8}</Badge>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function extractExtensionEnvelope(value: unknown): unknown {
+  if (!isRecord(value)) return undefined;
+  if (value.protocol === "mcsl.extension.v1") return value;
+  return value.envelope;
+}
+
+function isPluginExtensionEnvelopeSource(
+  envelope: ExtensionProtocolEnvelope,
+  sourceEvent: string,
+): boolean {
+  const plugin = "plugin" in envelope ? envelope.plugin : undefined;
+  return (
+    typeof plugin === "string" &&
+    sourceEvent === `plugin.${plugin}.event.extension`
+  );
+}
+
+function wrapDaemonEventForEntry(
+  entry: ClientExtensionCacheEntry,
+  packet: DaemonEventPacket,
+): ExtensionProtocolEnvelope | undefined {
+  const eventName = toExtensionEventName(packet.event);
+  if (eventName === undefined) return undefined;
+  if (!(entry.manifest.permissions.events ?? []).includes(eventName)) {
+    return undefined;
+  }
+  const data = toExtensionJsonObject(packet.data ?? {});
+  if (data === undefined) return undefined;
+  const meta = toExtensionJsonObject(packet.meta ?? undefined);
+  return {
+    protocol: "mcsl.extension.v1",
+    type: "event",
+    plugin: entry.id,
+    name: eventName,
+    version: 1,
+    data,
+    ...(meta === undefined ? {} : { meta }),
+  };
+}
+
+function toDaemonEventName(
+  entry: ClientExtensionCacheEntry,
+  eventName: string,
+): string | undefined {
+  if (eventName === `plugin.${entry.id}.event.extension`) {
+    return eventName;
+  }
+
+  switch (eventName) {
+    case "daemon.instance.catalog.changed":
+      return V2_EVENTS.catalogChanged;
+    case "daemon.instance.log":
+      return V2_EVENTS.instanceLog;
+    case "daemon.report":
+      return V2_EVENTS.daemonReport;
+    case "daemon.notification":
+      return V2_EVENTS.notification;
+    default:
+      return undefined;
+  }
+}
+
+function toExtensionEventName(eventName: string): string | undefined {
+  switch (eventName) {
+    case V2_EVENTS.catalogChanged:
+      return "daemon.instance.catalog.changed";
+    case V2_EVENTS.instanceLog:
+      return "daemon.instance.log";
+    case V2_EVENTS.daemonReport:
+      return "daemon.report";
+    case V2_EVENTS.notification:
+      return "daemon.notification";
+    default:
+      return undefined;
+  }
+}
+
+function toExtensionJsonObject(
+  value: Record<string, unknown> | undefined,
+): Record<string, ExtensionJsonValue> | undefined {
+  if (value === undefined) return undefined;
+  const converted = toExtensionJsonValue(value);
+  return isRecord(converted) && !Array.isArray(converted)
+    ? (converted as Record<string, ExtensionJsonValue>)
+    : undefined;
+}
+
+function toExtensionJsonValue(value: unknown): ExtensionJsonValue | undefined {
+  if (value === null) return null;
+  if (
+    typeof value === "string" ||
+    typeof value === "boolean" ||
+    (typeof value === "number" && Number.isFinite(value))
+  ) {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    const items: ExtensionJsonValue[] = [];
+    for (const item of value) {
+      const converted = toExtensionJsonValue(item);
+      if (converted === undefined) return undefined;
+      items.push(converted);
+    }
+    return items;
+  }
+  if (isRecord(value)) {
+    const output: Record<string, ExtensionJsonValue> = {};
+    for (const [key, item] of Object.entries(value)) {
+      const converted = toExtensionJsonValue(item);
+      if (converted === undefined) return undefined;
+      output[key] = converted;
+    }
+    return output;
+  }
+  return undefined;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function formatDiagnostics(
+  diagnostics: readonly MpxPackageDiagnostic[],
+): string {
+  return diagnostics
+    .slice(0, 6)
+    .map((diagnostic) => `${diagnostic.path}: ${diagnostic.message}`)
+    .join("\n");
+}
