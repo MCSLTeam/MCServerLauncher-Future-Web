@@ -791,6 +791,8 @@ export function ClientExtensionCenter() {
       </ConsolePanel>
 
       <div className="min-w-0 space-y-4">
+        <MarketplacePreviewPanel />
+
         {message ? (
           <Alert variant={message.kind === "error" ? "destructive" : "default"}>
             {message.kind === "success" ? (
@@ -978,6 +980,32 @@ export function ClientExtensionCenter() {
         )}
       </div>
     </div>
+  );
+}
+
+function MarketplacePreviewPanel() {
+  return (
+    <ConsolePanel>
+      <ConsolePanelHeader
+        title="Extension marketplace"
+        description="Online discovery, registry search, updates, and dependency downloads are reserved for the registry phase."
+        action={
+          <Button type="button" variant="outline" disabled>
+            <PlugZap className="size-4" />
+            Coming soon
+          </Button>
+        }
+      />
+      <Alert>
+        <TriangleAlert className="size-4" />
+        <AlertTitle>Marketplace shell only</AlertTitle>
+        <AlertDescription>
+          This preview keeps the user-facing marketplace location stable without
+          contacting a remote registry or installing packages from the network.
+          Use local .mpx install for now.
+        </AlertDescription>
+      </Alert>
+    </ConsolePanel>
   );
 }
 
