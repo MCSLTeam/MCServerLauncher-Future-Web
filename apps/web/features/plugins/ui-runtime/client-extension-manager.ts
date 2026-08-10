@@ -7,6 +7,7 @@ import {
   type MpxManifestFileRef,
   type MpxManifestResourceRef,
   type MpxManifestScriptRef,
+  type MpxPackageSignatureTrust,
   type ValidatedMpxPackage,
 } from "./mpx-validator.ts";
 import type { PluginUiSchema } from "./schema.ts";
@@ -30,6 +31,7 @@ export interface ClientExtensionCacheEntry {
   readonly resources: readonly MpxManifestResourceRef[];
   readonly commands: readonly MpxManifestCommand[];
   readonly fileDigests: Readonly<Record<string, string>>;
+  readonly signature?: MpxPackageSignatureTrust;
   readonly cachedPayloads?: readonly ClientExtensionCachedPayload[];
 }
 
@@ -487,6 +489,9 @@ function createClientExtensionEntry(
       resources: validatedPackage.deploymentPlan.client?.resources ?? [],
       commands: validatedPackage.commands,
       fileDigests: validatedPackage.fileDigests,
+      ...(validatedPackage.signature === undefined
+        ? {}
+        : { signature: validatedPackage.signature }),
       ...(cachedPayloads.length === 0 ? {} : { cachedPayloads }),
     },
   };
@@ -563,6 +568,7 @@ function isClientExtensionCacheEntry(
     isRecord(value.deploymentPlan) &&
     Array.isArray(value.deploymentPlan.scopes) &&
     isRecord(value.fileDigests) &&
+    (value.signature === undefined || isRecord(value.signature)) &&
     (value.cachedPayloads === undefined || Array.isArray(value.cachedPayloads))
   );
 }

@@ -998,6 +998,9 @@ function PendingInstallReview({
     review.package.deploymentPlan.daemon?.extensionPoints ??
     manifest.extensionPoints ??
     [];
+  const signatureSummary = review.package.signature
+    ? `Trusted publisher ${review.package.signature.publisher} (${review.package.signature.keyId})`
+    : "Unsigned local package";
   return (
     <ConsolePanel>
       <ConsolePanelHeader
@@ -1026,8 +1029,8 @@ function PendingInstallReview({
           <TriangleAlert className="size-4" />
           <AlertTitle>Local package audit</AlertTitle>
           <AlertDescription>
-            {manifest.integrity.signed === true
-              ? "Package signature metadata is present and must be verified before installation."
+            {review.package.signature
+              ? `Signature verified for ${review.package.signature.publisher} with key ${review.package.signature.keyId}.`
               : "This package is unsigned; install only if the source is trusted."}{" "}
             {daemonPlan?.plugin
               ? "It also carries a daemon payload, so daemon deployment and restart status must be handled separately."
@@ -1064,6 +1067,12 @@ function PendingInstallReview({
             label="Resources"
             values={(manifest.resources ?? []).map((resource) => resource.path)}
             empty="No resource"
+          />
+          <SummaryBlock
+            icon={<ShieldCheck className="size-4" />}
+            label="Signature"
+            values={[signatureSummary]}
+            empty="Unsigned local package"
           />
           <SummaryBlock
             icon={<FileArchive className="size-4" />}

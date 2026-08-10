@@ -273,6 +273,96 @@ test("rejects unsigned packages that carry signature sidecars", async () => {
   }
 });
 
+test("rejects signed packages without a trusted publisher key", async () => {
+  const keyPair = await crypto.subtle.generateKey(
+    { name: "ECDSA", namedCurve: "P-256" },
+    true,
+    ["sign", "verify"],
+  );
+  const publicKey = new Uint8Array(
+    await crypto.subtle.exportKey("spki", keyPair.publicKey),
+  );
+  const zip = await buildSignedMpxPackage(keyPair.privateKey, publicKey);
+
+  const result = await validateMpxPackage(zip);
+
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.equal(
+      result.diagnostics.some(
+        (diagnostic) => diagnostic.code === "signature_trust_unavailable",
+      ),
+      true,
+    );
+  }
+});
+
+test("accepts signed packages from a trusted publisher key", async () => {
+  const keyPair = await crypto.subtle.generateKey(
+    { name: "ECDSA", namedCurve: "P-256" },
+    true,
+    ["sign", "verify"],
+  );
+  const publicKey = new Uint8Array(
+    await crypto.subtle.exportKey("spki", keyPair.publicKey),
+  );
+  const zip = await buildSignedMpxPackage(keyPair.privateKey, publicKey);
+
+  const result = await validateMpxPackage(zip, {
+    trustedPublishers: [
+      {
+        publisher: "community.example",
+        keyId: "test-key",
+        publicKeySubjectPublicKeyInfo: publicKey,
+      },
+    ],
+  });
+
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.equal(result.package.signature?.publisher, "community.example");
+    assert.equal(result.package.signature?.keyId, "test-key");
+    assert.equal(
+      result.package.signature?.publicKeySha256,
+      await sha256Hex(publicKey),
+    );
+  }
+});
+
+test("rejects signed packages when payload is tampered", async () => {
+  const keyPair = await crypto.subtle.generateKey(
+    { name: "ECDSA", namedCurve: "P-256" },
+    true,
+    ["sign", "verify"],
+  );
+  const publicKey = new Uint8Array(
+    await crypto.subtle.exportKey("spki", keyPair.publicKey),
+  );
+  const zip = await buildSignedMpxPackage(keyPair.privateKey, publicKey, {
+    tamperPayload: true,
+  });
+
+  const result = await validateMpxPackage(zip, {
+    trustedPublishers: [
+      {
+        publisher: "community.example",
+        keyId: "test-key",
+        publicKeySubjectPublicKeyInfo: publicKey,
+      },
+    ],
+  });
+
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.equal(
+      result.diagnostics.some(
+        (diagnostic) => diagnostic.code === "signature_payload_mismatch",
+      ),
+      true,
+    );
+  }
+});
+
 test("rejects undeclared UI command bindings", async () => {
   const commandUi = JSON.stringify({
     schema: "mcsl.ui.v1",
@@ -703,6 +793,156 @@ async function buildMpxPackage(
     ...(scriptBytes === null ? {} : { "bundle.js": scriptBytes }),
     ...(options.extraEntries ?? {}),
   });
+}
+
+async function buildSignedMpxPackage(
+  privateKey: CryptoKey,
+  publicKey: Uint8Array,
+  options: { readonly tamperPayload?: boolean } = {},
+): Promise<Uint8Array> {
+  const uiBytes = encoder.encode(VALID_UI);
+  const scriptBytes = encoder.encode(VALID_SCRIPT);
+  const publicKeySha256 = await sha256Hex(publicKey);
+  const signedAt = "2026-08-10T00:00:00Z";
+  const manifest: MpxManifest = {
+    schema:
+      "https://mcsl-team.github.io/schemas/mcsl-extension-1.0.schema.json",
+    package: {
+      id: "community.example.status-panel",
+      version: "1.0.0",
+      publisher: "community.example",
+      displayName: "Status Panel",
+    },
+    runtime: {
+      ui: "[1.0.0,2.0.0)",
+      daemonApi: "[1.0.0,2.0.0)",
+      javascript: "es2020",
+    },
+    targets: {
+      client: {
+        ui: {
+          path: "client/ui.json",
+          sha256: await sha256Hex(uiBytes),
+        },
+      },
+    },
+    entry: {
+      script: {
+        path: "bundle.js",
+        sha256: await sha256Hex(scriptBytes),
+        module: "esm",
+      },
+    },
+    permissions: {
+      host: ["ui.state", "daemon.instance.query"],
+      events: [],
+      network: [],
+      storage: { privateBytes: 1024 },
+    },
+    resources: [],
+    integrity: { algorithm: "sha256", signed: true },
+  };
+  const entries: Record<string, string | Uint8Array> = {
+    "manifest.json": JSON.stringify(manifest),
+    "client/ui.json": uiBytes,
+    "bundle.js": scriptBytes,
+  };
+  const signatureEntries = await buildSignatureEntries(entries);
+  const signatureInput = buildSignatureInput({
+    algorithm: "ecdsa-p256-sha256",
+    publisher: "community.example",
+    packageId: "community.example.status-panel",
+    packageVersion: "1.0.0",
+    keyId: "test-key",
+    publicKeySha256,
+    signedAt,
+    payloadAlgorithm: "sha256",
+    entries: signatureEntries,
+  });
+  const signature = new Uint8Array(
+    await crypto.subtle.sign(
+      { name: "ECDSA", hash: "SHA-256" },
+      privateKey,
+      toArrayBuffer(signatureInput),
+    ),
+  );
+  entries["signatures/manifest.json"] = JSON.stringify({
+    schema:
+      "https://mcsl-team.github.io/schemas/mcsl-extension-signature-1.0.schema.json",
+    algorithm: "ecdsa-p256-sha256",
+    publisher: "community.example",
+    packageId: "community.example.status-panel",
+    packageVersion: "1.0.0",
+    keyId: "test-key",
+    publicKeySha256,
+    signedAt,
+    payload: { algorithm: "sha256", entries: signatureEntries },
+    signature: toBase64(signature),
+  });
+
+  if (options.tamperPayload === true) {
+    entries["client/ui.json"] = encoder.encode(
+      VALID_UI.replace("Ready", "Tampered"),
+    );
+  }
+
+  return makeStoredZip(entries);
+}
+
+async function buildSignatureEntries(
+  entries: Record<string, string | Uint8Array>,
+): Promise<readonly { readonly path: string; readonly sha256: string }[]> {
+  const signatureEntries: { path: string; sha256: string }[] = [];
+  for (const [path, raw] of Object.entries(entries)) {
+    if (path.startsWith("signatures/")) continue;
+    const bytes = typeof raw === "string" ? encoder.encode(raw) : raw;
+    signatureEntries.push({ path, sha256: await sha256Hex(bytes) });
+  }
+  return signatureEntries.sort((left, right) =>
+    left.path.localeCompare(right.path),
+  );
+}
+
+function buildSignatureInput(input: {
+  readonly algorithm: string;
+  readonly publisher: string;
+  readonly packageId: string;
+  readonly packageVersion: string;
+  readonly keyId: string;
+  readonly publicKeySha256: string;
+  readonly signedAt: string;
+  readonly payloadAlgorithm: string;
+  readonly entries: readonly {
+    readonly path: string;
+    readonly sha256: string;
+  }[];
+}): Uint8Array {
+  const lines = [
+    "MCSL-MPX-SIGNATURE-v1",
+    `algorithm:${input.algorithm}`,
+    `publisher:${input.publisher}`,
+    `packageId:${input.packageId}`,
+    `packageVersion:${input.packageVersion}`,
+    `keyId:${input.keyId}`,
+    `publicKeySha256:${input.publicKeySha256}`,
+    `signedAt:${input.signedAt}`,
+    `payloadAlgorithm:${input.payloadAlgorithm}`,
+    ...input.entries.map((entry) => `entry:${entry.path}:${entry.sha256}`),
+  ];
+  return encoder.encode(`${lines.join("\n")}\n`);
+}
+
+function toBase64(bytes: Uint8Array): string {
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary);
+}
+
+function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  return bytes.buffer.slice(
+    bytes.byteOffset,
+    bytes.byteOffset + bytes.byteLength,
+  ) as ArrayBuffer;
 }
 
 function makeStoredZip(

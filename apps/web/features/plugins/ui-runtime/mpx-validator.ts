@@ -63,6 +63,12 @@ const ALLOWED_RESOURCE_MIME = new Set([
   "image/jpeg",
   "image/webp",
 ]);
+const SIGNATURE_DIRECTORY = "signatures/";
+const SIGNATURE_MANIFEST_PATH = "signatures/manifest.json";
+const SIGNATURE_ALGORITHM = "ecdsa-p256-sha256";
+const SIGNATURE_PAYLOAD_ALGORITHM = "sha256";
+const SIGNATURE_INPUT_HEADER = "MCSL-MPX-SIGNATURE-v1";
+const textEncoder = new TextEncoder();
 const HEX_SHA256 = /^[a-f0-9]{64}$/;
 const PACKAGE_ID = /^[a-z0-9][a-z0-9.-]{2,127}$/;
 const SEMVER_LIKE = /^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/;
@@ -70,9 +76,23 @@ const COMMAND_ID = /^[A-Za-z_][\w]*(?:\.[A-Za-z_][\w]*)*$/;
 
 type MpxPackageLimits = typeof DEFAULT_LIMITS;
 
+export interface MpxTrustedPublisher {
+  readonly publisher: string;
+  readonly keyId: string;
+  readonly publicKeySubjectPublicKeyInfo: ArrayBuffer | ArrayBufferView;
+}
+
+export interface MpxPackageSignatureTrust {
+  readonly publisher: string;
+  readonly keyId: string;
+  readonly publicKeySha256: string;
+  readonly signedAt?: string;
+}
+
 export interface MpxPackageValidatorOptions {
   readonly limits?: Partial<MpxPackageLimits>;
   readonly allowedHostCapabilities?: ReadonlySet<string>;
+  readonly trustedPublishers?: readonly MpxTrustedPublisher[];
 }
 
 export interface MpxPackageDiagnostic {
@@ -172,6 +192,7 @@ export interface ValidatedMpxPackage {
   readonly commands: readonly MpxManifestCommand[];
   readonly fileDigests: Readonly<Record<string, string>>;
   readonly totalUncompressedBytes: number;
+  readonly signature?: MpxPackageSignatureTrust;
 }
 
 export type MpxPackageValidationResult =
@@ -273,6 +294,12 @@ export async function validateMpxPackage(
 
   validateManifest(manifest, allowedHostCapabilities, limits, diagnostics);
   rejectUnexpectedSignatureEntries(zip.keys(), manifest, diagnostics);
+  const signature = await validatePackageSignature(
+    zip,
+    manifest,
+    options.trustedPublishers ?? [],
+    diagnostics,
+  );
   if (diagnostics.length > 0) return { ok: false, diagnostics };
 
   const declaredCommands = collectDeclaredCommands(manifest);
@@ -412,6 +439,7 @@ export async function validateMpxPackage(
         (total, entry) => total + entry.uncompressedSize,
         0,
       ),
+      ...(signature === undefined ? {} : { signature }),
     },
   };
 }
@@ -648,15 +676,6 @@ function validateManifest(
         "integrity_algorithm_invalid",
         "$.integrity.algorithm",
         "Only sha256 package integrity is supported.",
-      ),
-    );
-  }
-  if (manifest.integrity?.signed === true) {
-    diagnostics.push(
-      diagnostic(
-        "signature_verification_unavailable",
-        "$.integrity.signed",
-        "Signed .mpx packages require a signature verifier before admission.",
       ),
     );
   }
@@ -908,6 +927,394 @@ function buildDeploymentPlan(
   };
 }
 
+interface MpxSignatureManifest {
+  readonly schema?: string;
+  readonly algorithm?: string;
+  readonly publisher?: string;
+  readonly packageId?: string;
+  readonly packageVersion?: string;
+  readonly keyId?: string;
+  readonly publicKeySha256?: string;
+  readonly signedAt?: string;
+  readonly payload?: {
+    readonly algorithm?: string;
+    readonly entries?: readonly MpxSignatureEntry[];
+  };
+  readonly signature?: string;
+}
+
+interface MpxSignatureEntry {
+  readonly path?: string;
+  readonly sha256?: string;
+}
+
+async function validatePackageSignature(
+  zip: ReadonlyMap<string, ZipEntry>,
+  manifest: MpxManifest,
+  trustedPublishers: readonly MpxTrustedPublisher[],
+  diagnostics: MpxPackageDiagnostic[],
+): Promise<MpxPackageSignatureTrust | undefined> {
+  if (manifest.integrity?.signed !== true) return undefined;
+
+  const signatureEntry = zip.get(SIGNATURE_MANIFEST_PATH);
+  if (signatureEntry === undefined) {
+    diagnostics.push(
+      diagnostic(
+        "signature_manifest_missing",
+        SIGNATURE_MANIFEST_PATH,
+        "Signed packages must include signatures/manifest.json.",
+      ),
+    );
+    return undefined;
+  }
+
+  for (const path of zip.keys()) {
+    if (
+      path.startsWith(SIGNATURE_DIRECTORY) &&
+      path !== SIGNATURE_MANIFEST_PATH
+    ) {
+      diagnostics.push(
+        diagnostic(
+          "signature_unexpected",
+          path,
+          "Only signatures/manifest.json is supported for signed .mpx packages.",
+        ),
+      );
+    }
+  }
+
+  const signatureManifest = parseSignatureManifest(signatureEntry, diagnostics);
+  if (signatureManifest === undefined) return undefined;
+
+  if (signatureManifest.algorithm !== SIGNATURE_ALGORITHM) {
+    diagnostics.push(
+      diagnostic(
+        "signature_algorithm_unsupported",
+        "$.algorithm",
+        `Only ${SIGNATURE_ALGORITHM} signatures are supported.`,
+      ),
+    );
+  }
+  if (signatureManifest.payload?.algorithm !== SIGNATURE_PAYLOAD_ALGORITHM) {
+    diagnostics.push(
+      diagnostic(
+        "signature_payload_algorithm_invalid",
+        "$.payload.algorithm",
+        "Only sha256 payload digests are supported.",
+      ),
+    );
+  }
+
+  if (
+    typeof manifest.package.publisher !== "string" ||
+    manifest.package.publisher.length === 0
+  ) {
+    diagnostics.push(
+      diagnostic(
+        "signature_publisher_missing",
+        "$.package.publisher",
+        "Signed packages must declare package.publisher.",
+      ),
+    );
+  }
+  if (signatureManifest.publisher !== manifest.package.publisher) {
+    diagnostics.push(
+      diagnostic(
+        "signature_publisher_mismatch",
+        "$.publisher",
+        "Signature publisher must match package.publisher.",
+      ),
+    );
+  }
+  if (signatureManifest.packageId !== manifest.package.id) {
+    diagnostics.push(
+      diagnostic(
+        "signature_package_mismatch",
+        "$.packageId",
+        "Signature packageId must match package.id.",
+      ),
+    );
+  }
+  if (signatureManifest.packageVersion !== manifest.package.version) {
+    diagnostics.push(
+      diagnostic(
+        "signature_version_mismatch",
+        "$.packageVersion",
+        "Signature packageVersion must match package.version.",
+      ),
+    );
+  }
+  if (
+    typeof signatureManifest.keyId !== "string" ||
+    signatureManifest.keyId.length === 0
+  ) {
+    diagnostics.push(
+      diagnostic(
+        "signature_key_missing",
+        "$.keyId",
+        "Signed packages must declare keyId.",
+      ),
+    );
+  }
+  if (
+    typeof signatureManifest.publicKeySha256 !== "string" ||
+    !HEX_SHA256.test(signatureManifest.publicKeySha256)
+  ) {
+    diagnostics.push(
+      diagnostic(
+        "signature_key_fingerprint_invalid",
+        "$.publicKeySha256",
+        "publicKeySha256 must be a lowercase SHA-256 fingerprint.",
+      ),
+    );
+  }
+  if (
+    typeof signatureManifest.signature !== "string" ||
+    signatureManifest.signature.length === 0
+  ) {
+    diagnostics.push(
+      diagnostic(
+        "signature_missing",
+        "$.signature",
+        "Signed packages must include a signature value.",
+      ),
+    );
+  }
+
+  const actualEntries = await buildSignatureEntries(zip);
+  if (
+    !signatureEntriesMatch(signatureManifest.payload?.entries, actualEntries)
+  ) {
+    diagnostics.push(
+      diagnostic(
+        "signature_payload_mismatch",
+        "$.payload.entries",
+        "Signature payload entries must exactly match package contents.",
+      ),
+    );
+  }
+
+  if (diagnostics.length > 0) return undefined;
+
+  if (trustedPublishers.length === 0) {
+    diagnostics.push(
+      diagnostic(
+        "signature_trust_unavailable",
+        "$.publisher",
+        "Signed .mpx packages require a trusted publisher key before admission.",
+      ),
+    );
+    return undefined;
+  }
+
+  let trusted: MpxTrustedPublisher | undefined;
+  for (const candidate of trustedPublishers) {
+    const keyBytes = toBytes(candidate.publicKeySubjectPublicKeyInfo);
+    const keySha256 = await sha256Hex(keyBytes);
+    if (
+      candidate.publisher === signatureManifest.publisher &&
+      candidate.keyId === signatureManifest.keyId &&
+      keySha256 === signatureManifest.publicKeySha256
+    ) {
+      trusted = candidate;
+      break;
+    }
+  }
+
+  if (trusted === undefined) {
+    diagnostics.push(
+      diagnostic(
+        "signature_key_untrusted",
+        "$.publicKeySha256",
+        "The package signing key is not trusted for this publisher.",
+      ),
+    );
+    return undefined;
+  }
+
+  const subtle = globalThis.crypto?.subtle;
+  if (subtle === undefined) {
+    diagnostics.push(
+      diagnostic(
+        "signature_verification_unavailable",
+        "$.signature",
+        "WebCrypto is unavailable, so package signatures cannot be verified.",
+      ),
+    );
+    return undefined;
+  }
+
+  let signatureBytes: Uint8Array;
+  try {
+    signatureBytes = decodeBase64(signatureManifest.signature!);
+  } catch {
+    diagnostics.push(
+      diagnostic(
+        "signature_invalid",
+        "$.signature",
+        "Signature must be base64-encoded.",
+      ),
+    );
+    return undefined;
+  }
+
+  try {
+    const key = await subtle.importKey(
+      "spki",
+      toArrayBuffer(toBytes(trusted.publicKeySubjectPublicKeyInfo)),
+      { name: "ECDSA", namedCurve: "P-256" },
+      false,
+      ["verify"],
+    );
+    const valid = await subtle.verify(
+      { name: "ECDSA", hash: "SHA-256" },
+      key,
+      toArrayBuffer(signatureBytes),
+      toArrayBuffer(buildSignatureInput(signatureManifest, actualEntries)),
+    );
+    if (!valid) {
+      diagnostics.push(
+        diagnostic(
+          "signature_invalid",
+          "$.signature",
+          "Package signature verification failed.",
+        ),
+      );
+      return undefined;
+    }
+  } catch (error) {
+    diagnostics.push(
+      diagnostic(
+        "signature_invalid",
+        "$.signature",
+        error instanceof Error
+          ? error.message
+          : "Package signature verification failed.",
+      ),
+    );
+    return undefined;
+  }
+
+  if (
+    signatureManifest.signedAt !== undefined &&
+    Number.isNaN(Date.parse(signatureManifest.signedAt))
+  ) {
+    diagnostics.push(
+      diagnostic(
+        "signature_signed_at_invalid",
+        "$.signedAt",
+        "signedAt must be an ISO 8601 timestamp when present.",
+      ),
+    );
+    return undefined;
+  }
+
+  return {
+    publisher: signatureManifest.publisher!,
+    keyId: signatureManifest.keyId!,
+    publicKeySha256: signatureManifest.publicKeySha256!,
+    ...(signatureManifest.signedAt === undefined
+      ? {}
+      : { signedAt: signatureManifest.signedAt }),
+  };
+}
+
+function parseSignatureManifest(
+  entry: ZipEntry,
+  diagnostics: MpxPackageDiagnostic[],
+): MpxSignatureManifest | undefined {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(decodeUtf8(entry.bytes));
+  } catch (error) {
+    diagnostics.push(
+      diagnostic(
+        "signature_manifest_parse_failed",
+        SIGNATURE_MANIFEST_PATH,
+        error instanceof Error
+          ? error.message
+          : "signatures/manifest.json is not valid JSON.",
+      ),
+    );
+    return undefined;
+  }
+
+  if (!isRecord(parsed)) {
+    diagnostics.push(
+      diagnostic(
+        "signature_manifest_invalid",
+        SIGNATURE_MANIFEST_PATH,
+        "Signature manifest must be an object.",
+      ),
+    );
+    return undefined;
+  }
+
+  return parsed as MpxSignatureManifest;
+}
+
+async function buildSignatureEntries(
+  zip: ReadonlyMap<string, ZipEntry>,
+): Promise<readonly Required<MpxSignatureEntry>[]> {
+  const entries: Required<MpxSignatureEntry>[] = [];
+  for (const [path, entry] of zip) {
+    if (path.startsWith(SIGNATURE_DIRECTORY)) continue;
+    entries.push({ path, sha256: await sha256Hex(entry.bytes) });
+  }
+  return entries.sort((left, right) => left.path.localeCompare(right.path));
+}
+
+function signatureEntriesMatch(
+  declared: readonly MpxSignatureEntry[] | undefined,
+  actual: readonly Required<MpxSignatureEntry>[],
+): boolean {
+  if (declared === undefined || declared.length !== actual.length) return false;
+  const ordered = [...declared].sort((left, right) =>
+    String(left.path ?? "").localeCompare(String(right.path ?? "")),
+  );
+  for (let index = 0; index < actual.length; index++) {
+    if (
+      ordered[index]?.path !== actual[index]?.path ||
+      ordered[index]?.sha256 !== actual[index]?.sha256
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function buildSignatureInput(
+  document: MpxSignatureManifest,
+  entries: readonly Required<MpxSignatureEntry>[],
+): Uint8Array {
+  const lines = [
+    SIGNATURE_INPUT_HEADER,
+    signatureField("algorithm", document.algorithm),
+    signatureField("publisher", document.publisher),
+    signatureField("packageId", document.packageId),
+    signatureField("packageVersion", document.packageVersion),
+    signatureField("keyId", document.keyId),
+    signatureField("publicKeySha256", document.publicKeySha256),
+    signatureField("signedAt", document.signedAt),
+    signatureField("payloadAlgorithm", document.payload?.algorithm),
+    ...entries.map((entry) => `entry:${entry.path}:${entry.sha256}`),
+  ];
+  return textEncoder.encode(`${lines.join("\n")}\n`);
+}
+
+function signatureField(key: string, value: string | undefined): string {
+  return `${key}:${value ?? ""}`;
+}
+
+function decodeBase64(value: string): Uint8Array {
+  const binary = globalThis.atob(value);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index++) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return bytes;
+}
+
 function rejectUnexpectedSignatureEntries(
   paths: Iterable<string>,
   manifest: MpxManifest,
@@ -915,12 +1322,12 @@ function rejectUnexpectedSignatureEntries(
 ): void {
   if (manifest.integrity?.signed === true) return;
   for (const path of paths) {
-    if (path.startsWith("signatures/")) {
+    if (path.startsWith(SIGNATURE_DIRECTORY)) {
       diagnostics.push(
         diagnostic(
           "signature_unexpected",
           path,
-          "Signature payloads are only accepted when signature verification is available.",
+          "Signature payloads are only accepted for signed packages.",
         ),
       );
     }
@@ -1726,6 +2133,13 @@ function toBytes(data: ArrayBuffer | ArrayBufferView): Uint8Array {
   return data instanceof ArrayBuffer
     ? new Uint8Array(data)
     : new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+}
+
+function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  return bytes.buffer.slice(
+    bytes.byteOffset,
+    bytes.byteOffset + bytes.byteLength,
+  ) as ArrayBuffer;
 }
 
 function decodeUtf8(bytes: Uint8Array): string {
