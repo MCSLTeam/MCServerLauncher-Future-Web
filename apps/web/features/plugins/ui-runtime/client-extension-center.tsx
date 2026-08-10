@@ -524,6 +524,54 @@ export function ClientExtensionCenter() {
     }
   }
 
+  async function setSelectedDaemonBundleEnabled(enabled: boolean) {
+    if (!selectedEntry || !selectedEntry.deploymentPlan.daemon?.plugin) return;
+    if (!connectedNodeId) {
+      setMessage({
+        kind: "error",
+        title: `No connected daemon is available for ${enabled ? "enable" : "disable"}.`,
+      });
+      return;
+    }
+
+    setInstalling(true);
+    setMessage(null);
+    try {
+      const changed = await daemon.runWithClient(connectedNodeId, (client) =>
+        enabled
+          ? client.enableExtensionDaemonBundle(selectedEntry.id)
+          : client.disableExtensionDaemonBundle(selectedEntry.id),
+      );
+      if (!changed.ok) {
+        setMessage({
+          kind: "error",
+          title: `Daemon bundle ${enabled ? "enable" : "disable"} failed.`,
+          details: changed.message,
+        });
+        return;
+      }
+
+      const status = deploymentStatus(changed.data);
+      setMessage({
+        kind: "success",
+        title: `Daemon bundle ${enabled ? "enabled" : "disabled"}.`,
+        details: `${status} Restart the daemon to apply it.`,
+      });
+      setDaemonDeploymentStatuses((current) => ({
+        ...current,
+        [selectedEntry.id]: status,
+      }));
+    } catch (error) {
+      setMessage({
+        kind: "error",
+        title: `Daemon bundle ${enabled ? "enable" : "disable"} failed.`,
+        details: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setInstalling(false);
+    }
+  }
+
   async function removeSelectedDaemonBundle() {
     if (!selectedEntry || !selectedEntry.deploymentPlan.daemon?.plugin) return;
     if (!connectedNodeId) {
@@ -739,6 +787,28 @@ export function ClientExtensionCenter() {
                         >
                           <Upload className="size-4" />
                           Deploy daemon
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={installing || !connectedNodeId}
+                          onClick={() =>
+                            void setSelectedDaemonBundleEnabled(true)
+                          }
+                        >
+                          <CheckCircle2 className="size-4" />
+                          Enable daemon
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={installing || !connectedNodeId}
+                          onClick={() =>
+                            void setSelectedDaemonBundleEnabled(false)
+                          }
+                        >
+                          <TriangleAlert className="size-4" />
+                          Disable daemon
                         </Button>
                         <Button
                           type="button"

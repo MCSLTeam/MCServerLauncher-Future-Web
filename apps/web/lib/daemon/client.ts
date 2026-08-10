@@ -276,6 +276,22 @@ export class DaemonClient {
     );
   }
 
+  enableExtensionDaemonBundle(pluginId: string) {
+    return this.request<DaemonExtensionBundleDeploymentResult>(
+      V2_METHODS.extensionDaemonBundleEnable,
+      { plugin_id: pluginId },
+      120_000,
+    );
+  }
+
+  disableExtensionDaemonBundle(pluginId: string) {
+    return this.request<DaemonExtensionBundleDeploymentResult>(
+      V2_METHODS.extensionDaemonBundleDisable,
+      { plugin_id: pluginId },
+      120_000,
+    );
+  }
+
   removeExtensionDaemonBundle(pluginId: string) {
     return this.request<DaemonExtensionBundleDeploymentResult>(
       V2_METHODS.extensionDaemonBundleRemove,

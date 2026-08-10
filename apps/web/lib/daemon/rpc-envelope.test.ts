@@ -30,6 +30,14 @@ test("V2 method catalog uses mcsl.* names", () => {
     "mcsl.extension.daemon.bundle.status",
   );
   assert.equal(
+    V2_METHODS.extensionDaemonBundleEnable,
+    "mcsl.extension.daemon.bundle.enable",
+  );
+  assert.equal(
+    V2_METHODS.extensionDaemonBundleDisable,
+    "mcsl.extension.daemon.bundle.disable",
+  );
+  assert.equal(
     V2_METHODS.extensionDaemonBundleRemove,
     "mcsl.extension.daemon.bundle.remove",
   );
