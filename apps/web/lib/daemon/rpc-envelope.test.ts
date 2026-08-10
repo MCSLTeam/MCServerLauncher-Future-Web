@@ -15,6 +15,10 @@ test("wsUrl uses /api/v2", () => {
 
 test("V2 method catalog uses mcsl.* names", () => {
   assert.equal(V2_METHODS.ping, "mcsl.daemon.ping");
+  assert.equal(
+    V2_METHODS.daemonShutdownRequest,
+    "mcsl.daemon.shutdown.request",
+  );
   assert.equal(V2_METHODS.start, "mcsl.instance.start");
   assert.equal(V2_METHODS.halt, "mcsl.instance.halt");
   assert.equal(V2_METHODS.uploadOpen, "mcsl.file.upload.open");

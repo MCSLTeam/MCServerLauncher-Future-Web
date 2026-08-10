@@ -19,6 +19,7 @@ import {
   type DaemonInstanceConfig,
   type DaemonInstanceReport,
   type DaemonJavaListResult,
+  type DaemonShutdownResult,
   type DaemonSystemInfo,
   type DaemonUploadSession,
   type InstanceFactorySettingPayload,
@@ -302,6 +303,13 @@ export class DaemonClient {
 
   ping() {
     return this.request<{ time?: number }>(V2_METHODS.ping, {});
+  }
+
+  requestDaemonShutdown(reason: string) {
+    return this.request<DaemonShutdownResult>(
+      V2_METHODS.daemonShutdownRequest,
+      { reason },
+    );
   }
 
   getSystemInfo() {

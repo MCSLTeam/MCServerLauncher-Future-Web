@@ -51,6 +51,7 @@ export type { InstanceFactorySettingPayload, JavaInfo };
 
 export const V2_METHODS = {
   ping: "mcsl.daemon.ping",
+  daemonShutdownRequest: "mcsl.daemon.shutdown.request",
   systemInfo: "mcsl.system.info.get",
   javaList: "mcsl.java.list",
   listReports: "mcsl.instance.report.list",
@@ -157,6 +158,11 @@ export type DaemonExtensionBundleDeploymentResult = {
   restartRequired?: boolean;
   plugin_directory?: string;
   pluginDirectory?: string;
+  message?: string;
+};
+
+export type DaemonShutdownResult = {
+  status?: string;
   message?: string;
 };
 

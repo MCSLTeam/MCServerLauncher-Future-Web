@@ -617,6 +617,49 @@ export function ClientExtensionCenter() {
     }
   }
 
+  async function requestDaemonRestart() {
+    if (!selectedEntry || !selectedEntry.deploymentPlan.daemon?.plugin) return;
+    if (!connectedNodeId) {
+      setMessage({
+        kind: "error",
+        title: "No connected daemon is available for restart request.",
+      });
+      return;
+    }
+
+    setInstalling(true);
+    setMessage(null);
+    try {
+      const requested = await daemon.runWithClient(connectedNodeId, (client) =>
+        client.requestDaemonShutdown(`extension:${selectedEntry.id}`),
+      );
+      if (!requested.ok) {
+        setMessage({
+          kind: "error",
+          title: "Daemon restart request failed.",
+          details: requested.message,
+        });
+        return;
+      }
+
+      setMessage({
+        kind: "success",
+        title: "Daemon shutdown requested.",
+        details:
+          requested.data.message ??
+          "Restart the daemon through its service manager or launcher.",
+      });
+    } catch (error) {
+      setMessage({
+        kind: "error",
+        title: "Daemon restart request failed.",
+        details: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setInstalling(false);
+    }
+  }
+
   async function handleUiEvent(
     entry: ClientExtensionCacheEntry,
     event: PluginUiEvent,
@@ -809,6 +852,15 @@ export function ClientExtensionCenter() {
                         >
                           <TriangleAlert className="size-4" />
                           Disable daemon
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={installing || !connectedNodeId}
+                          onClick={() => void requestDaemonRestart()}
+                        >
+                          <RefreshCw className="size-4" />
+                          Request restart
                         </Button>
                         <Button
                           type="button"
