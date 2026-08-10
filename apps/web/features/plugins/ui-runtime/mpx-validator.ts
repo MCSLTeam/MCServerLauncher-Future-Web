@@ -73,6 +73,10 @@ const HEX_SHA256 = /^[a-f0-9]{64}$/;
 const PACKAGE_ID = /^[a-z0-9][a-z0-9.-]{2,127}$/;
 const SEMVER_LIKE = /^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/;
 const COMMAND_ID = /^[A-Za-z_][\w]*(?:\.[A-Za-z_][\w]*)*$/;
+const VERSION_RANGE =
+  /^[\[(](\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?)?,(\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?)?[\])]$/;
+const UPDATE_CHANNELS = new Set(["stable", "preview"]);
+const UPDATE_STRATEGIES = new Set(["manual"]);
 
 type MpxPackageLimits = typeof DEFAULT_LIMITS;
 
@@ -150,6 +154,10 @@ export interface MpxManifest {
   readonly resources?: readonly MpxManifestResourceRef[];
   readonly extensionPoints?: readonly MpxManifestExtensionPoint[];
   readonly commands?: readonly MpxManifestCommand[];
+  readonly dependencies?: {
+    readonly extensions?: readonly MpxManifestExtensionDependency[];
+  };
+  readonly updates?: MpxManifestUpdatePolicy;
   readonly integrity: {
     readonly algorithm: "sha256";
     readonly signed?: boolean;
@@ -167,6 +175,16 @@ export interface MpxManifestCommand {
   readonly title?: string;
   readonly description?: string;
   readonly target?: "daemon";
+}
+
+export interface MpxManifestExtensionDependency {
+  readonly id: string;
+  readonly version: string;
+}
+
+export interface MpxManifestUpdatePolicy {
+  readonly channel?: "stable" | "preview";
+  readonly strategy?: "manual";
 }
 
 export interface MpxDeploymentPlan {
@@ -190,6 +208,8 @@ export interface ValidatedMpxPackage {
   readonly theme?: PluginThemeRuntime;
   readonly deploymentPlan: MpxDeploymentPlan;
   readonly commands: readonly MpxManifestCommand[];
+  readonly dependencies: readonly MpxManifestExtensionDependency[];
+  readonly updates?: Required<MpxManifestUpdatePolicy>;
   readonly fileDigests: Readonly<Record<string, string>>;
   readonly totalUncompressedBytes: number;
   readonly signature?: MpxPackageSignatureTrust;
@@ -434,6 +454,15 @@ export async function validateMpxPackage(
       theme,
       deploymentPlan,
       commands: manifest.commands ?? [],
+      dependencies: manifest.dependencies?.extensions ?? [],
+      ...(manifest.updates === undefined
+        ? {}
+        : {
+            updates: {
+              channel: manifest.updates.channel ?? "stable",
+              strategy: manifest.updates.strategy ?? "manual",
+            },
+          }),
       fileDigests,
       totalUncompressedBytes: Array.from(zip.values()).reduce(
         (total, entry) => total + entry.uncompressedSize,
@@ -667,6 +696,8 @@ function validateManifest(
   }
 
   validateExtensionPoints(manifest.extensionPoints, diagnostics);
+  validateDependencies(manifest, diagnostics);
+  validateUpdatePolicy(manifest.updates, diagnostics);
   validateCommands(manifest, daemonPluginRef, diagnostics);
   validatePluginExtensionEvents(manifest, daemonPluginRef, diagnostics);
 
@@ -1412,6 +1443,189 @@ function validateExtensionPoints(
       );
     }
   });
+}
+
+function validateDependencies(
+  manifest: MpxManifest,
+  diagnostics: MpxPackageDiagnostic[],
+): void {
+  const dependencies = manifest.dependencies?.extensions;
+  if (dependencies === undefined) return;
+  if (!Array.isArray(dependencies)) {
+    diagnostics.push(
+      diagnostic(
+        "dependencies_invalid",
+        "$.dependencies.extensions",
+        "Extension dependencies must be an array.",
+      ),
+    );
+    return;
+  }
+
+  const seen = new Set<string>();
+  dependencies.forEach((dependency, index) => {
+    const path = `$.dependencies.extensions[${index}]`;
+    if (!isRecord(dependency)) {
+      diagnostics.push(
+        diagnostic(
+          "dependency_invalid",
+          path,
+          "Extension dependency must be an object.",
+        ),
+      );
+      return;
+    }
+
+    if (typeof dependency.id !== "string" || !PACKAGE_ID.test(dependency.id)) {
+      diagnostics.push(
+        diagnostic(
+          "dependency_id_invalid",
+          `${path}.id`,
+          "Extension dependency id is invalid.",
+        ),
+      );
+    } else {
+      if (dependency.id === manifest.package.id) {
+        diagnostics.push(
+          diagnostic(
+            "dependency_self",
+            `${path}.id`,
+            "Extension packages must not depend on themselves.",
+          ),
+        );
+      }
+      if (seen.has(dependency.id)) {
+        diagnostics.push(
+          diagnostic(
+            "dependency_duplicate",
+            `${path}.id`,
+            "Extension dependency is duplicated.",
+          ),
+        );
+      }
+      seen.add(dependency.id);
+    }
+
+    if (
+      typeof dependency.version !== "string" ||
+      !isSupportedVersionRange(dependency.version)
+    ) {
+      diagnostics.push(
+        diagnostic(
+          "dependency_version_invalid",
+          `${path}.version`,
+          "Extension dependency version must be exact semver or a bracketed semver range.",
+        ),
+      );
+    }
+  });
+}
+
+function validateUpdatePolicy(
+  updates: MpxManifestUpdatePolicy | undefined,
+  diagnostics: MpxPackageDiagnostic[],
+): void {
+  if (updates === undefined) return;
+  if (!isRecord(updates)) {
+    diagnostics.push(
+      diagnostic("updates_invalid", "$.updates", "updates must be an object."),
+    );
+    return;
+  }
+  if (
+    updates.channel !== undefined &&
+    !UPDATE_CHANNELS.has(String(updates.channel))
+  ) {
+    diagnostics.push(
+      diagnostic(
+        "update_channel_invalid",
+        "$.updates.channel",
+        "Update channel must be stable or preview.",
+      ),
+    );
+  }
+  if (
+    updates.strategy !== undefined &&
+    !UPDATE_STRATEGIES.has(String(updates.strategy))
+  ) {
+    diagnostics.push(
+      diagnostic(
+        "update_strategy_invalid",
+        "$.updates.strategy",
+        "Only manual update strategy is implemented.",
+      ),
+    );
+  }
+}
+
+export function isDependencyVersionSatisfied(
+  requiredRange: string,
+  installedVersion: string,
+): boolean {
+  if (SEMVER_LIKE.test(requiredRange))
+    return requiredRange === installedVersion;
+  const match = VERSION_RANGE.exec(requiredRange);
+  const installed = parseSemverCore(installedVersion);
+  if (!match || installed === undefined) return false;
+
+  const [, minText, maxText] = match;
+  const minInclusive = requiredRange.startsWith("[");
+  const maxInclusive = requiredRange.endsWith("]");
+  if (minText) {
+    const min = parseSemverCore(minText);
+    if (min === undefined) return false;
+    const compare = compareSemverCore(installed, min);
+    if (compare < 0 || (compare === 0 && !minInclusive)) return false;
+  }
+  if (maxText) {
+    const max = parseSemverCore(maxText);
+    if (max === undefined) return false;
+    const compare = compareSemverCore(installed, max);
+    if (compare > 0 || (compare === 0 && !maxInclusive)) return false;
+  }
+  return true;
+}
+
+function isSupportedVersionRange(value: string): boolean {
+  return SEMVER_LIKE.test(value) || VERSION_RANGE.test(value);
+}
+
+function parseSemverCore(
+  value: string,
+):
+  | { readonly major: number; readonly minor: number; readonly patch: number }
+  | undefined {
+  const [core] = value.split(/[-+]/, 1);
+  const parts = core?.split(".") ?? [];
+  if (parts.length !== 3) return undefined;
+  const [major, minor, patch] = parts.map((part) => Number.parseInt(part, 10));
+  if (
+    !Number.isInteger(major) ||
+    !Number.isInteger(minor) ||
+    !Number.isInteger(patch)
+  ) {
+    return undefined;
+  }
+  return { major, minor, patch };
+}
+
+function compareSemverCore(
+  left: {
+    readonly major: number;
+    readonly minor: number;
+    readonly patch: number;
+  },
+  right: {
+    readonly major: number;
+    readonly minor: number;
+    readonly patch: number;
+  },
+): number {
+  return (
+    left.major - right.major ||
+    left.minor - right.minor ||
+    left.patch - right.patch
+  );
 }
 
 function validatePluginExtensionEvents(

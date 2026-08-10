@@ -97,6 +97,55 @@ test("client extension manager caches daemon-only packages without UI", () => {
   }
 });
 
+test("client extension manager rejects missing extension dependencies", () => {
+  const manager = new ClientExtensionManager();
+  const result = manager.install(
+    makePackage({
+      dependencies: [{ id: "community.example.base", version: "1.0.0" }],
+      manifest: {
+        ...makePackage().manifest,
+        dependencies: {
+          extensions: [{ id: "community.example.base", version: "1.0.0" }],
+        },
+      },
+    }),
+  );
+
+  assert.equal(result.ok, false);
+  if (!result.ok) assert.equal(result.code, "dependency_missing");
+});
+
+test("client extension manager installs when extension dependencies are satisfied", () => {
+  const manager = new ClientExtensionManager();
+  const base = manager.install(
+    makePackage({
+      manifest: {
+        ...makePackage().manifest,
+        package: { id: "community.example.base", version: "1.2.0" },
+      },
+    }),
+  );
+  assert.equal(base.ok, true);
+
+  const dependent = manager.install(
+    makePackage({
+      dependencies: [
+        { id: "community.example.base", version: "[1.0.0,2.0.0)" },
+      ],
+      manifest: {
+        ...makePackage().manifest,
+        dependencies: {
+          extensions: [
+            { id: "community.example.base", version: "[1.0.0,2.0.0)" },
+          ],
+        },
+      },
+    }),
+  );
+
+  assert.equal(dependent.ok, true);
+});
+
 test("client extension manager persists and restores client cache entries", async () => {
   const store = new MemoryClientExtensionCacheStore();
   const writer = new ClientExtensionManager(store);
@@ -266,6 +315,7 @@ function makePackage(
       },
     },
     commands: [],
+    dependencies: [],
     fileDigests: { "client/ui.json": "c".repeat(64) },
     totalUncompressedBytes: 512,
     ...overrides,

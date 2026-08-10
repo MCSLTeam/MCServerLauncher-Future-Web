@@ -1001,6 +1001,10 @@ function PendingInstallReview({
   const signatureSummary = review.package.signature
     ? `Trusted publisher ${review.package.signature.publisher} (${review.package.signature.keyId})`
     : "Unsigned local package";
+  const dependencies = manifest.dependencies?.extensions ?? [];
+  const updateSummary = manifest.updates
+    ? `${manifest.updates.channel ?? "stable"}/${manifest.updates.strategy ?? "manual"}`
+    : "Manual local install";
   return (
     <ConsolePanel>
       <ConsolePanelHeader
@@ -1067,6 +1071,20 @@ function PendingInstallReview({
             label="Resources"
             values={(manifest.resources ?? []).map((resource) => resource.path)}
             empty="No resource"
+          />
+          <SummaryBlock
+            icon={<PlugZap className="size-4" />}
+            label="Dependencies"
+            values={dependencies.map(
+              (dependency) => `${dependency.id} ${dependency.version}`,
+            )}
+            empty="No extension dependency"
+          />
+          <SummaryBlock
+            icon={<ShieldCheck className="size-4" />}
+            label="Updates"
+            values={[updateSummary]}
+            empty="Manual local install"
           />
           <SummaryBlock
             icon={<ShieldCheck className="size-4" />}

@@ -148,6 +148,34 @@ test("package builder emits client-only resource extension packages", async () =
   }
 });
 
+test("package builder emits dependency and manual update metadata", async () => {
+  const built = await buildMpxPackageFromSources({
+    package: { id: "community.example.dependent", version: "1.0.0" },
+    uiAuthoringJson5: UI_AUTHORING,
+    permissions: { host: ["ui.state"], events: [], network: [] },
+    dependencies: [{ id: "community.example.base", version: "[1.0.0,2.0.0)" }],
+    updates: { channel: "stable", strategy: "manual" },
+  });
+
+  assert.equal(built.ok, true);
+  if (built.ok) {
+    assert.equal(
+      built.manifest.dependencies?.extensions?.[0]?.id,
+      "community.example.base",
+    );
+    assert.equal(built.manifest.updates?.strategy, "manual");
+    const validated = await validateMpxPackage(built.bytes);
+    assert.equal(validated.ok, true);
+    if (validated.ok) {
+      assert.equal(
+        validated.package.dependencies[0]?.id,
+        "community.example.base",
+      );
+      assert.equal(validated.package.updates?.channel, "stable");
+    }
+  }
+});
+
 test("package builder rejects invalid authoring schema before packaging", async () => {
   const built = await buildMpxPackageFromSources({
     package: { id: "community.example.invalid", version: "1.0.0" },

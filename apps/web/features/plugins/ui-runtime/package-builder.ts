@@ -2,8 +2,10 @@ import { sha256Hex } from "../../../lib/daemon/binary.ts";
 import type {
   MpxManifest,
   MpxManifestCommand,
+  MpxManifestExtensionDependency,
   MpxManifestExtensionPoint,
   MpxManifestResourceRef,
+  MpxManifestUpdatePolicy,
 } from "./mpx-validator.ts";
 import { compilePluginUiSchema } from "./schema.ts";
 import { compilePluginTheme } from "./theme-runtime.ts";
@@ -42,6 +44,8 @@ export interface MpxPackageBuildInput {
   readonly permissions?: MpxManifest["permissions"];
   readonly extensionPoints?: readonly MpxManifestExtensionPoint[];
   readonly commands?: readonly MpxManifestCommand[];
+  readonly dependencies?: readonly MpxManifestExtensionDependency[];
+  readonly updates?: MpxManifestUpdatePolicy;
 }
 
 export type MpxPackageBuildResult =
@@ -142,6 +146,10 @@ export async function buildMpxPackageFromSources(
       ? {}
       : { extensionPoints: input.extensionPoints }),
     ...(input.commands === undefined ? {} : { commands: input.commands }),
+    ...(input.dependencies === undefined
+      ? {}
+      : { dependencies: { extensions: input.dependencies } }),
+    ...(input.updates === undefined ? {} : { updates: input.updates }),
     integrity: { algorithm: "sha256", signed: false },
   };
 

@@ -1,12 +1,15 @@
 import { sha256Hex } from "../../../lib/daemon/binary.ts";
 import {
   extractMpxPackageFiles,
+  isDependencyVersionSatisfied,
   type MpxDeploymentPlan,
   type MpxManifest,
   type MpxManifestCommand,
+  type MpxManifestExtensionDependency,
   type MpxManifestFileRef,
   type MpxManifestResourceRef,
   type MpxManifestScriptRef,
+  type MpxManifestUpdatePolicy,
   type MpxPackageSignatureTrust,
   type ValidatedMpxPackage,
 } from "./mpx-validator.ts";
@@ -30,6 +33,8 @@ export interface ClientExtensionCacheEntry {
   readonly theme?: PluginThemeRuntime;
   readonly resources: readonly MpxManifestResourceRef[];
   readonly commands: readonly MpxManifestCommand[];
+  readonly dependencies?: readonly MpxManifestExtensionDependency[];
+  readonly updates?: Required<MpxManifestUpdatePolicy>;
   readonly fileDigests: Readonly<Record<string, string>>;
   readonly signature?: MpxPackageSignatureTrust;
   readonly cachedPayloads?: readonly ClientExtensionCachedPayload[];
@@ -296,6 +301,9 @@ export class ClientExtensionManager {
   }
 
   install(validatedPackage: ValidatedMpxPackage): ClientExtensionInstallResult {
+    const dependencyFailure = this.validateDependencies(validatedPackage);
+    if (dependencyFailure !== undefined) return dependencyFailure;
+
     const result = createClientExtensionEntry(validatedPackage, []);
     if (!result.ok) return result;
     this.#entries.set(result.entry.id, result.entry);
@@ -307,6 +315,9 @@ export class ClientExtensionManager {
     packageBytes?: ArrayBuffer | ArrayBufferView,
   ): Promise<ClientExtensionInstallResult> {
     let cachedPayloads: readonly ClientExtensionCachedPayload[] = [];
+    const dependencyFailure = this.validateDependencies(validatedPackage);
+    if (dependencyFailure !== undefined) return dependencyFailure;
+
     if (packageBytes !== undefined) {
       if (this.#payloadStore === undefined) {
         return {
@@ -442,6 +453,31 @@ export class ClientExtensionManager {
     return { ok: true, payloads: cached };
   }
 
+  private validateDependencies(
+    validatedPackage: ValidatedMpxPackage,
+  ): ClientExtensionInstallResult | undefined {
+    for (const dependency of validatedPackage.dependencies) {
+      const installed = this.#entries.get(dependency.id);
+      if (installed === undefined) {
+        return {
+          ok: false,
+          code: "dependency_missing",
+          message: `Extension '${validatedPackage.manifest.package.id}' requires '${dependency.id}' ${dependency.version}.`,
+        };
+      }
+      if (
+        !isDependencyVersionSatisfied(dependency.version, installed.version)
+      ) {
+        return {
+          ok: false,
+          code: "dependency_version_unsupported",
+          message: `Extension '${validatedPackage.manifest.package.id}' requires '${dependency.id}' ${dependency.version}, but installed version is ${installed.version}.`,
+        };
+      }
+    }
+    return undefined;
+  }
+
   private async isRestorable(
     entry: ClientExtensionCacheEntry,
   ): Promise<boolean> {
@@ -488,6 +524,10 @@ function createClientExtensionEntry(
       theme: validatedPackage.theme,
       resources: validatedPackage.deploymentPlan.client?.resources ?? [],
       commands: validatedPackage.commands,
+      dependencies: validatedPackage.dependencies,
+      ...(validatedPackage.updates === undefined
+        ? {}
+        : { updates: validatedPackage.updates }),
       fileDigests: validatedPackage.fileDigests,
       ...(validatedPackage.signature === undefined
         ? {}
@@ -567,6 +607,7 @@ function isClientExtensionCacheEntry(
     isRecord(value.manifest) &&
     isRecord(value.deploymentPlan) &&
     Array.isArray(value.deploymentPlan.scopes) &&
+    (value.dependencies === undefined || Array.isArray(value.dependencies)) &&
     isRecord(value.fileDigests) &&
     (value.signature === undefined || isRecord(value.signature)) &&
     (value.cachedPayloads === undefined || Array.isArray(value.cachedPayloads))

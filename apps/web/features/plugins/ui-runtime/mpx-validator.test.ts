@@ -363,6 +363,51 @@ test("rejects signed packages when payload is tampered", async () => {
   }
 });
 
+test("accepts extension dependencies and manual update policy", async () => {
+  const zip = await buildMpxPackage({
+    mutateManifest: (manifest) => ({
+      ...manifest,
+      dependencies: {
+        extensions: [
+          { id: "community.example.base", version: "[1.0.0,2.0.0)" },
+        ],
+      },
+      updates: { channel: "stable", strategy: "manual" },
+    }),
+  });
+
+  const result = await validateMpxPackage(zip);
+
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.equal(result.package.dependencies[0]?.id, "community.example.base");
+    assert.equal(result.package.dependencies[0]?.version, "[1.0.0,2.0.0)");
+    assert.equal(result.package.updates?.channel, "stable");
+    assert.equal(result.package.updates?.strategy, "manual");
+  }
+});
+
+test("rejects invalid extension dependencies", async () => {
+  const zip = await buildMpxPackage({
+    mutateManifest: (manifest) => ({
+      ...manifest,
+      dependencies: {
+        extensions: [{ id: manifest.package.id, version: "not-a-range" }],
+      },
+    }),
+  });
+
+  const result = await validateMpxPackage(zip);
+
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(
+      result.diagnostics.map((diagnostic) => diagnostic.code).join(","),
+      /dependency_self|dependency_version_invalid/,
+    );
+  }
+});
+
 test("rejects undeclared UI command bindings", async () => {
   const commandUi = JSON.stringify({
     schema: "mcsl.ui.v1",
