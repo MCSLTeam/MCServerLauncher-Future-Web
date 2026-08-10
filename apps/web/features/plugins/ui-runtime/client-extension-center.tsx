@@ -97,6 +97,9 @@ export function ClientExtensionCenter() {
   const [stateSnapshots, setStateSnapshots] = useState<
     Readonly<Record<string, ExtensionStateSnapshot>>
   >({});
+  const [daemonDeploymentStatuses, setDaemonDeploymentStatuses] = useState<
+    Readonly<Record<string, string>>
+  >({});
 
   const connectedNodeId = useMemo(
     () =>
@@ -110,6 +113,10 @@ export function ClientExtensionCenter() {
     () => entries.find((entry) => entry.id === selectedId) ?? entries[0],
     [entries, selectedId],
   );
+
+  const selectedDaemonDeploymentStatus = selectedEntry
+    ? daemonDeploymentStatuses[selectedEntry.id]
+    : undefined;
 
   const recordEvent = useCallback(
     (
@@ -284,6 +291,42 @@ export function ClientExtensionCenter() {
       }
     };
   }, [connectedNodeId, daemon, entries]);
+
+  useEffect(() => {
+    if (!selectedEntry?.deploymentPlan.daemon?.plugin) return;
+    if (!connectedNodeId) {
+      setDaemonDeploymentStatuses((current) => ({
+        ...current,
+        [selectedEntry.id]:
+          "No connected daemon is available for deployment status.",
+      }));
+      return;
+    }
+
+    let cancelled = false;
+    void daemon
+      .runWithClient(connectedNodeId, (client) =>
+        client.getExtensionDaemonBundleStatus(selectedEntry.id),
+      )
+      .then((result) => {
+        if (cancelled) return;
+        setDaemonDeploymentStatuses((current) => ({
+          ...current,
+          [selectedEntry.id]: result.ok
+            ? deploymentStatus(result.data)
+            : (result.message ?? "Daemon deployment status is unavailable."),
+        }));
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    connectedNodeId,
+    daemon,
+    selectedEntry?.id,
+    selectedEntry?.deploymentPlan.daemon?.plugin,
+  ]);
 
   async function installPackage(file: File) {
     const manager = managerRef.current;
@@ -466,6 +509,10 @@ export function ClientExtensionCenter() {
         title: "Daemon bundle deployed.",
         details: `${deploymentStatus(deployed.data)} Restart the daemon to apply it.`,
       });
+      setDaemonDeploymentStatuses((current) => ({
+        ...current,
+        [selectedEntry.id]: deploymentStatus(deployed.data),
+      }));
     } catch (error) {
       setMessage({
         kind: "error",
@@ -507,6 +554,10 @@ export function ClientExtensionCenter() {
         title: "Daemon bundle removed.",
         details: `${deploymentStatus(removed.data)} Restart the daemon to apply it.`,
       });
+      setDaemonDeploymentStatuses((current) => ({
+        ...current,
+        [selectedEntry.id]: deploymentStatus(removed.data),
+      }));
     } catch (error) {
       setMessage({
         kind: "error",
@@ -740,6 +791,11 @@ export function ClientExtensionCenter() {
                     cached with this package. Deploying it to daemon plugins and
                     applying the required daemon restart is a separate lifecycle
                     step.
+                    {selectedDaemonDeploymentStatus ? (
+                      <span className="mt-2 block">
+                        Daemon status: {selectedDaemonDeploymentStatus}
+                      </span>
+                    ) : null}
                   </AlertDescription>
                 </Alert>
               ) : null}

@@ -85,6 +85,7 @@ export const V2_METHODS = {
   unsubscribe: "mcsl.event.unsubscribe",
   extensionDispatch: "mcsl.extension.dispatch",
   extensionDaemonBundleInstall: "mcsl.extension.daemon.bundle.install",
+  extensionDaemonBundleStatus: "mcsl.extension.daemon.bundle.status",
   extensionDaemonBundleRemove: "mcsl.extension.daemon.bundle.remove",
   discover: "rpc.discover",
 } as const;

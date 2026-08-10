@@ -269,6 +269,13 @@ export class DaemonClient {
     );
   }
 
+  getExtensionDaemonBundleStatus(pluginId: string) {
+    return this.request<DaemonExtensionBundleDeploymentResult>(
+      V2_METHODS.extensionDaemonBundleStatus,
+      { plugin_id: pluginId },
+    );
+  }
+
   removeExtensionDaemonBundle(pluginId: string) {
     return this.request<DaemonExtensionBundleDeploymentResult>(
       V2_METHODS.extensionDaemonBundleRemove,
