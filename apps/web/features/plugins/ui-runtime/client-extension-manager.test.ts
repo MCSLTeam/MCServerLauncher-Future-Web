@@ -6,6 +6,7 @@ import {
   LocalStorageClientExtensionCacheStore,
   MemoryClientExtensionCacheStore,
   MemoryClientExtensionPayloadStore,
+  buildClientExtensionManifestDrift,
   type ClientExtensionKeyValueStorage,
 } from "./client-extension-manager.ts";
 import { buildMpxPackageFromSources } from "./package-builder.ts";
@@ -144,6 +145,84 @@ test("client extension manager installs when extension dependencies are satisfie
   );
 
   assert.equal(dependent.ok, true);
+});
+
+test("client extension manager reports installed manifest drift", () => {
+  const manager = new ClientExtensionManager();
+  const installed = manager.install(makePackage());
+  assert.equal(installed.ok, true);
+  if (!installed.ok) return;
+
+  const drift = buildClientExtensionManifestDrift(
+    installed.entry,
+    makePackage({
+      manifest: {
+        ...makePackage().manifest,
+        package: { id: "community.example.status-panel", version: "1.1.0" },
+        runtime: { ui: "[1.0.0,2.0.0)", daemonApi: "[1.0.0,2.0.0)" },
+        permissions: {
+          host: ["ui.state", "daemon.instance.query"],
+          events: ["daemon.notification"],
+          network: [],
+        },
+        dependencies: {
+          extensions: [
+            { id: "community.example.base", version: "[1.0.0,2.0.0)" },
+          ],
+        },
+        targets: {
+          client: { ui: { path: "client/ui.json", sha256: "c".repeat(64) } },
+          daemon: {
+            plugin: {
+              path: "daemon/plugin-bundle.zip",
+              sha256: "d".repeat(64),
+            },
+          },
+        },
+      },
+      deploymentPlan: {
+        scopes: ["client", "daemon"],
+        client: {
+          ui: { path: "client/ui.json", sha256: "c".repeat(64) },
+          resources: [],
+        },
+        daemon: {
+          plugin: { path: "daemon/plugin-bundle.zip", sha256: "d".repeat(64) },
+          extensionPoints: [
+            {
+              kind: "override",
+              id: "override.process.launcher",
+              target: "daemon",
+            },
+          ],
+          commands: [{ id: "launch", target: "daemon" }],
+        },
+      },
+      commands: [{ id: "launch", target: "daemon" }],
+      dependencies: [
+        { id: "community.example.base", version: "[1.0.0,2.0.0)" },
+      ],
+      signature: {
+        publisher: "community.example",
+        keyId: "test-key",
+        publicKeySha256: "f".repeat(64),
+      },
+    }),
+  );
+
+  assert.deepEqual(
+    drift.map((finding) => [finding.title, finding.level]),
+    [
+      ["Version change", "low"],
+      ["Host permissions", "medium"],
+      ["Event permissions", "medium"],
+      ["Extension points", "high"],
+      ["Daemon commands", "medium"],
+      ["Extension dependencies", "medium"],
+      ["Daemon payload", "high"],
+      ["Signature trust", "medium"],
+    ],
+  );
 });
 
 test("client extension manager persists and restores client cache entries", async () => {

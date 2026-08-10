@@ -38,7 +38,9 @@ import {
   IndexedDbClientExtensionPayloadStore,
   LocalStorageClientExtensionCacheStore,
   MemoryClientExtensionPayloadStore,
+  buildClientExtensionManifestDrift,
   type ClientExtensionCacheEntry,
+  type ClientExtensionManifestDrift,
   type ClientExtensionPayloadStore,
 } from "./client-extension-manager";
 import {
@@ -78,6 +80,7 @@ interface PendingExtensionInstall {
   readonly fileName: string;
   readonly bytes: Uint8Array;
   readonly package: ValidatedMpxPackage;
+  readonly drift: readonly ClientExtensionManifestDrift[];
 }
 
 interface DaemonRestartWatch {
@@ -384,6 +387,10 @@ export function ClientExtensionCenter() {
         fileName: file.name,
         bytes,
         package: validation.package,
+        drift: buildClientExtensionManifestDrift(
+          manager.get(validation.package.manifest.package.id),
+          validation.package,
+        ),
       });
       setMessage({
         kind: "info",
@@ -1120,6 +1127,16 @@ function PendingInstallReview({
               : "It will only be cached by this client."}
           </AlertDescription>
         </Alert>
+        {review.drift.length > 0 ? (
+          <Alert>
+            <TriangleAlert className="size-4" />
+            <AlertTitle>Installed extension drift</AlertTitle>
+            <AlertDescription>
+              This package replaces an installed entry and changes reviewed
+              permissions, trust, deployment, or dependency metadata.
+            </AlertDescription>
+          </Alert>
+        ) : null}
         <div className="grid gap-3 text-sm md:grid-cols-3">
           <SummaryBlock
             icon={<PlugZap className="size-4" />}
@@ -1179,6 +1196,28 @@ function PendingInstallReview({
           />
         </div>
         <div className="grid gap-2 text-sm md:grid-cols-2">
+          {review.drift.map((finding) => (
+            <div
+              key={`drift-${finding.title}`}
+              className="rounded-xl border p-3"
+            >
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <span className="font-medium">Drift: {finding.title}</span>
+                <Badge
+                  variant={
+                    finding.level === "high"
+                      ? "destructive"
+                      : finding.level === "medium"
+                        ? "warning"
+                        : "success"
+                  }
+                >
+                  {finding.level}
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">{finding.details}</p>
+            </div>
+          ))}
           {auditFindings.map((finding) => (
             <div key={finding.title} className="rounded-xl border p-3">
               <div className="mb-2 flex items-center justify-between gap-2">

@@ -287,6 +287,14 @@ export type ClientExtensionInstallResult =
   | { readonly ok: true; readonly entry: ClientExtensionCacheEntry }
   | { readonly ok: false; readonly code: string; readonly message: string };
 
+export type ClientExtensionManifestDriftLevel = "low" | "medium" | "high";
+
+export interface ClientExtensionManifestDrift {
+  readonly level: ClientExtensionManifestDriftLevel;
+  readonly title: string;
+  readonly details: string;
+}
+
 export class ClientExtensionManager {
   readonly #entries = new Map<string, ClientExtensionCacheEntry>();
   readonly #store?: ClientExtensionCacheStore;
@@ -501,6 +509,88 @@ export class ClientExtensionManager {
   }
 }
 
+export function buildClientExtensionManifestDrift(
+  installed: ClientExtensionCacheEntry | undefined,
+  nextPackage: ValidatedMpxPackage,
+): readonly ClientExtensionManifestDrift[] {
+  if (installed === undefined) return [];
+
+  const findings: ClientExtensionManifestDrift[] = [];
+  if (installed.version !== nextPackage.manifest.package.version) {
+    findings.push({
+      level: "low",
+      title: "Version change",
+      details: `${installed.version} -> ${nextPackage.manifest.package.version}`,
+    });
+  }
+
+  addStringSetDrift(findings, {
+    title: "Host permissions",
+    previous: installed.manifest.permissions.host ?? [],
+    next: nextPackage.manifest.permissions.host ?? [],
+    addedLevel: (value) => (value.startsWith("daemon.") ? "medium" : "low"),
+  });
+  addStringSetDrift(findings, {
+    title: "Event permissions",
+    previous: installed.manifest.permissions.events ?? [],
+    next: nextPackage.manifest.permissions.events ?? [],
+    addedLevel: () => "medium",
+  });
+  addStringSetDrift(findings, {
+    title: "Extension points",
+    previous: extensionPointKeys(
+      installed.deploymentPlan.daemon?.extensionPoints,
+    ),
+    next: extensionPointKeys(
+      nextPackage.deploymentPlan.daemon?.extensionPoints,
+    ),
+    addedLevel: (value) =>
+      value.startsWith("override:override.process.launcher")
+        ? "high"
+        : "medium",
+  });
+  addStringSetDrift(findings, {
+    title: "Daemon commands",
+    previous: installed.commands.map((command) => command.id),
+    next: nextPackage.commands.map((command) => command.id),
+    addedLevel: () => "medium",
+  });
+  addStringSetDrift(findings, {
+    title: "Extension dependencies",
+    previous: installed.dependencies?.map(dependencyKey) ?? [],
+    next: nextPackage.dependencies.map(dependencyKey),
+    addedLevel: () => "medium",
+  });
+
+  const previousDaemon = installed.deploymentPlan.daemon?.plugin;
+  const nextDaemon = nextPackage.deploymentPlan.daemon?.plugin;
+  if (fileRefKey(previousDaemon) !== fileRefKey(nextDaemon)) {
+    findings.push({
+      level:
+        previousDaemon === undefined || nextDaemon === undefined
+          ? "high"
+          : "medium",
+      title: "Daemon payload",
+      details: `${fileRefKey(previousDaemon) ?? "none"} -> ${fileRefKey(nextDaemon) ?? "none"}`,
+    });
+  }
+
+  const previousSignature = signatureKey(installed.signature);
+  const nextSignature = signatureKey(nextPackage.signature);
+  if (previousSignature !== nextSignature) {
+    findings.push({
+      level:
+        installed.signature !== undefined && nextPackage.signature === undefined
+          ? "high"
+          : "medium",
+      title: "Signature trust",
+      details: `${previousSignature ?? "unsigned"} -> ${nextSignature ?? "unsigned"}`,
+    });
+  }
+
+  return findings;
+}
+
 function createClientExtensionEntry(
   validatedPackage: ValidatedMpxPackage,
   cachedPayloads: readonly ClientExtensionCachedPayload[],
@@ -587,6 +677,75 @@ function addFileRef(
     sha256: file.sha256,
     ...(mime === undefined ? {} : { mime }),
   });
+}
+
+function addStringSetDrift(
+  findings: ClientExtensionManifestDrift[],
+  options: {
+    readonly title: string;
+    readonly previous: readonly string[];
+    readonly next: readonly string[];
+    readonly addedLevel: (value: string) => ClientExtensionManifestDriftLevel;
+  },
+): void {
+  const previous = new Set(options.previous);
+  const next = new Set(options.next);
+  const added = [...next].filter((value) => !previous.has(value)).sort();
+  const removed = [...previous].filter((value) => !next.has(value)).sort();
+  if (added.length === 0 && removed.length === 0) return;
+
+  findings.push({
+    level:
+      added.length === 0 ? "low" : highestLevel(added.map(options.addedLevel)),
+    title: options.title,
+    details: [
+      added.length === 0 ? "" : `Added: ${added.join(", ")}.`,
+      removed.length === 0 ? "" : `Removed: ${removed.join(", ")}.`,
+    ]
+      .filter(Boolean)
+      .join(" "),
+  });
+}
+
+function highestLevel(
+  levels: readonly ClientExtensionManifestDriftLevel[],
+): ClientExtensionManifestDriftLevel {
+  if (levels.includes("high")) return "high";
+  if (levels.includes("medium")) return "medium";
+  return "low";
+}
+
+function extensionPointKeys(
+  points:
+    | readonly {
+        readonly kind: string;
+        readonly id: string;
+        readonly target?: string;
+      }[]
+    | undefined,
+): readonly string[] {
+  return (points ?? [])
+    .map(
+      (point) =>
+        `${point.kind}:${point.id}${point.target === undefined ? "" : `:${point.target}`}`,
+    )
+    .sort();
+}
+
+function dependencyKey(dependency: MpxManifestExtensionDependency): string {
+  return `${dependency.id} ${dependency.version}`;
+}
+
+function fileRefKey(file: MpxManifestFileRef | undefined): string | undefined {
+  return file === undefined ? undefined : `${file.path}@${file.sha256}`;
+}
+
+function signatureKey(
+  signature: MpxPackageSignatureTrust | undefined,
+): string | undefined {
+  return signature === undefined
+    ? undefined
+    : `${signature.publisher}/${signature.keyId}/${signature.publicKeySha256}`;
 }
 
 function memoryStorageRef(extensionId: string, path: string): string {
