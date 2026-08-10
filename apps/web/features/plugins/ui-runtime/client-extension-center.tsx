@@ -1304,12 +1304,13 @@ function buildAuditFindings(pkg: ValidatedMpxPackage): readonly AuditFinding[] {
       ? {
           level: "low",
           title: "Signature",
-          details: `Trusted publisher ${formatSignatureTrust(pkg.signature)}.`,
+          details: `Trust source: local trusted publisher key. ${formatSignatureTrust(pkg.signature)}.`,
         }
       : {
           level: "medium",
           title: "Signature",
-          details: "Unsigned package. Trust is based only on the local source.",
+          details:
+            "Unsigned package. No local trusted publisher key was verified; trust is based only on the local source.",
         },
     daemonPayload
       ? {
@@ -1423,7 +1424,7 @@ function formatSignatureTrust(signature: {
     signature.signedAt === undefined
       ? "unknown signing time"
       : signature.signedAt;
-  return `${signature.publisher} / ${signature.keyId} / ${fingerprint} / ${signedAt}`;
+  return `publisher ${signature.publisher}; key ${signature.keyId}; SPKI SHA-256 ${fingerprint}; signed at ${signedAt}`;
 }
 
 function formatAuditHistory(
