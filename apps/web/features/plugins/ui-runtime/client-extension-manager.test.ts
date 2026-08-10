@@ -111,6 +111,7 @@ test("client extension manager persists payload bytes and rejects tampered resto
       root: { type: "Text", props: { Text: "Ready" } },
     }`,
     themeJson: '{"schema":"mcsl.theme.v1","colors":{"accent":"#0070c0"}}',
+    daemonPlugin: new TextEncoder().encode("bundle"),
     permissions: { host: [], events: [], network: [] },
   });
   assert.equal(built.ok, true);
@@ -128,12 +129,22 @@ test("client extension manager persists payload bytes and rejects tampered resto
   );
   assert.equal(install.ok, true);
   if (!install.ok) return;
-  assert.equal(install.entry.cachedPayloads?.length, 2);
+  assert.equal(install.entry.cachedPayloads?.length, 3);
 
   const reader = new ClientExtensionManager(metadataStore, payloadStore);
   await reader.restore();
   const restored = reader.get("community.example.payload");
-  assert.equal(restored?.cachedPayloads?.length, 2);
+  assert.equal(restored?.cachedPayloads?.length, 3);
+  const daemonPayload = restored?.cachedPayloads?.find(
+    (payload) => payload.path === "daemon/plugin-bundle.zip",
+  );
+  assert.notEqual(daemonPayload, undefined);
+  if (daemonPayload !== undefined) {
+    assert.notEqual(
+      await payloadStore.readFile(daemonPayload.storageRef),
+      undefined,
+    );
+  }
   const uiPayload = restored?.cachedPayloads?.find(
     (payload) => payload.path === "client/ui.json",
   );

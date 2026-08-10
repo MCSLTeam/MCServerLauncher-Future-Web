@@ -388,7 +388,7 @@ export class ClientExtensionManager {
       };
     }
 
-    const refs = clientPayloadRefs(validatedPackage.deploymentPlan.client);
+    const refs = packagePayloadRefs(validatedPackage.deploymentPlan);
     const extracted = await extractMpxPackageFiles(
       packageBytes,
       refs.map((ref) => ref.path),
@@ -485,11 +485,20 @@ function createClientExtensionEntry(
   };
 }
 
-function clientPayloadRefs(
-  client: MpxDeploymentPlan["client"],
+function packagePayloadRefs(
+  deploymentPlan: MpxDeploymentPlan,
 ): readonly ClientPayloadRef[] {
-  if (client === undefined) return [];
   const refs: ClientPayloadRef[] = [];
+  addClientPayloadRefs(refs, deploymentPlan.client);
+  addFileRef(refs, deploymentPlan.daemon?.plugin, "application/zip");
+  return refs;
+}
+
+function addClientPayloadRefs(
+  refs: ClientPayloadRef[],
+  client: MpxDeploymentPlan["client"],
+): void {
+  if (client === undefined) return;
   addFileRef(refs, client.ui, undefined);
   addFileRef(refs, client.theme, "application/json");
   addFileRef(refs, client.script, "text/javascript");
@@ -500,7 +509,6 @@ function clientPayloadRefs(
       mime: resource.mime,
     });
   }
-  return refs;
 }
 
 interface ClientPayloadRef {

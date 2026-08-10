@@ -29,6 +29,7 @@ import {
 } from "@/components/templates/console-surface";
 import { useDaemon } from "@/features/nodes/daemon-provider";
 import { type DaemonEventPacket } from "@/lib/daemon/client";
+import { sha256Hex } from "@/lib/daemon/binary";
 import { V2_EVENTS } from "@/lib/daemon/types";
 import { cn } from "@/lib/utils";
 
@@ -38,6 +39,7 @@ import {
   LocalStorageClientExtensionCacheStore,
   MemoryClientExtensionPayloadStore,
   type ClientExtensionCacheEntry,
+  type ClientExtensionPayloadStore,
 } from "./client-extension-manager";
 import {
   applyClientExtensionStateEnvelope,
@@ -81,6 +83,7 @@ interface PendingExtensionInstall {
 export function ClientExtensionCenter() {
   const daemon = useDaemon();
   const managerRef = useRef<ClientExtensionManager | null>(null);
+  const payloadStoreRef = useRef<ClientExtensionPayloadStore | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [entries, setEntries] = useState<readonly ClientExtensionCacheEntry[]>(
     [],
@@ -200,6 +203,7 @@ export function ClientExtensionCenter() {
       payloadStore,
     );
     managerRef.current = manager;
+    payloadStoreRef.current = payloadStore;
 
     void manager
       .restore()
@@ -384,6 +388,136 @@ export function ClientExtensionCenter() {
     });
   }
 
+  async function deploySelectedDaemonBundle() {
+    if (!selectedEntry) return;
+    const daemonBundle = selectedEntry.deploymentPlan.daemon?.plugin;
+    if (daemonBundle === undefined) return;
+    if (!connectedNodeId) {
+      setMessage({
+        kind: "error",
+        title: "No connected daemon is available for deployment.",
+      });
+      return;
+    }
+
+    const payload = selectedEntry.cachedPayloads?.find(
+      (candidate) => candidate.path === daemonBundle.path,
+    );
+    const payloadStore = payloadStoreRef.current;
+    if (payload === undefined || payloadStore === null) {
+      setMessage({
+        kind: "error",
+        title: "Daemon bundle bytes are not cached.",
+        details:
+          "Reinstall the .mpx package so the daemon bundle can be deployed.",
+      });
+      return;
+    }
+
+    setInstalling(true);
+    setMessage(null);
+    try {
+      const bytes = await payloadStore.readFile(payload.storageRef);
+      if (
+        bytes === undefined ||
+        (await sha256Hex(bytes)) !== daemonBundle.sha256
+      ) {
+        setMessage({
+          kind: "error",
+          title: "Cached daemon bundle failed digest verification.",
+        });
+        return;
+      }
+
+      const uploadBuffer = new ArrayBuffer(bytes.byteLength);
+      new Uint8Array(uploadBuffer).set(bytes);
+      const upload = await daemon.uploadFile(
+        connectedNodeId,
+        new Blob([uploadBuffer], { type: "application/zip" }),
+        `caches/uploads/extensions/${selectedEntry.id}-${selectedEntry.version}.zip`,
+      );
+      if (!upload.ok || !upload.path) {
+        setMessage({
+          kind: "error",
+          title: "Daemon bundle upload failed.",
+          details: upload.message,
+        });
+        return;
+      }
+
+      const deployed = await daemon.runWithClient(connectedNodeId, (client) =>
+        client.installExtensionDaemonBundle({
+          pluginId: selectedEntry.id,
+          sourcePath: upload.path!,
+          sha256: daemonBundle.sha256,
+        }),
+      );
+      if (!deployed.ok) {
+        setMessage({
+          kind: "error",
+          title: "Daemon bundle deployment failed.",
+          details: deployed.message,
+        });
+        return;
+      }
+
+      setMessage({
+        kind: "success",
+        title: "Daemon bundle deployed.",
+        details: `${deploymentStatus(deployed.data)} Restart the daemon to apply it.`,
+      });
+    } catch (error) {
+      setMessage({
+        kind: "error",
+        title: "Daemon bundle deployment failed.",
+        details: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setInstalling(false);
+    }
+  }
+
+  async function removeSelectedDaemonBundle() {
+    if (!selectedEntry || !selectedEntry.deploymentPlan.daemon?.plugin) return;
+    if (!connectedNodeId) {
+      setMessage({
+        kind: "error",
+        title: "No connected daemon is available for removal.",
+      });
+      return;
+    }
+
+    setInstalling(true);
+    setMessage(null);
+    try {
+      const removed = await daemon.runWithClient(connectedNodeId, (client) =>
+        client.removeExtensionDaemonBundle(selectedEntry.id),
+      );
+      if (!removed.ok) {
+        setMessage({
+          kind: "error",
+          title: "Daemon bundle removal failed.",
+          details: removed.message,
+        });
+        return;
+      }
+
+      setMessage({
+        kind: "success",
+        title: "Daemon bundle removed.",
+        details: `${deploymentStatus(removed.data)} Restart the daemon to apply it.`,
+      });
+    } catch (error) {
+      setMessage({
+        kind: "error",
+        title: "Daemon bundle removal failed.",
+        details: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setInstalling(false);
+    }
+  }
+
   async function handleUiEvent(
     entry: ClientExtensionCacheEntry,
     event: PluginUiEvent,
@@ -543,14 +677,38 @@ export function ClientExtensionCenter() {
                 title={selectedEntry.id}
                 description={`Version ${selectedEntry.version}. ${connectedNodeId ? `Daemon dispatch target: ${connectedNodeId}.` : "Connect a daemon to enable command dispatch."}`}
                 action={
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => void uninstallSelected()}
-                  >
-                    <Trash2 className="size-4" />
-                    Remove
-                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedEntry.deploymentPlan.daemon?.plugin ? (
+                      <>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={installing || !connectedNodeId}
+                          onClick={() => void deploySelectedDaemonBundle()}
+                        >
+                          <Upload className="size-4" />
+                          Deploy daemon
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={installing || !connectedNodeId}
+                          onClick={() => void removeSelectedDaemonBundle()}
+                        >
+                          <Trash2 className="size-4" />
+                          Remove daemon
+                        </Button>
+                      </>
+                    ) : null}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => void uninstallSelected()}
+                    >
+                      <Trash2 className="size-4" />
+                      Remove client
+                    </Button>
+                  </div>
                 }
               />
               <div className="grid gap-3 text-sm md:grid-cols-3">
@@ -778,6 +936,16 @@ function SummaryBlock({
       </div>
     </div>
   );
+}
+
+function deploymentStatus(value: unknown): string {
+  if (!isRecord(value)) return "Deployment status is unknown.";
+  const status = String(value.status ?? "unknown");
+  const directory = String(
+    value.plugin_directory ?? value.pluginDirectory ?? "plugins/<plugin>",
+  );
+  const message = typeof value.message === "string" ? value.message : "";
+  return `${status} at ${directory}.${message ? ` ${message}` : ""}`;
 }
 
 function extractExtensionEnvelope(value: unknown): unknown {
