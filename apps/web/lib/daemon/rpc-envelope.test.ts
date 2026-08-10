@@ -45,6 +45,7 @@ test("V2 method catalog uses mcsl.* names", () => {
     V2_METHODS.extensionDaemonBundleRemove,
     "mcsl.extension.daemon.bundle.remove",
   );
+  assert.equal(V2_METHODS.auditQuery, "mcsl.audit.query");
   assert.equal(V2_UPLOAD_ACK_METHOD, "mcsl.file.upload.ack");
 });
 

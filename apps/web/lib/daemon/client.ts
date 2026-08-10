@@ -12,6 +12,7 @@ import { toDaemonPath } from "@/features/console/virtual-path";
 import { tKey } from "@/lib/i18n/translate";
 import {
   type DaemonAddInstanceResult,
+  type DaemonAuditQueryResult,
   type DaemonConsoleSession,
   type DaemonDownloadReadResult,
   type DaemonDownloadSession,
@@ -310,6 +311,24 @@ export class DaemonClient {
       V2_METHODS.daemonShutdownRequest,
       { reason },
     );
+  }
+
+  queryAudit(params: {
+    maximumRecords?: number;
+    target?: string;
+    method?: string;
+    principal?: string;
+    notBefore?: string;
+    notAfter?: string;
+  }) {
+    return this.request<DaemonAuditQueryResult>(V2_METHODS.auditQuery, {
+      maximum_records: params.maximumRecords,
+      target: params.target,
+      method: params.method,
+      principal: params.principal,
+      not_before: params.notBefore,
+      not_after: params.notAfter,
+    });
   }
 
   getSystemInfo() {

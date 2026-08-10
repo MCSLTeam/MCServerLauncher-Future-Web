@@ -30,7 +30,7 @@ import {
 import { useDaemon } from "@/features/nodes/daemon-provider";
 import { type DaemonEventPacket } from "@/lib/daemon/client";
 import { sha256Hex } from "@/lib/daemon/binary";
-import { V2_EVENTS } from "@/lib/daemon/types";
+import { V2_EVENTS, type DaemonAuditRecord } from "@/lib/daemon/types";
 import { cn } from "@/lib/utils";
 
 import {
@@ -109,6 +109,9 @@ export function ClientExtensionCenter() {
   const [daemonDeploymentStatuses, setDaemonDeploymentStatuses] = useState<
     Readonly<Record<string, string>>
   >({});
+  const [extensionAuditHistories, setExtensionAuditHistories] = useState<
+    Readonly<Record<string, string>>
+  >({});
   const [restartWatch, setRestartWatch] = useState<DaemonRestartWatch | null>(
     null,
   );
@@ -125,9 +128,13 @@ export function ClientExtensionCenter() {
     () => entries.find((entry) => entry.id === selectedId) ?? entries[0],
     [entries, selectedId],
   );
+  const selectedExtensionId = selectedEntry?.id ?? "";
 
   const selectedDaemonDeploymentStatus = selectedEntry
     ? daemonDeploymentStatuses[selectedEntry.id]
+    : undefined;
+  const selectedAuditHistory = selectedEntry
+    ? extensionAuditHistories[selectedEntry.id]
     : undefined;
 
   const recordEvent = useCallback(
@@ -363,6 +370,32 @@ export function ClientExtensionCenter() {
     selectedEntry?.id,
     selectedEntry?.deploymentPlan.daemon?.plugin,
   ]);
+
+  useEffect(() => {
+    if (!selectedExtensionId || !connectedNodeId) return;
+
+    let cancelled = false;
+    void daemon
+      .runWithClient(connectedNodeId, (client) =>
+        client.queryAudit({ maximumRecords: 6, target: selectedExtensionId }),
+      )
+      .then((result) => {
+        if (cancelled) return;
+        setExtensionAuditHistories((current) => ({
+          ...current,
+          [selectedExtensionId]: result.ok
+            ? formatAuditHistory(
+                result.data.records ?? [],
+                result.data.dropped_records ?? result.data.droppedRecords ?? 0,
+              )
+            : (result.message ?? "Audit history is unavailable."),
+        }));
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [connectedNodeId, daemon, selectedExtensionId]);
 
   async function installPackage(file: File) {
     const manager = managerRef.current;
@@ -980,6 +1013,15 @@ export function ClientExtensionCenter() {
                   </AlertDescription>
                 </Alert>
               ) : null}
+              {selectedAuditHistory ? (
+                <Alert className="mt-3">
+                  <ShieldCheck className="size-4" />
+                  <AlertTitle>Extension audit history</AlertTitle>
+                  <AlertDescription className="whitespace-pre-line">
+                    {selectedAuditHistory}
+                  </AlertDescription>
+                </Alert>
+              ) : null}
             </ConsolePanel>
 
             {selectedEntry.uiSchema ? (
@@ -1350,6 +1392,27 @@ function SummaryBlock({
       </div>
     </div>
   );
+}
+
+function formatAuditHistory(
+  records: readonly DaemonAuditRecord[],
+  droppedRecords: number,
+): string {
+  const lines = records.slice(0, 6).map((record) => {
+    const method = record.method ?? "unknown";
+    const outcome = record.succeeded
+      ? "ok"
+      : `failed:${record.error_code ?? record.errorCode ?? "unknown"}`;
+    const timestamp = record.timestamp ?? "unknown time";
+    return `${timestamp} ${method} ${outcome}`;
+  });
+  if (lines.length === 0)
+    lines.push("No daemon audit records for this extension target yet.");
+  if (droppedRecords > 0)
+    lines.push(
+      `${droppedRecords} audit record(s) were dropped by the bounded daemon log.`,
+    );
+  return lines.join("\n");
 }
 
 function deploymentStatus(value: unknown): string {

@@ -90,6 +90,7 @@ export const V2_METHODS = {
   extensionDaemonBundleEnable: "mcsl.extension.daemon.bundle.enable",
   extensionDaemonBundleDisable: "mcsl.extension.daemon.bundle.disable",
   extensionDaemonBundleRemove: "mcsl.extension.daemon.bundle.remove",
+  auditQuery: "mcsl.audit.query",
   discover: "rpc.discover",
 } as const;
 
@@ -164,6 +165,26 @@ export type DaemonExtensionBundleDeploymentResult = {
 export type DaemonShutdownResult = {
   status?: string;
   message?: string;
+};
+
+export type DaemonAuditRecord = {
+  timestamp?: string;
+  principal?: string;
+  plugin_id?: string | null;
+  pluginId?: string | null;
+  method?: string;
+  permission?: string;
+  target?: string | null;
+  succeeded?: boolean;
+  error_code?: string | null;
+  errorCode?: string | null;
+  detail?: string | null;
+};
+
+export type DaemonAuditQueryResult = {
+  records?: DaemonAuditRecord[];
+  dropped_records?: number;
+  droppedRecords?: number;
 };
 
 export type DaemonAddInstanceResult = {
