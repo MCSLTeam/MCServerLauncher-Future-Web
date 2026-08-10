@@ -15,6 +15,7 @@ import {
   type DaemonConsoleSession,
   type DaemonDownloadReadResult,
   type DaemonDownloadSession,
+  type DaemonExtensionBundleDeploymentResult,
   type DaemonInstanceConfig,
   type DaemonInstanceReport,
   type DaemonJavaListResult,
@@ -250,6 +251,30 @@ export class DaemonClient {
     return this.request<{ envelope?: unknown }>(V2_METHODS.extensionDispatch, {
       envelope,
     });
+  }
+
+  installExtensionDaemonBundle(params: {
+    pluginId: string;
+    sourcePath: string;
+    sha256: string;
+  }) {
+    return this.request<DaemonExtensionBundleDeploymentResult>(
+      V2_METHODS.extensionDaemonBundleInstall,
+      {
+        plugin_id: params.pluginId,
+        source_path: params.sourcePath,
+        sha256: params.sha256,
+      },
+      120_000,
+    );
+  }
+
+  removeExtensionDaemonBundle(pluginId: string) {
+    return this.request<DaemonExtensionBundleDeploymentResult>(
+      V2_METHODS.extensionDaemonBundleRemove,
+      { plugin_id: pluginId },
+      120_000,
+    );
   }
 
   ping() {

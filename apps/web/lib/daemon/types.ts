@@ -84,6 +84,8 @@ export const V2_METHODS = {
   subscribe: "mcsl.event.subscribe",
   unsubscribe: "mcsl.event.unsubscribe",
   extensionDispatch: "mcsl.extension.dispatch",
+  extensionDaemonBundleInstall: "mcsl.extension.daemon.bundle.install",
+  extensionDaemonBundleRemove: "mcsl.extension.daemon.bundle.remove",
   discover: "rpc.discover",
 } as const;
 
@@ -142,6 +144,17 @@ export type DaemonDownloadReadResult = {
   length?: number;
   is_final?: boolean;
   isFinal?: boolean;
+};
+
+export type DaemonExtensionBundleDeploymentResult = {
+  plugin_id?: string;
+  pluginId?: string;
+  status?: string;
+  restart_required?: boolean;
+  restartRequired?: boolean;
+  plugin_directory?: string;
+  pluginDirectory?: string;
+  message?: string;
 };
 
 export type DaemonAddInstanceResult = {

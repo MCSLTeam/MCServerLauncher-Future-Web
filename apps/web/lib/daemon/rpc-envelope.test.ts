@@ -20,6 +20,15 @@ test("V2 method catalog uses mcsl.* names", () => {
   assert.equal(V2_METHODS.uploadOpen, "mcsl.file.upload.open");
   assert.equal(V2_METHODS.downloadRead, "mcsl.file.download.read");
   assert.equal(V2_METHODS.subscribe, "mcsl.event.subscribe");
+  assert.equal(V2_METHODS.extensionDispatch, "mcsl.extension.dispatch");
+  assert.equal(
+    V2_METHODS.extensionDaemonBundleInstall,
+    "mcsl.extension.daemon.bundle.install",
+  );
+  assert.equal(
+    V2_METHODS.extensionDaemonBundleRemove,
+    "mcsl.extension.daemon.bundle.remove",
+  );
   assert.equal(V2_UPLOAD_ACK_METHOD, "mcsl.file.upload.ack");
 });
 
