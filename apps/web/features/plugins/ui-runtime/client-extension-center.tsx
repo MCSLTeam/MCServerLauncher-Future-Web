@@ -80,6 +80,12 @@ interface PendingExtensionInstall {
   readonly package: ValidatedMpxPackage;
 }
 
+interface DaemonRestartWatch {
+  readonly nodeId: string;
+  readonly extensionId: string;
+  readonly sawDisconnect: boolean;
+}
+
 export function ClientExtensionCenter() {
   const daemon = useDaemon();
   const managerRef = useRef<ClientExtensionManager | null>(null);
@@ -100,6 +106,9 @@ export function ClientExtensionCenter() {
   const [daemonDeploymentStatuses, setDaemonDeploymentStatuses] = useState<
     Readonly<Record<string, string>>
   >({});
+  const [restartWatch, setRestartWatch] = useState<DaemonRestartWatch | null>(
+    null,
+  );
 
   const connectedNodeId = useMemo(
     () =>
@@ -291,6 +300,30 @@ export function ClientExtensionCenter() {
       }
     };
   }, [connectedNodeId, daemon, entries]);
+
+  useEffect(() => {
+    if (!restartWatch) return;
+    const status = daemon.connections[restartWatch.nodeId]?.status ?? "offline";
+    if (!restartWatch.sawDisconnect && status !== "online") {
+      setRestartWatch({ ...restartWatch, sawDisconnect: true });
+      setMessage({
+        kind: "info",
+        title: "Daemon shutdown observed.",
+        details:
+          "Waiting for the same daemon node to come back online. Restart must be performed by its launcher or service manager.",
+      });
+      return;
+    }
+
+    if (restartWatch.sawDisconnect && status === "online") {
+      setMessage({
+        kind: "success",
+        title: "Daemon reconnected.",
+        details: `Node ${restartWatch.nodeId} is online again. Refresh deployment status before continuing extension work.`,
+      });
+      setRestartWatch(null);
+    }
+  }, [daemon.connections, restartWatch]);
 
   useEffect(() => {
     if (!selectedEntry?.deploymentPlan.daemon?.plugin) return;
@@ -646,8 +679,14 @@ export function ClientExtensionCenter() {
         kind: "success",
         title: "Daemon shutdown requested.",
         details:
-          requested.data.message ??
-          "Restart the daemon through its service manager or launcher.",
+          (requested.data.message ??
+            "Restart the daemon through its service manager or launcher.") +
+          " Waiting for disconnect and reconnect signals.",
+      });
+      setRestartWatch({
+        nodeId: connectedNodeId,
+        extensionId: selectedEntry.id,
+        sawDisconnect: false,
       });
     } catch (error) {
       setMessage({
@@ -906,6 +945,17 @@ export function ClientExtensionCenter() {
                   empty="No resource"
                 />
               </div>
+              {restartWatch?.extensionId === selectedEntry.id ? (
+                <Alert className="mt-3">
+                  <RefreshCw className="size-4" />
+                  <AlertTitle>Daemon restart lifecycle</AlertTitle>
+                  <AlertDescription>
+                    {restartWatch.sawDisconnect
+                      ? "Shutdown was observed. Waiting for this daemon node to reconnect."
+                      : "Shutdown request was accepted. Waiting for the daemon connection to close."}
+                  </AlertDescription>
+                </Alert>
+              ) : null}
               {selectedEntry.deploymentPlan.daemon?.plugin ? (
                 <Alert className="mt-3">
                   <TriangleAlert className="size-4" />
