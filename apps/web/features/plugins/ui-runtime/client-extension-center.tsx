@@ -1083,6 +1083,7 @@ function PendingInstallReview({
   const updateSummary = manifest.updates
     ? `${manifest.updates.channel ?? "stable"}/${manifest.updates.strategy ?? "manual"}`
     : "Manual local install";
+  const auditFindings = buildAuditFindings(review.package);
   return (
     <ConsolePanel>
       <ConsolePanelHeader
@@ -1177,9 +1178,100 @@ function PendingInstallReview({
             empty="No payload"
           />
         </div>
+        <div className="grid gap-2 text-sm md:grid-cols-2">
+          {auditFindings.map((finding) => (
+            <div key={finding.title} className="rounded-xl border p-3">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <span className="font-medium">{finding.title}</span>
+                <Badge
+                  variant={
+                    finding.level === "high"
+                      ? "destructive"
+                      : finding.level === "medium"
+                        ? "warning"
+                        : "success"
+                  }
+                >
+                  {finding.level}
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">{finding.details}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </ConsolePanel>
   );
+}
+
+type AuditFinding = {
+  readonly level: "low" | "medium" | "high";
+  readonly title: string;
+  readonly details: string;
+};
+
+function buildAuditFindings(pkg: ValidatedMpxPackage): readonly AuditFinding[] {
+  const manifest = pkg.manifest;
+  const host = manifest.permissions.host ?? [];
+  const extensionPoints = pkg.deploymentPlan.daemon?.extensionPoints ?? [];
+  const daemonPayload = pkg.deploymentPlan.daemon?.plugin;
+  const dependencies = pkg.dependencies;
+  return [
+    pkg.signature
+      ? {
+          level: "low",
+          title: "Signature",
+          details: `Trusted publisher ${pkg.signature.publisher}, key ${pkg.signature.keyId}.`,
+        }
+      : {
+          level: "medium",
+          title: "Signature",
+          details: "Unsigned package. Trust is based only on the local source.",
+        },
+    daemonPayload
+      ? {
+          level: "high",
+          title: "Daemon payload",
+          details: `${daemonPayload.path} can install startup-loaded C# plugin code and requires daemon restart lifecycle review.`,
+        }
+      : {
+          level: "low",
+          title: "Daemon payload",
+          details: "No daemon bundle is declared.",
+        },
+    {
+      level: host.some((capability) => capability.startsWith("daemon."))
+        ? "medium"
+        : "low",
+      title: "Host APIs",
+      details:
+        host.length === 0 ? "No host capability requested." : host.join(", "),
+    },
+    {
+      level: extensionPoints.some((point) => point.kind === "override")
+        ? "high"
+        : extensionPoints.some((point) => point.target === "daemon")
+          ? "medium"
+          : "low",
+      title: "Extension points",
+      details:
+        extensionPoints.length === 0
+          ? "No daemon extension point declared."
+          : extensionPoints
+              .map((point) => `${point.kind}:${point.id}`)
+              .join(", "),
+    },
+    {
+      level: dependencies.length === 0 ? "low" : "medium",
+      title: "Local dependencies",
+      details:
+        dependencies.length === 0
+          ? "No local extension dependency declared."
+          : dependencies
+              .map((dependency) => `${dependency.id} ${dependency.version}`)
+              .join(", "),
+    },
+  ];
 }
 
 function SummaryBlock({
