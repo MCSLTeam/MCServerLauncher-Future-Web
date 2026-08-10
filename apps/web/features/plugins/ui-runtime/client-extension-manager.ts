@@ -380,11 +380,12 @@ export class ClientExtensionManager {
       };
     }
 
-    if (!validatedPackage.deploymentPlan.scopes.includes("client")) {
+    if (!hasInstallableTarget(validatedPackage.deploymentPlan)) {
       return {
         ok: false,
-        code: "client_target_missing",
-        message: "Package has no client deployment target.",
+        code: "deployment_target_missing",
+        message:
+          "Package has no installable client or daemon deployment target.",
       };
     }
 
@@ -442,7 +443,13 @@ export class ClientExtensionManager {
   private async isRestorable(
     entry: ClientExtensionCacheEntry,
   ): Promise<boolean> {
-    if (!entry.deploymentPlan.scopes.includes("client")) return false;
+    if (!hasInstallableTarget(entry.deploymentPlan)) return false;
+    if (entry.deploymentPlan.daemon?.plugin !== undefined) {
+      const cachedDaemonPayload = entry.cachedPayloads?.some(
+        (payload) => payload.path === entry.deploymentPlan.daemon?.plugin?.path,
+      );
+      if (!cachedDaemonPayload) return false;
+    }
     if ((entry.cachedPayloads?.length ?? 0) === 0) return true;
     if (this.#payloadStore === undefined) return false;
 
@@ -460,11 +467,11 @@ function createClientExtensionEntry(
   validatedPackage: ValidatedMpxPackage,
   cachedPayloads: readonly ClientExtensionCachedPayload[],
 ): ClientExtensionInstallResult {
-  if (!validatedPackage.deploymentPlan.scopes.includes("client")) {
+  if (!hasInstallableTarget(validatedPackage.deploymentPlan)) {
     return {
       ok: false,
-      code: "client_target_missing",
-      message: "Package has no client deployment target.",
+      code: "deployment_target_missing",
+      message: "Package has no installable client or daemon deployment target.",
     };
   }
 
@@ -483,6 +490,13 @@ function createClientExtensionEntry(
       ...(cachedPayloads.length === 0 ? {} : { cachedPayloads }),
     },
   };
+}
+
+function hasInstallableTarget(deploymentPlan: MpxDeploymentPlan): boolean {
+  return (
+    deploymentPlan.scopes.includes("client") ||
+    deploymentPlan.daemon?.plugin !== undefined
+  );
 }
 
 function packagePayloadRefs(

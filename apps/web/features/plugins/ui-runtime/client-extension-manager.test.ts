@@ -57,10 +57,22 @@ test("client extension manager caches client theme packages without UI schema", 
   }
 });
 
-test("client extension manager rejects daemon-only packages", () => {
+test("client extension manager caches daemon-only packages without UI", () => {
   const manager = new ClientExtensionManager();
   const result = manager.install(
     makePackage({
+      manifest: {
+        ...makePackage().manifest,
+        runtime: { daemonApi: "[1.0.0,2.0.0)" },
+        targets: {
+          daemon: {
+            plugin: {
+              path: "daemon/plugin-bundle.zip",
+              sha256: "b".repeat(64),
+            },
+          },
+        },
+      },
       uiSchema: undefined,
       deploymentPlan: {
         scopes: ["daemon"],
@@ -75,8 +87,14 @@ test("client extension manager rejects daemon-only packages", () => {
     }),
   );
 
-  assert.equal(result.ok, false);
-  if (!result.ok) assert.equal(result.code, "client_target_missing");
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.equal(result.entry.uiSchema, undefined);
+    assert.equal(
+      result.entry.deploymentPlan.daemon?.plugin?.path,
+      "daemon/plugin-bundle.zip",
+    );
+  }
 });
 
 test("client extension manager persists and restores client cache entries", async () => {
@@ -163,7 +181,7 @@ test("client extension manager persists payload bytes and rejects tampered resto
   assert.equal(tampered.get("community.example.payload"), undefined);
 });
 
-test("client extension manager skips non-client entries restored from a store", async () => {
+test("client extension manager skips daemon entries restored without cached bundle", async () => {
   const store = new MemoryClientExtensionCacheStore();
   await store.writeEntry({
     id: "community.example.daemon-only",
