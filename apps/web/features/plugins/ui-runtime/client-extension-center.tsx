@@ -377,7 +377,7 @@ export function ClientExtensionCenter() {
     let cancelled = false;
     void daemon
       .runWithClient(connectedNodeId, (client) =>
-        client.queryAudit({ maximumRecords: 6, target: selectedExtensionId }),
+        client.queryAudit({ maximumRecords: 12, target: selectedExtensionId }),
       )
       .then((result) => {
         if (cancelled) return;
@@ -1297,6 +1297,8 @@ function buildAuditFindings(pkg: ValidatedMpxPackage): readonly AuditFinding[] {
   const extensionPoints = pkg.deploymentPlan.daemon?.extensionPoints ?? [];
   const daemonPayload = pkg.deploymentPlan.daemon?.plugin;
   const dependencies = pkg.dependencies;
+  const eventPermissions = manifest.permissions.events ?? [];
+  const commands = manifest.commands ?? [];
   return [
     pkg.signature
       ? {
@@ -1329,6 +1331,14 @@ function buildAuditFindings(pkg: ValidatedMpxPackage): readonly AuditFinding[] {
         host.length === 0 ? "No host capability requested." : host.join(", "),
     },
     {
+      level: eventPermissions.length === 0 ? "low" : "medium",
+      title: "Event permissions",
+      details:
+        eventPermissions.length === 0
+          ? "No daemon event subscription declared."
+          : eventPermissions.join(", "),
+    },
+    {
       level: extensionPoints.some((point) => point.kind === "override")
         ? "high"
         : extensionPoints.some((point) => point.target === "daemon")
@@ -1341,6 +1351,14 @@ function buildAuditFindings(pkg: ValidatedMpxPackage): readonly AuditFinding[] {
           : extensionPoints
               .map((point) => `${point.kind}:${point.id}`)
               .join(", "),
+    },
+    {
+      level: commands.length === 0 ? "low" : "medium",
+      title: "Daemon commands",
+      details:
+        commands.length === 0
+          ? "No daemon command binding declared."
+          : commands.map((command) => command.id).join(", "),
     },
     {
       level: dependencies.length === 0 ? "low" : "medium",
@@ -1412,21 +1430,42 @@ function formatAuditHistory(
   records: readonly DaemonAuditRecord[],
   droppedRecords: number,
 ): string {
-  const lines = records.slice(0, 6).map((record) => {
-    const method = record.method ?? "unknown";
-    const outcome = record.succeeded
-      ? "ok"
-      : `failed:${record.error_code ?? record.errorCode ?? "unknown"}`;
-    const timestamp = record.timestamp ?? "unknown time";
-    return `${timestamp} ${method} ${outcome}`;
-  });
-  if (lines.length === 0)
+  const failures = records.filter((record) => !record.succeeded).slice(0, 4);
+  const successes = records.filter((record) => record.succeeded).slice(0, 4);
+  const methods = [
+    ...new Set(records.map((record) => record.method ?? "unknown")),
+  ]
+    .slice(0, 6)
+    .join(", ");
+  const lines = [`Audit methods: ${methods || "none"}`];
+  if (records.length === 0) {
     lines.push("No daemon audit records for this extension target yet.");
+  } else {
+    lines.push(
+      "Recent failures:",
+      ...(failures.length === 0
+        ? ["- none"]
+        : failures.map((record) => `- ${formatAuditRecord(record)}`)),
+      "Recent successes:",
+      ...(successes.length === 0
+        ? ["- none"]
+        : successes.map((record) => `- ${formatAuditRecord(record)}`)),
+    );
+  }
   if (droppedRecords > 0)
     lines.push(
       `${droppedRecords} audit record(s) were dropped by the bounded daemon log.`,
     );
   return lines.join("\n");
+}
+
+function formatAuditRecord(record: DaemonAuditRecord): string {
+  const method = record.method ?? "unknown";
+  const outcome = record.succeeded
+    ? "ok"
+    : `failed:${record.error_code ?? record.errorCode ?? "unknown"}`;
+  const timestamp = record.timestamp ?? "unknown time";
+  return `${timestamp} ${method} ${outcome}`;
 }
 
 function deploymentStatus(value: unknown): string {
