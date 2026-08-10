@@ -1126,7 +1126,7 @@ function PendingInstallReview({
     manifest.extensionPoints ??
     [];
   const signatureSummary = review.package.signature
-    ? `Trusted publisher ${review.package.signature.publisher} (${review.package.signature.keyId})`
+    ? formatSignatureTrust(review.package.signature)
     : "Unsigned local package";
   const dependencies = manifest.dependencies?.extensions ?? [];
   const updateSummary = manifest.updates
@@ -1162,7 +1162,7 @@ function PendingInstallReview({
           <AlertTitle>Local package audit</AlertTitle>
           <AlertDescription>
             {review.package.signature
-              ? `Signature verified for ${review.package.signature.publisher} with key ${review.package.signature.keyId}.`
+              ? `Signature verified: ${formatSignatureTrust(review.package.signature)}.`
               : "This package is unsigned; install only if the source is trusted."}{" "}
             {daemonPlan?.plugin
               ? "It also carries a daemon payload, so daemon deployment and restart status must be handled separately."
@@ -1302,7 +1302,7 @@ function buildAuditFindings(pkg: ValidatedMpxPackage): readonly AuditFinding[] {
       ? {
           level: "low",
           title: "Signature",
-          details: `Trusted publisher ${pkg.signature.publisher}, key ${pkg.signature.keyId}.`,
+          details: `Trusted publisher ${formatSignatureTrust(pkg.signature)}.`,
         }
       : {
           level: "medium",
@@ -1392,6 +1392,20 @@ function SummaryBlock({
       </div>
     </div>
   );
+}
+
+function formatSignatureTrust(signature: {
+  readonly publisher: string;
+  readonly keyId: string;
+  readonly publicKeySha256: string;
+  readonly signedAt?: string;
+}): string {
+  const fingerprint = `${signature.publicKeySha256.slice(0, 12)}...${signature.publicKeySha256.slice(-8)}`;
+  const signedAt =
+    signature.signedAt === undefined
+      ? "unknown signing time"
+      : signature.signedAt;
+  return `${signature.publisher} / ${signature.keyId} / ${fingerprint} / ${signedAt}`;
 }
 
 function formatAuditHistory(
