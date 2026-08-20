@@ -8,6 +8,10 @@ use mcsl_resource_provider::{
 use serde::Serialize;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri_plugin_autostart::ManagerExt;
+
+const UPDATE_RELEASE_API: &str =
+    "https://api.github.com/repos/MCSLTeam/MCServerLauncher-Future/releases/latest";
 
 #[derive(serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -45,6 +49,95 @@ async fn resource_provider(request: ProviderRequest) -> Result<serde_json::Value
     fetch_json(&request)
         .await
         .map_err(|error| error.code().to_owned())
+}
+
+/// 对齐 WPF More_AutoCheckUpdateForLauncher / CheckUpdate：查 GitHub 最新发布。
+/// 无发布或请求失败时返回 None（前端不视为错误）。
+#[derive(Serialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+struct CheckUpdateResult {
+    latest_version: String,
+    release_url: String,
+}
+
+#[tauri::command]
+async fn check_update() -> Result<Option<CheckUpdateResult>, String> {
+    let client = reqwest::Client::builder()
+        .user_agent("MCServerLauncher-Future-Tauri/0.1")
+        .build()
+        .map_err(|e| e.to_string())?;
+    let response = client
+        .get(UPDATE_RELEASE_API)
+        .header("Accept", "application/vnd.github+json")
+        .send()
+        .await
+        .map_err(|_| "update-check-failed".to_string())?;
+    if !response.status().is_success() {
+        return Ok(None);
+    }
+    let body: serde_json::Value = serde_json::from_slice(
+        &response.bytes().await.map_err(|_| "update-check-invalid".to_string())?,
+    )
+    .map_err(|_| "update-check-invalid".to_string())?;
+    let latest_version = body
+        .get("tag_name")
+        .and_then(|v| v.as_str())
+        .unwrap_or("")
+        .to_string();
+    let release_url = body
+        .get("html_url")
+        .and_then(|v| v.as_str())
+        .unwrap_or("")
+        .to_string();
+    if latest_version.is_empty() && release_url.is_empty() {
+        return Ok(None);
+    }
+    Ok(Some(CheckUpdateResult {
+        latest_version,
+        release_url,
+    }))
+}
+
+/// 用系统默认浏览器打开 URL（检查更新后的下载页）。仅允许 http/https。
+#[tauri::command]
+fn open_external(url: String) -> Result<(), String> {
+    let trimmed = url.trim();
+    if !(trimmed.starts_with("https://") || trimmed.starts_with("http://")) {
+        return Err("invalid-external-url".to_string());
+    }
+    #[cfg(target_os = "windows")]
+    {
+        let _ = std::process::Command::new("cmd")
+            .args(["/C", "start", "", trimmed])
+            .spawn();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let _ = std::process::Command::new("open").arg(trimmed).spawn();
+    }
+    #[cfg(target_os = "linux")]
+    {
+        let _ = std::process::Command::new("xdg-open").arg(trimmed).spawn();
+    }
+    Ok(())
+}
+
+/// 对齐 WPF More_FollowStartupForLauncher：开机自启当前状态。
+#[tauri::command]
+fn autostart_enabled(app: AppHandle) -> Result<bool, String> {
+    app.autolaunch().is_enabled().map_err(|e| e.to_string())
+}
+
+/// 对齐 WPF More_FollowStartupForLauncher：开关开机自启。
+#[tauri::command]
+fn set_autostart(app: AppHandle, enabled: bool) -> Result<bool, String> {
+    let manager = app.autolaunch();
+    if enabled {
+        manager.enable().map_err(|e| e.to_string())?;
+    } else {
+        manager.disable().map_err(|e| e.to_string())?;
+    }
+    manager.is_enabled().map_err(|e| e.to_string())
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -293,6 +386,10 @@ async fn open_file_editor(
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_autostart::init(
+            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+            None,
+        ))
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_os::init())
@@ -310,7 +407,11 @@ pub fn run() {
             resource_download,
             resource_download_bytes,
             open_instance_console,
-            open_file_editor
+            open_file_editor,
+            check_update,
+            autostart_enabled,
+            set_autostart,
+            open_external
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

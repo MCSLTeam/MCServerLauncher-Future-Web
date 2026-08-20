@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Reveal } from "@/components/motion/reveal";
 import {
@@ -25,6 +25,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLocale, useT } from "@/features/i18n/locale-provider";
 import { type ThemeMode, useTheme } from "@/features/theme/theme-provider";
 import type { LocalePreference } from "@/lib/i18n/types";
+import {
+  checkForUpdate,
+  loadDesktopSettings,
+  openExternalUrl,
+  readAutostartState,
+  saveDesktopSettings,
+  writeAutostartState,
+  type DeleteConfirmMethod,
+  type DesktopSettings,
+  type DoubleClickAction,
+  type UpdateCheckResult,
+} from "@/lib/desktop-settings";
+import { useIsTauriRuntime } from "@/lib/tauri-runtime";
 import {
   RESOURCE_PROVIDERS,
   type ResourceProviderId,
@@ -66,6 +79,22 @@ export default function SettingsPage() {
     createDraft(mode),
   );
   const [saved, setSaved] = useState(false);
+  const isTauri = useIsTauriRuntime();
+  const [desktop, setDesktop] = useState(() => loadDesktopSettings());
+  const [autostart, setAutostart] = useState<boolean | null>(null);
+  const [updateResult, setUpdateResult] = useState<UpdateCheckResult | null>(
+    null,
+  );
+  const [checkingUpdate, setCheckingUpdate] = useState(false);
+
+  useEffect(() => {
+    void readAutostartState().then((state) => setAutostart(state));
+    if (desktop.checkUpdatesOnLaunch) {
+      void checkForUpdate().then((result) => setUpdateResult(result));
+    }
+    // 仅挂载一次读取桌面运行时状态。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 主题以 ThemeProvider 为准，渲染时合成草稿
   const draft: AppSettings = { ...settings, theme: mode };
@@ -94,6 +123,31 @@ export default function SettingsPage() {
     saveSettings(next);
     setSettings(next);
     setSaved(true);
+  }
+
+  function updateDesktop<K extends keyof DesktopSettings>(
+    key: K,
+    value: DesktopSettings[K],
+  ) {
+    setDesktop((prev) => {
+      const next = { ...prev, [key]: value };
+      saveDesktopSettings(next);
+      return next;
+    });
+  }
+
+  async function toggleAutostart(enabled: boolean) {
+    const current = await writeAutostartState(enabled);
+    setAutostart(current);
+  }
+
+  async function runCheckUpdate() {
+    setCheckingUpdate(true);
+    try {
+      setUpdateResult(await checkForUpdate());
+    } finally {
+      setCheckingUpdate(false);
+    }
   }
 
   return (
@@ -211,6 +265,71 @@ export default function SettingsPage() {
                 </div>
               </Field>
             </ConsolePanel>
+
+            <ConsolePanel>
+              <ConsolePanelHeader title={t("shared.settings.desktop.title")} />
+              <div className="space-y-1">
+                <ToggleField
+                  id="autostart"
+                  checked={autostart === true}
+                  disabled={!isTauri || autostart === null}
+                  onChange={(v) => void toggleAutostart(v)}
+                  label={t("shared.settings.desktop.follow-startup.label")}
+                  description={t("shared.settings.desktop.follow-startup.desc")}
+                />
+                <ToggleField
+                  id="check-launch"
+                  checked={desktop.checkUpdatesOnLaunch}
+                  onChange={(v) => updateDesktop("checkUpdatesOnLaunch", v)}
+                  label={t(
+                    "shared.settings.desktop.check-updates-on-launch.label",
+                  )}
+                  description={t(
+                    "shared.settings.desktop.check-updates-on-launch.desc",
+                  )}
+                />
+              </div>
+
+              {isTauri ? (
+                <div className="mt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={checkingUpdate}
+                    onClick={() => void runCheckUpdate()}
+                  >
+                    {checkingUpdate
+                      ? t("shared.settings.desktop.up-to-date", {
+                          version: "…",
+                        })
+                      : t("shared.settings.desktop.check-now")}
+                  </Button>
+                  {updateResult?.releaseUrl ? (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {t("shared.settings.desktop.update-found", {
+                        latest: updateResult.latestVersion,
+                      })}{" "}
+                      <Button
+                        type="button"
+                        variant="link"
+                        size="sm"
+                        className="h-auto p-0"
+                        onClick={() =>
+                          void openExternalUrl(updateResult.releaseUrl)
+                        }
+                      >
+                        {t("shared.settings.desktop.check-now")}
+                      </Button>
+                    </p>
+                  ) : (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {t("shared.settings.desktop.unavailable")}
+                    </p>
+                  )}
+                </div>
+              ) : null}
+            </ConsolePanel>
           </TabsContent>
 
           <TabsContent value="instance" className="space-y-4">
@@ -229,6 +348,70 @@ export default function SettingsPage() {
                   "shared.settings.instance-management.use-terminal-input.desc",
                 )}
               />
+            </ConsolePanel>
+
+            <ConsolePanel>
+              <ConsolePanelHeader
+                title={t("shared.settings.action-on-double-click.title")}
+                description={t("shared.settings.action-on-double-click.desc")}
+              />
+              <Select
+                value={desktop.actionOnDoubleClick}
+                onValueChange={(value) =>
+                  updateDesktop(
+                    "actionOnDoubleClick",
+                    value as DoubleClickAction,
+                  )
+                }
+              >
+                <SelectTrigger className="w-full max-w-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(
+                    [
+                      "none",
+                      "console",
+                      "settings",
+                      "start",
+                      "stop",
+                      "restart",
+                      "kill",
+                    ] as const
+                  ).map((value) => (
+                    <SelectItem key={value} value={value}>
+                      {t(`shared.settings.action-on-double-click.${value}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </ConsolePanel>
+
+            <ConsolePanel>
+              <ConsolePanelHeader
+                title={t("shared.settings.delete-confirm.title")}
+                description={t("shared.settings.delete-confirm.desc")}
+              />
+              <Select
+                value={desktop.deleteConfirmMethod}
+                onValueChange={(value) =>
+                  updateDesktop(
+                    "deleteConfirmMethod",
+                    value as DeleteConfirmMethod,
+                  )
+                }
+              >
+                <SelectTrigger className="w-full max-w-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(["confirm", "type-name"] as const).map((value) => (
+                    <SelectItem key={value} value={value}>
+                      {t(`shared.settings.delete-confirm.${value}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </ConsolePanel>
 
             <ConsolePanel>
@@ -500,18 +683,21 @@ function ToggleField({
   onChange,
   label,
   description,
+  disabled = false,
 }: {
   id: string;
   checked: boolean;
   onChange: (value: boolean) => void;
   label: string;
   description?: string;
+  disabled?: boolean;
 }) {
   return (
     <div className="flex items-start gap-3 py-1">
       <Checkbox
         id={id}
         checked={checked}
+        disabled={disabled}
         className="mt-0.5"
         onCheckedChange={(value) => onChange(value === true)}
       />

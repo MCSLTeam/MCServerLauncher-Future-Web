@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Eye,
   MoreHorizontal,
@@ -51,6 +51,7 @@ import {
   type RefreshIntervalSeconds,
 } from "@/lib/daemon/system-info";
 import { formatInstanceTypeLabel } from "@/features/console/event-types";
+import { loadDesktopSettings } from "@/lib/desktop-settings";
 import type { DaemonLiveInstance } from "@/lib/daemon/types";
 import { listNodes, nodeAddress } from "@/lib/nodes-store";
 import type { SavedNode } from "@/lib/types";
@@ -114,7 +115,7 @@ function statusColor(status: string) {
 
 export default function InstancesPage() {
   const t = useT();
-  const { confirm, toast } = useFeedback();
+  const { confirm, prompt, toast } = useFeedback();
   const isTauri = useIsTauriRuntime();
   const {
     instances,
@@ -203,12 +204,25 @@ export default function InstancesPage() {
       kill: t("shared.instances.confirm.kill", { name: item.name }),
       remove: t("shared.instances.confirm.remove", { name: item.name }),
     };
-    const ok = await confirm({
-      description: confirmations[action],
-      destructive: action === "kill" || action === "remove",
-      confirmLabel: t("ui.common.confirm"),
-      cancelLabel: t("ui.common.cancel"),
-    });
+    const needTypedName =
+      action === "remove" &&
+      loadDesktopSettings().deleteConfirmMethod === "type-name";
+    let ok: boolean;
+    if (needTypedName) {
+      const typed = await prompt({
+        title: t("shared.instances.confirm.remove", { name: item.name }),
+        description: t("shared.instances.delete.type-name-tip"),
+        placeholder: item.name,
+      });
+      ok = typed?.trim() === item.name;
+    } else {
+      ok = await confirm({
+        description: confirmations[action],
+        destructive: action === "kill" || action === "remove",
+        confirmLabel: t("ui.common.confirm"),
+        cancelLabel: t("ui.common.cancel"),
+      });
+    }
     if (!ok) return;
     setBusy(`${item.nodeId}:${item.id}:${action}`);
     const result =
@@ -224,6 +238,53 @@ export default function InstancesPage() {
     setBusy(null);
     if (!result.ok) {
       toast.error(result.message ?? t("shared.instances.action.failed"));
+    }
+  }
+
+  const openConsole = useCallback(
+    (item: DaemonLiveInstance) => {
+      void (async () => {
+        if (isTauri) {
+          try {
+            const result = await openInstanceConsole({
+              instanceId: item.id,
+              nodeId: item.nodeId,
+              title: buildInstanceConsoleWindowTitle(
+                t,
+                item.name,
+                item.nodeName || selectedNode?.name || item.nodeId,
+              ),
+            });
+            if (result.openedAsWindow) return;
+          } catch {
+            // fall through to in-app route
+          }
+        }
+        window.location.assign(instanceDetailPath(item.id, item.nodeId));
+      })();
+    },
+    [isTauri, selectedNode, t],
+  );
+
+  /** 对齐 WPF Instance_ActionOnDoubleClick：双击卡片执行预置动作。 */
+  function handleInstanceDoubleClick(item: DaemonLiveInstance) {
+    const action = loadDesktopSettings().actionOnDoubleClick;
+    switch (action) {
+      case "console":
+        openConsole(item);
+        break;
+      case "settings":
+        window.location.assign(instanceDetailPath(item.id, item.nodeId));
+        break;
+      case "start":
+      case "stop":
+      case "restart":
+      case "kill":
+        void runAction(item, action);
+        break;
+      case "none":
+      default:
+        break;
     }
   }
 
@@ -477,6 +538,7 @@ export default function InstancesPage() {
                       "flex h-[13.75rem] min-w-[min(100%,22.5rem)] flex-1 basis-[22.5rem] flex-col rounded-xl border bg-card shadow-sm",
                       selected && "border-primary/60 ring-1 ring-primary/40",
                     )}
+                    onDoubleClick={() => handleInstanceDoubleClick(item)}
                   >
                     <div className="flex items-center gap-2.5 px-5 pt-3.5">
                       <Checkbox
@@ -528,32 +590,7 @@ export default function InstancesPage() {
                       <Button
                         size="sm"
                         type="button"
-                        onClick={() => {
-                          void (async () => {
-                            if (isTauri) {
-                              try {
-                                const result = await openInstanceConsole({
-                                  instanceId: item.id,
-                                  nodeId: item.nodeId,
-                                  title: buildInstanceConsoleWindowTitle(
-                                    t,
-                                    item.name,
-                                    item.nodeName ||
-                                      selectedNode?.name ||
-                                      item.nodeId,
-                                  ),
-                                });
-                                if (result.openedAsWindow) return;
-                              } catch {
-                                // fall through to in-app route
-                              }
-                            }
-                            window.location.href = instanceDetailPath(
-                              item.id,
-                              item.nodeId,
-                            );
-                          })();
-                        }}
+                        onClick={() => openConsole(item)}
                       >
                         <Eye className="size-4" />
                         {t("shared.instances.open")}

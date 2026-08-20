@@ -69,6 +69,7 @@ import {
   type NodeVisibilityMode,
 } from "@/lib/nodes-store";
 import { canManageNodes } from "@/lib/permission";
+import { loadDesktopSettings } from "@/lib/desktop-settings";
 import { useIsTauriRuntime } from "@/lib/tauri-runtime";
 import type { NodeStatus, SavedNode } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -189,7 +190,7 @@ function ResourceRow({
 
 export default function NodesPage() {
   const t = useT();
-  const { confirm, toast } = useFeedback();
+  const { confirm, prompt, toast } = useFeedback();
   const {
     connections,
     getStatus,
@@ -488,15 +489,30 @@ export default function NodesPage() {
   }
 
   function requestDelete(id: string, name: string) {
-    setDeleteTarget({
-      id,
-      name: name.trim() || t("shared.nodes.title"),
-    });
+    const display = name.trim() || t("shared.nodes.title");
+    // 对齐 WPF ActionWhenDeleteConfirm_TypeName：输入名称确认（跳过弹窗）。
+    if (loadDesktopSettings().deleteConfirmMethod === "type-name") {
+      void (async () => {
+        const typed = await prompt({
+          title: t("ui.common.delete"),
+          description: t("shared.nodes.delete.type-name-tip"),
+          placeholder: display,
+        });
+        if (typed?.trim() !== display) return;
+        await doDeleteNode(id, display);
+      })();
+      return;
+    }
+    setDeleteTarget({ id, name: display });
   }
 
   async function confirmDelete() {
     if (!deleteTarget) return;
     const { id, name } = deleteTarget;
+    await doDeleteNode(id, name);
+  }
+
+  async function doDeleteNode(id: string, name: string) {
     try {
       disconnectNode(id, { purge: true });
       const ok = await removeNode(id);
