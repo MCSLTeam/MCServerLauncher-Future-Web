@@ -29,6 +29,20 @@ pub struct UserPreferences {
     pub daemon_auto_refresh_enabled: bool,
     #[serde(default = "default_refresh_seconds")]
     pub daemon_auto_refresh_seconds: u32,
+    #[serde(default = "default_true")]
+    pub auto_accept_mc_java_eula: bool,
+    #[serde(default = "default_true")]
+    pub auto_disable_mc_java_online_mode: bool,
+    #[serde(default = "default_true")]
+    pub auto_disable_mc_bedrock_online_mode: bool,
+    #[serde(default = "default_true")]
+    pub use_mirror_for_forge_install: bool,
+    #[serde(default = "default_true")]
+    pub use_mirror_for_fabric_install: bool,
+    #[serde(default = "default_true")]
+    pub use_mirror_for_neoforge_install: bool,
+    #[serde(default = "default_true")]
+    pub use_mirror_for_quilt_install: bool,
 }
 
 fn default_true() -> bool {
@@ -62,6 +76,13 @@ impl Default for UserPreferences {
             locale: None,
             daemon_auto_refresh_enabled: false,
             daemon_auto_refresh_seconds: default_refresh_seconds(),
+            auto_accept_mc_java_eula: true,
+            auto_disable_mc_java_online_mode: true,
+            auto_disable_mc_bedrock_online_mode: true,
+            use_mirror_for_forge_install: true,
+            use_mirror_for_fabric_install: true,
+            use_mirror_for_neoforge_install: true,
+            use_mirror_for_quilt_install: true,
         }
     }
 }

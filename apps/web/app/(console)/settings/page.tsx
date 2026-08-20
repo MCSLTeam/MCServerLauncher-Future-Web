@@ -46,6 +46,13 @@ function createDraft(theme: ThemeMode): AppSettings {
       downloadSource: "FastMirror",
       downloadThreads: 16,
       downloadErrorAction: "stop",
+      autoAcceptMcJavaEula: true,
+      autoDisableMcJavaOnlineMode: true,
+      autoDisableMcBedrockOnlineMode: true,
+      useMirrorForForge: true,
+      useMirrorForFabric: true,
+      useMirrorForNeoForge: true,
+      useMirrorForQuilt: true,
     };
   }
   return { ...loadSettings(), theme };
@@ -206,29 +213,106 @@ export default function SettingsPage() {
             </ConsolePanel>
           </TabsContent>
 
-          <TabsContent value="instance">
+          <TabsContent value="instance" className="space-y-4">
             <ConsolePanel>
-              <Field orientation="horizontal" className="items-start">
-                <Checkbox
-                  id="term"
-                  checked={draft.useTerminalInput}
-                  onCheckedChange={(v) =>
-                    update("useTerminalInput", v === true)
-                  }
+              <ConsolePanelHeader
+                title={t("shared.settings.instance-management.title")}
+              />
+              <ToggleField
+                id="term"
+                checked={draft.useTerminalInput}
+                onChange={(v) => update("useTerminalInput", v)}
+                label={t(
+                  "shared.settings.instance-management.use-terminal-input.label",
+                )}
+                description={t(
+                  "shared.settings.instance-management.use-terminal-input.desc",
+                )}
+              />
+            </ConsolePanel>
+
+            <ConsolePanel>
+              <ConsolePanelHeader
+                title={t("shared.settings.instance-creation.title")}
+              />
+              <div className="space-y-1">
+                <ToggleField
+                  id="eula"
+                  checked={draft.autoAcceptMcJavaEula}
+                  onChange={(v) => update("autoAcceptMcJavaEula", v)}
+                  label={t(
+                    "shared.settings.instance-creation.auto-accept-eula.label",
+                  )}
+                  description={t(
+                    "shared.settings.instance-creation.auto-accept-eula.desc",
+                  )}
                 />
-                <div className="space-y-1">
-                  <FieldLabel htmlFor="term" className="font-medium">
-                    {t(
-                      "shared.settings.instance-management.use-terminal-input.label",
-                    )}
-                  </FieldLabel>
-                  <FieldDescription>
-                    {t(
-                      "shared.settings.instance-management.use-terminal-input.desc",
-                    )}
-                  </FieldDescription>
-                </div>
-              </Field>
+                <ToggleField
+                  id="java-online"
+                  checked={draft.autoDisableMcJavaOnlineMode}
+                  onChange={(v) => update("autoDisableMcJavaOnlineMode", v)}
+                  label={t(
+                    "shared.settings.instance-creation.auto-disable-java-online.label",
+                  )}
+                  description={t(
+                    "shared.settings.instance-creation.auto-disable-java-online.desc",
+                  )}
+                />
+                <ToggleField
+                  id="be-online"
+                  checked={draft.autoDisableMcBedrockOnlineMode}
+                  onChange={(v) => update("autoDisableMcBedrockOnlineMode", v)}
+                  label={t(
+                    "shared.settings.instance-creation.auto-disable-bedrock-online.label",
+                  )}
+                  description={t(
+                    "shared.settings.instance-creation.auto-disable-bedrock-online.desc",
+                  )}
+                />
+              </div>
+            </ConsolePanel>
+
+            <ConsolePanel>
+              <ConsolePanelHeader
+                title={t("shared.settings.instance-creation.use-mirror.label")}
+                description={t(
+                  "shared.settings.instance-creation.use-mirror.desc",
+                )}
+              />
+              <div className="space-y-1">
+                <ToggleField
+                  id="mirror-forge"
+                  checked={draft.useMirrorForForge}
+                  onChange={(v) => update("useMirrorForForge", v)}
+                  label={t(
+                    "shared.settings.instance-creation.use-mirror-forge.label",
+                  )}
+                />
+                <ToggleField
+                  id="mirror-fabric"
+                  checked={draft.useMirrorForFabric}
+                  onChange={(v) => update("useMirrorForFabric", v)}
+                  label={t(
+                    "shared.settings.instance-creation.use-mirror-fabric.label",
+                  )}
+                />
+                <ToggleField
+                  id="mirror-neoforge"
+                  checked={draft.useMirrorForNeoForge}
+                  onChange={(v) => update("useMirrorForNeoForge", v)}
+                  label={t(
+                    "shared.settings.instance-creation.use-mirror-neoforge.label",
+                  )}
+                />
+                <ToggleField
+                  id="mirror-quilt"
+                  checked={draft.useMirrorForQuilt}
+                  onChange={(v) => update("useMirrorForQuilt", v)}
+                  label={t(
+                    "shared.settings.instance-creation.use-mirror-quilt.label",
+                  )}
+                />
+              </div>
             </ConsolePanel>
           </TabsContent>
 
@@ -407,5 +491,38 @@ export default function SettingsPage() {
         </Tabs>
       </Reveal>
     </ConsolePage>
+  );
+}
+
+function ToggleField({
+  id,
+  checked,
+  onChange,
+  label,
+  description,
+}: {
+  id: string;
+  checked: boolean;
+  onChange: (value: boolean) => void;
+  label: string;
+  description?: string;
+}) {
+  return (
+    <div className="flex items-start gap-3 py-1">
+      <Checkbox
+        id={id}
+        checked={checked}
+        className="mt-0.5"
+        onCheckedChange={(value) => onChange(value === true)}
+      />
+      <div className="space-y-1">
+        <FieldLabel htmlFor={id} className="font-medium">
+          {label}
+        </FieldLabel>
+        {description ? (
+          <FieldDescription>{description}</FieldDescription>
+        ) : null}
+      </div>
+    </div>
   );
 }

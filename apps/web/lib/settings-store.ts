@@ -22,6 +22,16 @@ export type AppSettings = {
   downloadThreads: number;
   /** WPF Download.ActionWhenDownloadError */
   downloadErrorAction: "stop" | "retry1" | "retry3";
+  /** WPF 创建实例：自动同意 EULA */
+  autoAcceptMcJavaEula: boolean;
+  /** WPF 创建实例：自动禁用正版验证 */
+  autoDisableMcJavaOnlineMode: boolean;
+  autoDisableMcBedrockOnlineMode: boolean;
+  /** WPF 创建实例：加载器镜像开关 */
+  useMirrorForForge: boolean;
+  useMirrorForFabric: boolean;
+  useMirrorForNeoForge: boolean;
+  useMirrorForQuilt: boolean;
 };
 
 const LEGACY_KEY = "mcsl-web-settings";
@@ -34,6 +44,13 @@ const DEFAULTS: AppSettings = {
   downloadSource: "FastMirror",
   downloadThreads: 16,
   downloadErrorAction: "stop",
+  autoAcceptMcJavaEula: true,
+  autoDisableMcJavaOnlineMode: true,
+  autoDisableMcBedrockOnlineMode: true,
+  useMirrorForForge: true,
+  useMirrorForFabric: true,
+  useMirrorForNeoForge: true,
+  useMirrorForQuilt: true,
 };
 
 type ApiPreferences = {
@@ -46,6 +63,13 @@ type ApiPreferences = {
   locale?: string | null;
   daemon_auto_refresh_enabled?: boolean;
   daemon_auto_refresh_seconds?: number;
+  auto_accept_mc_java_eula?: boolean;
+  auto_disable_mc_java_online_mode?: boolean;
+  auto_disable_mc_bedrock_online_mode?: boolean;
+  use_mirror_for_forge_install?: boolean;
+  use_mirror_for_fabric_install?: boolean;
+  use_mirror_for_neoforge_install?: boolean;
+  use_mirror_for_quilt_install?: boolean;
 };
 
 let memory: AppSettings | null = null;
@@ -69,6 +93,22 @@ function mapPrefs(p: ApiPreferences): AppSettings {
     downloadErrorAction:
       (p.download_error_action as AppSettings["downloadErrorAction"]) ??
       DEFAULTS.downloadErrorAction,
+    autoAcceptMcJavaEula:
+      p.auto_accept_mc_java_eula ?? DEFAULTS.autoAcceptMcJavaEula,
+    autoDisableMcJavaOnlineMode:
+      p.auto_disable_mc_java_online_mode ??
+      DEFAULTS.autoDisableMcJavaOnlineMode,
+    autoDisableMcBedrockOnlineMode:
+      p.auto_disable_mc_bedrock_online_mode ??
+      DEFAULTS.autoDisableMcBedrockOnlineMode,
+    useMirrorForForge:
+      p.use_mirror_for_forge_install ?? DEFAULTS.useMirrorForForge,
+    useMirrorForFabric:
+      p.use_mirror_for_fabric_install ?? DEFAULTS.useMirrorForFabric,
+    useMirrorForNeoForge:
+      p.use_mirror_for_neoforge_install ?? DEFAULTS.useMirrorForNeoForge,
+    useMirrorForQuilt:
+      p.use_mirror_for_quilt_install ?? DEFAULTS.useMirrorForQuilt,
   };
 }
 
@@ -80,6 +120,14 @@ function toApiBody(settings: AppSettings): ApiPreferences {
     download_source: settings.downloadSource,
     download_threads: settings.downloadThreads,
     download_error_action: settings.downloadErrorAction,
+    auto_accept_mc_java_eula: settings.autoAcceptMcJavaEula,
+    auto_disable_mc_java_online_mode: settings.autoDisableMcJavaOnlineMode,
+    auto_disable_mc_bedrock_online_mode:
+      settings.autoDisableMcBedrockOnlineMode,
+    use_mirror_for_forge_install: settings.useMirrorForForge,
+    use_mirror_for_fabric_install: settings.useMirrorForFabric,
+    use_mirror_for_neoforge_install: settings.useMirrorForNeoForge,
+    use_mirror_for_quilt_install: settings.useMirrorForQuilt,
     locale: localePref,
     daemon_auto_refresh_enabled: autoRefresh.enabled,
     daemon_auto_refresh_seconds: autoRefresh.seconds,
