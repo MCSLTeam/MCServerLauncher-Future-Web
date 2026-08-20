@@ -11,6 +11,7 @@ import {
   Home,
   Menu,
   Package,
+  Puzzle,
   Settings,
   User,
   Users,
@@ -47,6 +48,7 @@ type NavKey =
   | "instances"
   | "nodes"
   | "resourceCenter"
+  | "extensionCenter"
   | "helpCenter"
   | "settings"
   | "account"
@@ -97,6 +99,12 @@ const MAIN_NAV: NavItem[] = [
     href: "/resource-center/",
   },
   {
+    key: "extensionCenter",
+    labelKey: "shared.extension-center.title",
+    icon: Puzzle,
+    href: "/extensions/",
+  },
+  {
     key: "helpCenter",
     labelKey: "shared.help-center.title",
     icon: CircleHelp,
@@ -136,6 +144,7 @@ function getActiveNavKey(pathname: string): NavKey | null {
     return "instances";
   if (path.startsWith("/nodes")) return "nodes";
   if (path.startsWith("/resource-center")) return "resourceCenter";
+  if (path.startsWith("/extensions")) return "extensionCenter";
   if (path.startsWith("/help-center")) return "helpCenter";
   if (path.startsWith("/settings")) return "settings";
   if (path.startsWith("/account")) return "account";
