@@ -7,6 +7,7 @@ import {
   MemoryClientExtensionCacheStore,
   MemoryClientExtensionPayloadStore,
   buildClientExtensionManifestDrift,
+  resolveExtensionScopeKind,
   type ClientExtensionKeyValueStorage,
 } from "./client-extension-manager.ts";
 import { buildMpxPackageFromSources } from "./package-builder.ts";
@@ -334,6 +335,64 @@ test("client extension manager skips daemon entries restored without cached bund
   await manager.restore();
 
   assert.equal(manager.list().length, 0);
+});
+
+test("extension scope kind resolves client / server / both from scopes", () => {
+  const clientOnly = makePackage({
+    deploymentPlan: {
+      scopes: ["client"],
+      client: {
+        ui: { path: "client/ui.json", sha256: "c".repeat(64) },
+        resources: [],
+      },
+    },
+  });
+  const serverOnly = makePackage({
+    manifest: {
+      ...makePackage().manifest,
+      targets: {
+        daemon: {
+          plugin: { path: "daemon/plugin-bundle.zip", sha256: "b".repeat(64) },
+        },
+      },
+    },
+    uiSchema: undefined,
+    deploymentPlan: {
+      scopes: ["daemon"],
+      daemon: {
+        plugin: { path: "daemon/plugin-bundle.zip", sha256: "b".repeat(64) },
+        extensionPoints: [],
+        commands: [],
+      },
+    },
+  });
+  const both = makePackage({
+    manifest: {
+      ...makePackage().manifest,
+      targets: {
+        client: { ui: { path: "client/ui.json", sha256: "c".repeat(64) } },
+        daemon: {
+          plugin: { path: "daemon/plugin-bundle.zip", sha256: "b".repeat(64) },
+        },
+      },
+    },
+    deploymentPlan: {
+      scopes: ["client", "daemon"],
+      client: {
+        ui: { path: "client/ui.json", sha256: "c".repeat(64) },
+        resources: [],
+      },
+      daemon: {
+        plugin: { path: "daemon/plugin-bundle.zip", sha256: "b".repeat(64) },
+        extensionPoints: [],
+        commands: [],
+      },
+    },
+  });
+
+  assert.equal(resolveExtensionScopeKind(clientOnly), "client-only");
+  assert.equal(resolveExtensionScopeKind(serverOnly), "server-only");
+  assert.equal(resolveExtensionScopeKind(both), "both");
 });
 
 test("local storage cache store persists sorted entries and deletes by plugin id", async () => {

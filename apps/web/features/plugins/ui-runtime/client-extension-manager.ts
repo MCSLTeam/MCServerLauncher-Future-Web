@@ -809,6 +809,21 @@ function deleteCursorMatches(
   });
 }
 
+export type ExtensionScopeKind = "client-only" | "server-only" | "both";
+
+export function resolveExtensionScopeKind(
+  entry: Pick<ClientExtensionCacheEntry, "deploymentPlan">,
+): ExtensionScopeKind {
+  const scopes = entry.deploymentPlan.scopes;
+  const hasClient = scopes.includes("client");
+  const hasServer =
+    scopes.includes("daemon") ||
+    entry.deploymentPlan.daemon?.plugin !== undefined;
+  if (hasClient && hasServer) return "both";
+  if (hasClient) return "client-only";
+  return "server-only";
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }

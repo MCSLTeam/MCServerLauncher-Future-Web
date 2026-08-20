@@ -39,6 +39,7 @@ import {
   LocalStorageClientExtensionCacheStore,
   MemoryClientExtensionPayloadStore,
   buildClientExtensionManifestDrift,
+  resolveExtensionScopeKind,
   type ClientExtensionCacheEntry,
   type ClientExtensionManifestDrift,
   type ClientExtensionPayloadStore,
@@ -97,6 +98,9 @@ export function ClientExtensionCenter() {
   const [entries, setEntries] = useState<readonly ClientExtensionCacheEntry[]>(
     [],
   );
+  const [targetFilter, setTargetFilter] = useState<"all" | "local" | "server">(
+    "all",
+  );
   const [selectedId, setSelectedId] = useState("");
   const [message, setMessage] = useState<ExtensionCenterMessage | null>(null);
   const [installing, setInstalling] = useState(false);
@@ -124,9 +128,21 @@ export function ClientExtensionCenter() {
     [daemon.connections],
   );
 
+  const visibleEntries = useMemo(() => {
+    if (targetFilter === "all") return entries;
+    return entries.filter((entry) => {
+      const kind = resolveExtensionScopeKind(entry);
+      if (targetFilter === "local")
+        return kind === "client-only" || kind === "both";
+      return kind === "server-only" || kind === "both";
+    });
+  }, [entries, targetFilter]);
+
   const selectedEntry = useMemo(
-    () => entries.find((entry) => entry.id === selectedId) ?? entries[0],
-    [entries, selectedId],
+    () =>
+      visibleEntries.find((entry) => entry.id === selectedId) ??
+      visibleEntries[0],
+    [visibleEntries, selectedId],
   );
   const selectedExtensionId = selectedEntry?.id ?? "";
 
@@ -829,43 +845,85 @@ export function ClientExtensionCenter() {
               if (file) void installPackage(file);
             }}
           />
+          <div className="mt-3 grid grid-cols-3 gap-1 rounded-lg bg-muted/60 p-1">
+            {(
+              [
+                ["all", "全部"],
+                ["local", "本机"],
+                ["server", "服务器"],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                className={cn(
+                  "rounded-md px-2 py-1.5 text-xs font-medium transition-colors",
+                  targetFilter === value
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+                onClick={() => setTargetFilter(value)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="mcsl-scrollbar min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
-          {entries.map((entry) => (
-            <button
-              key={entry.id}
-              type="button"
-              className={cn(
-                "flex w-full min-w-0 flex-col gap-2 rounded-xl border p-3 text-left transition-colors",
-                selectedEntry?.id === entry.id
-                  ? "border-primary/50 bg-primary/5"
-                  : "hover:bg-muted/50",
-              )}
-              onClick={() => setSelectedId(entry.id)}
-            >
-              <span className="flex items-center justify-between gap-2">
-                <span className="truncate text-sm font-medium">{entry.id}</span>
-                <Badge variant={entry.uiSchema ? "success" : "secondary"}>
-                  {entry.uiSchema ? "UI" : "assets"}
-                </Badge>
-              </span>
-              <span className="flex flex-wrap gap-1 text-xs text-muted-foreground">
-                <Badge variant="outline">v{entry.version}</Badge>
-                <Badge variant="outline">
-                  {entry.commands.length} command(s)
-                </Badge>
-                <Badge variant="outline">
-                  {entry.resources.length} resource(s)
-                </Badge>
-              </span>
-            </button>
-          ))}
+          {visibleEntries.map((entry) => {
+            const kind = resolveExtensionScopeKind(entry);
+            return (
+              <button
+                key={entry.id}
+                type="button"
+                className={cn(
+                  "flex w-full min-w-0 flex-col gap-2 rounded-xl border p-3 text-left transition-colors",
+                  selectedEntry?.id === entry.id
+                    ? "border-primary/50 bg-primary/5"
+                    : "hover:bg-muted/50",
+                )}
+                onClick={() => setSelectedId(entry.id)}
+              >
+                <span className="flex items-center justify-between gap-2">
+                  <span className="truncate text-sm font-medium">
+                    {entry.id}
+                  </span>
+                  <Badge
+                    variant={
+                      kind === "both"
+                        ? "success"
+                        : kind === "server-only"
+                          ? "warning"
+                          : "secondary"
+                    }
+                  >
+                    {ExtensionScopeKindLabel(kind)}
+                  </Badge>
+                </span>
+                <span className="flex flex-wrap gap-1 text-xs text-muted-foreground">
+                  <Badge variant="outline">v{entry.version}</Badge>
+                  <Badge variant="outline">
+                    {entry.commands.length} command(s)
+                  </Badge>
+                  <Badge variant="outline">
+                    {entry.resources.length} resource(s)
+                  </Badge>
+                </span>
+              </button>
+            );
+          })}
           {entries.length === 0 ? (
             <div className="rounded-xl border border-dashed p-5 text-sm text-muted-foreground">
               No extension package is installed in the client cache yet.
             </div>
-          ) : null}
+          ) : (
+            visibleEntries.length === 0 && (
+              <div className="rounded-xl border border-dashed p-5 text-sm text-muted-foreground">
+                No extension matches this filter.
+              </div>
+            )
+          )}
         </div>
       </ConsolePanel>
 
@@ -896,6 +954,27 @@ export function ClientExtensionCenter() {
         {selectedEntry ? (
           <>
             <ConsolePanel>
+              <div className="mb-3 flex flex-wrap items-center gap-2">
+                <Badge
+                  variant={
+                    resolveExtensionScopeKind(selectedEntry) === "both"
+                      ? "success"
+                      : resolveExtensionScopeKind(selectedEntry) ===
+                          "server-only"
+                        ? "warning"
+                        : "secondary"
+                  }
+                >
+                  {ExtensionScopeKindLabel(
+                    resolveExtensionScopeKind(selectedEntry),
+                  )}
+                </Badge>
+                <span className="text-sm text-muted-foreground">
+                  {ExtensionScopeKindDescription(
+                    resolveExtensionScopeKind(selectedEntry),
+                  )}
+                </span>
+              </div>
               <ConsolePanelHeader
                 title={selectedEntry.id}
                 description={`Version ${selectedEntry.version}. ${connectedNodeId ? `Daemon dispatch target: ${connectedNodeId}.` : "Connect a daemon to enable command dispatch."}`}
@@ -1607,6 +1686,20 @@ function formatDiagnostics(
     .slice(0, 6)
     .map((diagnostic) => `${diagnostic.path}: ${diagnostic.message}`)
     .join("\n");
+}
+
+function ExtensionScopeKindLabel(kind: "client-only" | "server-only" | "both") {
+  if (kind === "client-only") return "仅客户端";
+  if (kind === "server-only") return "仅服务端";
+  return "双端需装";
+}
+
+function ExtensionScopeKindDescription(
+  kind: "client-only" | "server-only" | "both",
+) {
+  if (kind === "client-only") return "只安装在这台电脑";
+  if (kind === "server-only") return "只安装到服务器";
+  return "安装在这台电脑并部署到服务器";
 }
 
 function formatBytes(bytes: number): string {
