@@ -35,6 +35,8 @@ import {
   type AppSettings,
 } from "@/lib/settings-store";
 
+const APP_VERSION = "0.1.0";
+
 function createDraft(theme: ThemeMode): AppSettings {
   if (typeof window === "undefined") {
     return {
@@ -317,10 +319,11 @@ export default function SettingsPage() {
             </ConsolePanel>
           </TabsContent>
 
-          <TabsContent value="about">
+          <TabsContent value="about" className="space-y-4">
             <ConsolePanel>
               <ConsolePanelHeader
                 title={t("shared.settings.about.info.title")}
+                description={t("shared.settings.about.about.disclaimer")}
               />
               <dl className="grid gap-2 text-sm sm:grid-cols-2">
                 <div>
@@ -333,14 +336,72 @@ export default function SettingsPage() {
                   <dt className="text-muted-foreground">
                     {t("shared.settings.about.info.version")}
                   </dt>
-                  <dd>0.1.0</dd>
+                  <dd>{APP_VERSION}</dd>
                 </div>
               </dl>
-              {saved ? (
-                <p className="mt-4 text-xs text-muted-foreground">
-                  {t("shared.settings.saved")}
-                </p>
-              ) : null}
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button asChild variant="outline" size="sm">
+                  <a
+                    href="https://github.com/MCSLTeam/MCServerLauncher-Future-Web/releases"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {t("shared.settings.about.check-updates.button")}
+                  </a>
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <a
+                    href="https://github.com/MCSLTeam/MCServerLauncher-Future-Web"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {t("shared.settings.about.about.github")}
+                  </a>
+                </Button>
+              </div>
+            </ConsolePanel>
+
+            <ConsolePanel>
+              <ConsolePanelHeader
+                title={t("shared.settings.about.info.license.title")}
+              />
+              <p className="whitespace-pre-line text-sm leading-6 text-muted-foreground">
+                {t("shared.settings.about.info.license.content")}
+              </p>
+            </ConsolePanel>
+
+            <ConsolePanel>
+              <ConsolePanelHeader
+                title={t("shared.settings.about.special-thanks.title")}
+              />
+              <ul className="space-y-2 text-sm">
+                {[
+                  ["iNKORE", "inkore"],
+                  ["BMCLAPI", "bmcl"],
+                  ["BakaXL", "bakaxl"],
+                  [t("shared.settings.about.special-thanks.qq.title"), "qq"],
+                ].map(([name, key]) => (
+                  <li key={key}>
+                    <span className="font-medium">{name}</span>
+                    <span className="text-muted-foreground">
+                      {" — "}
+                      {t(`shared.settings.about.special-thanks.${key}.desc`)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </ConsolePanel>
+
+            <ConsolePanel>
+              <ConsolePanelHeader
+                title={t("shared.settings.about.dependencies.title")}
+              />
+              <p className="text-sm text-muted-foreground">
+                {t("shared.settings.about.about.qq")} ·{" "}
+                {t("shared.settings.about.about.email")} ·{" "}
+                {t("shared.settings.about.about.afdian")}
+              </p>
             </ConsolePanel>
           </TabsContent>
         </Tabs>
