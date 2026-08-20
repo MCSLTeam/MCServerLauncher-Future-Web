@@ -16,6 +16,7 @@ import Link from "next/link";
 import { Reveal } from "@/components/motion/reveal";
 import { ConsolePage } from "@/components/templates/console-surface";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -138,6 +139,12 @@ export default function InstancesPage() {
   const [intervalSeconds, setIntervalSeconds] =
     useState<RefreshIntervalSeconds>(() => loadAutoRefreshPreference().seconds);
   const [busy, setBusy] = useState<string | null>(null);
+  const [selectedKeys, setSelectedKeys] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  );
+
+  const instanceKey = (instance: DaemonLiveInstance) =>
+    `${instance.nodeId}:${instance.id}`;
 
   useEffect(() => {
     if (!autoRefresh || !selectedNodeId) return;
@@ -173,6 +180,11 @@ export default function InstancesPage() {
         .some((value) => String(value).toLowerCase().includes(query));
     });
   }, [instances, search, selectedNode, selectedNodeId, statusFilter, t]);
+
+  const selectedItems = useMemo(
+    () => filtered.filter((item) => selectedKeys.has(instanceKey(item))),
+    [filtered, selectedKeys],
+  );
 
   function statusLabel(status: string) {
     const key = `shared.instance.status.${status}`;
@@ -213,6 +225,82 @@ export default function InstancesPage() {
     if (!result.ok) {
       toast.error(result.message ?? t("shared.instances.action.failed"));
     }
+  }
+
+  function toggleSelected(key: string) {
+    setSelectedKeys((current) => {
+      const next = new Set(current);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }
+
+  function selectAllVisible() {
+    setSelectedKeys(new Set(filtered.map((item) => instanceKey(item))));
+  }
+
+  function clearSelection() {
+    setSelectedKeys(new Set());
+  }
+
+  /** 对齐 WPF BatchStart/Source – 对候选逐项启动，成功/失败计数后提示。 */
+  async function runBatch(
+    items: DaemonLiveInstance[],
+    action: "start" | "stop" | "remove",
+  ) {
+    let candidates: DaemonLiveInstance[] = [];
+    if (action === "start") {
+      candidates = items.filter(
+        (item) => item.status === "stopped" || item.status === "crashed",
+      );
+    } else if (action === "stop") {
+      candidates = items.filter((item) => item.status === "running");
+    } else {
+      candidates = items;
+    }
+    if (candidates.length === 0) {
+      clearSelection();
+      return;
+    }
+    const ok = await confirm({
+      description: t(`shared.instance.batch.confirm.${action}`, {
+        count: candidates.length,
+      }),
+      destructive: action === "remove",
+      confirmLabel: t("ui.common.confirm"),
+      cancelLabel: t("ui.common.cancel"),
+    });
+    if (!ok) {
+      clearSelection();
+      return;
+    }
+    let success = 0;
+    let fail = 0;
+    for (const item of candidates) {
+      const callbacks = {
+        start: startInstance,
+        stop: stopInstance,
+        remove: removeInstance,
+      };
+      try {
+        const result = await callbacks[action](item.nodeId, item.id);
+        if (result.ok) success += 1;
+        else {
+          fail += 1;
+          toast.error(
+            `${item.name}: ${result.message ?? t("shared.instances.action.failed")}`,
+          );
+        }
+      } catch (error) {
+        fail += 1;
+        toast.error(
+          `${item.name}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
+    clearSelection();
+    toast.success(t("shared.instance.batch.complete", { success, fail }));
   }
 
   return (
@@ -379,13 +467,24 @@ export default function InstancesPage() {
                 const canStart =
                   item.status === "stopped" || item.status === "crashed";
                 const running = item.status === "running";
+                const key = instanceKey(item);
+                const selected = selectedKeys.has(key);
 
                 return (
                   <article
-                    key={`${item.nodeId}:${item.id}`}
-                    className="flex h-[13.75rem] min-w-[min(100%,22.5rem)] flex-1 basis-[22.5rem] flex-col rounded-xl border bg-card shadow-sm"
+                    key={key}
+                    className={cn(
+                      "flex h-[13.75rem] min-w-[min(100%,22.5rem)] flex-1 basis-[22.5rem] flex-col rounded-xl border bg-card shadow-sm",
+                      selected && "border-primary/60 ring-1 ring-primary/40",
+                    )}
                   >
                     <div className="flex items-center gap-2.5 px-5 pt-3.5">
+                      <Checkbox
+                        checked={selected}
+                        onCheckedChange={() => toggleSelected(key)}
+                        aria-label={`${t("shared.instance.batch.selected", { count: 1 })} ${item.name}`}
+                        className="shrink-0"
+                      />
                       <h3 className="truncate text-base font-semibold">
                         {item.name}
                       </h3>
@@ -516,6 +615,90 @@ export default function InstancesPage() {
           )}
         </div>
       </Reveal>
+
+      {selectedKeys.size > 0 ? (
+        <div className="sticky bottom-3 z-10 mt-3">
+          <div className="flex flex-wrap items-center gap-2 rounded-xl border bg-card/95 px-3.5 py-2.5 shadow-lg backdrop-blur">
+            <span className="text-sm text-muted-foreground">
+              {t("shared.instance.batch.selected", {
+                count: selectedKeys.size,
+              })}
+            </span>
+            <div className="flex-1" />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={filtered.length === 0 || busy !== null}
+              onClick={selectAllVisible}
+            >
+              {t("shared.instance.batch.select-all")}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={
+                busy !== null ||
+                selectedItems.filter(
+                  (item) =>
+                    item.status === "stopped" || item.status === "crashed",
+                ).length === 0
+              }
+              onClick={() =>
+                void runBatch(
+                  selectedItems.filter(
+                    (item) =>
+                      item.status === "stopped" || item.status === "crashed",
+                  ),
+                  "start",
+                )
+              }
+            >
+              <Play className="size-4" />
+              {t("shared.instance.batch.start")}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={
+                busy !== null ||
+                selectedItems.filter((item) => item.status === "running")
+                  .length === 0
+              }
+              onClick={() =>
+                void runBatch(
+                  selectedItems.filter((item) => item.status === "running"),
+                  "stop",
+                )
+              }
+            >
+              <Square className="size-4" />
+              {t("shared.instance.batch.stop")}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              disabled={busy !== null}
+              onClick={() => void runBatch(selectedItems, "remove")}
+            >
+              <Trash2 className="size-4" />
+              {t("shared.instance.batch.remove")}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={busy !== null}
+              onClick={clearSelection}
+            >
+              {t("shared.instance.batch.cancel")}
+            </Button>
+          </div>
+        </div>
+      ) : null}
     </ConsolePage>
   );
 }

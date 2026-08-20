@@ -20,6 +20,7 @@ import {
 import { Reveal } from "@/components/motion/reveal";
 import { ConsolePage } from "@/components/templates/console-surface";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -188,7 +189,7 @@ function ResourceRow({
 
 export default function NodesPage() {
   const t = useT();
-  const { toast } = useFeedback();
+  const { confirm, toast } = useFeedback();
   const {
     connections,
     getStatus,
@@ -217,6 +218,57 @@ export default function NodesPage() {
     id: string;
     name: string;
   } | null>(null);
+  const [selectedIds, setSelectedIds] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  );
+
+  function toggleNodeSelected(id: string) {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function selectAllVisibleNodes(ids: readonly string[]) {
+    setSelectedIds(new Set(ids));
+  }
+
+  function clearNodeSelection() {
+    setSelectedIds(new Set());
+  }
+
+  async function confirmBatchDelete(targets: readonly SavedNode[]) {
+    if (targets.length === 0) return;
+    const ok = await confirm({
+      description: t("shared.nodes.batch.confirm.remove", {
+        count: targets.length,
+      }),
+      destructive: true,
+      confirmLabel: t("ui.common.confirm"),
+      cancelLabel: t("ui.common.cancel"),
+    });
+    if (!ok) {
+      clearNodeSelection();
+      return;
+    }
+    let success = 0;
+    let fail = 0;
+    for (const node of targets) {
+      try {
+        disconnectNode(node.id, { purge: true });
+        const removed = await removeNode(node.id);
+        if (removed) success += 1;
+        else fail += 1;
+      } catch {
+        fail += 1;
+      }
+    }
+    clearNodeSelection();
+    await refreshList();
+    toast.success(t("shared.nodes.batch.complete", { success, fail }));
+  }
 
   async function refreshList() {
     await hydrateNodes();
@@ -598,10 +650,20 @@ export default function NodesPage() {
               return (
                 <article
                   key={node.id}
-                  className="flex min-h-[13.5rem] min-w-[min(100%,24.375rem)] flex-1 basis-[24.375rem] flex-col rounded-xl border bg-card px-4 py-3.5 shadow-sm"
+                  className={cn(
+                    "flex min-h-[13.5rem] min-w-[min(100%,24.375rem)] flex-1 basis-[24.375rem] flex-col rounded-xl border bg-card px-4 py-3.5 shadow-sm",
+                    selectedIds.has(node.id) &&
+                      "border-primary/60 ring-1 ring-primary/40",
+                  )}
                 >
-                  {/* 行0：OS + 友好名 */}
+                  {/* 行0：checkbox + OS + 友好名 */}
                   <div className="mb-1 flex items-center gap-2.5">
+                    <Checkbox
+                      checked={selectedIds.has(node.id)}
+                      onCheckedChange={() => toggleNodeSelected(node.id)}
+                      aria-label={`${t("shared.nodes.batch.selected", { count: 1 })} ${displayName}`}
+                      className="shrink-0"
+                    />
                     <OsGlyph type={resource.systemType} />
                     <h3 className="truncate text-[1.05rem] font-semibold leading-tight">
                       {displayName}
@@ -708,6 +770,51 @@ export default function NodesPage() {
           </div>
         )}
       </Reveal>
+
+      {selectedIds.size > 0 ? (
+        <div className="sticky bottom-3 z-10">
+          <div className="flex flex-wrap items-center gap-2 rounded-xl border bg-card/95 px-3.5 py-2.5 shadow-lg backdrop-blur">
+            <span className="text-sm text-muted-foreground">
+              {t("shared.nodes.batch.selected", {
+                count: selectedIds.size,
+              })}
+            </span>
+            <div className="flex-1" />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={filteredNodes.length === 0}
+              onClick={() =>
+                selectAllVisibleNodes(filteredNodes.map((node) => node.id))
+              }
+            >
+              {t("shared.nodes.batch.select-all")}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              onClick={() =>
+                void confirmBatchDelete(
+                  filteredNodes.filter((node) => selectedIds.has(node.id)),
+                )
+              }
+            >
+              <Trash2 className="size-4" />
+              {t("shared.nodes.batch.remove")}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={clearNodeSelection}
+            >
+              {t("shared.nodes.batch.cancel")}
+            </Button>
+          </div>
+        </div>
+      ) : null}
 
       {/* 新建/编辑连接对话框 — 对齐 NewDaemonConnectionInput ContentDialog */}
       <Dialog

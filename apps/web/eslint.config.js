@@ -2,7 +2,7 @@ import next from "eslint-config-next";
 
 const config = [
   {
-    ignores: ["public/monaco/**", "out/**", ".next/**", "target/**"],
+    ignores: ["public/monaco/**", "out/**", "dist/**", ".next/**", "target/**"],
   },
   ...next,
   {
