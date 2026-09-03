@@ -119,6 +119,25 @@ export function MarketplacePanel({
     return () => clearTimeout(timer);
   }, [client, baseUrl, q, category, sort, page]);
 
+  // mcsl://install/<id>[/<version>] deep link (desktop client) and
+  // /extensions?mcslInstall=<id>&mcslVersion=<v> direct links both land here.
+  const handledDeepLink = useRef(false);
+  useEffect(() => {
+    if (handledDeepLink.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const targetId = params.get("mcslInstall");
+    if (!targetId) return;
+    handledDeepLink.current = true;
+    setQ(targetId);
+    openDetail(targetId).then((detail) => {
+      if (!detail) return;
+      const requested = params.get("mcslVersion");
+      const version = requested || detail.versions[0]?.version;
+      if (version) installVersion(targetId, version, detail.displayName);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [client, baseUrl]);
+
   const checkUpdates = useCallback(async () => {
     if (installed.length === 0) return;
     setCheckingUpdates(true);
@@ -143,14 +162,16 @@ export function MarketplacePanel({
     checkUpdates();
   }, [checkUpdates]);
 
-  async function openDetail(id: string) {
+  async function openDetail(id: string): Promise<RegistryPluginDetail | null> {
     setError(null);
     setInstallMessage(null);
     try {
       const detail = await client.getPlugin(id);
       setSelected(detail);
+      return detail;
     } catch (err) {
       setError(describeError(err));
+      return null;
     }
   }
 

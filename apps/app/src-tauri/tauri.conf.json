@@ -40,5 +40,14 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": [
+          "mcsl"
+        ]
+      }
+    }
   }
 }

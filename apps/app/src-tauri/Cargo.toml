@@ -23,9 +23,11 @@ tauri-plugin-os = "2.3.2"
 tauri-plugin-process = "2.3.1"
 mcsl_resource_provider = { path = "../../../packages/resource-provider" }
 mcsl_web_core = { path = "../../../packages/web-core" }
+url = "2"
 log = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 rfd = "0.15"
 tauri-plugin-autostart = "2.5.1"
+tauri-plugin-deep-link = "2.4.0"
 reqwest = { version = "0.13", default-features = false, features = ["rustls"] }

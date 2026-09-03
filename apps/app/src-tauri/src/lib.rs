@@ -7,7 +7,8 @@ use mcsl_resource_provider::{
 };
 use serde::Serialize;
 use std::path::PathBuf;
-use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri::{AppHandle, Emitter, Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri_plugin_deep_link::DeepLinkExt;
 use tauri_plugin_autostart::ManagerExt;
 
 const UPDATE_RELEASE_API: &str =
@@ -383,6 +384,49 @@ async fn open_file_editor(
     Ok(())
 }
 
+/// Navigate the main window to an app route (`/extensions?…`).
+fn navigate_main_to_route(app: &AppHandle, route: &str) {
+    if let Some(window) = app.get_webview_window("main") {
+        if let Ok(current) = window.url() {
+            let origin = format!(
+                "{}://{}",
+                current.scheme(),
+                current.host_str().unwrap_or("localhost")
+            );
+            if let Ok(base) = url::Url::parse(&origin) {
+                if let Ok(url) = base.join(route.trim_start_matches('/')) {
+                    let _ = window.navigate(url);
+                }
+            }
+        }
+    }
+}
+
+/// Parse `mcsl://install/&lt;packageId&gt;[/&lt;version&gt;]` into a console route.
+fn parse_mcsl_install_uri(uri: &str) -> Option<String> {
+    let url = url::Url::parse(uri).ok()?;
+    if !url.scheme().eq_ignore_ascii_case("mcsl") {
+        return None;
+    }
+    let mut segments = url
+        .path_segments()?
+        .filter(|segment| !segment.is_empty());
+    let action = segments.next()?;
+    if !action.eq_ignore_ascii_case("install") {
+        return None;
+    }
+    let package_id = segments.next()?;
+    let version = segments.next();
+    let mut route = format!(
+        "/extensions?mcslInstall={}",
+        urlencoding_encode(package_id)
+    );
+    if let Some(version) = version {
+        route.push_str(&format!("&mcslVersion={}", urlencoding_encode(version)));
+    }
+    Some(route)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -394,9 +438,30 @@ pub fn run() {
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_opener::init())
-        .setup(|_app| {
+        .plugin(tauri_plugin_deep_link::init())
+        .setup(|app| {
             if let Err(e) = init_data_dir() {
                 eprintln!("init_data_dir failed: {e}");
+            }
+            // mcsl://install/<packageId>[/<version>] -> extensions marketplace.
+            let event_handle = app.handle().clone();
+            app.deep_link().on_open_url(move |event| {
+                for uri in event.urls() {
+                    let Some(route) = parse_mcsl_install_uri(uri.as_str()) else {
+                        continue;
+                    };
+                    let _ = event_handle.emit("mcsl-deep-link", route.clone());
+                    navigate_main_to_route(&event_handle, &route);
+                }
+            });
+            // App started from a deep link: handle the first URL too.
+            let current_handle = app.handle().clone();
+            if let Ok(Some(urls)) = current_handle.deep_link().get_current() {
+                for uri in urls {
+                    if let Some(route) = parse_mcsl_install_uri(uri.as_str()) {
+                        navigate_main_to_route(&current_handle, &route);
+                    }
+                }
             }
             Ok(())
         })
