@@ -201,27 +201,31 @@ export class RegistryClient {
 
   /**
    * Update discovery: compare an installed version against the registry's
-   * latest published version of the same plugin id.
+   * latest published version via the dedicated `/updates` endpoint (same
+   * contract the WPF client uses).
    */
   async checkForUpdate(id: string, installedVersion: string): Promise<RegistryUpdateInfo | null> {
-    let detail: RegistryPluginDetail;
+    let response: Response;
     try {
-      detail = await this.getPlugin(id);
+      response = await this.request(
+        `/api/v1/plugins/${encodeURIComponent(id)}/updates?from=${encodeURIComponent(installedVersion)}`,
+      );
     } catch {
       return null;
     }
-    const latest = detail.versions[0];
-    if (!latest || !detail.latestVersion) {
-      return { updateAvailable: false, currentVersion: installedVersion, latestVersion: null, latestPublishedAt: null, changelog: null, downloadUrl: null };
+    try {
+      const body = (await response.json()) as {
+        updateAvailable: boolean;
+        currentVersion: string | null;
+        latestVersion: string | null;
+        latestPublishedAt: string | null;
+        changelog: string | null;
+        downloadUrl: string | null;
+      };
+      return body;
+    } catch {
+      return null;
     }
-    return {
-      updateAvailable: latest.version !== installedVersion,
-      currentVersion: installedVersion,
-      latestVersion: latest.version,
-      latestPublishedAt: latest.releasedAt,
-      changelog: latest.changelog,
-      downloadUrl: latest.downloadUrl,
-    };
   }
 }
 

@@ -98,42 +98,33 @@ test("registry client surfaces structured errors and timeouts", async () => {
   );
 });
 
-test("registry client checkForUpdate compares installed vs latest", async () => {
-  const detail = {
-    id: "acme.status",
-    displayName: "Status",
-    summary: "s",
-    publisher: { id: "p1", slug: "acme" },
-    categories: [],
-    keywords: [],
-    targets: { client: true, daemon: false },
-    license: null,
-    latestVersion: "1.1.0",
-    publishedAt: "2026-01-01T00:00:00Z",
-    updatedAt: "2026-01-02T00:00:00Z",
-    downloads: 1,
-    iconUrl: null,
-    description: "",
-    homepage: null,
-    repository: null,
-    versions: [
-      {
-        version: "1.1.0",
-        releasedAt: "2026-01-02T00:00:00Z",
-        changelog: "fixes",
-        sha256: "a".repeat(64),
-        sizeBytes: 10,
-        downloadCount: 1,
-        targets: { client: true, daemon: false },
-        runtime: null,
-        signed: false,
-        downloadUrl: "http://registry.test/api/v1/plugins/acme.status/versions/1.1.0/download",
-      },
-    ],
-  };
+test("registry client checkForUpdate uses the /updates endpoint", async () => {
+  const calls: string[] = [];
   const client = new RegistryClient({
     baseUrl: "http://registry.test",
-    fetchImpl: async () => jsonResponse(detail),
+    fetchImpl: async (input) => {
+      const url = String(input);
+      calls.push(url);
+      assert.ok(url.includes("/api/v1/plugins/acme.status/updates"), "must hit /updates endpoint");
+      if (url.includes("from=1.1.0")) {
+        return jsonResponse({
+          updateAvailable: false,
+          currentVersion: "1.1.0",
+          latestVersion: "1.1.0",
+          latestPublishedAt: null,
+          changelog: null,
+          downloadUrl: null,
+        });
+      }
+      return jsonResponse({
+        updateAvailable: true,
+        currentVersion: "1.0.0",
+        latestVersion: "1.1.0",
+        latestPublishedAt: "2026-01-02T00:00:00Z",
+        changelog: "fixes",
+        downloadUrl: "http://registry.test/api/v1/plugins/acme.status/versions/1.1.0/download",
+      });
+    },
   });
 
   const noUpdate = await client.checkForUpdate("acme.status", "1.1.0");
@@ -143,6 +134,7 @@ test("registry client checkForUpdate compares installed vs latest", async () => 
   assert.equal(update?.updateAvailable, true);
   assert.equal(update?.latestVersion, "1.1.0");
   assert.equal(update?.changelog, "fixes");
+  assert.equal(calls.length, 2);
 });
 
 function buildDepZip(id: string, version: string, deps: readonly { id: string; version: string }[] = []): Uint8Array {
