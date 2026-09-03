@@ -844,7 +844,7 @@ export class DaemonClient {
     sessionId: string,
     offset: number,
     length: number,
-    frame: ArrayBuffer | ArrayBufferView,
+    frame: ArrayBuffer | ArrayBufferView<ArrayBuffer>,
     timeoutMs: number,
   ): Promise<void> {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {

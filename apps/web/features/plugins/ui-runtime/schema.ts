@@ -693,13 +693,17 @@ function normalizeTabsItems(
     }
 
     if (item.Children !== undefined) {
-      normalizeChildren(
+      // Reassign the normalized children so the runtime schema tree is fully
+      // normalized (leaf nodes always carry a `children` array). The previous
+      // version only validated and discarded the result, which made the
+      // package validator crash when walking Tabs children.
+      (item as Record<string, unknown>).Children = normalizeChildren(
         item.Children,
         `${itemPath}.Children`,
         depth + 1,
         diagnostics,
         counter,
-      );
+      ) as unknown as PluginUiValue;
     }
   });
 }

@@ -61,7 +61,7 @@ export function buildBinaryFrame(
   offset: number,
   payload: Uint8Array,
   maximumChunkSize = DEFAULT_MAX_CHUNK_SIZE,
-): Uint8Array {
+): Uint8Array<ArrayBuffer> {
   if (offset < 0) throw new Error("Binary frame offset cannot be negative");
   if (payload.byteLength > maximumChunkSize) {
     throw new Error(

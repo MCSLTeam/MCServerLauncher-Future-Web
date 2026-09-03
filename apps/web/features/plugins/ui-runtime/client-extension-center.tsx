@@ -63,6 +63,12 @@ import {
   type ValidatedMpxPackage,
 } from "./mpx-validator";
 import { PluginUiRenderer, type PluginUiEvent } from "./web-renderer";
+import {
+  MarketplacePanel,
+  type MarketplaceInstallRequest,
+} from "../marketplace/marketplace-panel";
+import { TrustRootsPanel } from "../marketplace/trust-roots-panel";
+import { toTrustedPublishers } from "../marketplace/trust-roots";
 
 interface ExtensionCenterMessage {
   readonly kind: "success" | "error" | "info";
@@ -413,6 +419,76 @@ export function ClientExtensionCenter() {
     };
   }, [connectedNodeId, daemon, selectedExtensionId]);
 
+  async function installFromMarketplace(request: MarketplaceInstallRequest) {
+    const manager = managerRef.current;
+    if (!manager) return;
+    setInstalling(true);
+    setMessage(null);
+    setPendingInstall(null);
+
+    try {
+      // Auto-install resolved dependencies first; the main package still
+      // goes through the permission review below.
+      for (const dependency of request.dependencies) {
+        const dependencyValidation = await validateMpxPackage(dependency.bytes, { trustedPublishers: toTrustedPublishers() });
+        if (!dependencyValidation.ok) {
+          setMessage({
+            kind: "error",
+            title: "Dependency was rejected.",
+            details: formatDiagnostics(dependencyValidation.diagnostics),
+          });
+          return;
+        }
+        const installedDependency = await manager.installPersisted(
+          dependencyValidation.package,
+          dependency.bytes,
+        );
+        if (!installedDependency.ok) {
+          setMessage({
+            kind: "error",
+            title: "Dependency could not be installed.",
+            details: `${installedDependency.code}: ${installedDependency.message}`,
+          });
+          return;
+        }
+      }
+
+      const validation = await validateMpxPackage(request.bytes, { trustedPublishers: toTrustedPublishers() });
+      if (!validation.ok) {
+        setMessage({
+          kind: "error",
+          title: "Extension package was rejected.",
+          details: formatDiagnostics(validation.diagnostics),
+        });
+        return;
+      }
+
+      setPendingInstall({
+        fileName: `${request.id}-${request.version}.mpx`,
+        bytes: request.bytes,
+        package: validation.package,
+        drift: buildClientExtensionManifestDrift(
+          manager.get(validation.package.manifest.package.id),
+          validation.package,
+        ),
+      });
+      setMessage({
+        kind: "info",
+        title: "Review extension permissions before installation.",
+        details:
+          "The package passed offline validation. Dependencies are installed; confirm the review to install the package itself.",
+      });
+    } catch (error) {
+      setMessage({
+        kind: "error",
+        title: "Extension package could not be read.",
+        details: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setInstalling(false);
+    }
+  }
+
   async function installPackage(file: File) {
     const manager = managerRef.current;
     if (!manager) return;
@@ -422,7 +498,7 @@ export function ClientExtensionCenter() {
 
     try {
       const bytes = new Uint8Array(await file.arrayBuffer());
-      const validation = await validateMpxPackage(bytes);
+      const validation = await validateMpxPackage(bytes, { trustedPublishers: toTrustedPublishers() });
       if (!validation.ok) {
         setMessage({
           kind: "error",
@@ -928,7 +1004,12 @@ export function ClientExtensionCenter() {
       </ConsolePanel>
 
       <div className="min-w-0 space-y-4">
-        <MarketplacePreviewPanel />
+        <MarketplacePanel
+          installed={entries}
+          onInstall={installFromMarketplace}
+          onUpdateInstalled={refreshEntries}
+        />
+        <TrustRootsPanel />
 
         {message ? (
           <Alert variant={message.kind === "error" ? "destructive" : "default"}>
@@ -1158,32 +1239,6 @@ export function ClientExtensionCenter() {
         )}
       </div>
     </div>
-  );
-}
-
-function MarketplacePreviewPanel() {
-  return (
-    <ConsolePanel>
-      <ConsolePanelHeader
-        title="Extension marketplace"
-        description="Online discovery, registry search, updates, and dependency downloads are reserved for the registry phase."
-        action={
-          <Button type="button" variant="outline" disabled>
-            <PlugZap className="size-4" />
-            Coming soon
-          </Button>
-        }
-      />
-      <Alert>
-        <TriangleAlert className="size-4" />
-        <AlertTitle>Marketplace shell only</AlertTitle>
-        <AlertDescription>
-          This preview keeps the user-facing marketplace location stable without
-          contacting a remote registry or installing packages from the network.
-          Use local .mpx install for now.
-        </AlertDescription>
-      </Alert>
-    </ConsolePanel>
   );
 }
 
