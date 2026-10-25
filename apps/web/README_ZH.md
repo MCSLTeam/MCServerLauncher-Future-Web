@@ -40,7 +40,7 @@ QQ群2：[819067131](https://qm.qq.com/q/EXBE6a5CF4)
 
 ## 开源许可证
 
-本项目采用 [GNU General Public License Version 3.0](https://github.com/MCSLTeam/MCServerLauncher-Future/blob/master/LICENSE) 进行分发。
+本项目采用 [Apache License, Version 2.0](../../LICENSE) 进行分发。
 
 ## 版权
 

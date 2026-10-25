@@ -1,6 +1,7 @@
 {
   "name": "@repo/configs",
   "private": true,
+  "license": "Apache-2.0",
   "type": "module",
   "publishConfig": {
     "access": "public"

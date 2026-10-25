@@ -2,6 +2,7 @@
 name = "mcsl_resource_provider"
 version = "0.1.0"
 edition = "2024"
+license = "Apache-2.0"
 
 [dependencies]
 reqwest = { version = "0.13", default-features = false, features = ["rustls"] }

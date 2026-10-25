@@ -43,7 +43,7 @@ QQ Group 2: [819067131](https://qm.qq.com/q/EXBE6a5CF4)
 ## Open Source License
 
 This project is distributed under
-the [GNU General Public License Version 3.0](https://github.com/MCSLTeam/MCServerLauncher-Future/blob/master/LICENSE).
+the [Apache License, Version 2.0](../../LICENSE).
 
 ## Copyright
 

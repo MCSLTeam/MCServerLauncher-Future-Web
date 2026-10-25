@@ -9,7 +9,7 @@ Guide for agents working on the MCServerLauncher-Future-Web project.
 - **Repository**: MCServerLauncher-Future-Web
 - **Architecture**: Monorepo (Turborepo)
 - **Package Manager**: pnpm
-- **License**: GPLv3
+- **License**: Apache-2.0
 - **Team**: MCSLTeam
 - **Copyright**: © 2022-2026 MCSLTeam
 - **Codename**: CherryGrove

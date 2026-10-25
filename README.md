@@ -3,7 +3,7 @@ English | [中文](https://github.com/MCSLTeam/MCServerLauncher-Future-Web/blob/
 <br>
 This repository only includes sources of the <u>**Web Panel** and **Tauri Launcher**</u>. If you want to know more about <u>**Daemon** and the **WPF Launcher**</u>, just click [here](https://github.com/MCSLTeam/MCServerLauncher-Future).
 
-[![GPLv3](https://img.shields.io/badge/License-GPLv3-blue?color=#4ec820)](LICENSE)
+[![Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue?color=#4ec820)](LICENSE)
 ![Platform Windows | macOS | Linux](https://img.shields.io/badge/Platform-Windows%20|%20Linux%20|%20macOS-blue?color=#4ec820)
 
 ## Feature
@@ -85,7 +85,7 @@ QQ Group 2: [819067131](https://qm.qq.com/q/EXBE6a5CF4)
 ## Open Source License
 
 This project is distributed under
-the [GNU General Public License Version 3.0](https://github.com/MCSLTeam/MCServerLauncher-Future/blob/master/LICENSE).
+the [Apache License, Version 2.0](LICENSE).
 
 ## Copyright
 
