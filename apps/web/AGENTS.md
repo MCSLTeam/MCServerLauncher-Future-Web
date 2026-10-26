@@ -41,4 +41,7 @@ apps/web/
 - Browser-side WS client: `lib/daemon/client.ts` + `lib/daemon/types.ts`
 - Connection state: `features/nodes/daemon-provider.tsx` (`useDaemon`)
 - Nodes / Instances / Instance detail pages consume live reports — no mock instances
-- Protocol: `ws(s)://host:port/api/v1?token=...` action/event JSON (snake_case)
+- Protocol: sole `ws(s)://host:port/api/v2?token=...` endpoint; JSON-RPC 2.0 requests/responses, typed event notifications, and versioned binary frames. Do not restore V1 action/event envelopes or fallback parsing.
+- Protocol authority: the .NET daemon's frozen typed catalog (`rpc.discover` for runtime OpenRPC; HTTP `GET /apifox.json` for catalog-derived Apifox). Wire contracts and binary codec live in `MCServerLauncher.Common/Contracts/Protocol`; RPC/event descriptors live in `MCServerLauncher.Daemon.API/Protocol/BuiltInProtocolDefinitions.cs`.
+- V2 client method/DTO definitions must match the catalog, not historical protocol pages. Reconnect requires subscriptions and instance-catalog resynchronization; file/console sessions do not survive reconnect.
+- Binary header version `1`, `mcsl.extension.v1`, and the separate plugin Registry API version are not daemon V1 compatibility paths.
